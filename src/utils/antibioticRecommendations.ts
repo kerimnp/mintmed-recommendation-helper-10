@@ -34,6 +34,17 @@ interface AntibioticRecommendation {
   precautions: string[];
 }
 
+const calculateBMI = (weight: string, height: string): number => {
+  const weightKg = parseFloat(weight);
+  const heightM = parseFloat(height) / 100;
+  return weightKg / (heightM * heightM);
+};
+
+const isPregnancyContraindicated = (drug: string): boolean => {
+  const contraindicatedDrugs = ['tetracycline', 'doxycycline', 'ciprofloxacin', 'levofloxacin', 'gentamicin'];
+  return contraindicatedDrugs.some(d => drug.toLowerCase().includes(d.toLowerCase()));
+};
+
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
@@ -47,51 +58,69 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     precautions: []
   };
 
-  // Add precautions based on comorbidities
+  // Calculate BMI for dosing adjustments
+  const bmi = calculateBMI(data.weight, data.height);
+  const isObese = bmi > 30;
+
+  // Add baseline precautions based on comorbidities
   if (data.kidneyDisease) {
-    recommendation.precautions.push("Dose adjustment required due to kidney disease");
+    recommendation.precautions.push("Renal dose adjustment required - monitor kidney function");
   }
   if (data.liverDisease) {
-    recommendation.precautions.push("Monitor liver function closely");
+    recommendation.precautions.push("Avoid hepatotoxic antibiotics - monitor liver function");
   }
   if (data.diabetes) {
     recommendation.precautions.push("Consider broader coverage for diabetic infections");
   }
   if (data.immunosuppressed) {
-    recommendation.precautions.push("Consider broader spectrum antibiotics due to immunosuppression");
+    recommendation.precautions.push("Broader spectrum coverage required due to immunosuppression");
+  }
+  if (isObese) {
+    recommendation.precautions.push("Dose adjustment required for obesity");
   }
 
-  // Handle different infection sites
+  // Handle different infection sites with enhanced logic
   switch (data.infectionSite) {
     case "respiratory":
       if (data.severity === "mild") {
-        recommendation.primaryRecommendation = {
-          name: "Amoxicillin",
-          dose: "500mg",
-          route: "oral",
-          duration: "7 days"
-        };
-        recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
-        recommendation.alternatives.push({
-          name: "Azithromycin",
-          dose: "500mg day 1, then 250mg",
-          route: "oral",
-          duration: "5 days",
-          reason: "Alternative for penicillin allergy"
-        });
+        if (!data.allergies.toLowerCase().includes("penicillin")) {
+          recommendation.primaryRecommendation = {
+            name: "Amoxicillin",
+            dose: isObese ? "1000mg" : "500mg",
+            route: "oral",
+            duration: "7 days"
+          };
+          recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+          
+          recommendation.alternatives.push({
+            name: "Azithromycin",
+            dose: "500mg day 1, then 250mg",
+            route: "oral",
+            duration: "5 days",
+            reason: "Alternative for penicillin allergy or atypical coverage"
+          });
+        } else {
+          recommendation.primaryRecommendation = {
+            name: "Azithromycin",
+            dose: "500mg day 1, then 250mg",
+            route: "oral",
+            duration: "5 days"
+          };
+          recommendation.reasoning = "Selected due to penicillin allergy";
+        }
       } else {
         recommendation.primaryRecommendation = {
-          name: "Amoxicillin-Clavulanate",
-          dose: "875/125mg",
-          route: "oral",
-          duration: "7-10 days"
+          name: "Ceftriaxone + Azithromycin",
+          dose: "2g + 500mg",
+          route: "IV",
+          duration: "7-14 days"
         };
-        recommendation.reasoning = "Broader coverage for moderate-severe respiratory infections";
+        recommendation.reasoning = "Broad coverage for severe respiratory infection";
       }
       break;
 
     case "urinary":
-      if (data.severity === "mild") {
+      if (data.severity === "mild" && !data.kidneyDisease) {
         recommendation.primaryRecommendation = {
           name: "Nitrofurantoin",
           dose: "100mg",
@@ -99,6 +128,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
           duration: "5 days"
         };
         recommendation.reasoning = "First-line treatment for uncomplicated UTI";
+        
         if (data.kidneyDisease) {
           recommendation.primaryRecommendation = {
             name: "Cephalexin",
@@ -111,7 +141,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       } else {
         recommendation.primaryRecommendation = {
           name: "Ceftriaxone",
-          dose: "1g",
+          dose: isObese ? "2g" : "1g",
           route: "IV",
           duration: "7-14 days"
         };
@@ -131,7 +161,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       } else {
         recommendation.primaryRecommendation = {
           name: "Cephalexin",
-          dose: "500mg",
+          dose: isObese ? "1000mg" : "500mg",
           route: "oral",
           duration: "7 days"
         };
@@ -139,9 +169,19 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       }
       break;
 
+    case "bloodstream":
+      recommendation.primaryRecommendation = {
+        name: "Piperacillin-Tazobactam + Vancomycin",
+        dose: "4.5g + 15-20mg/kg",
+        route: "IV",
+        duration: "10-14 days"
+      };
+      recommendation.reasoning = "Broad-spectrum coverage for sepsis";
+      break;
+
     default:
       recommendation.primaryRecommendation = {
-        name: "Consultation Required",
+        name: "Specialist Consultation Required",
         dose: "N/A",
         route: "N/A",
         duration: "N/A"
@@ -154,8 +194,8 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     recommendation.precautions.push(
       "Pregnancy/breastfeeding status requires careful antibiotic selection"
     );
-    // Modify recommendations if current choice isn't pregnancy-safe
-    if (recommendation.primaryRecommendation.name === "Doxycycline") {
+    if (isPregnancyContraindicated(recommendation.primaryRecommendation.name)) {
+      const backupRecommendation = { ...recommendation.primaryRecommendation };
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
         dose: "500mg",
@@ -163,6 +203,24 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         duration: "7 days"
       };
       recommendation.reasoning += " (Modified for pregnancy safety)";
+      recommendation.alternatives.push({
+        ...backupRecommendation,
+        reason: "Alternative if benefit outweighs risk - requires specialist consultation"
+      });
+    }
+  }
+
+  // Recent antibiotic use considerations
+  if (data.recentAntibiotics) {
+    recommendation.precautions.push("Recent antibiotic use may increase resistance risk");
+    if (!recommendation.alternatives.length) {
+      recommendation.alternatives.push({
+        name: "Specialist Consultation",
+        dose: "N/A",
+        route: "N/A",
+        duration: "N/A",
+        reason: "Recent antibiotic use requires personalized approach"
+      });
     }
   }
 
