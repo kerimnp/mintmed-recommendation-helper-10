@@ -1,15 +1,27 @@
 export const calculateBMI = (weight: string, height: string): number => {
-  const weightKg = parseFloat(weight);
-  const heightM = parseFloat(height) / 100;
-  return weightKg / (heightM * heightM);
+  const weightNum = parseFloat(weight);
+  const heightNum = parseFloat(height);
+  
+  if (isNaN(weightNum) || isNaN(heightNum) || heightNum === 0) {
+    return 0;
+  }
+  
+  return weightNum / Math.pow(heightNum / 100, 2);
 };
 
-export const calculateAdjustedBodyWeight = (actualWeight: number, height: number): number => {
-  const idealBodyWeight = 22.5 * Math.pow(height / 100, 2); // BMI of 22.5 as ideal
-  return idealBodyWeight + 0.4 * (actualWeight - idealBodyWeight);
-};
+export const calculateAdjustedBodyWeight = (actualWeight: string, height: string, gender: string): number => {
+  const actualWeightNum = parseFloat(actualWeight);
+  const heightNum = parseFloat(height);
+  
+  if (isNaN(actualWeightNum) || isNaN(heightNum)) {
+    return 0;
+  }
 
-export const calculateCrCl = (age: number, weight: number, serumCreatinine: number, isFemale: boolean): number => {
-  const crCl = ((140 - age) * weight) / (72 * serumCreatinine);
-  return isFemale ? crCl * 0.85 : crCl;
+  // Calculate IBW using Devine formula
+  const heightInInches = heightNum / 2.54;
+  const baseWeight = gender.toLowerCase() === 'male' ? 50 : 45.5;
+  const ibw = baseWeight + (2.3 * (heightInInches - 60));
+  
+  // Calculate ABW
+  return ibw + (0.4 * (actualWeightNum - ibw));
 };
