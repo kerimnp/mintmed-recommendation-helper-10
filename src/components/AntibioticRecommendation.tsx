@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Pill, Info, Stethoscope } from "lucide-react";
 
 interface RecommendationProps {
   recommendation: {
@@ -27,7 +27,10 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
   return (
     <div className="space-y-6 animate-fade-in">
       <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
-        <h3 className="text-2xl font-semibold text-gray-900 mb-4">Primary Recommendation</h3>
+        <div className="flex items-center gap-2 mb-4">
+          <Pill className="h-6 w-6 text-mint-600" />
+          <h3 className="text-2xl font-semibold text-gray-900">Primary Recommendation</h3>
+        </div>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -47,8 +50,11 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               <p className="text-lg font-medium">{recommendation.primaryRecommendation.duration}</p>
             </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Reasoning</p>
+          <div className="bg-mint-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Info className="h-5 w-5 text-mint-600" />
+              <p className="text-sm font-medium text-mint-700">Clinical Reasoning</p>
+            </div>
             <p className="text-gray-700">{recommendation.reasoning}</p>
           </div>
         </div>
@@ -56,7 +62,10 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
 
       {recommendation.alternatives.length > 0 && (
         <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-4">Alternative Options</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <Stethoscope className="h-6 w-6 text-mint-600" />
+            <h3 className="text-2xl font-semibold text-gray-900">Alternative Options</h3>
+          </div>
           <div className="space-y-4">
             {recommendation.alternatives.map((alt, index) => (
               <div key={index} className="border-l-4 border-mint-300 pl-4">
@@ -87,13 +96,17 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
 
       {recommendation.precautions.length > 0 && (
         <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="h-6 w-6 text-orange-500" />
-            Precautions
-          </h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Precautions</h3>
+          </div>
           <div className="space-y-2">
             {recommendation.precautions.map((precaution, index) => (
-              <Badge key={index} variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+              <Badge 
+                key={index} 
+                variant="outline" 
+                className="bg-orange-50 text-orange-700 border-orange-200 block w-full text-left px-4 py-2"
+              >
                 {precaution}
               </Badge>
             ))}

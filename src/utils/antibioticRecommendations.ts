@@ -1,3 +1,7 @@
+import { calculateBMI, calculateAdjustedBodyWeight } from './patientCalculations';
+import { isContraindicatedInPregnancy, isContraindicatedInCKD, requiresDoseAdjustmentInCKD } from './antibioticSafety';
+import { getCommonPathogens, getSeverityScore } from './infectionLogic';
+
 interface PatientData {
   age: string;
   gender: string;
@@ -34,18 +38,11 @@ interface AntibioticRecommendation {
   precautions: string[];
 }
 
-const calculateBMI = (weight: string, height: string): number => {
-  const weightKg = parseFloat(weight);
-  const heightM = parseFloat(height) / 100;
-  return weightKg / (heightM * heightM);
-};
-
-const isPregnancyContraindicated = (drug: string): boolean => {
-  const contraindicatedDrugs = ['tetracycline', 'doxycycline', 'ciprofloxacin', 'levofloxacin', 'gentamicin'];
-  return contraindicatedDrugs.some(d => drug.toLowerCase().includes(d.toLowerCase()));
-};
-
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
+  const bmi = calculateBMI(data.weight, data.height);
+  const isObese = bmi > 30;
+  const pathogens = getCommonPathogens(data.infectionSite, false);
+  
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
@@ -58,16 +55,12 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     precautions: []
   };
 
-  // Calculate BMI for dosing adjustments
-  const bmi = calculateBMI(data.weight, data.height);
-  const isObese = bmi > 30;
-
-  // Add baseline precautions based on comorbidities
+  // Add baseline precautions
   if (data.kidneyDisease) {
     recommendation.precautions.push("Renal dose adjustment required - monitor kidney function");
   }
   if (data.liverDisease) {
-    recommendation.precautions.push("Avoid hepatotoxic antibiotics - monitor liver function");
+    recommendation.precautions.push("Monitor liver function - avoid hepatotoxic antibiotics");
   }
   if (data.diabetes) {
     recommendation.precautions.push("Consider broader coverage for diabetic infections");
@@ -79,7 +72,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     recommendation.precautions.push("Dose adjustment required for obesity");
   }
 
-  // Handle different infection sites with enhanced logic
+  // Generate recommendation based on infection site
   switch (data.infectionSite) {
     case "respiratory":
       if (data.severity === "mild") {
@@ -90,7 +83,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
             route: "oral",
             duration: "7 days"
           };
-          recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+          recommendation.reasoning = `First-line treatment for mild community-acquired respiratory infections. Common pathogens: ${pathogens.map(p => p.pathogen).join(", ")}`;
           
           recommendation.alternatives.push({
             name: "Azithromycin",
@@ -194,7 +187,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     recommendation.precautions.push(
       "Pregnancy/breastfeeding status requires careful antibiotic selection"
     );
-    if (isPregnancyContraindicated(recommendation.primaryRecommendation.name)) {
+    if (isContraindicatedInPregnancy(recommendation.primaryRecommendation.name)) {
       const backupRecommendation = { ...recommendation.primaryRecommendation };
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
@@ -206,20 +199,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       recommendation.alternatives.push({
         ...backupRecommendation,
         reason: "Alternative if benefit outweighs risk - requires specialist consultation"
-      });
-    }
-  }
-
-  // Recent antibiotic use considerations
-  if (data.recentAntibiotics) {
-    recommendation.precautions.push("Recent antibiotic use may increase resistance risk");
-    if (!recommendation.alternatives.length) {
-      recommendation.alternatives.push({
-        name: "Specialist Consultation",
-        dose: "N/A",
-        route: "N/A",
-        duration: "N/A",
-        reason: "Recent antibiotic use requires personalized approach"
       });
     }
   }
