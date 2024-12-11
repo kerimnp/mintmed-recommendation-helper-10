@@ -9,6 +9,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Textarea } from "./ui/textarea";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
+import { AllergySection } from "./AllergySection";
 
 export const PatientForm = () => {
   const { toast } = useToast();
@@ -23,7 +24,13 @@ export const PatientForm = () => {
     duration: "",
     severity: "",
     recentAntibiotics: false,
-    allergies: "",
+    allergies: {
+      penicillin: false,
+      cephalosporin: false,
+      sulfa: false,
+      macrolide: false,
+      fluoroquinolone: false
+    },
     kidneyDisease: false,
     liverDisease: false,
     diabetes: false,
@@ -34,6 +41,16 @@ export const PatientForm = () => {
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAllergyChange = (allergy: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      allergies: {
+        ...prev.allergies,
+        [allergy]: checked
+      }
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,8 +72,6 @@ export const PatientForm = () => {
       title: "Recommendation Generated",
       description: "Antibiotic recommendation has been generated based on patient data",
     });
-    
-    console.log("Form data:", formData);
   };
 
   return (
@@ -136,6 +151,14 @@ export const PatientForm = () => {
               </Select>
             </div>
           </div>
+        </Card>
+
+        {/* Allergies Section */}
+        <Card className="glass-card p-6">
+          <AllergySection
+            allergies={formData.allergies}
+            onAllergyChange={handleAllergyChange}
+          />
         </Card>
 
         {/* Comorbidities */}
