@@ -9,7 +9,13 @@ export interface PatientData {
   duration: string;
   severity: string;
   recentAntibiotics: boolean;
-  allergies: string;
+  allergies: {
+    penicillin: boolean;
+    cephalosporin: boolean;
+    sulfa: boolean;
+    macrolide: boolean;
+    fluoroquinolone: boolean;
+  };
   kidneyDisease: boolean;
   liverDisease: boolean;
   diabetes: boolean;
