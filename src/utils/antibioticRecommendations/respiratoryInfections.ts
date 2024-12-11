@@ -1,8 +1,5 @@
 import { PatientData, AntibioticRecommendation } from "./types";
-import { isContraindicatedInPregnancy, getPregnancySafeAlternatives } from "../antibioticSafety/pregnancySafety";
-import { isContraindicatedInCKD, getDoseAdjustment } from "../antibioticSafety/renalSafety";
-import { isHepatotoxic } from "../antibioticSafety/liverSafety";
-import { calculateBMI } from "../patientDemographics";
+import { calculateBMI } from "../patientCalculations";
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
   const bmi = calculateBMI(parseFloat(data.weight), parseFloat(data.height));
@@ -21,7 +18,7 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   };
 
   if (data.severity === "mild") {
-    if (!data.allergies.toLowerCase().includes("penicillin")) {
+    if (!data.allergies.penicillin) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
         dose: isObese ? "1000mg" : "500mg",
