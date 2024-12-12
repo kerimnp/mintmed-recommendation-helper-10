@@ -3,24 +3,136 @@ import { isContraindicatedInPregnancy, isContraindicatedInCKD, requiresDoseAdjus
 import { getCommonPathogens, getSeverityScore } from './infectionLogic';
 import { PatientData, AntibioticRecommendation } from './antibioticRecommendations/types';
 
+const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: string, severity: string): {
+  name: string;
+  dose: string;
+  route: string;
+  duration: string;
+  reasoning: string;
+} => {
+  // Respiratory infections
+  if (infectionSite === 'respiratory') {
+    if (severity === 'mild') {
+      if (!allergies.penicillin) {
+        return {
+          name: "Amoxicillin",
+          dose: "500mg",
+          route: "oral",
+          duration: "7 days",
+          reasoning: "First-line treatment for mild respiratory infections"
+        };
+      } else if (!allergies.macrolide) {
+        return {
+          name: "Azithromycin",
+          dose: "500mg day 1, then 250mg",
+          route: "oral",
+          duration: "5 days",
+          reasoning: "Selected due to penicillin allergy"
+        };
+      } else if (!allergies.fluoroquinolone) {
+        return {
+          name: "Levofloxacin",
+          dose: "750mg",
+          route: "oral",
+          duration: "5 days",
+          reasoning: "Selected due to penicillin and macrolide allergies"
+        };
+      }
+    } else {
+      // Severe respiratory infection
+      if (!allergies.cephalosporin && !allergies.penicillin) {
+        return {
+          name: "Ceftriaxone + Azithromycin",
+          dose: "2g + 500mg",
+          route: "IV",
+          duration: "7-14 days",
+          reasoning: "Broad coverage for severe respiratory infection"
+        };
+      } else if (!allergies.fluoroquinolone) {
+        return {
+          name: "Levofloxacin",
+          dose: "750mg",
+          route: "IV",
+          duration: "7-14 days",
+          reasoning: "Selected due to beta-lactam allergies"
+        };
+      }
+    }
+  }
+
+  // Urinary tract infections
+  if (infectionSite === 'urinary') {
+    if (severity === 'mild') {
+      if (!allergies.sulfa) {
+        return {
+          name: "Trimethoprim-Sulfamethoxazole",
+          dose: "160/800mg",
+          route: "oral",
+          duration: "3-5 days",
+          reasoning: "First-line treatment for uncomplicated UTI"
+        };
+      } else if (!allergies.fluoroquinolone) {
+        return {
+          name: "Ciprofloxacin",
+          dose: "250mg",
+          route: "oral",
+          duration: "3 days",
+          reasoning: "Selected due to sulfa allergy"
+        };
+      }
+    } else {
+      if (!allergies.cephalosporin) {
+        return {
+          name: "Ceftriaxone",
+          dose: "1g",
+          route: "IV",
+          duration: "7-14 days",
+          reasoning: "Selected for complicated UTI"
+        };
+      } else if (!allergies.fluoroquinolone) {
+        return {
+          name: "Levofloxacin",
+          dose: "750mg",
+          route: "IV",
+          duration: "7-14 days",
+          reasoning: "Selected due to cephalosporin allergy"
+        };
+      }
+    }
+  }
+
+  // Default fallback when no safe options are available
+  return {
+    name: "Specialist Consultation Required",
+    dose: "N/A",
+    route: "N/A",
+    duration: "N/A",
+    reasoning: "Multiple drug allergies present - requires specialist evaluation for safe antibiotic selection"
+  };
+};
+
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const bmi = calculateBMI(data.weight, data.height);
+  const bmi = calculateBMI(parseFloat(data.weight), parseFloat(data.height));
   const isObese = bmi > 30;
   const pathogens = getCommonPathogens(data.infectionSite, false);
   
+  const safeAntibiotic = getSafeAntibiotic(data.allergies, data.infectionSite, data.severity);
+  
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
-      name: "",
-      dose: "",
-      route: "",
-      duration: ""
+      name: safeAntibiotic.name,
+      dose: isObese && safeAntibiotic.route === "IV" ? 
+        safeAntibiotic.dose.replace(/\d+g/, (match) => `${parseInt(match) * 1.5}g`) : 
+        safeAntibiotic.dose,
+      route: safeAntibiotic.route,
+      duration: safeAntibiotic.duration
     },
-    reasoning: "",
+    reasoning: safeAntibiotic.reasoning,
     alternatives: [],
     precautions: []
   };
 
-  // Add baseline precautions
+  // Add relevant precautions based on patient factors
   if (data.kidneyDisease) {
     recommendation.precautions.push("Renal dose adjustment required - monitor kidney function");
   }
@@ -37,155 +149,12 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     recommendation.precautions.push("Dose adjustment required for obesity");
   }
 
-  // Check allergies and add relevant precautions
-  if (data.allergies.penicillin) {
-    recommendation.precautions.push("Penicillin allergy - avoid beta-lactams");
-  }
-  if (data.allergies.cephalosporin) {
-    recommendation.precautions.push("Cephalosporin allergy - avoid cephalosporins");
-  }
-  if (data.allergies.sulfa) {
-    recommendation.precautions.push("Sulfa allergy - avoid sulfonamides");
-  }
-  if (data.allergies.macrolide) {
-    recommendation.precautions.push("Macrolide allergy - avoid macrolide antibiotics");
-  }
-  if (data.allergies.fluoroquinolone) {
-    recommendation.precautions.push("Fluoroquinolone allergy - avoid fluoroquinolones");
-  }
-
-  // Generate recommendation based on infection site
-  switch (data.infectionSite) {
-    case "respiratory":
-      if (data.severity === "mild") {
-        if (!data.allergies.penicillin) {
-          recommendation.primaryRecommendation = {
-            name: "Amoxicillin",
-            dose: isObese ? "1000mg" : "500mg",
-            route: "oral",
-            duration: "7 days"
-          };
-          recommendation.reasoning = `First-line treatment for mild community-acquired respiratory infections. Common pathogens: ${pathogens.map(p => p.pathogen).join(", ")}`;
-          
-          if (!data.allergies.macrolide) {
-            recommendation.alternatives.push({
-              name: "Azithromycin",
-              dose: "500mg day 1, then 250mg",
-              route: "oral",
-              duration: "5 days",
-              reason: "Alternative for penicillin allergy or atypical coverage"
-            });
-          }
-        } else if (!data.allergies.macrolide) {
-          recommendation.primaryRecommendation = {
-            name: "Azithromycin",
-            dose: "500mg day 1, then 250mg",
-            route: "oral",
-            duration: "5 days"
-          };
-          recommendation.reasoning = "Selected due to penicillin allergy";
-        }
-      } else {
-        recommendation.primaryRecommendation = {
-          name: "Ceftriaxone + Azithromycin",
-          dose: "2g + 500mg",
-          route: "IV",
-          duration: "7-14 days"
-        };
-        recommendation.reasoning = "Broad coverage for severe respiratory infection";
-      }
-      break;
-
-    case "urinary":
-      if (data.severity === "mild" && !data.kidneyDisease) {
-        recommendation.primaryRecommendation = {
-          name: "Nitrofurantoin",
-          dose: "100mg",
-          route: "oral",
-          duration: "5 days"
-        };
-        recommendation.reasoning = "First-line treatment for uncomplicated UTI";
-        
-        if (data.kidneyDisease) {
-          recommendation.primaryRecommendation = {
-            name: "Cephalexin",
-            dose: "500mg",
-            route: "oral",
-            duration: "7 days"
-          };
-          recommendation.reasoning = "Modified due to kidney disease";
-        }
-      } else {
-        recommendation.primaryRecommendation = {
-          name: "Ceftriaxone",
-          dose: isObese ? "2g" : "1g",
-          route: "IV",
-          duration: "7-14 days"
-        };
-        recommendation.reasoning = "Severe UTI requiring parenteral therapy";
-      }
-      break;
-
-    case "skin":
-      if (data.diabetes) {
-        recommendation.primaryRecommendation = {
-          name: "Piperacillin-Tazobactam",
-          dose: "4.5g",
-          route: "IV",
-          duration: "7-14 days"
-        };
-        recommendation.reasoning = "Broad coverage for diabetic skin infection";
-      } else {
-        recommendation.primaryRecommendation = {
-          name: "Cephalexin",
-          dose: isObese ? "1000mg" : "500mg",
-          route: "oral",
-          duration: "7 days"
-        };
-        recommendation.reasoning = "First-line for uncomplicated skin infections";
-      }
-      break;
-
-    case "bloodstream":
-      recommendation.primaryRecommendation = {
-        name: "Piperacillin-Tazobactam + Vancomycin",
-        dose: "4.5g + 15-20mg/kg",
-        route: "IV",
-        duration: "10-14 days"
-      };
-      recommendation.reasoning = "Broad-spectrum coverage for sepsis";
-      break;
-
-    default:
-      recommendation.primaryRecommendation = {
-        name: "Specialist Consultation Required",
-        dose: "N/A",
-        route: "N/A",
-        duration: "N/A"
-      };
-      recommendation.reasoning = "Complex infection requiring specialist consultation";
-  }
-
-  // Pregnancy modifications
-  if (data.pregnancy === "pregnant" || data.pregnancy === "breastfeeding") {
-    recommendation.precautions.push(
-      "Pregnancy/breastfeeding status requires careful antibiotic selection"
-    );
-    if (isContraindicatedInPregnancy(recommendation.primaryRecommendation.name)) {
-      const backupRecommendation = { ...recommendation.primaryRecommendation };
-      recommendation.primaryRecommendation = {
-        name: "Amoxicillin",
-        dose: "500mg",
-        route: "oral",
-        duration: "7 days"
-      };
-      recommendation.reasoning += " (Modified for pregnancy safety)";
-      recommendation.alternatives.push({
-        ...backupRecommendation,
-        reason: "Alternative if benefit outweighs risk - requires specialist consultation"
-      });
+  // Add allergy warnings
+  Object.entries(data.allergies).forEach(([allergy, isAllergic]) => {
+    if (isAllergic) {
+      recommendation.precautions.push(`${allergy.charAt(0).toUpperCase() + allergy.slice(1)} allergy noted - avoid this class of antibiotics`);
     }
-  }
+  });
 
   return recommendation;
 };
