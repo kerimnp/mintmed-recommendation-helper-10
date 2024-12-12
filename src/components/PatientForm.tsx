@@ -31,6 +31,7 @@ export const PatientForm = () => {
       macrolide: false,
       fluoroquinolone: false
     },
+    otherAllergies: "", // New field for text-based allergies
     kidneyDisease: false,
     liverDisease: false,
     diabetes: false,
@@ -290,13 +291,13 @@ export const PatientForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="allergies" className="form-label">Known Allergies</Label>
+              <Label htmlFor="otherAllergies" className="form-label">Other Known Allergies</Label>
               <Textarea 
-                id="allergies" 
-                placeholder="List any known allergies"
+                id="otherAllergies" 
+                placeholder="List any other known allergies"
                 className="input-field"
-                value={formData.allergies}
-                onChange={(e) => handleInputChange("allergies", e.target.value)}
+                value={formData.otherAllergies}
+                onChange={(e) => handleInputChange("otherAllergies", e.target.value)}
               />
             </div>
           </div>
