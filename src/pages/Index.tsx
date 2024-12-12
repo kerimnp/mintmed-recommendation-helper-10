@@ -2,11 +2,13 @@ import { PatientForm } from "@/components/PatientForm";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-mint-50 via-white to-mint-100 relative overflow-hidden">
-      {/* Background decorative elements */}
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-mint-50 via-white to-mint-100">
+      {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-mint-200/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-mint-300/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-mint-200/20 via-transparent to-mint-300/20" />
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-mint-200/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-mint-300/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
       </div>
       
       <div className="container px-4 py-12 relative">
