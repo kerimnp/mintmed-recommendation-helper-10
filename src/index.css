@@ -76,12 +76,15 @@
 }
 
 .glass-card {
-  @apply bg-white/30 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl hover:shadow-mint-200/20 transition-all duration-300;
+  @apply bg-white/30 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl 
+    hover:shadow-mint-200/20 transition-all duration-300
+    hover:bg-white/40 hover:border-mint-200/50;
 }
 
 .input-field {
   @apply w-full px-4 py-2.5 bg-white/50 backdrop-blur-sm rounded-xl border border-mint-100 
     focus:border-mint-300 focus:ring-2 focus:ring-mint-200/50 transition-all duration-200
+    hover:border-mint-200 hover:shadow-lg hover:shadow-mint-100/20
     placeholder:text-gray-400;
 }
 
@@ -135,4 +138,43 @@
 .submit-button:hover::after {
   @apply absolute inset-0 bg-white/20 transform scale-x-100 transition-transform duration-200;
   content: '';
+}
+
+/* Futuristic glow effects */
+.glow-effect {
+  @apply relative;
+}
+
+.glow-effect::before {
+  @apply absolute inset-0 bg-gradient-to-r from-mint-300/0 via-mint-300/30 to-mint-300/0
+    opacity-0 transition-opacity duration-300 rounded-xl pointer-events-none;
+  content: '';
+}
+
+.glow-effect:hover::before {
+  @apply opacity-100;
+}
+
+/* Animated background gradient */
+.animated-gradient {
+  background: linear-gradient(
+    45deg,
+    theme('colors.mint.50'),
+    theme('colors.mint.100'),
+    theme('colors.mint.50')
+  );
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
