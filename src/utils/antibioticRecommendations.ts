@@ -1,19 +1,52 @@
-import { calculateBMI, calculateAdjustedBodyWeight } from './patientCalculations';
-import { isContraindicatedInPregnancy, isContraindicatedInCKD, requiresDoseAdjustmentInCKD } from './antibioticSafety';
-import { getCommonPathogens, getSeverityScore } from './infectionLogic';
-import { PatientData, AntibioticRecommendation } from './antibioticRecommendations/types';
+import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
+import { calculateBMI } from "./patientCalculations";
 
-const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: string, severity: string): {
+const isSafeAntibiotic = (drug: string, allergies: PatientData['allergies']): boolean => {
+  // Check each allergy against the drug name
+  if (allergies.penicillin && 
+      (drug.toLowerCase().includes('penicillin') || 
+       drug.toLowerCase().includes('amoxicillin') || 
+       drug.toLowerCase().includes('ampicillin'))) {
+    return false;
+  }
+  if (allergies.cephalosporin && 
+      (drug.toLowerCase().includes('cef') || 
+       drug.toLowerCase().includes('ceftriaxone') || 
+       drug.toLowerCase().includes('cefepime'))) {
+    return false;
+  }
+  if (allergies.sulfa && drug.toLowerCase().includes('sulfa')) {
+    return false;
+  }
+  if (allergies.macrolide && 
+      (drug.toLowerCase().includes('mycin') || 
+       drug.toLowerCase().includes('macrolide'))) {
+    return false;
+  }
+  if (allergies.fluoroquinolone && 
+      (drug.toLowerCase().includes('floxacin') || 
+       drug.toLowerCase().includes('fluoroquinolone'))) {
+    return false;
+  }
+  return true;
+};
+
+const getSafeAntibiotic = (
+  allergies: PatientData['allergies'], 
+  infectionSite: string, 
+  severity: string
+): {
   name: string;
   dose: string;
   route: string;
   duration: string;
   reasoning: string;
 } => {
-  // Respiratory infections
+  // For respiratory infections
   if (infectionSite === 'respiratory') {
     if (severity === 'mild') {
-      if (!allergies.penicillin) {
+      // Check single therapies first
+      if (isSafeAntibiotic('Amoxicillin', allergies)) {
         return {
           name: "Amoxicillin",
           dose: "500mg",
@@ -21,7 +54,7 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
           duration: "7 days",
           reasoning: "First-line treatment for mild respiratory infections"
         };
-      } else if (!allergies.macrolide) {
+      } else if (isSafeAntibiotic('Azithromycin', allergies)) {
         return {
           name: "Azithromycin",
           dose: "500mg day 1, then 250mg",
@@ -29,18 +62,18 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
           duration: "5 days",
           reasoning: "Selected due to penicillin allergy"
         };
-      } else if (!allergies.fluoroquinolone) {
+      } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
         return {
           name: "Levofloxacin",
           dose: "750mg",
           route: "oral",
           duration: "5 days",
-          reasoning: "Selected due to penicillin and macrolide allergies"
+          reasoning: "Selected due to multiple allergies"
         };
       }
     } else {
-      // Severe respiratory infection
-      if (!allergies.cephalosporin && !allergies.penicillin) {
+      // For severe cases, check combination therapy safety
+      if (isSafeAntibiotic('Ceftriaxone', allergies) && isSafeAntibiotic('Azithromycin', allergies)) {
         return {
           name: "Ceftriaxone + Azithromycin",
           dose: "2g + 500mg",
@@ -48,22 +81,22 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
           duration: "7-14 days",
           reasoning: "Broad coverage for severe respiratory infection"
         };
-      } else if (!allergies.fluoroquinolone) {
+      } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
         return {
           name: "Levofloxacin",
           dose: "750mg",
           route: "IV",
           duration: "7-14 days",
-          reasoning: "Selected due to beta-lactam allergies"
+          reasoning: "Selected due to beta-lactam/macrolide allergies"
         };
       }
     }
   }
 
-  // Urinary tract infections
+  // For urinary tract infections
   if (infectionSite === 'urinary') {
     if (severity === 'mild') {
-      if (!allergies.sulfa) {
+      if (isSafeAntibiotic('Trimethoprim-Sulfamethoxazole', allergies)) {
         return {
           name: "Trimethoprim-Sulfamethoxazole",
           dose: "160/800mg",
@@ -71,17 +104,25 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
           duration: "3-5 days",
           reasoning: "First-line treatment for uncomplicated UTI"
         };
-      } else if (!allergies.fluoroquinolone) {
+      } else if (isSafeAntibiotic('Nitrofurantoin', allergies)) {
+        return {
+          name: "Nitrofurantoin",
+          dose: "100mg",
+          route: "oral",
+          duration: "5 days",
+          reasoning: "Alternative first-line agent for uncomplicated UTI"
+        };
+      } else if (isSafeAntibiotic('Ciprofloxacin', allergies)) {
         return {
           name: "Ciprofloxacin",
           dose: "250mg",
           route: "oral",
           duration: "3 days",
-          reasoning: "Selected due to sulfa allergy"
+          reasoning: "Selected due to other drug allergies"
         };
       }
     } else {
-      if (!allergies.cephalosporin) {
+      if (isSafeAntibiotic('Ceftriaxone', allergies)) {
         return {
           name: "Ceftriaxone",
           dose: "1g",
@@ -89,7 +130,7 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
           duration: "7-14 days",
           reasoning: "Selected for complicated UTI"
         };
-      } else if (!allergies.fluoroquinolone) {
+      } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
         return {
           name: "Levofloxacin",
           dose: "750mg",
@@ -114,7 +155,6 @@ const getSafeAntibiotic = (allergies: PatientData['allergies'], infectionSite: s
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
   const bmi = calculateBMI(parseFloat(data.weight), parseFloat(data.height));
   const isObese = bmi > 30;
-  const pathogens = getCommonPathogens(data.infectionSite, false);
   
   const safeAntibiotic = getSafeAntibiotic(data.allergies, data.infectionSite, data.severity);
   
