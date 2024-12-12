@@ -153,7 +153,8 @@ const getSafeAntibiotic = (
 };
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const bmi = calculateBMI(parseFloat(data.weight), parseFloat(data.height));
+  // Pass the original string values to calculateBMI instead of parsing them
+  const bmi = calculateBMI(data.weight, data.height);
   const isObese = bmi > 30;
   
   const safeAntibiotic = getSafeAntibiotic(data.allergies, data.infectionSite, data.severity);
