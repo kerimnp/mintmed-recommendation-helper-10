@@ -2,6 +2,7 @@ import { PatientData, AntibioticRecommendation } from "./types";
 import { calculateBMI } from "../patientCalculations";
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
+  // Pass the original string values to calculateBMI
   const bmi = calculateBMI(data.weight, data.height);
   const isObese = bmi > 30;
   
