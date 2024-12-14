@@ -1,5 +1,6 @@
 import { PatientData, AntibioticRecommendation } from './types';
 import { calculateAdjustedDose, getDurationAdjustment, isSafeAntibiotic } from './antibioticSafety';
+import { calculatePediatricDose, isPediatricPatient } from './pediatricAdjustments';
 
 export const generateUrinaryRecommendation = (data: PatientData): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
@@ -14,17 +15,28 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
     precautions: []
   };
 
+  const isPediatric = isPediatricPatient(Number(data.age));
+
   if (data.severity === "mild" && !data.kidneyDisease) {
     if (!data.allergies.sulfa) {
-      const adjustedDose = calculateAdjustedDose(
-        "160/800mg",
-        data.weight,
-        data.age,
-        data.kidneyDisease,
-        data.liverDisease
-      );
+      const baseDose = "160/800mg";
+      const adjustedDose = isPediatric
+        ? calculatePediatricDose({
+            weight: Number(data.weight),
+            age: Number(data.age),
+            baseDose,
+            drug: "trimethoprim-sulfamethoxazole"
+          })
+        : calculateAdjustedDose(
+            baseDose,
+            data.weight,
+            data.age,
+            data.kidneyDisease,
+            data.liverDisease
+          );
+
       const adjustedDuration = getDurationAdjustment(
-        "3-5 days",
+        isPediatric ? "3-5 days" : "3-5 days",
         data.severity,
         data.immunosuppressed
       );
@@ -35,7 +47,9 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
         route: "oral",
         duration: adjustedDuration
       };
-      recommendation.reasoning = "First-line treatment for uncomplicated UTI";
+      recommendation.reasoning = isPediatric
+        ? "First-line treatment for pediatric UTI"
+        : "First-line treatment for uncomplicated UTI";
     } else {
       const adjustedDose = calculateAdjustedDose(
         "100mg",
