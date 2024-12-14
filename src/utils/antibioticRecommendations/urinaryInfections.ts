@@ -1,12 +1,8 @@
 import { PatientData, AntibioticRecommendation } from "./types";
-import { isContraindicatedInPregnancy } from "../antibioticSafety/pregnancySafety";
-import { isContraindicatedInCKD } from "../antibioticSafety/renalSafety";
-import { calculateBMI } from "../patientDemographics";
+import { calculateDose, calculateDuration } from "./doseCalculations";
+import { isSafeAntibiotic } from "./antibioticSafety";
 
 export const generateUrinaryRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const bmi = calculateBMI(parseFloat(data.weight), parseFloat(data.height));
-  const isObese = bmi > 30;
-  
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
@@ -20,21 +16,41 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   };
 
   if (data.severity === "mild" && !data.kidneyDisease) {
-    recommendation.primaryRecommendation = {
-      name: "Nitrofurantoin",
-      dose: "100mg",
-      route: "oral",
-      duration: "5 days"
-    };
-    recommendation.reasoning = "First-line treatment for uncomplicated UTI";
+    if (!data.allergies.sulfa) {
+      recommendation.primaryRecommendation = {
+        name: "Trimethoprim-Sulfamethoxazole",
+        dose: calculateDose("160/800mg", data, "trimethoprim-sulfamethoxazole"),
+        route: "oral",
+        duration: calculateDuration("3-5 days", data.severity, data.immunosuppressed)
+      };
+      recommendation.reasoning = "First-line treatment for uncomplicated UTI";
+    } else {
+      recommendation.primaryRecommendation = {
+        name: "Nitrofurantoin",
+        dose: calculateDose("100mg", data, "nitrofurantoin"),
+        route: "oral",
+        duration: calculateDuration("5 days", data.severity, data.immunosuppressed)
+      };
+      recommendation.reasoning = "Alternative first-line agent due to sulfa allergy";
+    }
   } else {
-    recommendation.primaryRecommendation = {
-      name: "Ceftriaxone",
-      dose: isObese ? "2g" : "1g",
-      route: "IV",
-      duration: "7-14 days"
-    };
-    recommendation.reasoning = "Selected for complicated UTI requiring parenteral therapy";
+    if (!data.allergies.cephalosporin) {
+      recommendation.primaryRecommendation = {
+        name: "Ceftriaxone",
+        dose: calculateDose("1g", data, "ceftriaxone"),
+        route: "IV",
+        duration: calculateDuration("7-14 days", data.severity, data.immunosuppressed)
+      };
+      recommendation.reasoning = "Selected for complicated UTI requiring parenteral therapy";
+    } else {
+      recommendation.primaryRecommendation = {
+        name: "Gentamicin",
+        dose: calculateDose("5mg/kg", data, "gentamicin"),
+        route: "IV",
+        duration: calculateDuration("7-14 days", data.severity, data.immunosuppressed)
+      };
+      recommendation.reasoning = "Alternative for complicated UTI with cephalosporin allergy";
+    }
   }
 
   return recommendation;

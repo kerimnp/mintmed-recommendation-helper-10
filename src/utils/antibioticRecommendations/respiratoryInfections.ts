@@ -1,11 +1,8 @@
 import { PatientData, AntibioticRecommendation } from "./types";
-import { calculateBMI } from "../patientCalculations";
+import { calculateDose, calculateDuration } from "./doseCalculations";
+import { isSafeAntibiotic } from "./antibioticSafety";
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
-  // Pass the original string values to calculateBMI
-  const bmi = calculateBMI(data.weight, data.height);
-  const isObese = bmi > 30;
-  
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
@@ -18,32 +15,40 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     precautions: []
   };
 
-  if (data.severity === "mild") {
-    if (!data.allergies.penicillin) {
+  if (data.severity === "mild" && !data.allergies.penicillin) {
+    recommendation.primaryRecommendation = {
+      name: "Amoxicillin",
+      dose: calculateDose("500mg", data, "amoxicillin"),
+      route: "oral",
+      duration: calculateDuration("7 days", data.severity, data.immunosuppressed)
+    };
+    recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+  } else if (data.severity === "mild" && data.allergies.penicillin && !data.allergies.macrolide) {
+    recommendation.primaryRecommendation = {
+      name: "Azithromycin",
+      dose: calculateDose("500mg", data, "azithromycin"),
+      route: "oral",
+      duration: calculateDuration("5 days", data.severity, data.immunosuppressed)
+    };
+    recommendation.reasoning = "Selected due to penicillin allergy";
+  } else if (data.severity === "severe") {
+    if (!data.allergies.cephalosporin && !data.allergies.macrolide) {
       recommendation.primaryRecommendation = {
-        name: "Amoxicillin",
-        dose: isObese ? "1000mg" : "500mg",
-        route: "oral",
-        duration: "7 days"
+        name: "Ceftriaxone + Azithromycin",
+        dose: `${calculateDose("2g", data, "ceftriaxone")} + ${calculateDose("500mg", data, "azithromycin")}`,
+        route: "IV",
+        duration: calculateDuration("7-14 days", data.severity, data.immunosuppressed)
       };
-      recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+      recommendation.reasoning = "Broad coverage for severe respiratory infection";
     } else {
       recommendation.primaryRecommendation = {
-        name: "Azithromycin",
-        dose: "500mg day 1, then 250mg",
-        route: "oral",
-        duration: "5 days"
+        name: "Levofloxacin",
+        dose: calculateDose("750mg", data, "levofloxacin"),
+        route: "IV",
+        duration: calculateDuration("7-14 days", data.severity, data.immunosuppressed)
       };
-      recommendation.reasoning = "Selected due to penicillin allergy";
+      recommendation.reasoning = "Alternative broad-spectrum coverage due to beta-lactam/macrolide allergies";
     }
-  } else {
-    recommendation.primaryRecommendation = {
-      name: "Ceftriaxone + Azithromycin",
-      dose: "2g + 500mg",
-      route: "IV",
-      duration: "7-14 days"
-    };
-    recommendation.reasoning = "Broad coverage for severe respiratory infection";
   }
 
   return recommendation;
