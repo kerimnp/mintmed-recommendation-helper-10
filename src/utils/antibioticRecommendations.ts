@@ -1,8 +1,13 @@
 import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
 import { calculateBMI } from "./patientCalculations";
+import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
+import { 
+  calculateRenalAdjustedDose, 
+  isContraindicatedInCKD,
+  requiresDoseAdjustmentInCKD 
+} from "./antibioticRecommendations/renalAdjustments/adjustments";
 
 const isSafeAntibiotic = (drug: string, allergies: PatientData['allergies']): boolean => {
-  // Check each allergy against the drug name
   if (allergies.penicillin && 
       (drug.toLowerCase().includes('penicillin') || 
        drug.toLowerCase().includes('amoxicillin') || 
@@ -34,7 +39,8 @@ const isSafeAntibiotic = (drug: string, allergies: PatientData['allergies']): bo
 const getSafeAntibiotic = (
   allergies: PatientData['allergies'], 
   infectionSite: string, 
-  severity: string
+  severity: string,
+  gfr: number
 ): {
   name: string;
   dose: string;
@@ -45,27 +51,56 @@ const getSafeAntibiotic = (
   // For respiratory infections
   if (infectionSite === 'respiratory') {
     if (severity === 'mild') {
-      // Check single therapies first
       if (isSafeAntibiotic('Amoxicillin', allergies)) {
+        const baseDose = "500mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Amoxicillin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Amoxicillin',
+            baseDose,
+            gfr,
+            weight: "70", // Default weight if not provided
+            age: "50" // Default age if not provided
+          }) : baseDose;
+
         return {
           name: "Amoxicillin",
-          dose: "500mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "7 days",
           reasoning: "First-line treatment for mild respiratory infections"
         };
       } else if (isSafeAntibiotic('Azithromycin', allergies)) {
+        const baseDose = "500mg day 1, then 250mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Azithromycin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Azithromycin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Azithromycin",
-          dose: "500mg day 1, then 250mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "5 days",
           reasoning: "Selected due to penicillin allergy"
         };
       } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
+        const baseDose = "750mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Levofloxacin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Levofloxacin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Levofloxacin",
-          dose: "750mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "5 days",
           reasoning: "Selected due to multiple allergies"
@@ -74,17 +109,46 @@ const getSafeAntibiotic = (
     } else {
       // For severe cases, check combination therapy safety
       if (isSafeAntibiotic('Ceftriaxone', allergies) && isSafeAntibiotic('Azithromycin', allergies)) {
+        const ceftriaxoneDose = "2g";
+        const azithromycinDose = "500mg";
+        const adjustedCeftriaxoneDose = requiresDoseAdjustmentInCKD('Ceftriaxone') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Ceftriaxone',
+            baseDose: ceftriaxoneDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : ceftriaxoneDose;
+        const adjustedAzithromycinDose = requiresDoseAdjustmentInCKD('Azithromycin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Azithromycin',
+            baseDose: azithromycinDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : azithromycinDose;
+
         return {
           name: "Ceftriaxone + Azithromycin",
-          dose: "2g + 500mg",
+          dose: `${adjustedCeftriaxoneDose} + ${adjustedAzithromycinDose}`,
           route: "IV",
           duration: "7-14 days",
           reasoning: "Broad coverage for severe respiratory infection"
         };
       } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
+        const baseDose = "750mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Levofloxacin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Levofloxacin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Levofloxacin",
-          dose: "750mg",
+          dose: adjustedDose,
           route: "IV",
           duration: "7-14 days",
           reasoning: "Selected due to beta-lactam/macrolide allergies"
@@ -97,25 +161,55 @@ const getSafeAntibiotic = (
   if (infectionSite === 'urinary') {
     if (severity === 'mild') {
       if (isSafeAntibiotic('Trimethoprim-Sulfamethoxazole', allergies)) {
+        const baseDose = "160/800mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Trimethoprim-Sulfamethoxazole') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Trimethoprim-Sulfamethoxazole',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Trimethoprim-Sulfamethoxazole",
-          dose: "160/800mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "3-5 days",
           reasoning: "First-line treatment for uncomplicated UTI"
         };
       } else if (isSafeAntibiotic('Nitrofurantoin', allergies)) {
+        const baseDose = "100mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Nitrofurantoin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Nitrofurantoin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Nitrofurantoin",
-          dose: "100mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "5 days",
           reasoning: "Alternative first-line agent for uncomplicated UTI"
         };
       } else if (isSafeAntibiotic('Ciprofloxacin', allergies)) {
+        const baseDose = "250mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Ciprofloxacin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Ciprofloxacin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Ciprofloxacin",
-          dose: "250mg",
+          dose: adjustedDose,
           route: "oral",
           duration: "3 days",
           reasoning: "Selected due to other drug allergies"
@@ -123,17 +217,37 @@ const getSafeAntibiotic = (
       }
     } else {
       if (isSafeAntibiotic('Ceftriaxone', allergies)) {
+        const baseDose = "1g";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Ceftriaxone') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Ceftriaxone',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Ceftriaxone",
-          dose: "1g",
+          dose: adjustedDose,
           route: "IV",
           duration: "7-14 days",
           reasoning: "Selected for complicated UTI"
         };
       } else if (isSafeAntibiotic('Levofloxacin', allergies)) {
+        const baseDose = "750mg";
+        const adjustedDose = requiresDoseAdjustmentInCKD('Levofloxacin') ? 
+          calculateRenalAdjustedDose({
+            drug: 'Levofloxacin',
+            baseDose,
+            gfr,
+            weight: "70",
+            age: "50"
+          }) : baseDose;
+
         return {
           name: "Levofloxacin",
-          dose: "750mg",
+          dose: adjustedDose,
           route: "IV",
           duration: "7-14 days",
           reasoning: "Selected due to cephalosporin allergy"
@@ -153,11 +267,17 @@ const getSafeAntibiotic = (
 };
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
-  // Pass the original string values to calculateBMI instead of parsing them
   const bmi = calculateBMI(data.weight, data.height);
   const isObese = bmi > 30;
   
-  const safeAntibiotic = getSafeAntibiotic(data.allergies, data.infectionSite, data.severity);
+  // Calculate GFR for renal adjustments
+  const gfr = calculateGFR({
+    age: data.age,
+    weight: data.weight,
+    gender: data.gender
+  });
+  
+  const safeAntibiotic = getSafeAntibiotic(data.allergies, data.infectionSite, data.severity, gfr);
   
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
@@ -172,6 +292,14 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     alternatives: [],
     precautions: []
   };
+
+  // Add renal-specific precautions
+  if (gfr < 60) {
+    recommendation.precautions.push(`Reduced renal function (GFR: ${gfr}) - dose adjusted accordingly`);
+  }
+  if (gfr < 30) {
+    recommendation.precautions.push("Severe renal impairment - careful monitoring required");
+  }
 
   // Add relevant precautions based on patient factors
   if (data.kidneyDisease) {
