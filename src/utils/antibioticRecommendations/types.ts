@@ -22,6 +22,19 @@ export interface PatientData {
   immunosuppressed: boolean;
 }
 
+export interface AntibioticProfile {
+  name: string;
+  dose: string;
+  route: string;
+  duration: string;
+  contraindications: string[];
+  renalDoseAdjustment?: boolean;
+  hepaticDoseAdjustment?: boolean;
+  pregnancyCategory?: string;
+  pediatricDose?: string;
+  interactions?: string[];
+}
+
 export interface AntibioticRecommendation {
   primaryRecommendation: {
     name: string;
