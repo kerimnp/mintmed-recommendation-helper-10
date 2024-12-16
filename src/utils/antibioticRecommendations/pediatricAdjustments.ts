@@ -1,54 +1,65 @@
+import { getPediatricAgeCategory, getWeightBasedDosing } from './pediatricCategories';
+
 interface PediatricDoseParams {
   weight: number;
   age: number;
   baseDose: string;
   drug: string;
+  creatinine?: number;
 }
 
 export const calculatePediatricDose = (params: PediatricDoseParams): string => {
-  const { weight, age, baseDose, drug } = params;
+  const { weight, age, baseDose, drug, creatinine } = params;
   
-  // Convert base dose to numeric value and unit
-  const match = baseDose.match(/(\d+)(\D+)/);
-  if (!match) return baseDose;
-  
-  const baseAmount = parseFloat(match[1]);
-  const unit = match[2];
+  const ageCategory = getPediatricAgeCategory(age);
+  if (!ageCategory) return baseDose;
 
-  // Age-specific adjustments
-  let doseMultiplier = 1;
+  const { doseMgPerKg, maxDose } = getWeightBasedDosing(weight, ageCategory, drug);
   
-  if (age < 1/12) { // Neonate
-    doseMultiplier = 0.25;
-  } else if (age < 2) { // Infant
-    doseMultiplier = 0.5;
-  } else if (age < 12) { // Child
-    doseMultiplier = weight / 70; // Standard adult weight reference
-  } else if (age < 18) { // Adolescent
-    doseMultiplier = Math.min(1, weight / 70);
+  // Calculate weight-based dose
+  let calculatedDose = weight * doseMgPerKg;
+  
+  // Apply maximum dose cap
+  calculatedDose = Math.min(calculatedDose, maxDose);
+  
+  // Round to nearest practical dose
+  calculatedDose = Math.round(calculatedDose / 50) * 50;
+
+  // Adjust for renal function if creatinine is provided
+  if (creatinine && creatinine > 1.0) {
+    const renalAdjustmentFactor = 1 / (creatinine * 0.8);
+    calculatedDose *= Math.min(renalAdjustmentFactor, 1);
+    calculatedDose = Math.round(calculatedDose / 50) * 50;
   }
 
-  // Drug-specific pediatric adjustments
-  switch (drug.toLowerCase()) {
-    case 'amoxicillin':
-      return `${Math.round((baseAmount * doseMultiplier * (weight / 10)) / 5) * 5}${unit}`;
-    case 'ceftriaxone':
-      return `${Math.round((baseAmount * doseMultiplier * (weight / 15)) / 5) * 5}${unit}`;
-    case 'azithromycin':
-      return `${Math.round((baseAmount * doseMultiplier * (weight / 20)) / 5) * 5}${unit}`;
-    default:
-      return `${Math.round(baseAmount * doseMultiplier / 10) * 10}${unit}`;
+  return `${calculatedDose}mg`;
+};
+
+export const getPediatricPrecautions = (age: number, weight: number): string[] => {
+  const precautions: string[] = [];
+  const ageCategory = getPediatricAgeCategory(age);
+
+  if (!ageCategory) return precautions;
+
+  precautions.push(`Pediatric patient (${ageCategory}) - dose adjusted for age and weight`);
+  
+  // Weight-based warnings
+  const expectedWeights = {
+    neonate: { min: 2, max: 5 },
+    infant: { min: 4, max: 10 },
+    toddler: { min: 8, max: 15 },
+    preschool: { min: 12, max: 20 },
+    "school-age": { min: 15, max: 50 },
+    adolescent: { min: 30, max: 70 }
+  };
+
+  const expectedWeight = expectedWeights[ageCategory];
+  if (weight < expectedWeight.min) {
+    precautions.push("Patient weight below expected range - careful dose monitoring required");
   }
-};
+  if (weight > expectedWeight.max) {
+    precautions.push("Patient weight above expected range - consider using lower weight-based dosing");
+  }
 
-export const isPediatricPatient = (age: number): boolean => {
-  return age < 18;
-};
-
-export const getPediatricAgeCategory = (age: number): string => {
-  if (age < 1/12) return "neonate";
-  if (age < 2) return "infant";
-  if (age < 12) return "child";
-  if (age < 18) return "adolescent";
-  return "adult";
+  return precautions;
 };
