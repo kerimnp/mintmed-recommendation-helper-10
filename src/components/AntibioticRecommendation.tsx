@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Flask } from "lucide-react";
+import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Beaker } from "lucide-react";
 
 interface RecommendationProps {
   recommendation: {
@@ -66,7 +66,7 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               )}
               {recommendation.calculations.renalAdjustment && (
                 <div className="flex items-center gap-2">
-                  <Flask className="h-5 w-5 text-mint-600" />
+                  <Beaker className="h-5 w-5 text-mint-600" />
                   <p className="text-sm text-gray-700">{recommendation.calculations.renalAdjustment}</p>
                 </div>
               )}

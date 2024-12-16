@@ -1,4 +1,5 @@
 import { getPediatricAgeCategory, getWeightBasedDosing } from './pediatricCategories';
+import type { PediatricAgeCategory } from './pediatricCategories';
 
 interface PediatricDoseParams {
   weight: number;
@@ -7,6 +8,10 @@ interface PediatricDoseParams {
   drug: string;
   creatinine?: number;
 }
+
+export const isPediatricPatient = (age: number): boolean => {
+  return age < 18;
+};
 
 export const calculatePediatricDose = (params: PediatricDoseParams): string => {
   const { weight, age, baseDose, drug, creatinine } = params;
