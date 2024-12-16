@@ -1,62 +1,63 @@
 import { calculateGFR } from './renalAdjustments/gfrCalculation';
-import { calculatePediatricDose, getPediatricPrecautions } from './pediatricAdjustments';
-import { getPediatricAgeCategory } from './pediatricCategories';
+import { antibioticDatabase, calculateAdjustedDose } from './antibioticDatabase';
+import { PatientData } from './types';
 
-interface DoseCalculationParams {
-  age: string;
-  weight: string;
-  height: string;
-  gender: string;
-  creatinine?: string;
-  drug: string;
-  baseDose: string;
-}
-
-export interface DoseCalculationResult {
-  adjustedDose: string;
+export const calculateDoseForPatient = (
+  antibioticName: string,
+  patientData: PatientData,
+  severity: "mild" | "moderate" | "severe"
+): {
+  dose: string;
   calculations: {
     weightBased?: string;
     renalAdjustment?: string;
     pediatricFactors?: string;
   };
-  precautions: string[];
-}
+} => {
+  const antibiotic = antibioticDatabase.find(a => a.name === antibioticName);
+  if (!antibiotic) {
+    return {
+      dose: "Antibiotic not found in database",
+      calculations: {}
+    };
+  }
 
-export const calculateAdjustedDose = (params: DoseCalculationParams): DoseCalculationResult => {
-  const { age, weight, gender, creatinine, drug, baseDose } = params;
-  const ageNum = parseFloat(age);
-  const weightNum = parseFloat(weight);
-  const result: DoseCalculationResult = {
-    adjustedDose: baseDose,
-    calculations: {},
-    precautions: []
+  const weight = Number(patientData.weight);
+  const age = Number(patientData.age);
+  const gfr = calculateGFR({
+    age: patientData.age,
+    weight: patientData.weight,
+    gender: patientData.gender
+  });
+
+  const adjustedDose = calculateAdjustedDose(
+    antibiotic,
+    weight,
+    age,
+    gfr,
+    severity
+  );
+
+  const calculations: {
+    weightBased?: string;
+    renalAdjustment?: string;
+    pediatricFactors?: string;
+  } = {};
+
+  if (age < 18) {
+    calculations.pediatricFactors = `Pediatric dose calculated based on weight (${weight}kg) at ${antibiotic.standardDosing.pediatric.mgPerKg}mg/kg`;
+  }
+
+  if (antibiotic.weightAdjustment?.some(adj => weight >= adj.threshold)) {
+    calculations.weightBased = `Dose adjusted for weight > ${antibiotic.weightAdjustment[0].threshold}kg`;
+  }
+
+  if (antibiotic.renalAdjustment.length > 0 && gfr <= antibiotic.renalAdjustment[0].gfr) {
+    calculations.renalAdjustment = `Dose adjusted for GFR ${gfr} mL/min`;
+  }
+
+  return {
+    dose: adjustedDose,
+    calculations
   };
-
-  // Check if pediatric patient
-  const ageCategory = getPediatricAgeCategory(ageNum);
-  if (ageCategory) {
-    result.adjustedDose = calculatePediatricDose({
-      weight: weightNum,
-      age: ageNum,
-      baseDose,
-      drug,
-      creatinine: creatinine ? parseFloat(creatinine) : undefined
-    });
-    result.calculations.pediatricFactors = `Pediatric dose calculated based on age (${ageCategory}) and weight (${weightNum}kg)`;
-    result.precautions.push(...getPediatricPrecautions(ageNum, weightNum));
-  }
-
-  // Calculate GFR and adjust for renal function if creatinine is provided
-  if (creatinine) {
-    const gfr = calculateGFR({ age, weight, gender });
-    if (gfr < 60) {
-      result.calculations.renalAdjustment = `Dose adjusted for reduced renal function (GFR: ${gfr} mL/min)`;
-      // Further renal adjustments would be applied here
-    }
-  }
-
-  // Add weight-based calculation info
-  result.calculations.weightBased = `Base dose adjusted for patient weight: ${weightNum}kg`;
-
-  return result;
 };
