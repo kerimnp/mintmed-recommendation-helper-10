@@ -68,3 +68,6 @@ export const getPediatricPrecautions = (age: number, weight: number): string[] =
 
   return precautions;
 };
+
+// Re-export getPediatricAgeCategory from pediatricCategories
+export { getPediatricAgeCategory };
