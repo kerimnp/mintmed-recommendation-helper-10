@@ -1,6 +1,9 @@
 import { PatientData, AntibioticRecommendation } from "./types";
 import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
+import { generateSkinInfectionRecommendation } from "./skinInfections";
+import { generateAbdominalInfectionRecommendation } from "./abdominalInfections";
+import { generateCNSInfectionRecommendation } from "./cnsInfections";
 import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
@@ -10,6 +13,12 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateRespiratoryRecommendation(data);
       case "urinary":
         return generateUrinaryRecommendation(data);
+      case "skin":
+        return generateSkinInfectionRecommendation(data);
+      case "abdominal":
+        return generateAbdominalInfectionRecommendation(data);
+      case "cns":
+        return generateCNSInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
@@ -18,9 +27,9 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
             route: "N/A",
             duration: "N/A"
           },
-          reasoning: "Complex infection requiring specialist consultation",
+          reasoning: "Complex or undefined infection site requiring specialist consultation",
           alternatives: [],
-          precautions: []
+          precautions: ["Immediate infectious disease consultation recommended"]
         };
     }
   })();

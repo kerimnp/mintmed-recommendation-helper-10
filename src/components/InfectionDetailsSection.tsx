@@ -37,8 +37,9 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <SelectItem value="respiratory">Respiratory</SelectItem>
               <SelectItem value="urinary">Urinary</SelectItem>
               <SelectItem value="skin">Skin/Soft Tissue</SelectItem>
+              <SelectItem value="abdominal">Intra-abdominal</SelectItem>
+              <SelectItem value="cns">Central Nervous System</SelectItem>
               <SelectItem value="wound">Wound</SelectItem>
-              <SelectItem value="gastrointestinal">Gastrointestinal</SelectItem>
               <SelectItem value="bloodstream">Bloodstream (Sepsis)</SelectItem>
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
