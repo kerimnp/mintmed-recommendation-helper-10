@@ -15,42 +15,42 @@ export const generateWoundInfectionRecommendation = (data: PatientData): Antibio
     precautions: []
   };
 
+  const isPediatric = isPediatricPatient(Number(data.age));
+
   if (data.severity === "mild" && !data.allergies.penicillin) {
     recommendation.primaryRecommendation = {
       name: "Amoxicillin-Clavulanate",
-      dose: "875/125mg",
+      dose: isPediatric ? "25-45mg/kg/day divided q12h" : "875/125mg q12h",
       route: "oral",
       duration: "7-10 days"
     };
     recommendation.reasoning = "First-line coverage for mild wound infections";
     
-    recommendation.alternatives.push({
-      name: "Cephalexin",
-      dose: "500mg",
-      route: "oral",
-      duration: "7-10 days",
-      reason: "Alternative for penicillin allergy"
-    });
+    if (!data.allergies.cephalosporin) {
+      recommendation.alternatives.push({
+        name: "Cephalexin",
+        dose: isPediatric ? "25-50mg/kg/day divided q6h" : "500mg q6h",
+        route: "oral",
+        duration: "7-10 days",
+        reason: "Alternative for uncomplicated wound infections"
+      });
+    }
   } else if (data.severity === "moderate") {
-    recommendation.primaryRecommendation = {
-      name: "Piperacillin-Tazobactam",
-      dose: "4.5g",
-      route: "IV",
-      duration: "10-14 days"
-    };
-    recommendation.reasoning = "Broad spectrum coverage for moderate wound infections";
-    
-    recommendation.alternatives.push({
-      name: "Ertapenem",
-      dose: "1g",
-      route: "IV",
-      duration: "10-14 days",
-      reason: "Alternative broad spectrum option"
-    });
+    if (!data.allergies.penicillin) {
+      recommendation.primaryRecommendation = {
+        name: "Piperacillin-Tazobactam",
+        dose: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
+        route: "IV",
+        duration: "10-14 days"
+      };
+      recommendation.reasoning = "Broad spectrum coverage for moderate wound infections";
+    }
   } else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Meropenem + Vancomycin",
-      dose: "1g + 15-20mg/kg",
+      dose: isPediatric ?
+        "20mg/kg q8h + 15mg/kg q6h" :
+        "1g q8h + 15-20mg/kg q8-12h",
       route: "IV",
       duration: "14-21 days"
     };
@@ -66,7 +66,7 @@ export const generateWoundInfectionRecommendation = (data: PatientData): Antibio
 
   if (data.immunosuppressed) {
     recommendation.precautions.push(
-      "Immunosuppressed patient - consider broader coverage",
+      "Consider broader coverage due to immunosuppression",
       "Monitor for opportunistic infections"
     );
   }

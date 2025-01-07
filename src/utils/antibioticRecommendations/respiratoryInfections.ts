@@ -1,6 +1,6 @@
 import { PatientData, AntibioticRecommendation } from './types';
-import { calculateAdjustedDose, getDurationAdjustment, isSafeAntibiotic } from './antibioticSafety';
-import { calculatePediatricDose, isPediatricPatient } from './pediatricAdjustments';
+import { calculateAdjustedDose } from './antibioticDatabase';
+import { isPediatricPatient } from './pediatricAdjustments';
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
@@ -18,157 +18,51 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   const isPediatric = isPediatricPatient(Number(data.age));
 
   if (data.severity === "mild" && !data.allergies.penicillin) {
-    const baseDose = "500mg";
-    const adjustedDose = isPediatric
-      ? calculatePediatricDose({
-          weight: Number(data.weight),
-          age: Number(data.age),
-          baseDose,
-          drug: "amoxicillin"
-        })
-      : calculateAdjustedDose(
-          baseDose,
-          data.weight,
-          data.age,
-          data.kidneyDisease,
-          data.liverDisease
-        );
-
-    const adjustedDuration = getDurationAdjustment(
-      isPediatric ? "5-7 days" : "7 days",
-      data.severity,
-      data.immunosuppressed
-    );
-
+    const baseDose = isPediatric ? "45-90mg/kg/day divided q12h" : "875mg";
     recommendation.primaryRecommendation = {
       name: "Amoxicillin",
-      dose: adjustedDose,
+      dose: baseDose,
       route: "oral",
-      duration: adjustedDuration
+      duration: "5-7 days"
     };
-    recommendation.reasoning = isPediatric
-      ? "First-line treatment for pediatric respiratory infections"
-      : "First-line treatment for mild community-acquired respiratory infections";
-  } else if (data.severity === "mild" && data.allergies.penicillin && !data.allergies.macrolide) {
-    const baseDose = "500mg";
-    const adjustedDose = isPediatric
-      ? calculatePediatricDose({
-          weight: Number(data.weight),
-          age: Number(data.age),
-          baseDose,
-          drug: "azithromycin"
-        })
-      : calculateAdjustedDose(
-          baseDose,
-          data.weight,
-          data.age,
-          data.kidneyDisease,
-          data.liverDisease
-        );
-
-    const adjustedDuration = getDurationAdjustment(
-      isPediatric ? "5 days" : "5 days",
-      data.severity,
-      data.immunosuppressed
-    );
-
-    recommendation.primaryRecommendation = {
-      name: "Azithromycin",
-      dose: adjustedDose,
-      route: "oral",
-      duration: adjustedDuration
-    };
-    recommendation.reasoning = isPediatric
-      ? "Selected due to penicillin allergy in pediatric patients"
-      : "Selected due to penicillin allergy";
-  } else if (data.severity === "severe") {
-    if (!data.allergies.cephalosporin && !data.allergies.macrolide) {
-      const ceftriaxoneDose = "2g";
-      const azithromycinDose = "500mg";
-      const adjustedCeftriaxoneDose = isPediatric
-        ? calculatePediatricDose({
-            weight: Number(data.weight),
-            age: Number(data.age),
-            baseDose: ceftriaxoneDose,
-            drug: "ceftriaxone"
-          })
-        : calculateAdjustedDose(
-            ceftriaxoneDose,
-            data.weight,
-            data.age,
-            data.kidneyDisease,
-            data.liverDisease
-          );
-      const adjustedAzithromycinDose = isPediatric
-        ? calculatePediatricDose({
-            weight: Number(data.weight),
-            age: Number(data.age),
-            baseDose: azithromycinDose,
-            drug: "azithromycin"
-          })
-        : calculateAdjustedDose(
-            azithromycinDose,
-            data.weight,
-            data.age,
-            data.kidneyDisease,
-            data.liverDisease
-          );
-
-      const adjustedDuration = getDurationAdjustment(
-        isPediatric ? "7-14 days" : "7-14 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
+    recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+    
+    if (!data.allergies.macrolide) {
+      recommendation.alternatives.push({
+        name: "Azithromycin",
+        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg",
+        route: "oral",
+        duration: "5 days",
+        reason: "Alternative for penicillin allergy"
+      });
+    }
+  } else if (data.severity === "moderate") {
+    if (!data.allergies.cephalosporin) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone + Azithromycin",
-        dose: `${adjustedCeftriaxoneDose} + ${adjustedAzithromycinDose}`,
+        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "2g daily + 500mg",
         route: "IV",
-        duration: adjustedDuration
+        duration: "7-10 days"
       };
-      recommendation.reasoning = "Broad coverage for severe respiratory infection";
-    } else {
-      const baseDose = "750mg";
-      const adjustedDose = isPediatric
-        ? calculatePediatricDose({
-            weight: Number(data.weight),
-            age: Number(data.age),
-            baseDose,
-            drug: "levofloxacin"
-          })
-        : calculateAdjustedDose(
-            baseDose,
-            data.weight,
-            data.age,
-            data.kidneyDisease,
-            data.liverDisease
-          );
-
-      const adjustedDuration = getDurationAdjustment(
-        isPediatric ? "7-14 days" : "7-14 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
-      recommendation.primaryRecommendation = {
-        name: "Levofloxacin",
-        dose: adjustedDose,
-        route: "IV",
-        duration: adjustedDuration
-      };
-      recommendation.reasoning = "Alternative broad-spectrum coverage due to beta-lactam/macrolide allergies";
+      recommendation.reasoning = "Broad coverage for moderate respiratory infection";
     }
+  } else if (data.severity === "severe") {
+    recommendation.primaryRecommendation = {
+      name: "Ceftriaxone + Azithromycin + Vancomycin",
+      dose: isPediatric ? 
+        "75mg/kg/day + 10mg/kg/day + 15mg/kg q6h" : 
+        "2g q12h + 500mg daily + 15-20mg/kg q8-12h",
+      route: "IV",
+      duration: "10-14 days"
+    };
+    recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection including possible MRSA";
   }
 
-  // Add relevant precautions
-  if (data.kidneyDisease) {
-    recommendation.precautions.push("Dose adjusted for renal impairment - monitor kidney function");
-  }
-  if (data.liverDisease) {
-    recommendation.precautions.push("Dose adjusted for hepatic impairment - monitor liver function");
-  }
   if (data.immunosuppressed) {
-    recommendation.precautions.push("Extended duration due to immunosuppression");
+    recommendation.precautions.push(
+      "Consider broader coverage due to immunosuppression",
+      "Monitor closely for opportunistic infections"
+    );
   }
 
   return recommendation;

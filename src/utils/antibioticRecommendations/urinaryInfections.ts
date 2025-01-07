@@ -1,6 +1,6 @@
 import { PatientData, AntibioticRecommendation } from './types';
-import { calculateAdjustedDose, getDurationAdjustment, isSafeAntibiotic } from './antibioticSafety';
-import { calculatePediatricDose, isPediatricPatient } from './pediatricAdjustments';
+import { calculateAdjustedDose } from './antibioticDatabase';
+import { isPediatricPatient } from './pediatricAdjustments';
 
 export const generateUrinaryRecommendation = (data: PatientData): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
@@ -17,116 +17,49 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
 
   const isPediatric = isPediatricPatient(Number(data.age));
 
-  if (data.severity === "mild" && !data.kidneyDisease) {
-    if (!data.allergies.sulfa) {
-      const baseDose = "160/800mg";
-      const adjustedDose = isPediatric
-        ? calculatePediatricDose({
-            weight: Number(data.weight),
-            age: Number(data.age),
-            baseDose,
-            drug: "trimethoprim-sulfamethoxazole"
-          })
-        : calculateAdjustedDose(
-            baseDose,
-            data.weight,
-            data.age,
-            data.kidneyDisease,
-            data.liverDisease
-          );
-
-      const adjustedDuration = getDurationAdjustment(
-        isPediatric ? "3-5 days" : "3-5 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
+  if (data.severity === "mild") {
+    if (!data.allergies.sulfa && !data.kidneyDisease) {
       recommendation.primaryRecommendation = {
         name: "Trimethoprim-Sulfamethoxazole",
-        dose: adjustedDose,
+        dose: isPediatric ? "8-12mg/kg/day divided q12h" : "160/800mg q12h",
         route: "oral",
-        duration: adjustedDuration
+        duration: "3-5 days"
       };
-      recommendation.reasoning = isPediatric
-        ? "First-line treatment for pediatric UTI"
-        : "First-line treatment for uncomplicated UTI";
-    } else {
-      const adjustedDose = calculateAdjustedDose(
-        "100mg",
-        data.weight,
-        data.age,
-        data.kidneyDisease,
-        data.liverDisease
-      );
-      const adjustedDuration = getDurationAdjustment(
-        "5 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
+      recommendation.reasoning = "First-line treatment for uncomplicated UTI";
+    } else if (!data.kidneyDisease) {
       recommendation.primaryRecommendation = {
         name: "Nitrofurantoin",
-        dose: adjustedDose,
+        dose: isPediatric ? "5-7mg/kg/day divided q6h" : "100mg q12h",
         route: "oral",
-        duration: adjustedDuration
+        duration: "5-7 days"
       };
-      recommendation.reasoning = "Alternative first-line agent due to sulfa allergy";
+      recommendation.reasoning = "Alternative first-line agent for uncomplicated UTI";
     }
-  } else {
+  } else if (data.severity === "moderate" || data.severity === "severe") {
     if (!data.allergies.cephalosporin) {
-      const adjustedDose = calculateAdjustedDose(
-        "1g",
-        data.weight,
-        data.age,
-        data.kidneyDisease,
-        data.liverDisease
-      );
-      const adjustedDuration = getDurationAdjustment(
-        "7-14 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone",
-        dose: adjustedDose,
+        dose: isPediatric ? "50-75mg/kg/day" : "1-2g q24h",
         route: "IV",
-        duration: adjustedDuration
+        duration: "10-14 days"
       };
-      recommendation.reasoning = "Selected for complicated UTI requiring parenteral therapy";
+      recommendation.reasoning = "Treatment for complicated UTI or pyelonephritis";
     } else {
-      const adjustedDose = calculateAdjustedDose(
-        "5mg/kg",
-        data.weight,
-        data.age,
-        data.kidneyDisease,
-        data.liverDisease
-      );
-      const adjustedDuration = getDurationAdjustment(
-        "7-14 days",
-        data.severity,
-        data.immunosuppressed
-      );
-
       recommendation.primaryRecommendation = {
-        name: "Gentamicin",
-        dose: adjustedDose,
+        name: "Ertapenem",
+        dose: isPediatric ? "15mg/kg q12h" : "1g q24h",
         route: "IV",
-        duration: adjustedDuration
+        duration: "10-14 days"
       };
       recommendation.reasoning = "Alternative for complicated UTI with cephalosporin allergy";
     }
   }
 
-  // Add relevant precautions
   if (data.kidneyDisease) {
-    recommendation.precautions.push("Dose adjusted for renal impairment - monitor kidney function");
-  }
-  if (data.liverDisease) {
-    recommendation.precautions.push("Monitor liver function during treatment");
-  }
-  if (data.immunosuppressed) {
-    recommendation.precautions.push("Extended duration due to immunosuppression");
+    recommendation.precautions.push(
+      "Dose adjusted for renal impairment",
+      "Monitor renal function closely"
+    );
   }
 
   return recommendation;

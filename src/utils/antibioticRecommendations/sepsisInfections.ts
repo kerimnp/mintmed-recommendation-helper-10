@@ -15,31 +15,41 @@ export const generateSepsisRecommendation = (data: PatientData): AntibioticRecom
     precautions: []
   };
 
+  const isPediatric = isPediatricPatient(Number(data.age));
+
   // Sepsis is always treated as severe
   if (!data.allergies.cephalosporin) {
     recommendation.primaryRecommendation = {
       name: "Cefepime + Vancomycin",
-      dose: "2g q8h + 15-20mg/kg q12h",
+      dose: isPediatric ? 
+        "50mg/kg q8h + 15mg/kg q6h" : 
+        "2g q8h + 15-20mg/kg q8-12h",
       route: "IV",
       duration: "7-14 days"
     };
     recommendation.reasoning = "Broad spectrum coverage for sepsis including MRSA";
     
-    recommendation.alternatives.push({
-      name: "Meropenem + Vancomycin",
-      dose: "1g q8h + 15-20mg/kg q12h",
-      route: "IV",
-      duration: "7-14 days",
-      reason: "Alternative broad spectrum coverage"
-    });
+    if (!data.allergies.penicillin) {
+      recommendation.alternatives.push({
+        name: "Piperacillin-Tazobactam + Vancomycin",
+        dose: isPediatric ?
+          "100mg/kg q6h + 15mg/kg q6h" :
+          "4.5g q6h + 15-20mg/kg q8-12h",
+        route: "IV",
+        duration: "7-14 days",
+        reason: "Alternative broad spectrum coverage"
+      });
+    }
   } else {
     recommendation.primaryRecommendation = {
-      name: "Aztreonam + Vancomycin",
-      dose: "2g q8h + 15-20mg/kg q12h",
+      name: "Meropenem + Vancomycin",
+      dose: isPediatric ?
+        "20mg/kg q8h + 15mg/kg q6h" :
+        "1g q8h + 15-20mg/kg q8-12h",
       route: "IV",
       duration: "7-14 days"
     };
-    recommendation.reasoning = "Alternative coverage for patients with beta-lactam allergies";
+    recommendation.reasoning = "Alternative coverage for patients with cephalosporin allergy";
   }
 
   recommendation.precautions.push(
