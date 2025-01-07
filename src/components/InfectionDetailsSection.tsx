@@ -41,6 +41,10 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <SelectItem value="cns">Central Nervous System</SelectItem>
               <SelectItem value="wound">Wound</SelectItem>
               <SelectItem value="bloodstream">Bloodstream (Sepsis)</SelectItem>
+              <SelectItem value="bone">Bone/Joint</SelectItem>
+              <SelectItem value="ear">Ear</SelectItem>
+              <SelectItem value="eye">Eye</SelectItem>
+              <SelectItem value="dental">Dental</SelectItem>
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
