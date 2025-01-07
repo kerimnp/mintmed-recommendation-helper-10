@@ -2,27 +2,45 @@ import { PatientData, AntibioticRecommendation } from "./types";
 import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
-import { generateAbdominalInfectionRecommendation } from "./abdominalInfections";
-import { generateCNSInfectionRecommendation } from "./cnsInfections";
 import { generateWoundInfectionRecommendation } from "./woundInfections";
 import { generateSepsisRecommendation } from "./sepsisInfections";
 import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
+import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
+  // Calculate GFR for renal adjustments
+  const gfr = calculateGFR({
+    age: data.age,
+    weight: data.weight,
+    gender: data.gender
+  });
+
+  // Validate required fields
+  if (!data.infectionSite || !data.severity) {
+    return {
+      primaryRecommendation: {
+        name: "Incomplete Information",
+        dose: "N/A",
+        route: "N/A",
+        duration: "N/A"
+      },
+      reasoning: "Please provide infection site and severity to generate recommendation",
+      alternatives: [],
+      precautions: ["Complete all required fields to receive accurate recommendation"]
+    };
+  }
+
   const baseRecommendation = (() => {
-    switch (data.infectionSite) {
+    switch (data.infectionSite.toLowerCase()) {
       case "respiratory":
         return generateRespiratoryRecommendation(data);
       case "urinary":
         return generateUrinaryRecommendation(data);
       case "skin":
         return generateSkinInfectionRecommendation(data);
-      case "abdominal":
-        return generateAbdominalInfectionRecommendation(data);
-      case "cns":
-        return generateCNSInfectionRecommendation(data);
       case "wound":
         return generateWoundInfectionRecommendation(data);
+      case "sepsis":
       case "bloodstream":
         return generateSepsisRecommendation(data);
       default:
@@ -33,9 +51,9 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
             route: "N/A",
             duration: "N/A"
           },
-          reasoning: "Complex or undefined infection site requiring specialist consultation",
+          reasoning: "Infection site not recognized or requires specialist evaluation",
           alternatives: [],
-          precautions: ["Immediate infectious disease consultation recommended"]
+          precautions: ["Please select a valid infection site"]
         };
     }
   })();
@@ -45,17 +63,30 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     const ageCategory = getPediatricAgeCategory(Number(data.age));
     baseRecommendation.precautions.push(
       `Pediatric patient (${ageCategory}) - dose adjusted for age and weight`,
-      "Regular monitoring of clinical response recommended",
-      "Consider pediatric infectious disease consultation for complex cases"
+      "Regular monitoring of clinical response recommended"
+    );
+  }
+
+  // Add pregnancy-specific precautions
+  if (data.pregnancy === "pregnant") {
+    baseRecommendation.precautions.push(
+      "Pregnant patient - medication selected for pregnancy safety",
+      "Regular monitoring of maternal and fetal well-being recommended"
+    );
+  }
+
+  // Add renal function precautions
+  if (gfr < 60) {
+    baseRecommendation.precautions.push(
+      `Reduced renal function (GFR: ${Math.round(gfr)} mL/min) - dose adjusted accordingly`
     );
   }
 
   // Add immunosuppression precautions
   if (data.immunosuppressed) {
     baseRecommendation.precautions.push(
-      "Immunocompromised status - consider broader coverage",
-      "Monitor closely for opportunistic infections",
-      "Consider infectious disease consultation"
+      "Immunocompromised status - broader coverage recommended",
+      "Monitor closely for opportunistic infections"
     );
   }
 
@@ -63,8 +94,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   if (data.diabetes) {
     baseRecommendation.precautions.push(
       "Diabetic patient - monitor glucose levels",
-      "Consider broader coverage for diabetic infections",
-      "Ensure adequate source control"
+      "Consider broader coverage for diabetic infections"
     );
   }
 

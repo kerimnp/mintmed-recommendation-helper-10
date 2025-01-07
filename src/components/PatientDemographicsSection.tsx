@@ -19,6 +19,13 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
   formData,
   onInputChange,
 }) => {
+  const handleGenderChange = (value: string) => {
+    onInputChange("gender", value);
+    if (value === "male") {
+      onInputChange("pregnancy", "not-applicable");
+    }
+  };
+
   return (
     <Card className="glass-card p-6 space-y-6">
       <div className="space-y-2">
@@ -41,15 +48,13 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         <div className="space-y-2">
           <Label htmlFor="gender" className="form-label">Gender</Label>
-          <Select value={formData.gender} onValueChange={(value) => onInputChange("gender", value)}>
+          <Select value={formData.gender} onValueChange={handleGenderChange}>
             <SelectTrigger className="input-field">
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -78,20 +83,21 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="pregnancy" className="form-label">Pregnancy Status</Label>
-          <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
-            <SelectTrigger className="input-field">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="not-pregnant">Not Pregnant</SelectItem>
-              <SelectItem value="pregnant">Pregnant</SelectItem>
-              <SelectItem value="breastfeeding">Breastfeeding</SelectItem>
-              <SelectItem value="not-applicable">Not Applicable</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {formData.gender === "female" && (
+          <div className="space-y-2">
+            <Label htmlFor="pregnancy" className="form-label">Pregnancy Status</Label>
+            <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
+              <SelectTrigger className="input-field">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not-pregnant">Not Pregnant</SelectItem>
+                <SelectItem value="pregnant">Pregnant</SelectItem>
+                <SelectItem value="breastfeeding">Breastfeeding</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
     </Card>
   );

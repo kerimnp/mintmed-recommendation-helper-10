@@ -51,4 +51,9 @@ export interface AntibioticRecommendation {
     reason: string;
   }>;
   precautions: string[];
+  calculations?: {
+    weightBased?: string;
+    renalAdjustment?: string;
+    pediatricFactors?: string;
+  };
 }
