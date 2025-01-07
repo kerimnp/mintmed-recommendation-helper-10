@@ -21,6 +21,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 }) => {
   const handleGenderChange = (value: string) => {
     onInputChange("gender", value);
+    // Automatically set pregnancy to not-applicable for male patients
     if (value === "male") {
       onInputChange("pregnancy", "not-applicable");
     }
@@ -43,12 +44,13 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             className="input-field"
             value={formData.age}
             onChange={(e) => onInputChange("age", e.target.value)}
+            required
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="gender" className="form-label">Gender</Label>
-          <Select value={formData.gender} onValueChange={handleGenderChange}>
+          <Select value={formData.gender} onValueChange={handleGenderChange} required>
             <SelectTrigger className="input-field">
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
@@ -68,6 +70,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             className="input-field"
             value={formData.weight}
             onChange={(e) => onInputChange("weight", e.target.value)}
+            required
           />
         </div>
 
@@ -80,13 +83,14 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             className="input-field"
             value={formData.height}
             onChange={(e) => onInputChange("height", e.target.value)}
+            required
           />
         </div>
 
         {formData.gender === "female" && (
           <div className="space-y-2">
             <Label htmlFor="pregnancy" className="form-label">Pregnancy Status</Label>
-            <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
+            <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)} required>
               <SelectTrigger className="input-field">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>

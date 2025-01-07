@@ -17,30 +17,29 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
 
   const isPediatric = isPediatricPatient(Number(data.age));
 
-  if (data.severity === "mild" && !data.allergies.penicillin) {
-    const baseDose = isPediatric ? "45-90mg/kg/day divided q12h" : "875mg";
-    recommendation.primaryRecommendation = {
-      name: "Amoxicillin",
-      dose: baseDose,
-      route: "oral",
-      duration: "5-7 days"
-    };
-    recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
-    
-    if (!data.allergies.macrolide) {
-      recommendation.alternatives.push({
-        name: "Azithromycin",
-        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg",
+  if (data.severity === "mild") {
+    if (!data.allergies.penicillin) {
+      recommendation.primaryRecommendation = {
+        name: "Amoxicillin",
+        dose: isPediatric ? "45-90mg/kg/day divided q12h" : "875mg q12h",
         route: "oral",
-        duration: "5 days",
-        reason: "Alternative for penicillin allergy"
-      });
+        duration: "5-7 days"
+      };
+      recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+    } else if (!data.allergies.macrolide) {
+      recommendation.primaryRecommendation = {
+        name: "Azithromycin",
+        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
+        route: "oral",
+        duration: "5 days"
+      };
+      recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
   } else if (data.severity === "moderate") {
     if (!data.allergies.cephalosporin) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone + Azithromycin",
-        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "2g daily + 500mg",
+        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "2g daily + 500mg daily",
         route: "IV",
         duration: "7-10 days"
       };
@@ -56,13 +55,6 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
       duration: "10-14 days"
     };
     recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection including possible MRSA";
-  }
-
-  if (data.immunosuppressed) {
-    recommendation.precautions.push(
-      "Consider broader coverage due to immunosuppression",
-      "Monitor closely for opportunistic infections"
-    );
   }
 
   return recommendation;
