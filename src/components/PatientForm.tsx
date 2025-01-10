@@ -67,22 +67,31 @@ export const PatientForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.age || !formData.gender || !formData.weight || !formData.height) {
+    // Validate required fields
+    if (!formData.age || !formData.gender || !formData.weight || !formData.height || !formData.infectionSite) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields including age, gender, weight, height, and infection site.",
         variant: "destructive"
       });
       return;
     }
 
-    const recommendation = generateAntibioticRecommendation(formData);
-    setRecommendation(recommendation);
-    
-    toast({
-      title: "Recommendation Generated",
-      description: "Antibiotic recommendation has been generated based on patient data",
-    });
+    try {
+      const recommendation = generateAntibioticRecommendation(formData);
+      setRecommendation(recommendation);
+      
+      toast({
+        title: "Recommendation Generated",
+        description: "Antibiotic recommendation has been generated based on patient data",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while generating the recommendation. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -118,13 +127,16 @@ export const PatientForm = () => {
           onInputChange={handleInputChange}
         />
 
-        <div className="sticky bottom-6 z-10">
-          <Button 
+        <div className="sticky bottom-6 z-10 px-4">
+          <button 
             type="submit"
-            className="w-full premium-button"
+            className="w-full bg-medical-deep text-white px-6 py-3 rounded-lg font-medium
+              transition-all duration-300 hover:bg-gradient-to-r hover:from-medical-deep hover:to-medical-electric
+              hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed
+              backdrop-blur-sm"
           >
             Generate Antibiotic Recommendation
-          </Button>
+          </button>
         </div>
       </form>
 
