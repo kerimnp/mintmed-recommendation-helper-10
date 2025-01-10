@@ -9,20 +9,21 @@ import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { MedicationHistorySection } from "./MedicationHistorySection";
+import type { PatientData } from "@/utils/antibioticRecommendations/types";
 
 export const PatientForm = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<PatientData>({
     age: "",
-    gender: "",
+    gender: "male",
     weight: "",
     height: "",
-    pregnancy: "",
+    pregnancy: "not_applicable",
     infectionSite: "",
     symptoms: "",
     duration: "",
-    severity: "",
-    creatinine: "", // New field for renal function
+    severity: "mild",
+    creatinine: "",
     recentAntibiotics: false,
     allergies: {
       penicillin: false,
@@ -41,7 +42,16 @@ export const PatientForm = () => {
   const [recommendation, setRecommendation] = useState<any>(null);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Automatically set pregnancy to not_applicable for male patients
+      if (field === "gender" && value === "male") {
+        newData.pregnancy = "not_applicable";
+      }
+      
+      return newData;
+    });
   };
 
   const handleAllergyChange = (allergy: string, checked: boolean) => {
@@ -111,7 +121,7 @@ export const PatientForm = () => {
         <div className="sticky bottom-6 z-10">
           <Button 
             type="submit"
-            className="w-full bg-mint-300 hover:bg-mint-400 text-gray-900 font-medium transition-all duration-200 shadow-lg"
+            className="w-full premium-button"
           >
             Generate Antibiotic Recommendation
           </Button>

@@ -19,6 +19,9 @@ export default {
     },
     extend: {
       colors: {
+        "medical-deep": "#0A2540",
+        "medical-electric": "#00A3FF",
+        "medical-cyan": "#7CD2FF",
         mint: {
           50: "#f2fbf2",
           100: "#e6f7e6",
