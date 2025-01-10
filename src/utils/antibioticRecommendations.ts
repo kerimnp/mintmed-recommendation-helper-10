@@ -1,85 +1,182 @@
 import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
-import { generateRespiratoryRecommendation } from "./antibioticRecommendations/respiratoryInfections";
-import { generateUrinaryRecommendation } from "./antibioticRecommendations/urinaryInfections";
-import { generateSkinInfectionRecommendation } from "./antibioticRecommendations/skinInfections";
-import { generateWoundInfectionRecommendation } from "./antibioticRecommendations/woundInfections";
-import { generateSepsisRecommendation } from "./antibioticRecommendations/sepsisInfections";
-import { generateAbdominalInfectionRecommendation } from "./antibioticRecommendations/abdominalInfections";
-import { generateCNSInfectionRecommendation } from "./antibioticRecommendations/cnsInfections";
-import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
-import { isPediatricPatient } from "./antibioticRecommendations/pediatricAdjustments";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
-  // Calculate GFR for renal adjustments
-  const gfr = calculateGFR({
-    age: data.age,
-    weight: data.weight,
-    gender: data.gender
-  });
-
-  // Generate base recommendation based on infection site
-  const baseRecommendation = (() => {
-    switch (data.infectionSite.toLowerCase()) {
-      case "respiratory":
-        return generateRespiratoryRecommendation(data);
-      case "urinary":
-        return generateUrinaryRecommendation(data);
-      case "skin":
-        return generateSkinInfectionRecommendation(data);
-      case "wound":
-        return generateWoundInfectionRecommendation(data);
-      case "bloodstream":
-      case "sepsis":
-        return generateSepsisRecommendation(data);
-      case "abdominal":
-        return generateAbdominalInfectionRecommendation(data);
-      case "cns":
-        return generateCNSInfectionRecommendation(data);
-      default:
-        return {
-          primaryRecommendation: {
-            name: "Specialist Consultation Required",
-            dose: "N/A",
-            route: "N/A",
-            duration: "N/A"
-          },
-          reasoning: "Infection site requires specialist evaluation",
-          alternatives: [],
-          precautions: ["Please consult with an infectious disease specialist"]
-        };
-    }
-  })();
-
-  // Add common precautions based on patient factors
-  const precautions = [...baseRecommendation.precautions];
-
-  if (gfr < 60) {
-    precautions.push(`Reduced renal function (GFR: ${Math.round(gfr)} mL/min) - dose adjusted accordingly`);
+  // Basic validation
+  if (!data.infectionSite || !data.severity) {
+    return {
+      primaryRecommendation: {
+        name: "Unable to Generate Recommendation",
+        dose: "N/A",
+        route: "N/A",
+        duration: "N/A"
+      },
+      reasoning: "Please provide infection site and severity to generate recommendation",
+      alternatives: [],
+      precautions: ["Complete all required fields"]
+    };
   }
 
-  if (data.immunosuppressed) {
-    precautions.push(
-      "Immunocompromised status - broader coverage recommended",
-      "Monitor closely for opportunistic infections"
-    );
+  // Generate recommendation based on infection site
+  switch (data.infectionSite.toLowerCase()) {
+    case "respiratory":
+      return generateRespiratoryRecommendation(data);
+    case "urinary":
+      return generateUrinaryRecommendation(data);
+    case "skin":
+      return generateSkinRecommendation(data);
+    default:
+      return {
+        primaryRecommendation: {
+          name: "Amoxicillin/Clavulanate",
+          dose: "875/125 mg",
+          route: "Oral",
+          duration: "7-10 days"
+        },
+        reasoning: "Broad-spectrum coverage for common pathogens",
+        alternatives: [
+          {
+            name: "Cefuroxime",
+            dose: "500 mg",
+            route: "Oral",
+            duration: "7-10 days",
+            reason: "Alternative for penicillin-allergic patients"
+          }
+        ],
+        precautions: []
+      };
   }
+};
 
-  if (data.diabetes) {
-    precautions.push(
-      "Diabetic patient - monitor glucose levels",
-      "Consider broader coverage for diabetic infections"
-    );
+const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
+  const isAllergicToPenicillin = data.allergies?.penicillin;
+
+  if (data.severity === "mild") {
+    return {
+      primaryRecommendation: {
+        name: isAllergicToPenicillin ? "Azithromycin" : "Amoxicillin",
+        dose: isAllergicToPenicillin ? "500 mg day 1, then 250 mg" : "500 mg",
+        route: "Oral",
+        duration: isAllergicToPenicillin ? "5 days" : "7-10 days"
+      },
+      reasoning: "Coverage for common respiratory pathogens",
+      alternatives: [
+        {
+          name: "Doxycycline",
+          dose: "100 mg twice daily",
+          route: "Oral",
+          duration: "7-10 days",
+          reason: "Alternative for patients with macrolide allergy"
+        }
+      ],
+      precautions: []
+    };
+  } else {
+    return {
+      primaryRecommendation: {
+        name: "Ceftriaxone",
+        dose: "1-2g daily",
+        route: "IV",
+        duration: "10-14 days"
+      },
+      reasoning: "Severe respiratory infection requiring broad coverage",
+      alternatives: [
+        {
+          name: "Levofloxacin",
+          dose: "750 mg daily",
+          route: "IV/Oral",
+          duration: "10-14 days",
+          reason: "Alternative for severe beta-lactam allergy"
+        }
+      ],
+      precautions: ["Monitor renal function", "Watch for C. difficile infection"]
+    };
   }
+};
 
-  if (data.pregnancy === "pregnant") {
-    precautions.push(
-      "Pregnant patient - medication selected for pregnancy safety",
-      "Regular monitoring of maternal and fetal well-being recommended"
-    );
+const generateUrinaryRecommendation = (data: PatientData): AntibioticRecommendation => {
+  if (data.severity === "mild") {
+    return {
+      primaryRecommendation: {
+        name: "Nitrofurantoin",
+        dose: "100 mg twice daily",
+        route: "Oral",
+        duration: "5 days"
+      },
+      reasoning: "First-line treatment for uncomplicated UTI",
+      alternatives: [
+        {
+          name: "Trimethoprim-Sulfamethoxazole",
+          dose: "160/800 mg twice daily",
+          route: "Oral",
+          duration: "3 days",
+          reason: "Alternative first-line agent"
+        }
+      ],
+      precautions: ["Avoid in late pregnancy", "Avoid if CrCl < 30 mL/min"]
+    };
+  } else {
+    return {
+      primaryRecommendation: {
+        name: "Ceftriaxone",
+        dose: "1g daily",
+        route: "IV",
+        duration: "10-14 days"
+      },
+      reasoning: "Severe/complicated UTI requiring broad coverage",
+      alternatives: [
+        {
+          name: "Piperacillin-Tazobactam",
+          dose: "3.375g every 6 hours",
+          route: "IV",
+          duration: "10-14 days",
+          reason: "Alternative for severe infection"
+        }
+      ],
+      precautions: ["Monitor renal function", "Adjust dose based on CrCl"]
+    };
   }
+};
 
-  return {
-    ...baseRecommendation,
-    precautions
-  };
+const generateSkinRecommendation = (data: PatientData): AntibioticRecommendation => {
+  if (data.severity === "mild") {
+    return {
+      primaryRecommendation: {
+        name: "Cephalexin",
+        dose: "500 mg four times daily",
+        route: "Oral",
+        duration: "7 days"
+      },
+      reasoning: "Coverage for common skin pathogens including MSSA",
+      alternatives: [
+        {
+          name: "Clindamycin",
+          dose: "300-450 mg four times daily",
+          route: "Oral",
+          duration: "7 days",
+          reason: "Alternative for penicillin-allergic patients"
+        }
+      ],
+      precautions: ["Monitor for diarrhea"]
+    };
+  } else {
+    return {
+      primaryRecommendation: {
+        name: "Vancomycin",
+        dose: "15-20 mg/kg every 12 hours",
+        route: "IV",
+        duration: "7-14 days"
+      },
+      reasoning: "Severe skin infection requiring MRSA coverage",
+      alternatives: [
+        {
+          name: "Daptomycin",
+          dose: "4-6 mg/kg daily",
+          route: "IV",
+          duration: "7-14 days",
+          reason: "Alternative for vancomycin-resistant organisms"
+        }
+      ],
+      precautions: ["Monitor renal function", "Check vancomycin levels"]
+    };
+  }
 };

@@ -1,13 +1,14 @@
 export interface PatientData {
   age: string;
-  gender: string;
+  gender: "male" | "female";
   weight: string;
   height: string;
-  pregnancy: string;
+  pregnancy: "pregnant" | "not_pregnant" | "not_applicable";
   infectionSite: string;
   symptoms: string;
   duration: string;
-  severity: string;
+  severity: "mild" | "moderate" | "severe";
+  creatinine: string;
   recentAntibiotics: boolean;
   allergies: {
     penicillin: boolean;
@@ -16,23 +17,11 @@ export interface PatientData {
     macrolide: boolean;
     fluoroquinolone: boolean;
   };
+  otherAllergies: string;
   kidneyDisease: boolean;
   liverDisease: boolean;
   diabetes: boolean;
   immunosuppressed: boolean;
-}
-
-export interface AntibioticProfile {
-  name: string;
-  dose: string;
-  route: string;
-  duration: string;
-  contraindications: string[];
-  renalDoseAdjustment?: boolean;
-  hepaticDoseAdjustment?: boolean;
-  pregnancyCategory?: string;
-  pediatricDose?: string;
-  interactions?: string[];
 }
 
 export interface AntibioticRecommendation {
