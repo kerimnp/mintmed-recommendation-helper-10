@@ -6,11 +6,73 @@ const translations = {
   en: {
     title: "Antibioteka",
     subtitle: "Advanced Clinical Decision Support for Antibiotic Recommendations",
+    patientDemographics: {
+      title: "Patient Demographics",
+      subtitle: "Enter the patient's basic information",
+      age: "Age",
+      gender: "Gender",
+      weight: "Weight (kg)",
+      height: "Height (cm)",
+      pregnancy: "Pregnancy Status",
+      genderOptions: {
+        male: "Male",
+        female: "Female"
+      },
+      pregnancyOptions: {
+        notPregnant: "Not Pregnant",
+        pregnant: "Pregnant",
+        breastfeeding: "Breastfeeding"
+      }
+    },
+    comorbidities: {
+      title: "Comorbidities",
+      subtitle: "Select any existing medical conditions",
+      kidneyDisease: "Chronic Kidney Disease",
+      liverDisease: "Liver Disease",
+      diabetes: "Diabetes",
+      immunosuppressed: "Immunosuppression"
+    },
+    renalFunction: {
+      title: "Renal Function",
+      subtitle: "Enter patient's renal function data",
+      creatinine: "Serum Creatinine (mg/dL)"
+    }
   },
   bs: {
     title: "Antibioteka",
     subtitle: "Napredna klinička podrška za preporuke antibiotika",
-  },
+    patientDemographics: {
+      title: "Demografski podaci",
+      subtitle: "Unesite osnovne informacije o pacijentu",
+      age: "Godine",
+      gender: "Spol",
+      weight: "Težina (kg)",
+      height: "Visina (cm)",
+      pregnancy: "Status trudnoće",
+      genderOptions: {
+        male: "Muško",
+        female: "Žensko"
+      },
+      pregnancyOptions: {
+        notPregnant: "Nije trudna",
+        pregnant: "Trudna",
+        breastfeeding: "Doji"
+      }
+    },
+    comorbidities: {
+      title: "Komorbiditeti",
+      subtitle: "Odaberite postojeća medicinska stanja",
+      kidneyDisease: "Hronična bubrežna bolest",
+      liverDisease: "Bolest jetre",
+      diabetes: "Dijabetes",
+      immunosuppressed: "Imunosupresija"
+    },
+    renalFunction: {
+      title: "Bubrežna funkcija",
+      subtitle: "Unesite podatke o bubrežnoj funkciji pacijenta",
+      creatinine: "Serumski kreatinin (mg/dL)"
+    }
+  }
 };
 
 const Index = () => {
