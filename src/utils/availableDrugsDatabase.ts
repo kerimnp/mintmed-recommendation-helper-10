@@ -45,7 +45,19 @@ export const availableDrugs: DrugDatabase = {
           packaging: "16 capsules (2 PVC/Al blisters of 8 capsules)"
         }
       ]
-    }
+    },
+    {
+      name: "AMOXIBOS",
+      manufacturer: "BOSNALIJEK D.D.",
+      forms: [
+        {
+          type: "Capsule",
+          strength: "500 mg",
+          packaging: "16 capsules (2 PVC/PVDC/Al blisters of 8 capsules)"
+        }
+      ]
+    },
+    // ... Add more Amoxicillin products
   ],
   "Azithromycin": [
     {
@@ -58,7 +70,38 @@ export const availableDrugs: DrugDatabase = {
           packaging: "3 film tablets (1 PVC/PE/PVDC-Al blister)"
         }
       ]
-    }
+    },
+    {
+      name: "AZIBIOT",
+      manufacturer: "KRKA, TOVARNA ZDRAVIL, D.D., NOVO MESTO",
+      forms: [
+        {
+          type: "Film coated tablet",
+          strength: "500 mg",
+          packaging: "3 film coated tablets (1 Al/PVC blister)"
+        }
+      ]
+    },
+    // ... Add more Azithromycin products
   ],
-  // Add more antibiotics and their available products
+  "Ciprofloxacin": [
+    {
+      name: "CIPRINOL",
+      manufacturer: "KRKA, TOVARNA ZDRAVIL, D.D., NOVO MESTO",
+      forms: [
+        {
+          type: "Film coated tablet",
+          strength: "250 mg",
+          packaging: "10 film coated tablets (PVC/PVDC/Al blister)"
+        },
+        {
+          type: "Film coated tablet",
+          strength: "500 mg",
+          packaging: "10 film coated tablets (PVC/PVDC/Al blister)"
+        }
+      ]
+    },
+    // ... Add more Ciprofloxacin products
+  ],
+  // ... Add more antibiotics
 };

@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Beaker } from "lucide-react";
 import { AvailableDrugs } from "./AvailableDrugs";
+import { DrugProduct } from "@/utils/availableDrugsDatabase";
+import { availableDrugs } from "@/utils/availableDrugsDatabase";
 
 interface RecommendationProps {
   recommendation: {
@@ -30,6 +32,16 @@ interface RecommendationProps {
 }
 
 export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recommendation }) => {
+  const [selectedProduct, setSelectedProduct] = useState<DrugProduct>();
+
+  const handleProductSelect = (product: DrugProduct) => {
+    setSelectedProduct(product);
+  };
+
+  const getAvailableDrugs = (antibioticName: string) => {
+    return availableDrugs[antibioticName] || [];
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -43,6 +55,9 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               <div>
                 <p className="text-sm text-gray-500">Antibiotic</p>
                 <p className="text-lg font-medium">{recommendation.primaryRecommendation.name}</p>
+                {selectedProduct && (
+                  <p className="text-sm text-mint-600 mt-1">Selected: {selectedProduct.name}</p>
+                )}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Dose</p>
@@ -91,28 +106,10 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
           </div>
         </Card>
 
-        {/* Available Drugs Section */}
         <AvailableDrugs 
           drugName={recommendation.primaryRecommendation.name}
-          products={[
-            {
-              name: "ALMACIN",
-              manufacturer: "ALKALOID AD SKOPJE",
-              forms: [
-                {
-                  type: "Capsule",
-                  strength: "500 mg",
-                  packaging: "16 capsules (2 Al/PVC blisters of 8 capsules)"
-                },
-                {
-                  type: "Oral suspension",
-                  strength: "250 mg/5 mL",
-                  packaging: "100 mL glass bottle with powder"
-                }
-              ]
-            },
-            // Add more products as needed based on the antibiotic
-          ]}
+          products={getAvailableDrugs(recommendation.primaryRecommendation.name)}
+          onProductSelect={handleProductSelect}
         />
       </div>
 
