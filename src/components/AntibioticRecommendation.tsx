@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Beaker } from "lucide-react";
 import { AvailableDrugs } from "./AvailableDrugs";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
 import { availableDrugs } from "@/utils/availableDrugsDatabase";
+import { PrescriptionModal } from "./PrescriptionModal";
 
 interface RecommendationProps {
   recommendation: {
@@ -33,6 +35,7 @@ interface RecommendationProps {
 
 export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recommendation }) => {
   const [selectedProduct, setSelectedProduct] = useState<DrugProduct>();
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
 
   const handleProductSelect = (product: DrugProduct) => {
     setSelectedProduct(product);
@@ -166,6 +169,22 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
           </div>
         </Card>
       )}
+
+      <div className="flex justify-end mt-6">
+        <Button 
+          className="premium-button"
+          onClick={() => setIsPrescriptionModalOpen(true)}
+        >
+          Generate Prescription
+        </Button>
+      </div>
+
+      <PrescriptionModal
+        open={isPrescriptionModalOpen}
+        onClose={() => setIsPrescriptionModalOpen(false)}
+        recommendationData={recommendation}
+        selectedProduct={selectedProduct}
+      />
     </div>
   );
 };
