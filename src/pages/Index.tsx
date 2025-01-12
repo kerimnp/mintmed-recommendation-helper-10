@@ -2,7 +2,7 @@ import { PatientForm } from "@/components/PatientForm";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const translations = {
+export const translations = {
   en: {
     title: "Antibioteka",
     subtitle: "Advanced Clinical Decision Support for Antibiotic Recommendations",
