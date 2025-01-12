@@ -3,6 +3,7 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/pages/Index";
+import { Card } from "./ui/card";
 
 interface AllergySectionProps {
   allergies: {
@@ -23,14 +24,14 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
   const t = translations[language].allergies;
 
   return (
-    <div className="space-y-4">
+    <Card className="glass-card p-6 space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold text-gray-900">{t.title}</h2>
         <p className="text-sm text-gray-500">{t.subtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border border-gray-200">
           <Checkbox
             id="penicillin"
             checked={allergies.penicillin}
@@ -39,7 +40,7 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
           <Label htmlFor="penicillin">{t.penicillin}</Label>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border border-gray-200">
           <Checkbox
             id="cephalosporin"
             checked={allergies.cephalosporin}
@@ -48,7 +49,7 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
           <Label htmlFor="cephalosporin">{t.cephalosporin}</Label>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border border-gray-200">
           <Checkbox
             id="sulfa"
             checked={allergies.sulfa}
@@ -57,7 +58,7 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
           <Label htmlFor="sulfa">{t.sulfa}</Label>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border border-gray-200">
           <Checkbox
             id="macrolide"
             checked={allergies.macrolide}
@@ -66,7 +67,7 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
           <Label htmlFor="macrolide">{t.macrolide}</Label>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 p-3 bg-white rounded-lg border border-gray-200">
           <Checkbox
             id="fluoroquinolone"
             checked={allergies.fluoroquinolone}
@@ -75,6 +76,6 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
           <Label htmlFor="fluoroquinolone">{t.fluoroquinolone}</Label>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
