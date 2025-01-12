@@ -2,6 +2,7 @@ import React from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Beaker } from "lucide-react";
+import { AvailableDrugs } from "./AvailableDrugs";
 
 interface RecommendationProps {
   recommendation: {
@@ -31,63 +32,89 @@ interface RecommendationProps {
 export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recommendation }) => {
   return (
     <div className="space-y-6 animate-fade-in">
-      <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
-        <div className="flex items-center gap-2 mb-4">
-          <Pill className="h-6 w-6 text-mint-600" />
-          <h3 className="text-2xl font-semibold text-gray-900">Primary Recommendation</h3>
-        </div>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Antibiotic</p>
-              <p className="text-lg font-medium">{recommendation.primaryRecommendation.name}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
+          <div className="flex items-center gap-2 mb-4">
+            <Pill className="h-6 w-6 text-mint-600" />
+            <h3 className="text-2xl font-semibold text-gray-900">Primary Recommendation</h3>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Antibiotic</p>
+                <p className="text-lg font-medium">{recommendation.primaryRecommendation.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Dose</p>
+                <p className="text-lg font-medium">{recommendation.primaryRecommendation.dose}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Route</p>
+                <p className="text-lg font-medium">{recommendation.primaryRecommendation.route}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Duration</p>
+                <p className="text-lg font-medium">{recommendation.primaryRecommendation.duration}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Dose</p>
-              <p className="text-lg font-medium">{recommendation.primaryRecommendation.dose}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Route</p>
-              <p className="text-lg font-medium">{recommendation.primaryRecommendation.route}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Duration</p>
-              <p className="text-lg font-medium">{recommendation.primaryRecommendation.duration}</p>
+
+            {recommendation.calculations && (
+              <div className="grid grid-cols-1 gap-4 mt-4">
+                {recommendation.calculations.weightBased && (
+                  <div className="flex items-center gap-2">
+                    <Scale className="h-5 w-5 text-mint-600" />
+                    <p className="text-sm text-gray-700">{recommendation.calculations.weightBased}</p>
+                  </div>
+                )}
+                {recommendation.calculations.renalAdjustment && (
+                  <div className="flex items-center gap-2">
+                    <Beaker className="h-5 w-5 text-mint-600" />
+                    <p className="text-sm text-gray-700">{recommendation.calculations.renalAdjustment}</p>
+                  </div>
+                )}
+                {recommendation.calculations.pediatricFactors && (
+                  <div className="flex items-center gap-2">
+                    <Baby className="h-5 w-5 text-mint-600" />
+                    <p className="text-sm text-gray-700">{recommendation.calculations.pediatricFactors}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="bg-mint-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Info className="h-5 w-5 text-mint-600" />
+                <p className="text-sm font-medium text-mint-700">Clinical Reasoning</p>
+              </div>
+              <p className="text-gray-700">{recommendation.reasoning}</p>
             </div>
           </div>
+        </Card>
 
-          {recommendation.calculations && (
-            <div className="grid grid-cols-1 gap-4 mt-4">
-              {recommendation.calculations.weightBased && (
-                <div className="flex items-center gap-2">
-                  <Scale className="h-5 w-5 text-mint-600" />
-                  <p className="text-sm text-gray-700">{recommendation.calculations.weightBased}</p>
-                </div>
-              )}
-              {recommendation.calculations.renalAdjustment && (
-                <div className="flex items-center gap-2">
-                  <Beaker className="h-5 w-5 text-mint-600" />
-                  <p className="text-sm text-gray-700">{recommendation.calculations.renalAdjustment}</p>
-                </div>
-              )}
-              {recommendation.calculations.pediatricFactors && (
-                <div className="flex items-center gap-2">
-                  <Baby className="h-5 w-5 text-mint-600" />
-                  <p className="text-sm text-gray-700">{recommendation.calculations.pediatricFactors}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="bg-mint-50 p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Info className="h-5 w-5 text-mint-600" />
-              <p className="text-sm font-medium text-mint-700">Clinical Reasoning</p>
-            </div>
-            <p className="text-gray-700">{recommendation.reasoning}</p>
-          </div>
-        </div>
-      </Card>
+        {/* Available Drugs Section */}
+        <AvailableDrugs 
+          drugName={recommendation.primaryRecommendation.name}
+          products={[
+            {
+              name: "ALMACIN",
+              manufacturer: "ALKALOID AD SKOPJE",
+              forms: [
+                {
+                  type: "Capsule",
+                  strength: "500 mg",
+                  packaging: "16 capsules (2 Al/PVC blisters of 8 capsules)"
+                },
+                {
+                  type: "Oral suspension",
+                  strength: "250 mg/5 mL",
+                  packaging: "100 mL glass bottle with powder"
+                }
+              ]
+            },
+            // Add more products as needed based on the antibiotic
+          ]}
+        />
+      </div>
 
       {recommendation.alternatives.length > 0 && (
         <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
