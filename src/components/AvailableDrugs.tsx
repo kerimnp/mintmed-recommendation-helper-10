@@ -34,11 +34,12 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
           {displayProducts.map((product, index) => (
             <Card 
               key={index} 
-              className={`p-3 border transition-colors ${
+              className={`p-3 border transition-colors cursor-pointer ${
                 selectedProduct?.name === product.name 
                   ? 'border-mint-500 bg-mint-50' 
-                  : 'border-mint-200 bg-white'
+                  : 'border-mint-200 bg-white hover:border-mint-300'
               }`}
+              onClick={() => handleProductSelect(product)}
             >
               <h4 className="font-semibold text-medical-deep">{product.name}</h4>
               <p className="text-sm text-gray-600 mb-2">{product.manufacturer}</p>
