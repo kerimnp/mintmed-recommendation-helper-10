@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
 import jsPDF from "jspdf";
+import { DrugProduct } from "@/utils/availableDrugsDatabase";
 
 interface PrescriptionModalProps {
   open: boolean;
@@ -17,11 +18,7 @@ interface PrescriptionModalProps {
       duration: string;
     };
   };
-  selectedProduct?: {
-    name: string;
-    manufacturer: string;
-    form: string;
-  };
+  selectedProduct?: DrugProduct;
 }
 
 export const PrescriptionModal = ({ open, onClose, recommendationData, selectedProduct }: PrescriptionModalProps) => {
@@ -63,7 +60,9 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
       doc.text("Selected Product:", 20, 130);
       doc.text(`Name: ${selectedProduct.name}`, 20, 140);
       doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 20, 150);
-      doc.text(`Form: ${selectedProduct.form}`, 20, 160);
+      if (selectedProduct.forms.length > 0) {
+        doc.text(`Form: ${selectedProduct.forms[0].type} - ${selectedProduct.forms[0].strength}`, 20, 160);
+      }
     }
     
     // Add doctor's information and stamp area
