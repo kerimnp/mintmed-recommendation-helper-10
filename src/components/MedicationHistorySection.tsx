@@ -3,6 +3,8 @@ import { Card } from "./ui/card";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Textarea } from "./ui/textarea";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/pages/Index";
 
 interface MedicationHistorySectionProps {
   formData: {
@@ -16,11 +18,14 @@ export const MedicationHistorySection: React.FC<MedicationHistorySectionProps> =
   formData,
   onInputChange,
 }) => {
+  const { language } = useLanguage();
+  const t = translations[language].medicationHistory;
+
   return (
     <Card className="glass-card p-6 space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900">Medication History</h2>
-        <p className="text-sm text-gray-500">Provide information about medications and allergies</p>
+        <h2 className="text-2xl font-semibold text-gray-900">{t.title}</h2>
+        <p className="text-sm text-gray-500">{t.subtitle}</p>
       </div>
 
       <div className="space-y-6">
@@ -30,14 +35,14 @@ export const MedicationHistorySection: React.FC<MedicationHistorySectionProps> =
             checked={formData.recentAntibiotics}
             onCheckedChange={(checked) => onInputChange("recentAntibiotics", checked)}
           />
-          <Label htmlFor="recentAntibiotics">Recent Antibiotic Use (within 3 months)</Label>
+          <Label htmlFor="recentAntibiotics">{t.recentAntibiotics}</Label>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="otherAllergies" className="form-label">Other Known Allergies</Label>
+          <Label htmlFor="otherAllergies" className="form-label">{t.otherAllergies}</Label>
           <Textarea 
             id="otherAllergies" 
-            placeholder="List any other known allergies"
+            placeholder={t.otherAllergies}
             className="input-field"
             value={formData.otherAllergies}
             onChange={(e) => onInputChange("otherAllergies", e.target.value)}

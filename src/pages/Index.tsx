@@ -21,8 +21,23 @@ export const translations = {
       pregnancyOptions: {
         notPregnant: "Not Pregnant",
         pregnant: "Pregnant",
-        breastfeeding: "Breastfeeding"
+        breastfeeding: "Breastfeeding",
+        notApplicable: "Not Applicable"
       }
+    },
+    allergies: {
+      title: "Allergies",
+      subtitle: "Select any known drug allergies",
+      penicillin: "Penicillin (includes Amoxicillin, Ampicillin)",
+      cephalosporin: "Cephalosporins (e.g., Ceftriaxone, Cefepime)",
+      sulfa: "Sulfa Drugs (e.g., TMP-SMX)",
+      macrolide: "Macrolides (e.g., Azithromycin, Clarithromycin)",
+      fluoroquinolone: "Fluoroquinolones (e.g., Ciprofloxacin, Levofloxacin)"
+    },
+    renalFunction: {
+      title: "Renal Function",
+      subtitle: "Enter patient's renal function data",
+      creatinine: "Serum Creatinine (mg/dL)"
     },
     comorbidities: {
       title: "Comorbidities",
@@ -32,10 +47,41 @@ export const translations = {
       diabetes: "Diabetes",
       immunosuppressed: "Immunosuppression"
     },
-    renalFunction: {
-      title: "Renal Function",
-      subtitle: "Enter patient's renal function data",
-      creatinine: "Serum Creatinine (mg/dL)"
+    infectionDetails: {
+      title: "Infection Details",
+      subtitle: "Provide information about the infection",
+      site: "Site of Infection",
+      symptoms: "Symptoms",
+      duration: "Duration of Symptoms (days)",
+      severity: "Severity",
+      sites: {
+        respiratory: "Respiratory",
+        urinary: "Urinary",
+        skin: "Skin/Soft Tissue",
+        abdominal: "Intra-abdominal",
+        cns: "Central Nervous System",
+        wound: "Wound",
+        bloodstream: "Bloodstream (Sepsis)",
+        bone: "Bone/Joint",
+        ear: "Ear",
+        eye: "Eye",
+        dental: "Dental",
+        other: "Other"
+      },
+      severityLevels: {
+        mild: "Mild",
+        moderate: "Moderate",
+        severe: "Severe"
+      }
+    },
+    medicationHistory: {
+      title: "Medication History",
+      subtitle: "Provide information about medications and allergies",
+      recentAntibiotics: "Recent Antibiotic Use (within 3 months)",
+      otherAllergies: "Other Known Allergies"
+    },
+    buttons: {
+      generate: "Generate Antibiotic Recommendation"
     }
   },
   bs: {
@@ -56,8 +102,23 @@ export const translations = {
       pregnancyOptions: {
         notPregnant: "Nije trudna",
         pregnant: "Trudna",
-        breastfeeding: "Doji"
+        breastfeeding: "Doji",
+        notApplicable: "Nije primjenjivo"
       }
+    },
+    allergies: {
+      title: "Alergije",
+      subtitle: "Odaberite poznate alergije na lijekove",
+      penicillin: "Penicilin (uključujući Amoksicilin, Ampicilin)",
+      cephalosporin: "Cefalosporini (npr. Ceftriakson, Cefepim)",
+      sulfa: "Sulfa lijekovi (npr. TMP-SMX)",
+      macrolide: "Makrolidi (npr. Azitromicin, Klaritromicin)",
+      fluoroquinolone: "Fluorokinoloni (npr. Ciprofloksacin, Levofloksacin)"
+    },
+    renalFunction: {
+      title: "Bubrežna funkcija",
+      subtitle: "Unesite podatke o bubrežnoj funkciji pacijenta",
+      creatinine: "Serumski kreatinin (mg/dL)"
     },
     comorbidities: {
       title: "Komorbiditeti",
@@ -67,10 +128,41 @@ export const translations = {
       diabetes: "Dijabetes",
       immunosuppressed: "Imunosupresija"
     },
-    renalFunction: {
-      title: "Bubrežna funkcija",
-      subtitle: "Unesite podatke o bubrežnoj funkciji pacijenta",
-      creatinine: "Serumski kreatinin (mg/dL)"
+    infectionDetails: {
+      title: "Detalji infekcije",
+      subtitle: "Unesite informacije o infekciji",
+      site: "Mjesto infekcije",
+      symptoms: "Simptomi",
+      duration: "Trajanje simptoma (dana)",
+      severity: "Težina",
+      sites: {
+        respiratory: "Respiratorni",
+        urinary: "Urinarni",
+        skin: "Koža/Meko tkivo",
+        abdominal: "Intraabdominalni",
+        cns: "Centralni nervni sistem",
+        wound: "Rana",
+        bloodstream: "Krvotok (Sepsa)",
+        bone: "Kost/Zglob",
+        ear: "Uho",
+        eye: "Oko",
+        dental: "Zubni",
+        other: "Ostalo"
+      },
+      severityLevels: {
+        mild: "Blaga",
+        moderate: "Umjerena",
+        severe: "Teška"
+      }
+    },
+    medicationHistory: {
+      title: "Historija lijekova",
+      subtitle: "Unesite informacije o lijekovima i alergijama",
+      recentAntibiotics: "Nedavna upotreba antibiotika (unutar 3 mjeseca)",
+      otherAllergies: "Druge poznate alergije"
+    },
+    buttons: {
+      generate: "Generiši preporuku antibiotika"
     }
   }
 };

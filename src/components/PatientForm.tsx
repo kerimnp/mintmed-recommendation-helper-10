@@ -9,9 +9,13 @@ import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { MedicationHistorySection } from "./MedicationHistorySection";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/pages/Index";
 import type { PatientData } from "@/utils/antibioticRecommendations/types";
 
 export const PatientForm = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
   const { toast } = useToast();
   const [formData, setFormData] = useState<PatientData>({
     age: "",
@@ -135,7 +139,7 @@ export const PatientForm = () => {
               hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed
               backdrop-blur-sm"
           >
-            Generate Antibiotic Recommendation
+            {t.buttons.generate}
           </button>
         </div>
       </form>
