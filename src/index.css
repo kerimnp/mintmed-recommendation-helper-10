@@ -32,12 +32,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
   }
 }
 
 .glass-card {
-  @apply bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl 
+  @apply bg-white rounded-2xl border border-white/20 shadow-xl 
     transition-all duration-300 hover:shadow-2xl hover:scale-[1.01];
 }
 
