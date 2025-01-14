@@ -1,4 +1,5 @@
 import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
+import { isSafeAntibiotic } from "./antibioticRecommendations/antibioticSafety";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
   // Basic validation
@@ -16,167 +17,289 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     };
   }
 
-  // Generate recommendation based on infection site
+  // Function to check if an antibiotic is safe based on allergies
+  const checkAllergySafety = (antibioticName: string): boolean => {
+    const allergies = data.allergies;
+    
+    // Check penicillin allergy
+    if (allergies.penicillin && (
+      antibioticName.toLowerCase().includes('penicillin') ||
+      antibioticName.toLowerCase().includes('amoxicillin') ||
+      antibioticName.toLowerCase().includes('ampicillin') ||
+      antibioticName.toLowerCase().includes('piperacillin')
+    )) {
+      return false;
+    }
+
+    // Check cephalosporin allergy
+    if (allergies.cephalosporin && (
+      antibioticName.toLowerCase().includes('cef') ||
+      antibioticName.toLowerCase().includes('cephalosporin')
+    )) {
+      return false;
+    }
+
+    // Check sulfa allergy
+    if (allergies.sulfa && (
+      antibioticName.toLowerCase().includes('sulfa') ||
+      antibioticName.toLowerCase().includes('trimethoprim') ||
+      antibioticName.toLowerCase().includes('sulfamethoxazole')
+    )) {
+      return false;
+    }
+
+    // Check macrolide allergy
+    if (allergies.macrolide && (
+      antibioticName.toLowerCase().includes('mycin') ||
+      antibioticName.toLowerCase().includes('macrolide')
+    )) {
+      return false;
+    }
+
+    // Check fluoroquinolone allergy
+    if (allergies.fluoroquinolone && (
+      antibioticName.toLowerCase().includes('floxacin') ||
+      antibioticName.toLowerCase().includes('fluoroquinolone')
+    )) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Generate safe recommendations based on infection site
+  let recommendation: AntibioticRecommendation;
+  
   switch (data.infectionSite.toLowerCase()) {
     case "respiratory":
-      return generateRespiratoryRecommendation(data);
+      recommendation = generateRespiratoryRecommendation(data, checkAllergySafety);
+      break;
     case "urinary":
-      return generateUrinaryRecommendation(data);
+      recommendation = generateUrinaryRecommendation(data, checkAllergySafety);
+      break;
     case "skin":
-      return generateSkinRecommendation(data);
+      recommendation = generateSkinRecommendation(data, checkAllergySafety);
+      break;
     default:
-      return {
-        primaryRecommendation: {
+      // Default safe recommendation
+      let safePrimary = {
+        name: "Unable to Generate Safe Recommendation",
+        dose: "N/A",
+        route: "N/A",
+        duration: "N/A"
+      };
+
+      // Try different options based on allergies
+      if (checkAllergySafety("Amoxicillin/Clavulanate")) {
+        safePrimary = {
           name: "Amoxicillin/Clavulanate",
           dose: "875/125 mg",
           route: "Oral",
           duration: "7-10 days"
-        },
-        reasoning: "Broad-spectrum coverage for common pathogens",
-        alternatives: [
-          {
-            name: "Cefuroxime",
-            dose: "500 mg",
-            route: "Oral",
-            duration: "7-10 days",
-            reason: "Alternative for penicillin-allergic patients"
-          }
-        ],
+        };
+      } else if (checkAllergySafety("Doxycycline")) {
+        safePrimary = {
+          name: "Doxycycline",
+          dose: "100 mg",
+          route: "Oral",
+          duration: "7-10 days"
+        };
+      }
+
+      recommendation = {
+        primaryRecommendation: safePrimary,
+        reasoning: "Selected based on patient's allergy profile",
+        alternatives: [],
         precautions: []
       };
   }
+
+  // Add allergy warnings to precautions
+  const allergyWarnings = Object.entries(data.allergies)
+    .filter(([_, isAllergic]) => isAllergic)
+    .map(([allergyType]) => `Patient is allergic to ${allergyType} antibiotics`);
+
+  recommendation.precautions = [
+    ...allergyWarnings,
+    ...recommendation.precautions
+  ];
+
+  return recommendation;
 };
 
-const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const isAllergicToPenicillin = data.allergies?.penicillin;
-
+// Helper function to generate respiratory recommendations with allergy checking
+const generateRespiratoryRecommendation = (
+  data: PatientData,
+  checkAllergySafety: (name: string) => boolean
+): AntibioticRecommendation => {
   if (data.severity === "mild") {
-    return {
-      primaryRecommendation: {
-        name: isAllergicToPenicillin ? "Azithromycin" : "Amoxicillin",
-        dose: isAllergicToPenicillin ? "500 mg day 1, then 250 mg" : "500 mg",
-        route: "Oral",
-        duration: isAllergicToPenicillin ? "5 days" : "7-10 days"
-      },
-      reasoning: "Coverage for common respiratory pathogens",
-      alternatives: [
-        {
+    // Try different options based on allergies
+    if (checkAllergySafety("Amoxicillin")) {
+      return {
+        primaryRecommendation: {
+          name: "Amoxicillin",
+          dose: "500 mg",
+          route: "Oral",
+          duration: "7-10 days"
+        },
+        reasoning: "First-line treatment for mild respiratory infections",
+        alternatives: checkAllergySafety("Doxycycline") ? [{
           name: "Doxycycline",
           dose: "100 mg twice daily",
           route: "Oral",
           duration: "7-10 days",
-          reason: "Alternative for patients with macrolide allergy"
-        }
-      ],
-      precautions: []
-    };
+          reason: "Alternative for patients with penicillin allergy"
+        }] : [],
+        precautions: []
+      };
+    } else if (checkAllergySafety("Doxycycline")) {
+      return {
+        primaryRecommendation: {
+          name: "Doxycycline",
+          dose: "100 mg twice daily",
+          route: "Oral",
+          duration: "7-10 days"
+        },
+        reasoning: "Selected due to penicillin allergy",
+        alternatives: [],
+        precautions: []
+      };
+    }
   } else {
-    return {
-      primaryRecommendation: {
-        name: "Ceftriaxone",
-        dose: "1-2g daily",
-        route: "IV",
-        duration: "10-14 days"
-      },
-      reasoning: "Severe respiratory infection requiring broad coverage",
-      alternatives: [
-        {
+    // For moderate/severe cases
+    if (checkAllergySafety("Levofloxacin")) {
+      return {
+        primaryRecommendation: {
           name: "Levofloxacin",
           dose: "750 mg daily",
           route: "IV/Oral",
-          duration: "10-14 days",
-          reason: "Alternative for severe beta-lactam allergy"
-        }
-      ],
-      precautions: ["Monitor renal function", "Watch for C. difficile infection"]
-    };
+          duration: "10-14 days"
+        },
+        reasoning: "Broad spectrum coverage for severe respiratory infection",
+        alternatives: [],
+        precautions: ["Monitor for tendon issues", "Watch for C. difficile infection"]
+      };
+    }
   }
+
+  // If no safe options found
+  return {
+    primaryRecommendation: {
+      name: "Consultation Required",
+      dose: "N/A",
+      route: "N/A",
+      duration: "N/A"
+    },
+    reasoning: "No safe antibiotic options available due to multiple allergies",
+    alternatives: [],
+    precautions: ["Infectious disease consultation recommended"]
+  };
 };
 
-const generateUrinaryRecommendation = (data: PatientData): AntibioticRecommendation => {
+// Helper function to generate urinary recommendations with allergy checking
+const generateUrinaryRecommendation = (
+  data: PatientData,
+  checkAllergySafety: (name: string) => boolean
+): AntibioticRecommendation => {
   if (data.severity === "mild") {
-    return {
-      primaryRecommendation: {
-        name: "Nitrofurantoin",
-        dose: "100 mg twice daily",
-        route: "Oral",
-        duration: "5 days"
-      },
-      reasoning: "First-line treatment for uncomplicated UTI",
-      alternatives: [
-        {
-          name: "Trimethoprim-Sulfamethoxazole",
-          dose: "160/800 mg twice daily",
+    if (checkAllergySafety("Nitrofurantoin")) {
+      return {
+        primaryRecommendation: {
+          name: "Nitrofurantoin",
+          dose: "100 mg twice daily",
           route: "Oral",
-          duration: "3 days",
+          duration: "5 days"
+        },
+        reasoning: "First-line treatment for uncomplicated UTI",
+        alternatives: checkAllergySafety("Fosfomycin") ? [{
+          name: "Fosfomycin",
+          dose: "3g single dose",
+          route: "Oral",
+          duration: "Single dose",
           reason: "Alternative first-line agent"
-        }
-      ],
-      precautions: ["Avoid in late pregnancy", "Avoid if CrCl < 30 mL/min"]
-    };
+        }] : [],
+        precautions: ["Avoid in late pregnancy", "Avoid if CrCl < 30 mL/min"]
+      };
+    }
   } else {
-    return {
-      primaryRecommendation: {
-        name: "Ceftriaxone",
-        dose: "1g daily",
-        route: "IV",
-        duration: "10-14 days"
-      },
-      reasoning: "Severe/complicated UTI requiring broad coverage",
-      alternatives: [
-        {
-          name: "Piperacillin-Tazobactam",
-          dose: "3.375g every 6 hours",
+    if (checkAllergySafety("Ertapenem")) {
+      return {
+        primaryRecommendation: {
+          name: "Ertapenem",
+          dose: "1g daily",
           route: "IV",
-          duration: "10-14 days",
-          reason: "Alternative for severe infection"
-        }
-      ],
-      precautions: ["Monitor renal function", "Adjust dose based on CrCl"]
-    };
+          duration: "10-14 days"
+        },
+        reasoning: "Selected for complicated UTI considering allergy profile",
+        alternatives: [],
+        precautions: ["Monitor renal function"]
+      };
+    }
   }
+
+  return {
+    primaryRecommendation: {
+      name: "Consultation Required",
+      dose: "N/A",
+      route: "N/A",
+      duration: "N/A"
+    },
+    reasoning: "No safe antibiotic options available due to multiple allergies",
+    alternatives: [],
+    precautions: ["Infectious disease consultation recommended"]
+  };
 };
 
-const generateSkinRecommendation = (data: PatientData): AntibioticRecommendation => {
+// Helper function to generate skin infection recommendations with allergy checking
+const generateSkinRecommendation = (
+  data: PatientData,
+  checkAllergySafety: (name: string) => boolean
+): AntibioticRecommendation => {
   if (data.severity === "mild") {
-    return {
-      primaryRecommendation: {
-        name: "Cephalexin",
-        dose: "500 mg four times daily",
-        route: "Oral",
-        duration: "7 days"
-      },
-      reasoning: "Coverage for common skin pathogens including MSSA",
-      alternatives: [
-        {
+    if (checkAllergySafety("Clindamycin")) {
+      return {
+        primaryRecommendation: {
           name: "Clindamycin",
           dose: "300-450 mg four times daily",
           route: "Oral",
-          duration: "7 days",
-          reason: "Alternative for penicillin-allergic patients"
-        }
-      ],
-      precautions: ["Monitor for diarrhea"]
-    };
+          duration: "7 days"
+        },
+        reasoning: "Selected based on allergy profile",
+        alternatives: [],
+        precautions: ["Monitor for diarrhea"]
+      };
+    }
   } else {
-    return {
-      primaryRecommendation: {
-        name: "Vancomycin",
-        dose: "15-20 mg/kg every 12 hours",
-        route: "IV",
-        duration: "7-14 days"
-      },
-      reasoning: "Severe skin infection requiring MRSA coverage",
-      alternatives: [
-        {
+    if (checkAllergySafety("Vancomycin")) {
+      return {
+        primaryRecommendation: {
+          name: "Vancomycin",
+          dose: "15-20 mg/kg every 12 hours",
+          route: "IV",
+          duration: "7-14 days"
+        },
+        reasoning: "Severe skin infection requiring MRSA coverage",
+        alternatives: checkAllergySafety("Daptomycin") ? [{
           name: "Daptomycin",
           dose: "4-6 mg/kg daily",
           route: "IV",
           duration: "7-14 days",
           reason: "Alternative for vancomycin-resistant organisms"
-        }
-      ],
-      precautions: ["Monitor renal function", "Check vancomycin levels"]
-    };
+        }] : [],
+        precautions: ["Monitor renal function", "Check vancomycin levels"]
+      };
+    }
   }
+
+  return {
+    primaryRecommendation: {
+      name: "Consultation Required",
+      dose: "N/A",
+      route: "N/A",
+      duration: "N/A"
+    },
+    reasoning: "No safe antibiotic options available due to multiple allergies",
+    alternatives: [],
+    precautions: ["Infectious disease consultation recommended"]
+  };
 };
