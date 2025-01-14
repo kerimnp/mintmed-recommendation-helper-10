@@ -282,5 +282,139 @@ export const availableDrugs: DrugDatabase = {
         }
       ]
     }
+  ],
+  "Nitrofurantoin": [
+    {
+      name: "NIFURAN",
+      manufacturer: "ZADA PHARMACEUTICALS D.O.O.",
+      forms: [
+        {
+          type: "Capsule",
+          strength: "50 mg",
+          packaging: "30 capsules (3 PVC/PVDC/Al blisters of 10 capsules)"
+        }
+      ]
+    }
+  ],
+
+  "Fosfomycin": [
+    {
+      name: "MONURAL",
+      manufacturer: "ZAMBON S.P.A.",
+      forms: [
+        {
+          type: "Granules for oral solution",
+          strength: "3 g",
+          packaging: "1 four-layer sachet (paper/PE/Al/PE) with 8g granules"
+        }
+      ]
+    }
+  ],
+
+  "Ertapenem": [
+    {
+      name: "ERTAPENEM APTAPHARMA",
+      manufacturer: "APTA MEDICA INTERNATIONAL D.O.O.",
+      forms: [
+        {
+          type: "Powder for infusion",
+          strength: "1 g",
+          packaging: "10 glass vials of 20 ml with powder for concentrate"
+        }
+      ]
+    }
+  ],
+
+  "Clindamycin": [
+    {
+      name: "DALACIN C",
+      manufacturer: "PFIZER LUXEMBOURG SARL",
+      forms: [
+        {
+          type: "Capsule",
+          strength: "150 mg",
+          packaging: "16 capsules (2 PVC/Al blisters of 8 capsules)"
+        },
+        {
+          type: "Capsule",
+          strength: "300 mg",
+          packaging: "16 capsules (2 PVC/Al blisters of 8 capsules)"
+        }
+      ]
+    },
+    {
+      name: "KLIMICIN",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
+        {
+          type: "Capsule",
+          strength: "300 mg",
+          packaging: "16 capsules (2 PVC/PVdC-Al blisters of 8 capsules)"
+        },
+        {
+          type: "Solution for injection/infusion",
+          strength: "300 mg/2 mL",
+          packaging: "10 glass ampoules of 2 ml"
+        }
+      ]
+    }
+  ],
+
+  "Vancomycin": [
+    {
+      name: "EDICIN",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
+        {
+          type: "Powder for infusion",
+          strength: "1000 mg",
+          packaging: "1 glass vial with 1000 mg powder"
+        }
+      ]
+    }
+  ],
+
+  "Meropenem": [
+    {
+      name: "MEROPENEM VENUS",
+      manufacturer: "VENUS PHARMA GMBH",
+      forms: [
+        {
+          type: "Powder for injection/infusion",
+          strength: "1 g",
+          packaging: "10 glass vials with powder"
+        },
+        {
+          type: "Powder for injection/infusion",
+          strength: "500 mg",
+          packaging: "10 glass vials with powder"
+        }
+      ]
+    }
+  ],
+
+  "Cefepime": [
+    {
+      name: "CEBOPIM",
+      manufacturer: "SCIENTIFIC INDUSTRIAL CENTRE 'BORSHCHAHIVSKIY CHEMICAL PHARMACEUTICAL PLANT' PUBLIC JOINT-STOCK COMPANY",
+      forms: [
+        {
+          type: "Powder for injection",
+          strength: "1 g",
+          packaging: "1 glass vial with powder"
+        }
+      ]
+    },
+    {
+      name: "CEFEPIM HF",
+      manufacturer: "HEMOFARM PROIZVODNJA FARMACEUTSKIH PROIZVODA D.O.O. BANJA LUKA",
+      forms: [
+        {
+          type: "Powder for injection/infusion",
+          strength: "1000 mg",
+          packaging: "1 glass vial with powder"
+        }
+      ]
+    }
   ]
 };
