@@ -36,10 +36,7 @@
   }
 }
 
-.glass-card {
-  @apply bg-white/00 backdrop-blur-sm rounded-2xl border border-white/0 shadow-xl 
-    transition-all duration-300 hover:shadow-2xl hover:scale-[1.01];
-}
+
 
 .input-field {
   @apply w-full px-4 py-2 bg-white rounded-lg border border-medical-cyan/00
