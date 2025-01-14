@@ -176,9 +176,16 @@ const Index = () => {
       <LanguageToggle />
       <div className="container px-4 py-12">
         <div className="text-center mb-12 space-y-4 animate-fade-in">
-          <h1 className="text-5xl font-bold text-medical-deep bg-clip-text text-transparent bg-gradient-to-r from-medical-deep to-medical-electric">
-            {t.title}
-          </h1>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <img 
+              src="/lovable-uploads/92a7493e-1412-4613-a90f-3a412e6e77c4.png" 
+              alt="Horalix Logo" 
+              className="h-24 w-auto mb-4"
+            />
+            <h1 className="text-5xl font-bold text-medical-deep bg-clip-text text-transparent bg-gradient-to-r from-medical-deep to-medical-electric">
+              {t.title}
+            </h1>
+          </div>
           <p className="text-lg text-medical-deep/60 max-w-2xl mx-auto">
             {t.subtitle}
           </p>
