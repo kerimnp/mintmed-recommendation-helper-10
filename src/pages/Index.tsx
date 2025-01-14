@@ -173,19 +173,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-medical-cyan/10 to-medical-deep/5">
+      <div className="absolute top-4 left-4">
+        <img 
+          src="/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png" 
+          alt="Horalix Logo" 
+          className="h-12 w-auto"
+        />
+      </div>
       <LanguageToggle />
       <div className="container px-4 py-12">
         <div className="text-center mb-12 space-y-4 animate-fade-in">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <img 
-              src="/lovable-uploads/92a7493e-1412-4613-a90f-3a412e6e77c4.png" 
-              alt="Horalix Logo" 
-              className="h-24 w-auto mb-4"
-            />
-            <h1 className="text-5xl font-bold text-medical-deep bg-clip-text text-transparent bg-gradient-to-r from-medical-deep to-medical-electric">
-              {t.title}
-            </h1>
-          </div>
+          <h1 className="text-5xl font-bold text-medical-deep bg-clip-text text-transparent bg-gradient-to-r from-medical-deep to-medical-electric">
+            {t.title}
+          </h1>
           <p className="text-lg text-medical-deep/60 max-w-2xl mx-auto">
             {t.subtitle}
           </p>
