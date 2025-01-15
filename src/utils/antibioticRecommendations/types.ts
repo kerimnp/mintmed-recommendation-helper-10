@@ -4,7 +4,7 @@ export interface PatientData {
   weight: string;
   height: string;
   pregnancy: "pregnant" | "not_pregnant" | "not_applicable";
-  infectionSite: string;
+  infectionSites: string[];
   symptoms: string;
   duration: string;
   severity: "mild" | "moderate" | "severe";

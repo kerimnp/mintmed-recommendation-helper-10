@@ -23,7 +23,7 @@ export const PatientForm = () => {
     weight: "",
     height: "",
     pregnancy: "not_applicable",
-    infectionSite: "",
+    infectionSites: [],
     symptoms: "",
     duration: "",
     severity: "mild",
@@ -49,7 +49,6 @@ export const PatientForm = () => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       
-      // Automatically set pregnancy to not_applicable for male patients
       if (field === "gender" && value === "male") {
         newData.pregnancy = "not_applicable";
       }
@@ -71,11 +70,10 @@ export const PatientForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!formData.age || !formData.gender || !formData.weight || !formData.height || !formData.infectionSite) {
+    if (!formData.age || !formData.gender || !formData.weight || !formData.height || formData.infectionSites.length === 0) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including age, gender, weight, height, and infection site.",
+        description: "Please fill in all required fields including age, gender, weight, height, and at least one infection site.",
         variant: "destructive"
       });
       return;
