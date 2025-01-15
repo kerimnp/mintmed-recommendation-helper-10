@@ -40,7 +40,14 @@ export const PatientForm = () => {
     kidneyDisease: false,
     liverDisease: false,
     diabetes: false,
-    immunosuppressed: false
+    immunosuppressed: false,
+    resistances: {
+      mrsa: false,
+      vre: false,
+      esbl: false,
+      cre: false,
+      pseudomonas: false
+    }
   });
 
   const [recommendation, setRecommendation] = useState<any>(null);
@@ -134,8 +141,7 @@ export const PatientForm = () => {
             type="submit"
             className="w-full bg-medical-deep text-white px-6 py-3 rounded-lg font-medium
               transition-all duration-300 hover:bg-gradient-to-r hover:from-medical-deep hover:to-medical-electric
-              hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed
-              backdrop-blur-sm"
+              hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t.buttons.generate}
           </button>

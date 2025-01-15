@@ -1,9 +1,10 @@
 import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
+import { calculateBMI } from "./antibioticRecommendations/bmiCalculations";
 import { isSafeAntibiotic } from "./antibioticRecommendations/antibioticSafety";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
   // Basic validation
-  if (!data.infectionSite || !data.severity) {
+  if (!data.infectionSites || data.infectionSites.length === 0 || !data.severity) {
     return {
       primaryRecommendation: {
         name: "Unable to Generate Recommendation",
@@ -11,7 +12,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         route: "N/A",
         duration: "N/A"
       },
-      reasoning: "Please provide infection site and severity to generate recommendation",
+      reasoning: "Please provide infection sites and severity to generate recommendation",
       alternatives: [],
       precautions: ["Complete all required fields"]
     };
@@ -21,7 +22,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   const checkAllergySafety = (antibioticName: string): boolean => {
     const allergies = data.allergies;
     
-    // Check penicillin allergy
     if (allergies.penicillin && (
       antibioticName.toLowerCase().includes('penicillin') ||
       antibioticName.toLowerCase().includes('amoxicillin') ||
@@ -31,7 +31,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       return false;
     }
 
-    // Check cephalosporin allergy
     if (allergies.cephalosporin && (
       antibioticName.toLowerCase().includes('cef') ||
       antibioticName.toLowerCase().includes('cephalosporin')
@@ -39,7 +38,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       return false;
     }
 
-    // Check sulfa allergy
     if (allergies.sulfa && (
       antibioticName.toLowerCase().includes('sulfa') ||
       antibioticName.toLowerCase().includes('trimethoprim') ||
@@ -48,7 +46,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       return false;
     }
 
-    // Check macrolide allergy
     if (allergies.macrolide && (
       antibioticName.toLowerCase().includes('mycin') ||
       antibioticName.toLowerCase().includes('macrolide')
@@ -56,7 +53,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
       return false;
     }
 
-    // Check fluoroquinolone allergy
     if (allergies.fluoroquinolone && (
       antibioticName.toLowerCase().includes('floxacin') ||
       antibioticName.toLowerCase().includes('fluoroquinolone')
@@ -67,67 +63,64 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     return true;
   };
 
-  // Generate safe recommendations based on infection site
-  let recommendation: AntibioticRecommendation;
+  // Generate recommendations based on infection sites
+  let recommendations: AntibioticRecommendation[] = data.infectionSites.map(site => {
+    switch (site.toLowerCase()) {
+      case "respiratory":
+        return generateRespiratoryRecommendation(data);
+      case "urinary":
+        return generateUrinaryRecommendation(data);
+      case "skin":
+        return generateSkinRecommendation(data);
+      default:
+        return {
+          primaryRecommendation: {
+            name: "Specialist Consultation Required",
+            dose: "N/A",
+            route: "N/A",
+            duration: "N/A"
+          },
+          reasoning: `Infection site "${site}" requires specialist evaluation`,
+          alternatives: [],
+          precautions: []
+        };
+    }
+  });
+
+  // Merge recommendations for multiple sites
+  const mergedRecommendation = recommendations[0];
   
-  switch (data.infectionSite.toLowerCase()) {
-    case "respiratory":
-      recommendation = generateRespiratoryRecommendation(data, checkAllergySafety);
-      break;
-    case "urinary":
-      recommendation = generateUrinaryRecommendation(data, checkAllergySafety);
-      break;
-    case "skin":
-      recommendation = generateSkinRecommendation(data, checkAllergySafety);
-      break;
-    default:
-      // Default safe recommendation
-      let safePrimary = {
-        name: "Unable to Generate Safe Recommendation",
-        dose: "N/A",
-        route: "N/A",
-        duration: "N/A"
-      };
-
-      // Try different options based on allergies
-      if (checkAllergySafety("Amoxicillin/Clavulanate")) {
-        safePrimary = {
-          name: "Amoxicillin/Clavulanate",
-          dose: "875/125 mg",
-          route: "Oral",
-          duration: "7-10 days"
-        };
-      } else if (checkAllergySafety("Doxycycline")) {
-        safePrimary = {
-          name: "Doxycycline",
-          dose: "100 mg",
-          route: "Oral",
-          duration: "7-10 days"
-        };
-      }
-
-      recommendation = {
-        primaryRecommendation: safePrimary,
-        reasoning: "Selected based on patient's allergy profile",
-        alternatives: [],
-        precautions: []
-      };
+  // Add resistance-specific precautions
+  if (data.resistances.mrsa) {
+    mergedRecommendation.precautions.push("MRSA positive - ensure coverage with appropriate anti-MRSA agents");
   }
 
-  // Add allergy warnings to precautions
-  const allergyWarnings = Object.entries(data.allergies)
-    .filter(([_, isAllergic]) => isAllergic)
-    .map(([allergyType]) => `Patient is allergic to ${allergyType} antibiotics`);
+  if (data.resistances.vre) {
+    mergedRecommendation.precautions.push("VRE positive - consider alternative agents");
+  }
 
-  recommendation.precautions = [
-    ...allergyWarnings,
-    ...recommendation.precautions
-  ];
+  if (data.resistances.esbl) {
+    mergedRecommendation.precautions.push("ESBL positive - carbapenem therapy recommended");
+  }
 
-  return recommendation;
+  if (data.resistances.cre) {
+    mergedRecommendation.precautions.push("CRE positive - consult infectious disease specialist");
+  }
+
+  if (data.resistances.pseudomonas) {
+    mergedRecommendation.precautions.push("Pseudomonas positive - ensure antipseudomonal coverage");
+  }
+
+  // Add BMI-related precautions
+  const bmi = calculateBMI(data.weight, data.height);
+  if (bmi >= 30) {
+    mergedRecommendation.precautions.push(`Patient BMI: ${bmi.toFixed(1)} - Consider dose adjustment for obesity`);
+  }
+
+  return mergedRecommendation;
 };
 
-// Helper function to generate respiratory recommendations with allergy checking
+// Helper functions for specific infection types remain unchanged
 const generateRespiratoryRecommendation = (
   data: PatientData,
   checkAllergySafety: (name: string) => boolean
