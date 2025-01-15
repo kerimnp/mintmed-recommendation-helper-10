@@ -98,7 +98,7 @@ export const availableDrugs: DrugDatabase = {
   "Ampicillin": [
     {
       name: "AMPIBOS",
-      manufacturer: "BOSNALIJEK D.D.",
+      manufacturer: "BOSNALIJEK",
       forms: [
         {
           type: "Capsule",
@@ -108,24 +108,51 @@ export const availableDrugs: DrugDatabase = {
       ]
     },
     {
-      name: "AMPICILIN ALKALOID",
-      manufacturer: "ALKALOID AD SKOPJE",
+      name: "AMPICILLIN ANTIBIOTICE",
+      manufacturer: "ANTIBIOTICE S.A.",
       forms: [
         {
-          type: "Capsule",
+          type: "Powder for injection",
+          strength: "1 g",
+          packaging: "1 vial"
+        }
+      ]
+    },
+    {
+      name: "SOLICILLIN",
+      manufacturer: "INJECT CARE",
+      forms: [
+        {
+          type: "Powder for injection",
           strength: "500 mg",
-          packaging: "16 capsules (2 Al/PVC blisters of 8 capsules)"
+          packaging: "1 vial"
+        },
+        {
+          type: "Powder for injection",
+          strength: "1 g",
+          packaging: "1 vial"
+        }
+      ]
+    },
+    {
+      name: "SWISSCILLIN",
+      manufacturer: "SWISS PARENTERALS",
+      forms: [
+        {
+          type: "Powder for injection",
+          strength: "1 g",
+          packaging: "1 vial"
         }
       ]
     },
     {
       name: "PENTREXYL",
-      manufacturer: "GALENIKA A.D. BEOGRAD",
+      manufacturer: "GALENIKA",
       forms: [
         {
           type: "Capsule",
           strength: "500 mg",
-          packaging: "16 capsules (2 Al/PVC blisters of 8 capsules)"
+          packaging: "16 capsules"
         }
       ]
     }
@@ -139,6 +166,28 @@ export const availableDrugs: DrugDatabase = {
           type: "Film tablet",
           strength: "500 mg",
           packaging: "3 film tablets (1 PVC/PE/PVDC-Al blister)"
+        }
+      ]
+    },
+    {
+      name: "SUMAMED",
+      manufacturer: "PLIVA HRVATSKA D.O.O.",
+      forms: [
+        {
+          type: "Film tablet",
+          strength: "500 mg",
+          packaging: "3 tablets"
+        }
+      ]
+    },
+    {
+      name: "HEMOMYCIN",
+      manufacturer: "HEMOFARM",
+      forms: [
+        {
+          type: "Film tablet",
+          strength: "500 mg",
+          packaging: "3 tablets"
         }
       ]
     },
@@ -296,7 +345,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Fosfomycin": [
     {
       name: "MONURAL",
@@ -310,7 +358,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Ertapenem": [
     {
       name: "ERTAPENEM APTAPHARMA",
@@ -324,7 +371,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Clindamycin": [
     {
       name: "DALACIN C",
@@ -359,7 +405,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Vancomycin": [
     {
       name: "EDICIN",
@@ -373,7 +418,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Meropenem": [
     {
       name: "MEROPENEM VENUS",
@@ -392,7 +436,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Cefepime": [
     {
       name: "CEBOPIM",
@@ -417,7 +460,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Piperacillin-Tazobactam": [
     {
       name: "TAZOCIN",
@@ -436,7 +478,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Trimethoprim-Sulfamethoxazole": [
     {
       name: "BACTRIM",
@@ -455,7 +496,6 @@ export const availableDrugs: DrugDatabase = {
       ]
     }
   ],
-
   "Cephalexin": [
     {
       name: "KEFLEX",
@@ -470,6 +510,48 @@ export const availableDrugs: DrugDatabase = {
           type: "Oral suspension",
           strength: "250mg/5mL",
           packaging: "100mL bottle"
+        }
+      ]
+    }
+  ],
+  "Linezolid": [
+    {
+      name: "ZYVOX",
+      manufacturer: "PFIZER INC.",
+      forms: [
+        {
+          type: "Film tablet",
+          strength: "600 mg",
+          packaging: "10 tablets"
+        },
+        {
+          type: "Solution for infusion",
+          strength: "2 mg/mL",
+          packaging: "300 mL bag"
+        }
+      ]
+    },
+    {
+      name: "LINEZOLID TEVA",
+      manufacturer: "TEVA PHARMACEUTICALS",
+      forms: [
+        {
+          type: "Film tablet",
+          strength: "600 mg",
+          packaging: "10 tablets"
+        }
+      ]
+    }
+  ],
+  "Tigecycline": [
+    {
+      name: "TYGACIL",
+      manufacturer: "PFIZER INC.",
+      forms: [
+        {
+          type: "Powder for infusion",
+          strength: "50 mg",
+          packaging: "10 vials"
         }
       ]
     }
