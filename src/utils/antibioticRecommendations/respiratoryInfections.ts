@@ -40,23 +40,45 @@ export const generateRespiratoryRecommendation = (
   } else if (data.severity === "moderate") {
     if (checkAllergySafety("Ceftriaxone")) {
       recommendation.primaryRecommendation = {
-        name: "Ceftriaxone + Azithromycin",
-        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "2g daily + 500mg daily",
+        name: "Ceftriaxone",
+        dose: isPediatric ? "50-75mg/kg/day" : "1g daily",
         route: "IV",
         duration: "7-10 days"
       };
-      recommendation.reasoning = "Broad coverage for moderate respiratory infection";
+      recommendation.reasoning = "Moderate respiratory infection requiring parenteral therapy";
+      
+      if (checkAllergySafety("Azithromycin")) {
+        recommendation.alternatives.push({
+          name: "Azithromycin",
+          dose: isPediatric ? "10mg/kg/day" : "500mg daily",
+          route: "IV",
+          duration: "7-10 days",
+          reason: "Alternative for atypical coverage"
+        });
+      }
     }
   } else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
-      name: "Ceftriaxone + Azithromycin + Vancomycin",
+      name: "Cefepime + Azithromycin",
       dose: isPediatric ? 
-        "75mg/kg/day + 10mg/kg/day + 15mg/kg q6h" : 
-        "2g q12h + 500mg daily + 15-20mg/kg q8-12h",
+        "50mg/kg q8h + 10mg/kg/day" : 
+        "2g q8h + 500mg daily",
       route: "IV",
       duration: "10-14 days"
     };
-    recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection including possible MRSA";
+    recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection";
+
+    if (data.resistances.mrsa) {
+      recommendation.alternatives.push({
+        name: "Vancomycin + Cefepime + Azithromycin",
+        dose: isPediatric ?
+          "15mg/kg q6h + 50mg/kg q8h + 10mg/kg/day" :
+          "15-20mg/kg q8-12h + 2g q8h + 500mg daily",
+        route: "IV",
+        duration: "10-14 days",
+        reason: "Added MRSA coverage due to risk factors"
+      });
+    }
   }
 
   return recommendation;

@@ -416,5 +416,62 @@ export const availableDrugs: DrugDatabase = {
         }
       ]
     }
+  ],
+
+  "Piperacillin-Tazobactam": [
+    {
+      name: "TAZOCIN",
+      manufacturer: "PFIZER",
+      forms: [
+        {
+          type: "Powder for injection/infusion",
+          strength: "4g/0.5g",
+          packaging: "12 vials"
+        },
+        {
+          type: "Powder for injection/infusion",
+          strength: "2g/0.25g",
+          packaging: "12 vials"
+        }
+      ]
+    }
+  ],
+
+  "Trimethoprim-Sulfamethoxazole": [
+    {
+      name: "BACTRIM",
+      manufacturer: "ROCHE",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "160mg/800mg",
+          packaging: "20 tablets"
+        },
+        {
+          type: "Oral suspension",
+          strength: "40mg/200mg per 5mL",
+          packaging: "100mL bottle"
+        }
+      ]
+    }
+  ],
+
+  "Cephalexin": [
+    {
+      name: "KEFLEX",
+      manufacturer: "LEGACY PHARMACEUTICALS",
+      forms: [
+        {
+          type: "Capsule",
+          strength: "500mg",
+          packaging: "20 capsules"
+        },
+        {
+          type: "Oral suspension",
+          strength: "250mg/5mL",
+          packaging: "100mL bottle"
+        }
+      ]
+    }
   ]
 };
