@@ -22,6 +22,13 @@ export interface PatientData {
   liverDisease: boolean;
   diabetes: boolean;
   immunosuppressed: boolean;
+  resistances: {
+    mrsa: boolean;
+    vre: boolean;
+    esbl: boolean;
+    cre: boolean;
+    pseudomonas: boolean;
+  };
 }
 
 export interface AntibioticRecommendation {
@@ -44,5 +51,6 @@ export interface AntibioticRecommendation {
     weightBased?: string;
     renalAdjustment?: string;
     pediatricFactors?: string;
+    bmiFactors?: string;
   };
 }

@@ -1,4 +1,5 @@
 import { PatientData, AntibioticRecommendation } from "./types";
+import { calculateBMI, getBMICategory, shouldAdjustForWeight } from "./bmiCalculations";
 import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
@@ -8,7 +9,9 @@ import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustme
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
-  // Calculate GFR for renal adjustments
+  // Calculate BMI and GFR
+  const bmi = calculateBMI(data.weight, data.height);
+  const bmiCategory = getBMICategory(bmi);
   const gfr = calculateGFR({
     age: data.age,
     weight: data.weight,
@@ -16,7 +19,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   });
 
   // Validate required fields
-  if (!data.infectionSite || !data.severity) {
+  if (!data.infectionSites || data.infectionSites.length === 0 || !data.severity) {
     return {
       primaryRecommendation: {
         name: "Incomplete Information",
@@ -24,14 +27,15 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         route: "N/A",
         duration: "N/A"
       },
-      reasoning: "Please provide infection site and severity to generate recommendation",
+      reasoning: "Please provide infection sites and severity to generate recommendation",
       alternatives: [],
       precautions: ["Complete all required fields to receive accurate recommendation"]
     };
   }
 
-  const baseRecommendation = (() => {
-    switch (data.infectionSite.toLowerCase()) {
+  // Handle multiple infection sites
+  let recommendations: AntibioticRecommendation[] = data.infectionSites.map(site => {
+    switch (site.toLowerCase()) {
       case "respiratory":
         return generateRespiratoryRecommendation(data);
       case "urinary":
@@ -51,52 +55,80 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
             route: "N/A",
             duration: "N/A"
           },
-          reasoning: "Infection site not recognized or requires specialist evaluation",
+          reasoning: `Infection site "${site}" requires specialist evaluation`,
           alternatives: [],
-          precautions: ["Please select a valid infection site"]
+          precautions: []
         };
     }
-  })();
+  });
 
-  // Add pediatric-specific precautions and adjustments
+  // Merge recommendations for multiple sites
+  const mergedRecommendation = recommendations[0];
+  
+  // Add resistance-specific precautions and adjustments
+  if (data.resistances.mrsa) {
+    mergedRecommendation.precautions.push(
+      "MRSA positive - ensure coverage with appropriate anti-MRSA agents"
+    );
+    // Adjust recommendations based on MRSA
+    if (!mergedRecommendation.primaryRecommendation.name.includes("Vancomycin") &&
+        !mergedRecommendation.primaryRecommendation.name.includes("Daptomycin")) {
+      mergedRecommendation.alternatives.unshift({
+        name: "Vancomycin",
+        dose: "15-20mg/kg q8-12h",
+        route: "IV",
+        duration: mergedRecommendation.primaryRecommendation.duration,
+        reason: "Added due to MRSA positive status"
+      });
+    }
+  }
+
+  if (data.resistances.esbl) {
+    mergedRecommendation.precautions.push(
+      "ESBL positive - carbapenem therapy recommended"
+    );
+    // Add carbapenem if not already present
+    if (!mergedRecommendation.primaryRecommendation.name.includes("Meropenem")) {
+      mergedRecommendation.alternatives.unshift({
+        name: "Meropenem",
+        dose: "1g q8h",
+        route: "IV",
+        duration: mergedRecommendation.primaryRecommendation.duration,
+        reason: "Added due to ESBL positive status"
+      });
+    }
+  }
+
+  // Add BMI-related precautions and calculations
+  if (bmi >= 30) {
+    mergedRecommendation.precautions.push(
+      `Patient is ${bmiCategory} (BMI: ${bmi.toFixed(1)}) - dose adjustments may be needed`
+    );
+    mergedRecommendation.calculations = {
+      ...mergedRecommendation.calculations,
+      bmiFactors: `Consider dose adjustment for ${bmiCategory} patient`
+    };
+  }
+
+  // Add other existing precautions
   if (isPediatricPatient(Number(data.age))) {
     const ageCategory = getPediatricAgeCategory(Number(data.age));
-    baseRecommendation.precautions.push(
-      `Pediatric patient (${ageCategory}) - dose adjusted for age and weight`,
-      "Regular monitoring of clinical response recommended"
+    mergedRecommendation.precautions.push(
+      `Pediatric patient (${ageCategory}) - dose adjusted for age and weight`
     );
   }
 
-  // Add pregnancy-specific precautions
   if (data.pregnancy === "pregnant") {
-    baseRecommendation.precautions.push(
-      "Pregnant patient - medication selected for pregnancy safety",
-      "Regular monitoring of maternal and fetal well-being recommended"
+    mergedRecommendation.precautions.push(
+      "Pregnant patient - medication selected for pregnancy safety"
     );
   }
 
-  // Add renal function precautions
   if (gfr < 60) {
-    baseRecommendation.precautions.push(
+    mergedRecommendation.precautions.push(
       `Reduced renal function (GFR: ${Math.round(gfr)} mL/min) - dose adjusted accordingly`
     );
   }
 
-  // Add immunosuppression precautions
-  if (data.immunosuppressed) {
-    baseRecommendation.precautions.push(
-      "Immunocompromised status - broader coverage recommended",
-      "Monitor closely for opportunistic infections"
-    );
-  }
-
-  // Add diabetes-specific precautions
-  if (data.diabetes) {
-    baseRecommendation.precautions.push(
-      "Diabetic patient - monitor glucose levels",
-      "Consider broader coverage for diabetic infections"
-    );
-  }
-
-  return baseRecommendation;
+  return mergedRecommendation;
 };
