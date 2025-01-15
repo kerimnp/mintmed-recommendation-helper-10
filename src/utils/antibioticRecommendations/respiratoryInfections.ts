@@ -1,8 +1,10 @@
 import { PatientData, AntibioticRecommendation } from './types';
-import { calculateAdjustedDose } from './antibioticDatabase';
 import { isPediatricPatient } from './pediatricAdjustments';
 
-export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
+export const generateRespiratoryRecommendation = (
+  data: PatientData,
+  checkAllergySafety: (name: string) => boolean
+): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
@@ -18,7 +20,7 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   const isPediatric = isPediatricPatient(Number(data.age));
 
   if (data.severity === "mild") {
-    if (!data.allergies.penicillin) {
+    if (checkAllergySafety("Amoxicillin")) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
         dose: isPediatric ? "45-90mg/kg/day divided q12h" : "875mg q12h",
@@ -26,7 +28,7 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
         duration: "5-7 days"
       };
       recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
-    } else if (!data.allergies.macrolide) {
+    } else if (checkAllergySafety("Azithromycin")) {
       recommendation.primaryRecommendation = {
         name: "Azithromycin",
         dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
@@ -36,7 +38,7 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
   } else if (data.severity === "moderate") {
-    if (!data.allergies.cephalosporin) {
+    if (checkAllergySafety("Ceftriaxone")) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone + Azithromycin",
         dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "2g daily + 500mg daily",
