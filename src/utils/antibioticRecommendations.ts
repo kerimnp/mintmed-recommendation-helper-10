@@ -1,13 +1,12 @@
-import { PatientData, AntibioticRecommendation } from "./types";
-import { calculateBMI, getBMICategory, shouldAdjustForWeight } from "./bmiCalculations";
-import { generateRespiratoryRecommendation } from "./respiratoryInfections";
-import { generateUrinaryRecommendation } from "./urinaryInfections";
-import { generateSkinInfectionRecommendation } from "./skinInfections";
-import { generateWoundInfectionRecommendation } from "./woundInfections";
-import { generateSepsisRecommendation } from "./sepsisInfections";
-import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
-import { calculateGFR } from "./renalAdjustments/gfrCalculation";
-import { isSafeAntibiotic } from "./antibioticSafety";
+import { PatientData, AntibioticRecommendation } from "./antibioticRecommendations/types";
+import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCalculations";
+import { generateRespiratoryRecommendation } from "./antibioticRecommendations/respiratoryInfections";
+import { generateUrinaryRecommendation } from "./antibioticRecommendations/urinaryInfections";
+import { generateSkinInfectionRecommendation } from "./antibioticRecommendations/skinInfections";
+import { generateWoundInfectionRecommendation } from "./antibioticRecommendations/woundInfections";
+import { generateSepsisRecommendation } from "./antibioticRecommendations/sepsisInfections";
+import { isPediatricPatient } from "./antibioticRecommendations/pediatricAdjustments";
+import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
 
 export const generateAntibioticRecommendation = (data: PatientData): AntibioticRecommendation => {
   // Calculate BMI and GFR
@@ -80,7 +79,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   };
 
   // Generate recommendations based on infection sites
-  let recommendations: AntibioticRecommendation[] = data.infectionSites.map(site => {
+  let recommendations = data.infectionSites.map(site => {
     switch (site.toLowerCase()) {
       case "respiratory":
         return generateRespiratoryRecommendation(data, checkAllergySafety);
@@ -88,6 +87,10 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateUrinaryRecommendation(data, checkAllergySafety);
       case "skin":
         return generateSkinInfectionRecommendation(data, checkAllergySafety);
+      case "wound":
+        return generateWoundInfectionRecommendation(data, checkAllergySafety);
+      case "sepsis":
+        return generateSepsisRecommendation(data);
       default:
         return {
           primaryRecommendation: {
