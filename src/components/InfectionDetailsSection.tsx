@@ -54,7 +54,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
   return (
     <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t.title}</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t.title}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
@@ -66,9 +66,10 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <Badge 
                 key={site}
                 variant="secondary"
-                className="px-3 py-1 flex items-center gap-2 cursor-pointer
-                  bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100
-                  hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                className="px-3 py-1.5 flex items-center gap-2 cursor-pointer
+                  bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200
+                  hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-colors
+                  border border-blue-200 dark:border-blue-800"
                 onDoubleClick={() => handleSiteDoubleClick(site)}
               >
                 {t.sites[site as keyof typeof t.sites]}
@@ -81,11 +82,11 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <button
                 key={site.value}
                 onClick={() => handleSiteSelect(site.value)}
-                className={`p-2 text-sm rounded-lg transition-colors
+                className={`p-2.5 text-sm rounded-xl transition-all duration-200
                   ${formData.infectionSites?.includes(site.value)
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 cursor-not-allowed'
-                    : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50'
-                  } border border-gray-200 dark:border-gray-600`}
+                    ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 cursor-not-allowed border-blue-200 dark:border-blue-800'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-gray-200 dark:border-gray-700'
+                  } border shadow-sm hover:shadow-md`}
                 disabled={formData.infectionSites?.includes(site.value)}
               >
                 {site.label}
@@ -95,40 +96,44 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="symptoms" className="form-label">{t.symptoms}</Label>
+          <Label htmlFor="symptoms" className="text-gray-700 dark:text-gray-300">{t.symptoms}</Label>
           <Textarea 
             id="symptoms" 
             placeholder={t.symptoms}
-            className="input-field min-h-[100px]"
+            className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
+              focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 min-h-[100px]
+              placeholder:text-gray-400 dark:placeholder:text-gray-500"
             value={formData.symptoms}
             onChange={(e) => onInputChange("symptoms", e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="duration" className="form-label">{t.duration}</Label>
+          <Label htmlFor="duration" className="text-gray-700 dark:text-gray-300">{t.duration}</Label>
           <Input 
             id="duration" 
             type="number" 
             placeholder={t.duration}
-            className="input-field"
+            className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
+              focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40
+              placeholder:text-gray-400 dark:placeholder:text-gray-500"
             value={formData.duration}
             onChange={(e) => onInputChange("duration", e.target.value)}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="severity" className="form-label">{t.severity}</Label>
+          <Label htmlFor="severity" className="text-gray-700 dark:text-gray-300">{t.severity}</Label>
           <div className="grid grid-cols-3 gap-2">
             {Object.entries(t.severityLevels).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => onInputChange("severity", value)}
-                className={`p-2 text-sm rounded-lg border transition-colors
+                className={`p-2.5 text-sm rounded-xl border transition-all duration-200
                   ${formData.severity === value
-                    ? 'border-medical-deep/40 bg-medical-deep/5 text-medical-deep'
-                    : 'border-gray-200 hover:border-medical-deep/40 hover:bg-medical-deep/5'
-                  }`}
+                    ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-800 shadow-inner'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                  } shadow-sm hover:shadow-md`}
               >
                 {label}
               </button>

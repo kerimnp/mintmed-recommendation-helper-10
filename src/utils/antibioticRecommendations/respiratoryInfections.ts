@@ -1,5 +1,5 @@
-import { PatientData, AntibioticRecommendation } from '../types';
-import { isPediatricPatient } from '../antibioticRecommendations/pediatricAdjustments';
+import { PatientData, AntibioticRecommendation } from './types';
+import { isPediatricPatient } from './pediatricAdjustments';
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
   const recommendation: AntibioticRecommendation = {
@@ -16,8 +16,13 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
 
   const isPediatric = isPediatricPatient(Number(data.age));
 
+  // Check for resistance patterns first
+  const hasMRSA = data.resistances.mrsa;
+  const hasESBL = data.resistances.esbl;
+  const hasPseudomonas = data.resistances.pseudomonas;
+
   if (data.severity === "mild") {
-    if (!data.allergies.penicillin) {
+    if (!data.allergies.penicillin && !hasESBL) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
         dose: isPediatric ? 
@@ -37,7 +42,15 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
   } else if (data.severity === "moderate") {
-    if (!data.allergies.cephalosporin) {
+    if (hasMRSA) {
+      recommendation.primaryRecommendation = {
+        name: "Vancomycin",
+        dose: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
+        route: "IV",
+        duration: "7-10 days"
+      };
+      recommendation.reasoning = "MRSA coverage required based on resistance pattern";
+    } else if (!data.allergies.cephalosporin && !hasESBL) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone",
         dose: isPediatric ? "50-75mg/kg/day" : "1g q24h",
@@ -57,7 +70,17 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
       }
     }
   } else if (data.severity === "severe") {
-    if (!data.allergies.cephalosporin) {
+    if (hasMRSA || hasESBL || hasPseudomonas) {
+      recommendation.primaryRecommendation = {
+        name: "Meropenem + Vancomycin",
+        dose: isPediatric ? 
+          "20mg/kg q8h + 15mg/kg q6h" : 
+          "1g q8h + 15-20mg/kg q8-12h",
+        route: "IV",
+        duration: "10-14 days"
+      };
+      recommendation.reasoning = "Broad spectrum coverage needed due to resistant organisms";
+    } else if (!data.allergies.cephalosporin) {
       recommendation.primaryRecommendation = {
         name: "Cefepime + Azithromycin",
         dose: isPediatric ? 
@@ -67,30 +90,18 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
         duration: "10-14 days"
       };
       recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection";
-
-      if (data.resistances.mrsa) {
-        recommendation.alternatives.push({
-          name: "Vancomycin + Cefepime + Azithromycin",
-          dose: isPediatric ?
-            "15mg/kg q6h + 50mg/kg q8h + 10mg/kg/day" :
-            "15-20mg/kg q8-12h + 2g q8h + 500mg daily",
-          route: "IV",
-          duration: "10-14 days",
-          reason: "Added MRSA coverage due to risk factors"
-        });
-      }
-    } else {
-      // For patients with cephalosporin allergy in severe cases
-      recommendation.primaryRecommendation = {
-        name: "Meropenem + Azithromycin",
-        dose: isPediatric ?
-          "20mg/kg q8h + 10mg/kg/day" :
-          "1g q8h + 500mg daily",
-        route: "IV",
-        duration: "10-14 days"
-      };
-      recommendation.reasoning = "Alternative regimen for patients with cephalosporin allergy";
     }
+  }
+
+  // Add resistance-specific precautions
+  if (hasMRSA) {
+    recommendation.precautions.push("MRSA positive - ensure coverage with appropriate anti-MRSA agents");
+  }
+  if (hasESBL) {
+    recommendation.precautions.push("ESBL positive - carbapenem therapy recommended");
+  }
+  if (hasPseudomonas) {
+    recommendation.precautions.push("Pseudomonas positive - ensure antipseudomonal coverage");
   }
 
   return recommendation;
