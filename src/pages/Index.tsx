@@ -177,7 +177,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
-      <header className="w-full border-b border-blue-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80">
+      <header className="w-full border-b border-blue-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/90">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
@@ -191,19 +191,23 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              className="rounded-full"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
-            <LanguageToggle />
+            <div className="relative z-10">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                className="rounded-full bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5 text-yellow-500" />
+                ) : (
+                  <Moon className="h-5 w-5 text-blue-900 dark:text-blue-100" />
+                )}
+              </Button>
+            </div>
+            <div className="relative z-20">
+              <LanguageToggle />
+            </div>
           </div>
         </div>
       </header>
