@@ -85,7 +85,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                 className={`p-2.5 text-sm rounded-xl transition-all duration-200
                   ${formData.infectionSites?.includes(site.value)
                     ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 cursor-not-allowed border-blue-200 dark:border-blue-800'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-gray-200 dark:border-gray-700'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-gray-200 dark:border-gray-700'
                   } border shadow-sm hover:shadow-md`}
                 disabled={formData.infectionSites?.includes(site.value)}
               >
@@ -100,7 +100,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
           <Textarea 
             id="symptoms" 
             placeholder={t.symptoms}
-            className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
               focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 min-h-[100px]
               placeholder:text-gray-400 dark:placeholder:text-gray-500"
             value={formData.symptoms}
@@ -114,7 +114,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
             id="duration" 
             type="number" 
             placeholder={t.duration}
-            className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
               focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40
               placeholder:text-gray-400 dark:placeholder:text-gray-500"
             value={formData.duration}
@@ -132,7 +132,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                 className={`p-2.5 text-sm rounded-xl border transition-all duration-200
                   ${formData.severity === value
                     ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-800 shadow-inner'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30'
                   } shadow-sm hover:shadow-md`}
               >
                 {label}

@@ -5,6 +5,11 @@ import { generateUrinaryRecommendation } from "./antibioticRecommendations/urina
 import { generateSkinInfectionRecommendation } from "./antibioticRecommendations/skinInfections";
 import { generateWoundInfectionRecommendation } from "./antibioticRecommendations/woundInfections";
 import { generateSepsisRecommendation } from "./antibioticRecommendations/sepsisInfections";
+import { generateBoneInfectionRecommendation } from "./antibioticRecommendations/boneInfections";
+import { generateCNSInfectionRecommendation } from "./antibioticRecommendations/cnsInfections";
+import { generateEyeInfectionRecommendation } from "./antibioticRecommendations/eyeInfections";
+import { generateDentalInfectionRecommendation } from "./antibioticRecommendations/dentalInfections";
+import { generateEarInfectionRecommendation } from "./antibioticRecommendations/earInfections";
 import { isPediatricPatient } from "./antibioticRecommendations/pediatricAdjustments";
 import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
 
@@ -33,51 +38,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     };
   }
 
-  // Function to check if an antibiotic is safe based on allergies
-  const checkAllergySafety = (antibioticName: string): boolean => {
-    const allergies = data.allergies;
-    
-    if (allergies.penicillin && (
-      antibioticName.toLowerCase().includes('penicillin') ||
-      antibioticName.toLowerCase().includes('amoxicillin') ||
-      antibioticName.toLowerCase().includes('ampicillin') ||
-      antibioticName.toLowerCase().includes('piperacillin')
-    )) {
-      return false;
-    }
-
-    if (allergies.cephalosporin && (
-      antibioticName.toLowerCase().includes('cef') ||
-      antibioticName.toLowerCase().includes('cephalosporin')
-    )) {
-      return false;
-    }
-
-    if (allergies.sulfa && (
-      antibioticName.toLowerCase().includes('sulfa') ||
-      antibioticName.toLowerCase().includes('trimethoprim') ||
-      antibioticName.toLowerCase().includes('sulfamethoxazole')
-    )) {
-      return false;
-    }
-
-    if (allergies.macrolide && (
-      antibioticName.toLowerCase().includes('mycin') ||
-      antibioticName.toLowerCase().includes('macrolide')
-    )) {
-      return false;
-    }
-
-    if (allergies.fluoroquinolone && (
-      antibioticName.toLowerCase().includes('floxacin') ||
-      antibioticName.toLowerCase().includes('fluoroquinolone')
-    )) {
-      return false;
-    }
-
-    return true;
-  };
-
   // Generate recommendations based on infection sites
   let recommendations = data.infectionSites.map(site => {
     switch (site.toLowerCase()) {
@@ -89,8 +49,18 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateSkinInfectionRecommendation(data);
       case "wound":
         return generateWoundInfectionRecommendation(data);
-      case "sepsis":
+      case "bloodstream":
         return generateSepsisRecommendation(data);
+      case "bone":
+        return generateBoneInfectionRecommendation(data);
+      case "cns":
+        return generateCNSInfectionRecommendation(data);
+      case "eye":
+        return generateEyeInfectionRecommendation(data);
+      case "dental":
+        return generateDentalInfectionRecommendation(data);
+      case "ear":
+        return generateEarInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
