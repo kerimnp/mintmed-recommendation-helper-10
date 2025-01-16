@@ -32,8 +32,8 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
     }
   };
 
-  const handleRemoveSite = (siteToRemove: string) => {
-    const updatedSites = formData.infectionSites.filter(site => site !== siteToRemove);
+  const handleSiteDoubleClick = (site: string) => {
+    const updatedSites = formData.infectionSites.filter(s => s !== site);
     onInputChange("infectionSites", updatedSites);
   };
 
@@ -52,29 +52,27 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
   ];
 
   return (
-    <Card className="p-6 space-y-6">
+    <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900">{t.title}</h2>
-        <p className="text-sm text-gray-500">{t.subtitle}</p>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t.title}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label className="form-label">Selected Infection Sites</Label>
+          <Label className="text-gray-700 dark:text-gray-300">Selected Infection Sites</Label>
           <div className="flex flex-wrap gap-2 mb-4">
             {formData.infectionSites?.map((site) => (
               <Badge 
                 key={site}
                 variant="secondary"
-                className="px-3 py-1 flex items-center gap-2"
+                className="px-3 py-1 flex items-center gap-2 cursor-pointer
+                  bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100
+                  hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                onDoubleClick={() => handleSiteDoubleClick(site)}
               >
                 {t.sites[site as keyof typeof t.sites]}
-                <button
-                  onClick={() => handleRemoveSite(site)}
-                  className="hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+                <X className="h-3 w-3" />
               </Badge>
             ))}
           </div>
@@ -83,11 +81,11 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <button
                 key={site.value}
                 onClick={() => handleSiteSelect(site.value)}
-                className={`p-2 text-sm rounded-lg border transition-colors
+                className={`p-2 text-sm rounded-lg transition-colors
                   ${formData.infectionSites?.includes(site.value)
-                    ? 'border-medical-deep/40 bg-medical-deep/5 text-medical-deep cursor-not-allowed'
-                    : 'border-gray-200 hover:border-medical-deep/40 hover:bg-medical-deep/5'
-                  }`}
+                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 cursor-not-allowed'
+                    : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50'
+                  } border border-gray-200 dark:border-gray-600`}
                 disabled={formData.infectionSites?.includes(site.value)}
               >
                 {site.label}

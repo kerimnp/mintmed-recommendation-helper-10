@@ -82,13 +82,13 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   let recommendations = data.infectionSites.map(site => {
     switch (site.toLowerCase()) {
       case "respiratory":
-        return generateRespiratoryRecommendation(data, checkAllergySafety);
+        return generateRespiratoryRecommendation(data);
       case "urinary":
-        return generateUrinaryRecommendation(data, checkAllergySafety);
+        return generateUrinaryRecommendation(data);
       case "skin":
-        return generateSkinInfectionRecommendation(data, checkAllergySafety);
+        return generateSkinInfectionRecommendation(data);
       case "wound":
-        return generateWoundInfectionRecommendation(data, checkAllergySafety);
+        return generateWoundInfectionRecommendation(data);
       case "sepsis":
         return generateSepsisRecommendation(data);
       default:
