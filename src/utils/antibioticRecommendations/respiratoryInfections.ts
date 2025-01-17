@@ -15,8 +15,6 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   };
 
   const isPediatric = isPediatricPatient(Number(data.age));
-
-  // Check for resistance patterns first
   const hasMRSA = data.resistances.mrsa;
   const hasESBL = data.resistances.esbl;
   const hasPseudomonas = data.resistances.pseudomonas;
@@ -25,13 +23,21 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     if (!data.allergies.penicillin && !hasESBL) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
-        dose: isPediatric ? 
-          (Number(data.age) < 5 ? "250mg q8h" : "500mg q8h") : 
-          "500mg q8h",
+        dose: isPediatric ? "45-90mg/kg/day divided BID" : "1g",
         route: "oral",
-        duration: "5-7 days"
+        duration: isPediatric ? "7-10 days" : "5-7 days"
       };
       recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
+
+      if (hasMRSA) {
+        recommendation.alternatives.push({
+          name: "Trimethoprim-Sulfamethoxazole",
+          dose: "160/800mg",
+          route: "oral",
+          duration: "7-10 days",
+          reason: "Added for MRSA coverage"
+        });
+      }
     } else if (!data.allergies.macrolide) {
       recommendation.primaryRecommendation = {
         name: "Azithromycin",
@@ -44,30 +50,20 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   } else if (data.severity === "moderate") {
     if (hasMRSA) {
       recommendation.primaryRecommendation = {
-        name: "Vancomycin",
-        dose: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
+        name: "Vancomycin + Ceftriaxone",
+        dose: isPediatric ? "15mg/kg q6h + 50-75mg/kg/day" : "15-20mg/kg q8-12h + 1-2g daily",
         route: "IV",
         duration: "7-10 days"
       };
-      recommendation.reasoning = "MRSA coverage required based on resistance pattern";
+      recommendation.reasoning = "Coverage for MRSA and typical respiratory pathogens";
     } else if (!data.allergies.cephalosporin && !hasESBL) {
       recommendation.primaryRecommendation = {
-        name: "Ceftriaxone",
-        dose: isPediatric ? "50-75mg/kg/day" : "1g q24h",
+        name: "Ceftriaxone + Azithromycin",
+        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "1-2g daily + 500mg daily",
         route: "IV",
         duration: "7-10 days"
       };
       recommendation.reasoning = "Moderate respiratory infection requiring parenteral therapy";
-
-      if (!data.allergies.macrolide) {
-        recommendation.alternatives.push({
-          name: "Azithromycin",
-          dose: isPediatric ? "10mg/kg/day" : "500mg daily",
-          route: "IV",
-          duration: "7-10 days",
-          reason: "Add for atypical pathogen coverage"
-        });
-      }
     }
   } else if (data.severity === "severe") {
     if (hasMRSA || hasESBL || hasPseudomonas) {
@@ -80,12 +76,12 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
         duration: "10-14 days"
       };
       recommendation.reasoning = "Broad spectrum coverage needed due to resistant organisms";
-    } else if (!data.allergies.cephalosporin) {
+    } else {
       recommendation.primaryRecommendation = {
-        name: "Cefepime + Azithromycin",
+        name: "Piperacillin-Tazobactam + Azithromycin + Vancomycin",
         dose: isPediatric ? 
-          "50mg/kg q8h + 10mg/kg/day" : 
-          "2g q8h + 500mg daily",
+          "100mg/kg q6h + 10mg/kg/day + 15mg/kg q6h" : 
+          "4.5g q6h + 500mg daily + 15-20mg/kg q8-12h",
         route: "IV",
         duration: "10-14 days"
       };
@@ -93,15 +89,25 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     }
   }
 
-  // Add resistance-specific precautions
   if (hasMRSA) {
-    recommendation.precautions.push("MRSA positive - ensure coverage with appropriate anti-MRSA agents");
+    recommendation.precautions.push(
+      "MRSA positive - ensure therapeutic vancomycin levels (15-20 µg/mL)"
+    );
   }
   if (hasESBL) {
-    recommendation.precautions.push("ESBL positive - carbapenem therapy recommended");
+    recommendation.precautions.push(
+      "ESBL positive - carbapenem therapy recommended"
+    );
   }
   if (hasPseudomonas) {
-    recommendation.precautions.push("Pseudomonas positive - ensure antipseudomonal coverage");
+    recommendation.precautions.push(
+      "Pseudomonas positive - ensure antipseudomonal coverage"
+    );
+  }
+  if (data.kidneyDisease) {
+    recommendation.precautions.push(
+      "Adjust doses based on renal function"
+    );
   }
 
   return recommendation;

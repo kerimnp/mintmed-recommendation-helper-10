@@ -32,7 +32,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
     }
   };
 
-  const handleSiteDoubleClick = (site: string) => {
+  const handleSiteRemove = (site: string) => {
     const updatedSites = formData.infectionSites.filter(s => s !== site);
     onInputChange("infectionSites", updatedSites);
   };
@@ -52,7 +52,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
   ];
 
   return (
-    <Card className="p-6 bg-white dark:bg-gray-800 shadow-lg space-y-6">
+    <Card className="p-6 bg-white/80 dark:bg-gray-800/80 shadow-lg space-y-6 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t.title}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
@@ -69,11 +69,11 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                 className="px-3 py-1.5 flex items-center gap-2 cursor-pointer
                   bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-200
                   hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-colors
-                  border border-blue-200 dark:border-blue-800"
-                onDoubleClick={() => handleSiteDoubleClick(site)}
+                  border border-blue-200 dark:border-blue-800 group"
+                onClick={() => handleSiteRemove(site)}
               >
                 {t.sites[site as keyof typeof t.sites]}
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3 opacity-50 group-hover:opacity-100" />
               </Badge>
             ))}
           </div>
