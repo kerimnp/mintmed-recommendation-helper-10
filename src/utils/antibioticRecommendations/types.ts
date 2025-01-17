@@ -1,13 +1,13 @@
 export interface PatientData {
   age: string;
-  gender: "male" | "female";
+  gender: string;
   weight: string;
   height: string;
-  pregnancy: "pregnant" | "not_pregnant" | "not_applicable";
+  pregnancy: string;
   infectionSites: string[];
   symptoms: string;
   duration: string;
-  severity: "mild" | "moderate" | "severe";
+  severity: string;
   creatinine: string;
   recentAntibiotics: boolean;
   allergies: {
