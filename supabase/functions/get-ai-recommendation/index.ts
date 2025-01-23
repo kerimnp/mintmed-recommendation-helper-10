@@ -6,8 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -22,6 +20,7 @@ serve(async (req) => {
     }
     console.log('Received patient data:', patientData);
 
+    const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
     if (!perplexityApiKey) {
       console.error('Missing Perplexity API key');
       return new Response(
@@ -34,7 +33,7 @@ serve(async (req) => {
     }
 
     const systemPrompt = `You are an AI medical assistant specializing in antibiotic recommendations. 
-    Given the patient data, provide a recommendation following this EXACT format (no additional text, just the JSON):
+    Given the patient data, provide a recommendation in JSON format. Return ONLY a valid JSON object with NO markdown formatting or additional text. The JSON must follow this structure:
     {
       "primaryRecommendation": {
         "name": "antibiotic name",
@@ -97,15 +96,13 @@ serve(async (req) => {
     console.log('Raw AI response:', aiResponse);
 
     try {
-      // Try to parse the response as JSON
-      let parsedRecommendation;
-      if (typeof aiResponse === 'string') {
-        // Remove any potential markdown code block markers
-        const cleanJson = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
-        parsedRecommendation = JSON.parse(cleanJson);
-      } else {
-        parsedRecommendation = aiResponse;
-      }
+      // Clean and parse the response
+      const cleanJson = aiResponse
+        .replace(/```json\n?|\n?```/g, '') // Remove markdown code blocks
+        .replace(/[\u0000-\u001F]+/g, '') // Remove control characters
+        .trim();
+      
+      const parsedRecommendation = JSON.parse(cleanJson);
 
       // Validate the structure
       if (!parsedRecommendation.primaryRecommendation ||
