@@ -30,6 +30,7 @@ export const PatientForm = () => {
   const [bmi, setBmi] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
   
   const [formData, setFormData] = useState({
     age: "",
@@ -103,6 +104,16 @@ export const PatientForm = () => {
         </div>
       </Card>
     );
+  };
+
+  const handleAllergyChange = (allergy: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      allergies: {
+        ...prev.allergies,
+        [allergy]: checked
+      }
+    }));
   };
 
   const validateForm = () => {
@@ -224,8 +235,6 @@ export const PatientForm = () => {
     </div>
   );
 
-  const [showAnalysis, setShowAnalysis] = useState(false);
-
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -247,10 +256,7 @@ export const PatientForm = () => {
           )}
 
           <div>
-            {renderSectionHeader(1, 
-              t.title,
-              t.subtitle
-            )}
+            {renderSectionHeader(1, t.title, t.subtitle)}
             <PatientDemographicsSection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -264,7 +270,7 @@ export const PatientForm = () => {
           {renderSectionHeader(2, t.allergies.title, t.allergies.subtitle)}
           <AllergySection 
             allergies={formData.allergies} 
-            onAllergyChange={(allergy, checked) => handleInputChange(`allergies.${allergy}`, checked)} 
+            onAllergyChange={handleAllergyChange}
           />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />

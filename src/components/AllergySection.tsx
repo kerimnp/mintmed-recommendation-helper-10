@@ -22,31 +22,37 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
   const { language } = useLanguage();
   const t = translations[language];
 
-  const handleAllergyToggle = (allergy: string) => {
-    onAllergyChange(allergy, !allergies[allergy as keyof typeof allergies]);
-  };
-
   const allergyTypes = [
     "penicillin",
     "cephalosporin",
     "sulfa",
     "macrolide",
     "fluoroquinolone",
-  ];
+  ] as const;
 
   return (
     <Card className="p-6">
       <div className="space-y-4">
+        <div className="flex flex-col space-y-2">
+          <h3 className="text-lg font-semibold">{t.allergies.title}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t.allergies.subtitle}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-2">
           {allergyTypes.map((allergy) => (
             <Button
               key={allergy}
               type="button"
-              variant={allergies[allergy as keyof typeof allergies] ? "default" : "outline"}
-              onClick={() => handleAllergyToggle(allergy)}
-              className="transition-all duration-200"
+              variant={allergies[allergy] ? "default" : "outline"}
+              onClick={() => onAllergyChange(allergy, !allergies[allergy])}
+              className={`transition-all duration-200 ${
+                allergies[allergy] 
+                  ? "bg-red-500 hover:bg-red-600 text-white" 
+                  : "hover:bg-red-100 dark:hover:bg-red-900"
+              }`}
             >
-              {t.allergies[allergy as keyof typeof t.allergies]}
+              {t.allergies[allergy]}
             </Button>
           ))}
         </div>
