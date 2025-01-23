@@ -18,25 +18,37 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Supabase client with service role key
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+    console.log('Received request to get AI recommendation');
 
     // Get the JWT token from the request headers
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('No authorization header found');
       throw new Error('No authorization header');
     }
+
+    // Initialize Supabase client with service role key
+    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
 
     // Verify the JWT token and get the user
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
-    if (authError || !user) {
+    if (authError) {
+      console.error('Auth error:', authError);
       throw new Error('Unauthorized');
     }
 
+    if (!user) {
+      console.error('No user found');
+      throw new Error('User not found');
+    }
+
+    console.log('User authenticated successfully:', user.id);
+
     const { patientData } = await req.json();
+    console.log('Received patient data:', patientData);
 
     // Call Perplexity API
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -63,11 +75,14 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error('Perplexity API error:', await response.text());
       throw new Error('Failed to get AI recommendation');
     }
 
     const result = await response.json();
     const recommendation = result.choices[0].message.content;
+
+    console.log('Got recommendation from Perplexity');
 
     // Store recommendation in database
     const { error: insertError } = await supabase
@@ -79,8 +94,11 @@ serve(async (req) => {
       });
 
     if (insertError) {
+      console.error('Database insert error:', insertError);
       throw new Error(`Failed to store recommendation: ${insertError.message}`);
     }
+
+    console.log('Stored recommendation in database');
 
     return new Response(
       JSON.stringify({ recommendation }),
