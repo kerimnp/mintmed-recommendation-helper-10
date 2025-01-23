@@ -41,7 +41,7 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
     const doc = new jsPDF();
     
     // Add logo with larger dimensions and better positioning
-    doc.addImage("/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png", "PNG", 10, 5, 80, 30);
+    doc.addImage("/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png", "PNG", 10, 10, 60, 30);
     
     // Add modern header with gradient-like effect
     doc.setFillColor(248, 250, 252);
@@ -52,7 +52,7 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
     // Add title with adjusted position to account for larger logo
     doc.setFontSize(24);
     doc.setTextColor(30, 41, 59);
-    doc.text("Medical Prescription", 100, 25);
+    doc.text("Medical Prescription", 100, 25, { align: "center" });
     
     // Add patient information section
     doc.setFillColor(249, 250, 251);
