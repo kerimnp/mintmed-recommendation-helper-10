@@ -12,11 +12,25 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import type { PatientData } from "@/utils/antibioticRecommendations/types";
+import { Card } from "./ui/card";
+import { 
+  User, 
+  AlertCircle, 
+  Kidney, 
+  Heart, 
+  Virus, 
+  PillIcon, 
+  Calculator,
+  ChevronRight,
+  ChevronLeft
+} from "lucide-react";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
+  const [activeSection, setActiveSection] = useState<number>(0);
+  const [recommendation, setRecommendation] = useState<any>(null);
   const [formData, setFormData] = useState<PatientData>({
     age: "",
     gender: "male",
@@ -49,8 +63,6 @@ export const PatientForm = () => {
       pseudomonas: false
     }
   });
-
-  const [recommendation, setRecommendation] = useState<any>(null);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => {
@@ -103,47 +115,105 @@ export const PatientForm = () => {
     }
   };
 
+  const sections = [
+    {
+      title: "Patient Demographics",
+      icon: <User className="h-5 w-5" />,
+      component: <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
+    },
+    {
+      title: "Allergies",
+      icon: <AlertCircle className="h-5 w-5" />,
+      component: <AllergySection allergies={formData.allergies} onAllergyChange={handleAllergyChange} />
+    },
+    {
+      title: "Renal Function",
+      icon: <Kidney className="h-5 w-5" />,
+      component: <RenalFunctionSection creatinine={formData.creatinine} onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
+    },
+    {
+      title: "Comorbidities",
+      icon: <Heart className="h-5 w-5" />,
+      component: <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
+    },
+    {
+      title: "Infection Details",
+      icon: <Virus className="h-5 w-5" />,
+      component: <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
+    },
+    {
+      title: "Medication History",
+      icon: <PillIcon className="h-5 w-5" />,
+      component: <MedicationHistorySection formData={formData} onInputChange={handleInputChange} />
+    }
+  ];
+
+  const nextSection = () => {
+    if (activeSection < sections.length - 1) {
+      setActiveSection(prev => prev + 1);
+    }
+  };
+
+  const previousSection = () => {
+    if (activeSection > 0) {
+      setActiveSection(prev => prev - 1);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <PatientDemographicsSection
-          formData={formData}
-          onInputChange={handleInputChange}
-        />
-
-        <AllergySection
-          allergies={formData.allergies}
-          onAllergyChange={handleAllergyChange}
-        />
-
-        <RenalFunctionSection
-          creatinine={formData.creatinine}
-          onCreatinineChange={(value) => handleInputChange("creatinine", value)}
-        />
-
-        <ComorbiditySection
-          formData={formData}
-          onInputChange={handleInputChange}
-        />
-
-        <InfectionDetailsSection
-          formData={formData}
-          onInputChange={handleInputChange}
-        />
-
-        <MedicationHistorySection
-          formData={formData}
-          onInputChange={handleInputChange}
-        />
-
-        <div className="sticky bottom-6 z-10 px-4">
-          <button 
-            type="submit"
-            className="premium-button"
+      <div className="flex flex-wrap gap-2 justify-center mb-6">
+        {sections.map((section, index) => (
+          <Button
+            key={index}
+            variant={activeSection === index ? "default" : "outline"}
+            className="flex items-center gap-2"
+            onClick={() => setActiveSection(index)}
           >
-            {t.buttons.generate}
-          </button>
-        </div>
+            {section.icon}
+            <span className="hidden sm:inline">{section.title}</span>
+          </Button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <Card className="p-6">
+          <div className="space-y-6">
+            {sections[activeSection].component}
+          </div>
+
+          <div className="flex justify-between mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={previousSection}
+              disabled={activeSection === 0}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+
+            {activeSection === sections.length - 1 ? (
+              <Button 
+                type="submit"
+                className="premium-button flex items-center gap-2"
+              >
+                <Calculator className="h-4 w-4" />
+                Generate Recommendation
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={nextSection}
+                className="flex items-center gap-2"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </Card>
       </form>
 
       {recommendation && (
