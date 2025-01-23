@@ -52,7 +52,7 @@ export const antibioticDatabase: AntibioticDosing[] = [
   },
   {
     name: "Ceftriaxone",
-    class: "Cephalosporin",
+    class: "Third Generation Cephalosporin",
     standardDosing: {
       adult: {
         mild: { dose: "1g", interval: "q24h" },
@@ -67,13 +67,23 @@ export const antibioticDatabase: AntibioticDosing[] = [
     },
     routes: ["IV", "IM"],
     renalAdjustment: [
-      { gfr: 10, adjustment: "2g q24h" }
+      { gfr: 10, adjustment: "50% of normal dose" }
     ],
     weightAdjustment: [
-      { threshold: 120, adjustment: "increase dose by 50%" }
+      { threshold: 120, adjustment: "Consider increased dosing based on severity" }
     ],
-    contraindications: ["cephalosporin allergy"],
-    commonIndications: ["respiratory", "meningitis", "sepsis"]
+    contraindications: [
+      "cephalosporin allergy",
+      "severe hyperbilirubinemia",
+      "prematurity"
+    ],
+    commonIndications: [
+      "pneumonia",
+      "meningitis",
+      "sepsis",
+      "urinary tract infections",
+      "skin infections"
+    ]
   },
   {
     name: "Azithromycin",
@@ -146,42 +156,3 @@ export const antibioticDatabase: AntibioticDosing[] = [
     commonIndications: ["urinary", "respiratory", "gastrointestinal"]
   }
 ];
-
-export const calculateAdjustedDose = (
-  antibiotic: AntibioticDosing,
-  patientWeight: number,
-  patientAge: number,
-  gfr: number,
-  severity: "mild" | "moderate" | "severe"
-): string => {
-  let dose = "";
-  
-  // Check if pediatric dosing should be used
-  if (patientAge < 18) {
-    const weightBasedDose = antibiotic.standardDosing.pediatric.mgPerKg * patientWeight;
-    dose = `${Math.min(weightBasedDose, antibiotic.standardDosing.pediatric.maxDose)}mg ${antibiotic.standardDosing.pediatric.interval}`;
-  } else {
-    dose = `${antibiotic.standardDosing.adult[severity].dose} ${antibiotic.standardDosing.adult[severity].interval}`;
-  }
-
-  // Apply weight-based adjustments if applicable
-  if (antibiotic.weightAdjustment) {
-    const weightAdjustment = antibiotic.weightAdjustment.find(adj => patientWeight >= adj.threshold);
-    if (weightAdjustment) {
-      dose += ` (${weightAdjustment.adjustment})`;
-    }
-  }
-
-  // Apply renal adjustments if applicable
-  if (antibiotic.renalAdjustment.length > 0) {
-    const renalAdjustment = antibiotic.renalAdjustment
-      .sort((a, b) => b.gfr - a.gfr)
-      .find(adj => gfr <= adj.gfr);
-    
-    if (renalAdjustment) {
-      dose = renalAdjustment.adjustment;
-    }
-  }
-
-  return dose;
-};
