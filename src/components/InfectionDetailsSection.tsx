@@ -72,14 +72,18 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
     <Card className="p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-6 backdrop-blur-sm
       border border-gray-200 dark:border-gray-800 transition-colors duration-200">
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t.title}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          {t.title as string}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {t.subtitle as string}
+        </p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.acquisitionType}
+            {t.acquisitionType as string}
           </Label>
           <div className="flex gap-2">
             <Button
@@ -103,7 +107,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.sites.respiratory}
+            {t.sites.respiratory as string}
           </Label>
           <div className="flex flex-wrap gap-2 min-h-[40px]">
             {formData.infectionSites?.map((site) => (
@@ -118,7 +122,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                 )}
                 onClick={() => handleSiteRemove(site)}
               >
-                {t.sites[site as keyof typeof t.sites]}
+                {(t.sites[site as keyof typeof t.sites] as string) || site}
                 <X className="h-3 w-3 opacity-50 group-hover:opacity-100" />
               </Badge>
             ))}
@@ -143,11 +147,11 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-2">
           <Label htmlFor="symptoms" className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.symptoms}
+            {t.symptoms as string}
           </Label>
           <Textarea 
             id="symptoms" 
-            placeholder={t.symptoms}
+            placeholder={t.symptoms as string}
             className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
               focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 min-h-[100px]
               placeholder:text-gray-400 dark:placeholder:text-gray-500"
@@ -158,12 +162,12 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-2">
           <Label htmlFor="duration" className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.duration}
+            {t.duration as string}
           </Label>
           <Input 
             id="duration" 
             type="number" 
-            placeholder={t.duration}
+            placeholder={t.duration as string}
             className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
               focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40
               placeholder:text-gray-400 dark:placeholder:text-gray-500"
@@ -174,10 +178,10 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-2">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.severity}
+            {t.severity as string}
           </Label>
           <div className="grid grid-cols-3 gap-2">
-            {Object.entries(t.severityLevels).map(([value, label]) => (
+            {Object.entries(t.severityLevels as Record<string, string>).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => onInputChange("severity", value)}
