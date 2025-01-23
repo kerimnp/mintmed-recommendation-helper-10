@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { AlertTriangle, Pill, Info, Stethoscope, Baby, Scale, Beaker } from "lucide-react";
+import { AlertTriangle, Pill, Info, Stethoscope } from "lucide-react";
 import { AvailableDrugs } from "./AvailableDrugs";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
 import { availableDrugs } from "@/utils/availableDrugsDatabase";
@@ -76,29 +76,6 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               </div>
             </div>
 
-            {recommendation.calculations && (
-              <div className="grid grid-cols-1 gap-4 mt-4">
-                {recommendation.calculations.weightBased && (
-                  <div className="flex items-center gap-2">
-                    <Scale className="h-5 w-5 text-mint-600" />
-                    <p className="text-sm text-gray-700">{recommendation.calculations.weightBased}</p>
-                  </div>
-                )}
-                {recommendation.calculations.renalAdjustment && (
-                  <div className="flex items-center gap-2">
-                    <Beaker className="h-5 w-5 text-mint-600" />
-                    <p className="text-sm text-gray-700">{recommendation.calculations.renalAdjustment}</p>
-                  </div>
-                )}
-                {recommendation.calculations.pediatricFactors && (
-                  <div className="flex items-center gap-2">
-                    <Baby className="h-5 w-5 text-mint-600" />
-                    <p className="text-sm text-gray-700">{recommendation.calculations.pediatricFactors}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
             <div className="bg-mint-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
                 <Info className="h-5 w-5 text-mint-600" />
@@ -113,6 +90,7 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
           drugName={recommendation.primaryRecommendation.name}
           products={getAvailableDrugs(recommendation.primaryRecommendation.name)}
           onProductSelect={handleProductSelect}
+          selectedProduct={selectedProduct}
         />
       </div>
 
@@ -175,7 +153,7 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
           className="premium-button"
           onClick={() => setIsPrescriptionModalOpen(true)}
         >
-          Generate Prescription
+          Print Prescription
         </Button>
       </div>
 

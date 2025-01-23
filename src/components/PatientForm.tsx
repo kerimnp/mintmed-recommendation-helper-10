@@ -11,21 +11,17 @@ import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator, Activity } from "lucide-react";
+import { Calculator } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
-import { PatientAnalysis } from "./PatientAnalysis";
-import { PrescriptionModal } from "./PrescriptionModal";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<any>(null);
-  const [bmi, setBmi] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     age: "",
@@ -70,7 +66,6 @@ export const PatientForm = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Only validate essential fields
     if (!formData.age) {
       newErrors.age = t.errors?.requiredField || "Age is required";
     } else if (Number(formData.age) < 0 || Number(formData.age) > 120) {
@@ -117,7 +112,10 @@ export const PatientForm = () => {
 
     setIsSubmitting(true);
     try {
-      const recommendation = generateAntibioticRecommendation(formData);
+      const recommendation = generateAntibioticRecommendation({
+        ...formData,
+        isHospitalAcquired: false
+      });
       setRecommendation(recommendation);
       
       toast({
@@ -234,22 +232,8 @@ export const PatientForm = () => {
       </form>
 
       {recommendation && (
-        <div>
-          <PatientAnalysis
-            infectionSites={formData.infectionSites}
-            severity={formData.severity}
-            symptoms={formData.symptoms}
-            bmi={bmi || undefined}
-          />
-          <AntibioticRecommendation recommendation={recommendation} />
-        </div>
+        <AntibioticRecommendation recommendation={recommendation} />
       )}
-
-      <PrescriptionModal
-        open={isPrescriptionModalOpen}
-        onClose={() => setIsPrescriptionModalOpen(false)}
-        recommendationData={recommendation}
-      />
     </div>
   );
 };
