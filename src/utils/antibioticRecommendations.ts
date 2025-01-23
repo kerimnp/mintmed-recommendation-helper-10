@@ -3,13 +3,6 @@ import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCal
 import { generateRespiratoryRecommendation } from "./antibioticRecommendations/respiratoryInfections";
 import { generateUrinaryRecommendation } from "./antibioticRecommendations/urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./antibioticRecommendations/skinInfections";
-import { generateWoundInfectionRecommendation } from "./antibioticRecommendations/woundInfections";
-import { generateSepsisRecommendation } from "./antibioticRecommendations/sepsisInfections";
-import { generateBoneInfectionRecommendation } from "./antibioticRecommendations/boneInfections";
-import { generateCNSInfectionRecommendation } from "./antibioticRecommendations/cnsInfections";
-import { generateEyeInfectionRecommendation } from "./antibioticRecommendations/eyeInfections";
-import { generateDentalInfectionRecommendation } from "./antibioticRecommendations/dentalInfections";
-import { generateEarInfectionRecommendation } from "./antibioticRecommendations/earInfections";
 import { isPediatricPatient } from "./antibioticRecommendations/pediatricAdjustments";
 import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
 
@@ -47,20 +40,6 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateUrinaryRecommendation(data);
       case "skin":
         return generateSkinInfectionRecommendation(data);
-      case "wound":
-        return generateWoundInfectionRecommendation(data);
-      case "bloodstream":
-        return generateSepsisRecommendation(data);
-      case "bone":
-        return generateBoneInfectionRecommendation(data);
-      case "cns":
-        return generateCNSInfectionRecommendation(data);
-      case "eye":
-        return generateEyeInfectionRecommendation(data);
-      case "dental":
-        return generateDentalInfectionRecommendation(data);
-      case "ear":
-        return generateEarInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
