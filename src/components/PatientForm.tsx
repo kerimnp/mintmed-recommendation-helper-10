@@ -78,11 +78,16 @@ export const PatientForm = () => {
 
   const calculateProgress = () => {
     const requiredFields = ['age', 'gender', 'weight', 'height', 'nationality'];
-    const filledRequired = requiredFields.filter(field => formData[field]).length;
+    const filledRequired = requiredFields.filter(field => {
+      const value = formData[field];
+      return value !== "" && value !== undefined && value !== null;
+    }).length;
+    
     const hasInfectionSite = formData.infectionSites.length > 0;
+    const totalFields = requiredFields.length + 1; // +1 for infection site
     
     const progressPercentage = Math.round(
-      ((filledRequired + (hasInfectionSite ? 1 : 0)) / (requiredFields.length + 1)) * 100
+      ((filledRequired + (hasInfectionSite ? 1 : 0)) / totalFields) * 100
     );
     setProgress(progressPercentage);
   };
