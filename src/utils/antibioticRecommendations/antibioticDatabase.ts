@@ -19,7 +19,7 @@ export interface AntibioticDosing {
     adjustment: string;
   }[];
   weightAdjustment?: {
-    threshold: number; // kg
+    threshold: number;
     adjustment: string;
   }[];
   contraindications: string[];
@@ -156,3 +156,46 @@ export const antibioticDatabase: AntibioticDosing[] = [
     commonIndications: ["urinary", "respiratory", "gastrointestinal"]
   }
 ];
+
+export const calculateAdjustedDose = (
+  antibiotic: AntibioticDosing,
+  weight: number,
+  age: number,
+  gfr: number,
+  severity: "mild" | "moderate" | "severe"
+): string => {
+  let dose = "";
+
+  // Handle pediatric dosing
+  if (age < 18) {
+    const mgPerKg = antibiotic.standardDosing.pediatric.mgPerKg;
+    const maxDose = antibiotic.standardDosing.pediatric.maxDose;
+    const calculatedDose = weight * mgPerKg;
+    dose = `${Math.min(calculatedDose, maxDose)}mg ${antibiotic.standardDosing.pediatric.interval}`;
+  } else {
+    // Adult dosing based on severity
+    dose = `${antibiotic.standardDosing.adult[severity].dose} ${antibiotic.standardDosing.adult[severity].interval}`;
+  }
+
+  // Apply renal adjustments if needed
+  const renalAdjustment = antibiotic.renalAdjustment
+    .sort((a, b) => b.gfr - a.gfr)
+    .find(adj => gfr <= adj.gfr);
+
+  if (renalAdjustment) {
+    dose = renalAdjustment.adjustment;
+  }
+
+  // Apply weight-based adjustments if needed
+  if (antibiotic.weightAdjustment) {
+    const weightAdjustment = antibiotic.weightAdjustment
+      .sort((a, b) => b.threshold - a.threshold)
+      .find(adj => weight >= adj.threshold);
+
+    if (weightAdjustment) {
+      dose += ` (${weightAdjustment.adjustment})`;
+    }
+  }
+
+  return dose;
+};
