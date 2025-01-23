@@ -97,21 +97,6 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
             <span className="text-4xl font-bold text-gray-900 dark:text-white">{bmi.toFixed(1)}</span>
             <span className={`text-sm font-medium ${color}`}>{category}</span>
           </div>
-
-          <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-1 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-700" />
-              <span>Severe Thinness (&lt;16)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span>Normal (18.5-25)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-700" />
-              <span>Obese (&gt;30)</span>
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -159,10 +144,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
               cx="100"
               cy="50"
               r="35"
-              className={cn(
-                "stroke-2 transition-colors duration-300",
-                getOrganColor("head")
-              )}
+              className="stroke-2 stroke-gray-400 fill-gray-200 dark:fill-gray-700"
             />
 
             {/* Neck */}
@@ -171,16 +153,83 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
               className="fill-none stroke-gray-400 stroke-2"
             />
 
-            {/* Torso */}
+            {/* Torso outline */}
             <path
               d="M60 100 
                  C60 150, 60 200, 70 250
                  L130 250
                  C140 200, 140 150, 140 100
                  Z"
+              className="fill-none stroke-gray-400 stroke-2"
+            />
+
+            {/* Left Lung */}
+            <path
+              d="M70 120 
+                 C70 140, 70 160, 75 180
+                 C80 200, 85 220, 90 230
+                 L95 230
+                 C95 220, 95 200, 95 180
+                 C95 160, 95 140, 95 120
+                 Z"
               className={cn(
-                "stroke-2 transition-colors duration-300",
-                getOrganColor("torso")
+                "transition-all duration-300",
+                infectionSites.includes("respiratory")
+                  ? severity === "severe"
+                    ? "fill-red-600 animate-pulse"
+                    : severity === "moderate"
+                    ? "fill-red-400"
+                    : "fill-red-300"
+                  : "fill-gray-200 dark:fill-gray-700"
+              )}
+            />
+
+            {/* Right Lung */}
+            <path
+              d="M105 120 
+                 C105 140, 105 160, 105 180
+                 C105 200, 105 220, 105 230
+                 L110 230
+                 C115 220, 120 200, 125 180
+                 C130 160, 130 140, 130 120
+                 Z"
+              className={cn(
+                "transition-all duration-300",
+                infectionSites.includes("respiratory")
+                  ? severity === "severe"
+                    ? "fill-red-600 animate-pulse"
+                    : severity === "moderate"
+                    ? "fill-red-400"
+                    : "fill-red-300"
+                  : "fill-gray-200 dark:fill-gray-700"
+              )}
+            />
+
+            {/* Kidneys */}
+            <path
+              d="M80 180 C75 190, 75 200, 80 210 C85 220, 90 220, 95 210 C100 200, 100 190, 95 180 Z"
+              className={cn(
+                "transition-all duration-300",
+                infectionSites.includes("urinary")
+                  ? severity === "severe"
+                    ? "fill-red-600 animate-pulse"
+                    : severity === "moderate"
+                    ? "fill-red-400"
+                    : "fill-red-300"
+                  : "fill-gray-200 dark:fill-gray-700"
+              )}
+            />
+            <path
+              d="M105 180 C100 190, 100 200, 105 210 C110 220, 115 220, 120 210 C125 200, 125 190, 120 180 Z"
+              className={cn(
+                "transition-all duration-300",
+                infectionSites.includes("urinary")
+                  ? severity === "severe"
+                    ? "fill-red-600 animate-pulse"
+                    : severity === "moderate"
+                    ? "fill-red-400"
+                    : "fill-red-300"
+                  : "fill-gray-200 dark:fill-gray-700"
               )}
             />
 
@@ -208,7 +257,24 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
               className="fill-none stroke-gray-400 stroke-2"
             />
 
-            {/* Infection site indicators */}
+            {/* Brain (CNS) */}
+            <circle
+              cx="100"
+              cy="40"
+              r="25"
+              className={cn(
+                "transition-all duration-300",
+                infectionSites.includes("cns")
+                  ? severity === "severe"
+                    ? "fill-red-600 animate-pulse"
+                    : severity === "moderate"
+                    ? "fill-red-400"
+                    : "fill-red-300"
+                  : "fill-gray-200 dark:fill-gray-700"
+              )}
+            />
+
+            {/* Infection site indicators with dynamic positioning */}
             {infectionSites.map((site, index) => {
               const position = getPositionForSite(site);
               return (
@@ -216,7 +282,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
                   <circle
                     r="8"
                     className={cn(
-                      "stroke-2",
+                      "transition-all duration-300",
                       severity === "severe"
                         ? "fill-red-600 animate-pulse"
                         : severity === "moderate"
