@@ -3,8 +3,7 @@ import { calculateBMI, getBMICategory } from "./bmiCalculations";
 import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
-import { generateWoundInfectionRecommendation } from "./woundInfections";
-import { generateSepsisRecommendation } from "./sepsisInfections";
+import { generateBoneInfectionRecommendation } from "./boneInfections";
 import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 
@@ -42,11 +41,8 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateUrinaryRecommendation(data);
       case "skin":
         return generateSkinInfectionRecommendation(data);
-      case "wound":
-        return generateWoundInfectionRecommendation(data);
-      case "sepsis":
-      case "bloodstream":
-        return generateSepsisRecommendation(data);
+      case "bone":
+        return generateBoneInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
