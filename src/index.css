@@ -27,7 +27,7 @@
   }
  
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 222 47% 11%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
@@ -81,6 +81,26 @@
     focus:border-medical-primary/40 
     dark:text-medical-text
     placeholder:text-gray-400 dark:placeholder:text-medical-text-secondary/50;
+}
+
+.demographics-card {
+  @apply bg-gradient-to-br from-medical-accent to-medical-accent-tertiary/90 
+    dark:from-medical-accent/20 dark:to-medical-accent-tertiary/30
+    backdrop-blur-xl border border-medical-accent/20 dark:border-medical-accent/10
+    shadow-lg rounded-2xl transition-all duration-300;
+}
+
+.allergies-card {
+  @apply bg-gradient-to-br from-medical-error/10 to-medical-warning/10
+    dark:from-medical-error/5 dark:to-medical-warning/5
+    backdrop-blur-xl border border-medical-error/20 dark:border-medical-warning/10
+    shadow-lg rounded-2xl transition-all duration-300;
+}
+
+.standard-card {
+  @apply bg-white/5 dark:bg-medical-bg-secondary/50
+    backdrop-blur-xl border border-white/10 dark:border-medical-text-secondary/10
+    shadow-lg rounded-2xl transition-all duration-300;
 }
 
 .animate-fade-in {
