@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Activity, AlertCircle, Heart, Scale, Thermometer } from "lucide-react";
+import { Activity, AlertCircle, Heart, Scale, Thermometer, Tooth, Eye, Bone, Droplet, Bacteria, Bandage, Brain } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,27 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
     return "fill-gray-200 dark:fill-gray-700";
   };
 
+  const getInfectionIcon = (site: string) => {
+    switch (site) {
+      case "dental":
+        return <Tooth className="h-6 w-6 text-blue-500" />;
+      case "eye":
+        return <Eye className="h-6 w-6 text-green-500" />;
+      case "bone":
+        return <Bone className="h-6 w-6 text-orange-500" />;
+      case "urinary":
+        return <Droplet className="h-6 w-6 text-yellow-500" />;
+      case "abdominal":
+        return <Bacteria className="h-6 w-6 text-purple-500" />;
+      case "surgical":
+        return <Bandage className="h-6 w-6 text-red-500" />;
+      case "cns":
+        return <Brain className="h-6 w-6 text-pink-500" />;
+      default:
+        return <AlertCircle className="h-6 w-6 text-gray-500" />;
+    }
+  };
+
   const getBMICategory = (bmi: number) => {
     if (bmi < 16) return { category: "Severe Thinness", color: "text-blue-700", bgColor: "bg-blue-700" };
     if (bmi < 17) return { category: "Moderate Thinness", color: "text-blue-500", bgColor: "bg-blue-500" };
@@ -55,10 +76,10 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
     const rotation = Math.min((bmi / 50) * 180, 180); // Max BMI scale at 50
 
     return (
-      <div className="relative w-48 h-48 mx-auto mt-6">
+      <div className="relative w-64 h-64 mx-auto mt-6">
         <div className="absolute inset-0">
           {/* BMI Scale Background */}
-          <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="absolute inset-0 rounded-full border-8 border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="absolute w-full h-full">
               <div className="absolute w-1/2 h-full origin-right transform rotate-[-90deg]">
                 <div className="w-full h-full rounded-l-full bg-gradient-to-r from-blue-700 via-green-500 to-red-700" />
@@ -76,44 +97,44 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
           
           {/* Center display */}
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-full transform scale-[0.85]">
-            <span className="text-3xl font-bold text-gray-900 dark:text-white">{bmi.toFixed(1)}</span>
+            <span className="text-4xl font-bold text-gray-900 dark:text-white">{bmi.toFixed(1)}</span>
             <span className={`text-sm font-medium ${color}`}>{category}</span>
           </div>
-        </div>
 
-        {/* BMI Categories Legend */}
-        <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-1 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-700" />
-            <span>Severe Thinness (&lt;16)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500" />
-            <span>Moderate Thinness (16-17)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-400" />
-            <span>Mild Thinness (17-18.5)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span>Normal (18.5-25)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <span>Overweight (25-30)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-orange-500" />
-            <span>Obese Class I (30-35)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <span>Obese Class II (35-40)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-700" />
-            <span>Obese Class III (&gt;40)</span>
+          {/* BMI Scale Labels */}
+          <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-1 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-700" />
+              <span>Severe Thinness (&lt;16)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <span>Moderate Thinness (16-17)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-400" />
+              <span>Mild Thinness (17-18.5)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500" />
+              <span>Normal (18.5-25)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+              <span>Overweight (25-30)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <span>Obese Class I (30-35)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <span>Obese Class II (35-40)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-700" />
+              <span>Obese Class III (&gt;40)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -283,7 +304,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
                 transition: "all 0.3s ease-in-out",
               }}
             >
-              <AlertCircle className="h-6 w-6 text-red-500 animate-pulse" />
+              {getInfectionIcon(site)}
             </div>
           ))}
         </div>
@@ -298,7 +319,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
                 <span
                   key={site}
                   className={cn(
-                    "px-3 py-1 rounded-full text-sm",
+                    "px-3 py-1 rounded-full text-sm flex items-center gap-2",
                     severity === "severe"
                       ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
                       : severity === "moderate"
@@ -306,28 +327,11 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
                       : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300"
                   )}
                 >
+                  {getInfectionIcon(site)}
                   {t.infectionDetails.sites[site as keyof typeof t.infectionDetails.sites]}
                 </span>
               ))}
             </div>
-          </div>
-
-          <div>
-            <h3 className="font-medium mb-2">
-              {language === "en" ? "Severity" : "Ozbiljnost"}:
-            </h3>
-            <span
-              className={cn(
-                "px-3 py-1 rounded-full text-sm",
-                severity === "severe"
-                  ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
-                  : severity === "moderate"
-                  ? "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300"
-                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300"
-              )}
-            >
-              {t.infectionDetails.severityLevels[severity as keyof typeof t.infectionDetails.severityLevels]}
-            </span>
           </div>
 
           {renderBMIWheel()}
