@@ -36,10 +36,10 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
           {displayProducts.map((product, index) => (
             <Card 
               key={index} 
-              className={`p-3 border transition-colors cursor-pointer ${
+              className={`p-3 border transition-all duration-200 cursor-pointer ${
                 (selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name)
-                  ? 'border-mint-500 bg-mint-50 ring-2 ring-mint-500 ring-opacity-50' 
-                  : 'border-mint-200 bg-white hover:border-mint-300'
+                  ? 'border-medical-primary bg-medical-primary/5 ring-4 ring-medical-primary ring-opacity-50 shadow-lg transform scale-[1.02]' 
+                  : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-md'
               }`}
               onClick={() => handleProductSelect(product)}
             >
@@ -47,7 +47,7 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
               <p className="text-sm text-gray-600 mb-2">{product.manufacturer}</p>
               <div className="space-y-2">
                 {product.forms.map((form, formIndex) => (
-                  <div key={formIndex} className="text-sm pl-4 border-l-2 border-mint-200">
+                  <div key={formIndex} className="text-sm pl-4 border-l-2 border-medical-primary/20">
                     <p className="font-medium">{form.type}</p>
                     <p className="text-gray-600">{form.strength}</p>
                     <p className="text-gray-500 text-xs">{form.packaging}</p>
