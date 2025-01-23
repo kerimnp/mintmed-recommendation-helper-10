@@ -34,7 +34,7 @@ serve(async (req) => {
     }
 
     const systemPrompt = `You are an AI medical assistant specializing in antibiotic recommendations. 
-    Analyze the patient data and provide a recommendation in the following JSON format ONLY:
+    Given the patient data, provide a recommendation following this EXACT format (no additional text, just the JSON):
     {
       "primaryRecommendation": {
         "name": "antibiotic name",
@@ -55,11 +55,7 @@ serve(async (req) => {
       "precautions": [
         "list of relevant precautions and warnings"
       ]
-    }
-    
-    Consider all patient factors including allergies, comorbidities, and infection details. 
-    Ensure dosing is appropriate for patient weight and renal function.
-    IMPORTANT: Return ONLY the JSON object, no additional text.`;
+    }`;
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -97,32 +93,51 @@ serve(async (req) => {
     }
 
     const result = await response.json();
-    let recommendation = result.choices[0].message.content;
-    
-    // Ensure the response is valid JSON
+    const aiResponse = result.choices[0].message.content;
+    console.log('Raw AI response:', aiResponse);
+
     try {
-      // If it's a string, parse it to ensure it's valid JSON
-      if (typeof recommendation === 'string') {
-        recommendation = JSON.parse(recommendation);
+      // Try to parse the response as JSON
+      let parsedRecommendation;
+      if (typeof aiResponse === 'string') {
+        // Remove any potential markdown code block markers
+        const cleanJson = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
+        parsedRecommendation = JSON.parse(cleanJson);
+      } else {
+        parsedRecommendation = aiResponse;
       }
-      console.log('Got structured recommendation from Perplexity');
+
+      // Validate the structure
+      if (!parsedRecommendation.primaryRecommendation ||
+          !parsedRecommendation.reasoning ||
+          !Array.isArray(parsedRecommendation.alternatives) ||
+          !Array.isArray(parsedRecommendation.precautions)) {
+        throw new Error('Response missing required fields');
+      }
+
+      console.log('Successfully parsed AI recommendation:', parsedRecommendation);
+      
+      return new Response(
+        JSON.stringify({ recommendation: parsedRecommendation }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     } catch (error) {
       console.error('Error parsing AI response:', error);
+      console.error('Problematic response:', aiResponse);
       return new Response(
-        JSON.stringify({ error: 'Invalid AI response format' }),
+        JSON.stringify({ 
+          error: 'Invalid AI response format',
+          details: error.message,
+          rawResponse: aiResponse 
+        }),
         { 
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }
-
-    return new Response(
-      JSON.stringify({ recommendation }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
   } catch (error) {
     console.error('Error in get-ai-recommendation:', error);
     return new Response(
