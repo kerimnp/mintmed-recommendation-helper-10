@@ -8,7 +8,6 @@ import { RenalFunctionSection } from "./RenalFunctionSection";
 import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
-import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
@@ -19,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { calculateBMI } from "@/utils/antibioticRecommendations/bmiCalculations";
+import { calculateBMI, getBMICategory } from "@/utils/antibioticRecommendations/bmiCalculations";
 import { PatientAnalysis } from "./PatientAnalysis";
 import { Alert, AlertDescription } from "./ui/alert";
 
@@ -67,12 +66,44 @@ export const PatientForm = () => {
     }
   });
 
-  useEffect(() => {
-    if (formData.weight && formData.height) {
-      const calculatedBMI = calculateBMI(formData.weight, formData.height);
-      setBmi(calculatedBMI);
-    }
-  }, [formData.weight, formData.height]);
+  const getBMIColor = (bmi: number) => {
+    if (bmi < 18.5) return "text-blue-500";
+    if (bmi < 25) return "text-green-500";
+    if (bmi < 30) return "text-yellow-500";
+    if (bmi < 35) return "text-orange-500";
+    if (bmi < 40) return "text-red-500";
+    return "text-red-700";
+  };
+
+  const renderBMIDisplay = () => {
+    if (!bmi) return null;
+    
+    const category = getBMICategory(bmi);
+    const color = getBMIColor(bmi);
+    
+    return (
+      <div className="mt-4 p-4 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">BMI</span>
+            <p className={`text-2xl font-bold ${color}`}>{bmi.toFixed(1)}</p>
+          </div>
+          <div className="text-right">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Category</span>
+            <p className={`font-medium ${color}`}>
+              {t.bmi.categories[category as keyof typeof t.bmi.categories]}
+            </p>
+          </div>
+        </div>
+        <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className={`h-full ${color} transition-all duration-500`}
+            style={{ width: `${Math.min((bmi / 40) * 100, 100)}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -200,7 +231,7 @@ export const PatientForm = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
           {Object.keys(errors).length > 0 && (
-            <Alert variant="destructive" className="mb-6">
+            <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 {language === "en" 
@@ -217,33 +248,20 @@ export const PatientForm = () => {
 
           <div>
             {renderSectionHeader(1, 
-              language === "en" ? "Patient Demographics" : "Demografski Podaci",
-              language === "en" ? "Basic patient information" : "Osnovni podaci o pacijentu"
+              t.title,
+              t.subtitle
             )}
             <PatientDemographicsSection 
               formData={formData} 
               onInputChange={handleInputChange}
               errors={errors}
             />
-            
-            {bmi && (
-              <div className="mt-4 p-3 bg-medical-primary/10 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-medical-primary" />
-                  <span className="font-medium text-medical-primary">
-                    BMI: {bmi.toFixed(1)} kg/m²
-                  </span>
-                </div>
-              </div>
-            )}
+            {renderBMIDisplay()}
           </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(2,
-            language === "en" ? "Allergies" : "Alergije",
-            language === "en" ? "Known drug allergies" : "Poznate alergije na lijekove"
-          )}
+          {renderSectionHeader(2, t.allergies.title, t.allergies.subtitle)}
           <AllergySection 
             allergies={formData.allergies} 
             onAllergyChange={(allergy, checked) => handleInputChange(`allergies.${allergy}`, checked)} 
@@ -251,10 +269,7 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(3,
-            language === "en" ? "Renal Function" : "Bubrežna Funkcija",
-            language === "en" ? "Creatinine levels" : "Nivoi kreatinina"
-          )}
+          {renderSectionHeader(3, t.renalFunction.title, t.renalFunction.subtitle)}
           <RenalFunctionSection 
             creatinine={formData.creatinine} 
             onCreatinineChange={(value) => handleInputChange("creatinine", value)} 
@@ -262,27 +277,13 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(4,
-            language === "en" ? "Comorbidities" : "Komorbiditeti",
-            language === "en" ? "Existing conditions" : "Postojeća stanja"
-          )}
+          {renderSectionHeader(4, t.comorbidities.title, t.comorbidities.subtitle)}
           <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(5,
-            language === "en" ? "Infection Details" : "Detalji Infekcije",
-            language === "en" ? "Infection characteristics" : "Karakteristike infekcije"
-          )}
+          {renderSectionHeader(5, t.infectionDetails.title, t.infectionDetails.subtitle)}
           <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
-          
-          <div className="h-px bg-gray-200 dark:bg-gray-700" />
-          
-          {renderSectionHeader(6,
-            language === "en" ? "Medication History" : "Istorija Lijekova",
-            language === "en" ? "Previous treatments" : "Prethodna liječenja"
-          )}
-          <MedicationHistorySection formData={formData} onInputChange={handleInputChange} />
 
           <div className="flex gap-4">
             <Button 
@@ -293,7 +294,7 @@ export const PatientForm = () => {
               <Calculator className="h-4 w-4" />
               {isSubmitting 
                 ? (language === "en" ? "Generating..." : "Generisanje...") 
-                : (language === "en" ? "Generate Recommendation" : "Generiši Preporuku")
+                : t.buttons.generate
               }
             </Button>
 
@@ -334,6 +335,7 @@ export const PatientForm = () => {
           infectionSites={formData.infectionSites}
           severity={formData.severity}
           symptoms={formData.symptoms}
+          bmi={bmi || undefined}
         />
       )}
 

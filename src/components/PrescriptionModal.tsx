@@ -40,36 +40,66 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
 
     const doc = new jsPDF();
     
-    // Add header
-    doc.setFontSize(20);
-    doc.text("Medical Prescription", 105, 20, { align: "center" });
+    // Add logo
+    const logoPath = "/lovable-uploads/cd9530dc-7974-4ff9-af77-057326fea5a9.png";
+    doc.addImage(logoPath, "PNG", 20, 10, 40, 20);
     
-    // Add patient information
+    // Add modern header with gradient-like effect
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, 0, 210, 40, "F");
+    doc.setFillColor(241, 245, 249);
+    doc.rect(0, 35, 210, 5, "F");
+    
+    // Add title
+    doc.setFontSize(24);
+    doc.setTextColor(30, 41, 59);
+    doc.text("Medical Prescription", 70, 25);
+    
+    // Add patient information section
+    doc.setFillColor(249, 250, 251);
+    doc.rect(20, 50, 170, 40, "F");
     doc.setFontSize(12);
-    doc.text("Patient Information:", 20, 40);
-    doc.text(`Name: ${patientName} ${patientSurname}`, 20, 50);
+    doc.setTextColor(71, 85, 105);
+    doc.text("Patient Information", 25, 60);
+    doc.setTextColor(51, 65, 85);
+    doc.text(`Name: ${patientName} ${patientSurname}`, 25, 70);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 25, 80);
     
-    // Add medication details
-    doc.text("Prescribed Medication:", 20, 70);
-    doc.text(`Medication: ${recommendationData.primaryRecommendation.name}`, 20, 80);
-    doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 20, 90);
-    doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 20, 100);
-    doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 20, 110);
+    // Add medication details section
+    doc.setFillColor(249, 250, 251);
+    doc.rect(20, 100, 170, 60, "F");
+    doc.setTextColor(71, 85, 105);
+    doc.text("Prescribed Medication", 25, 110);
+    doc.setTextColor(51, 65, 85);
+    doc.text(`Medication: ${recommendationData.primaryRecommendation.name}`, 25, 120);
+    doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 130);
+    doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 140);
+    doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 150);
     
     if (selectedProduct) {
-      doc.text("Selected Product:", 20, 130);
-      doc.text(`Name: ${selectedProduct.name}`, 20, 140);
-      doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 20, 150);
-      if (selectedProduct.forms.length > 0) {
-        doc.text(`Form: ${selectedProduct.forms[0].type} - ${selectedProduct.forms[0].strength}`, 20, 160);
-      }
+      doc.setFillColor(249, 250, 251);
+      doc.rect(20, 170, 170, 40, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Selected Product", 25, 180);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Name: ${selectedProduct.name}`, 25, 190);
+      doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 25, 200);
     }
     
-    // Add doctor's information and stamp area
-    doc.text("Prescribed by:", 20, 200);
-    doc.text(`Dr. ${doctorName} ${doctorSurname}`, 20, 210);
-    doc.rect(20, 220, 50, 50); // Rectangle for stamp
-    doc.text("(Stamp)", 35, 250);
+    // Add doctor's signature section
+    doc.setFillColor(249, 250, 251);
+    doc.rect(20, 220, 170, 50, "F");
+    doc.setTextColor(71, 85, 105);
+    doc.text("Prescribed by:", 25, 230);
+    doc.setTextColor(51, 65, 85);
+    doc.text(`Dr. ${doctorName} ${doctorSurname}`, 25, 240);
+    
+    // Add signature line
+    doc.setDrawColor(203, 213, 225);
+    doc.line(25, 255, 95, 255);
+    doc.setFontSize(10);
+    doc.setTextColor(148, 163, 184);
+    doc.text("(Signature)", 50, 265);
 
     // Save the PDF
     doc.save(`prescription_${patientSurname}_${patientName}.pdf`);
