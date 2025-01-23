@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Activity, AlertCircle, Heart, Scale, Thermometer, Eye, Bone, Droplet, Bandage, Brain, Stethoscope, Syringe } from "lucide-react";
+import { Activity, Heart, Scale, Thermometer, Eye, Bone, Droplet, Bandage, Brain, Stethoscope } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { cn } from "@/lib/utils";
@@ -50,12 +50,12 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
         return <Droplet className="h-6 w-6 text-yellow-500" />;
       case "abdominal":
         return <Stethoscope className="h-6 w-6 text-purple-500" />;
-      case "surgical":
+      case "wound":
         return <Bandage className="h-6 w-6 text-red-500" />;
       case "cns":
         return <Brain className="h-6 w-6 text-pink-500" />;
       default:
-        return <AlertCircle className="h-6 w-6 text-gray-500" />;
+        return <Activity className="h-6 w-6 text-gray-500" />;
     }
   };
 
@@ -73,21 +73,19 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   const renderBMIWheel = () => {
     if (!bmi) return null;
     const { category, color } = getBMICategory(bmi);
-    const rotation = Math.min((bmi / 50) * 180, 180); // Max BMI scale at 50
+    const rotation = Math.min((bmi / 50) * 180, 180);
 
     return (
       <div className="relative w-64 h-64 mx-auto mt-6">
         <div className="absolute inset-0">
-          {/* BMI Scale Background */}
-          <div className="absolute inset-0 rounded-full border-8 border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="absolute w-full h-full">
+          <div className="absolute inset-0 rounded-full border-8 border-gray-200 dark:border-gray-700">
+            <div className="absolute w-full h-full overflow-hidden">
               <div className="absolute w-1/2 h-full origin-right transform rotate-[-90deg]">
                 <div className="w-full h-full rounded-l-full bg-gradient-to-r from-blue-700 via-green-500 to-red-700" />
               </div>
             </div>
           </div>
           
-          {/* Needle */}
           <div 
             className="absolute top-1/2 left-1/2 w-1 h-[45%] bg-gray-800 dark:bg-white origin-bottom transform -translate-x-1/2 transition-transform duration-500"
             style={{ transform: `translateX(-50%) rotate(${rotation - 90}deg)` }}
@@ -95,45 +93,23 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
             <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-gray-800 dark:bg-white" />
           </div>
           
-          {/* Center display */}
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-full transform scale-[0.85]">
             <span className="text-4xl font-bold text-gray-900 dark:text-white">{bmi.toFixed(1)}</span>
             <span className={`text-sm font-medium ${color}`}>{category}</span>
           </div>
 
-          {/* BMI Scale Labels */}
           <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-1 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-blue-700" />
               <span>Severe Thinness (&lt;16)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <span>Moderate Thinness (16-17)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-400" />
-              <span>Mild Thinness (17-18.5)</span>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500" />
               <span>Normal (18.5-25)</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <span>Overweight (25-30)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
-              <span>Obese Class I (30-35)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span>Obese Class II (35-40)</span>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-red-700" />
-              <span>Obese Class III (&gt;40)</span>
+              <span>Obese (&gt;30)</span>
             </div>
           </div>
         </div>
@@ -161,24 +137,6 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
           </div>
         </div>
       )}
-      {bloodPressure && (
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-          <Activity className="h-5 w-5 text-blue-500" />
-          <div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Blood Pressure</span>
-            <p className="font-medium">{bloodPressure} mmHg</p>
-          </div>
-        </div>
-      )}
-      {bmi && (
-        <div className="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
-          <Scale className="h-5 w-5 text-green-500" />
-          <div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">BMI</span>
-            <p className="font-medium">{bmi.toFixed(1)} kg/m²</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -186,142 +144,126 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
     <Card className="p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-6">
       <div className="flex items-center gap-2 mb-4">
         <Activity className="h-5 w-5 text-blue-600" />
-        <h2 className="text-xl font-semibold">
-          {language === "en" ? "Patient Analysis" : "Analiza Pacijenta"}
-        </h2>
+        <h2 className="text-xl font-semibold">Patient Analysis</h2>
       </div>
 
       <div className="flex gap-8">
         <div className="relative w-64 h-96">
           <svg
-            viewBox="0 0 100 200"
+            viewBox="0 0 200 400"
             className="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Head */}
             <circle
-              cx="50"
-              cy="25"
-              r="20"
+              cx="100"
+              cy="50"
+              r="35"
               className={cn(
-                "stroke-gray-400 transition-colors duration-300",
+                "stroke-2 transition-colors duration-300",
                 getOrganColor("head")
               )}
             />
 
             {/* Neck */}
-            <rect
-              x="45"
-              y="42"
-              width="10"
-              height="8"
-              className="fill-gray-200 dark:fill-gray-700 stroke-gray-400"
+            <path
+              d="M85 85 C85 85, 100 95, 115 85"
+              className="fill-none stroke-gray-400 stroke-2"
             />
 
-            {/* Shoulders */}
+            {/* Torso */}
             <path
-              d="M25 55 L75 55"
-              className="stroke-gray-400 stroke-2 fill-none"
-            />
-
-            {/* Body */}
-            <path
-              d="M35 55 
-                 C35 65, 35 85, 35 95 
-                 L65 95 
-                 C65 85, 65 65, 65 55 
+              d="M60 100 
+                 C60 150, 60 200, 70 250
+                 L130 250
+                 C140 200, 140 150, 140 100
                  Z"
-              className="fill-gray-200 dark:fill-gray-700 stroke-gray-400"
+              className={cn(
+                "stroke-2 transition-colors duration-300",
+                getOrganColor("torso")
+              )}
             />
 
             {/* Arms */}
             <path
-              d="M25 55 
-                 C20 65, 18 75, 15 95"
-              className="stroke-gray-400 stroke-2 fill-none"
+              d="M60 120
+                 C40 140, 30 180, 25 220"
+              className="fill-none stroke-gray-400 stroke-2"
             />
             <path
-              d="M75 55 
-                 C80 65, 82 75, 85 95"
-              className="stroke-gray-400 stroke-2 fill-none"
-            />
-
-            {/* Lower Body */}
-            <path
-              d="M35 95 
-                 C35 105, 35 115, 35 125 
-                 L65 125 
-                 C65 115, 65 105, 65 95 
-                 Z"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("abdominal")
-              )}
+              d="M140 120
+                 C160 140, 170 180, 175 220"
+              className="fill-none stroke-gray-400 stroke-2"
             />
 
             {/* Legs */}
             <path
-              d="M35 125 
-                 C33 145, 32 165, 30 185"
-              className="stroke-gray-400 stroke-2 fill-none"
+              d="M70 250
+                 C65 300, 60 350, 55 390"
+              className="fill-none stroke-gray-400 stroke-2"
             />
             <path
-              d="M65 125 
-                 C67 145, 68 165, 70 185"
-              className="stroke-gray-400 stroke-2 fill-none"
+              d="M130 250
+                 C135 300, 140 350, 145 390"
+              className="fill-none stroke-gray-400 stroke-2"
             />
 
-            {/* Organs and infection sites */}
-            <circle
-              cx="50"
-              cy="75"
-              r="8"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("respiratory")
-              )}
-            />
-            <circle
-              cx="50"
-              cy="110"
-              r="8"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("urinary")
-              )}
-            />
+            {/* Infection site indicators */}
+            {infectionSites.map((site, index) => {
+              const position = getPositionForSite(site);
+              return (
+                <g key={site} transform={`translate(${position.x}, ${position.y})`}>
+                  <circle
+                    r="8"
+                    className={cn(
+                      "stroke-2",
+                      severity === "severe"
+                        ? "fill-red-600 animate-pulse"
+                        : severity === "moderate"
+                        ? "fill-red-400"
+                        : "fill-red-300"
+                    )}
+                  />
+                </g>
+              );
+            })}
           </svg>
 
-          {infectionSites.map((site) => (
-            <div
-              key={site}
-              className="absolute"
-              style={{
-                ...getPositionForSite(site),
-                transition: "all 0.3s ease-in-out",
-              }}
-            >
-              {getInfectionIcon(site)}
-            </div>
-          ))}
+          {/* Overlay infection icons */}
+          {infectionSites.map((site) => {
+            const position = getPositionForSite(site);
+            return (
+              <div
+                key={site}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: `${(position.x / 200) * 100}%`,
+                  top: `${(position.y / 400) * 100}%`,
+                }}
+              >
+                {getInfectionIcon(site)}
+              </div>
+            );
+          })}
         </div>
 
-        <div className="flex-1 space-y-4">
-          <div>
-            <h3 className="font-medium mb-2">
-              {language === "en" ? "Infection Sites" : "Mjesta Infekcije"}:
-            </h3>
+        <div className="flex-1 space-y-6">
+          {renderBMIWheel()}
+          {renderVitalSigns()}
+
+          <div className="space-y-4">
+            <h3 className="font-medium">Infection Sites:</h3>
             <div className="flex flex-wrap gap-2">
               {infectionSites.map((site) => (
                 <span
                   key={site}
                   className={cn(
-                    "px-3 py-1 rounded-full text-sm flex items-center gap-2",
+                    "px-3 py-1.5 rounded-full text-sm flex items-center gap-2",
                     severity === "severe"
-                      ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
+                      ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                       : severity === "moderate"
-                      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300"
-                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300"
+                      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
                   )}
                 >
                   {getInfectionIcon(site)}
@@ -331,14 +273,9 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
             </div>
           </div>
 
-          {renderBMIWheel()}
-          {renderVitalSigns()}
-
           {symptoms && (
-            <div>
-              <h3 className="font-medium mb-2">
-                {language === "en" ? "Symptoms" : "Simptomi"}:
-              </h3>
+            <div className="space-y-2">
+              <h3 className="font-medium">Symptoms:</h3>
               <p className="text-gray-600 dark:text-gray-400">{symptoms}</p>
             </div>
           )}
@@ -348,25 +285,29 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   );
 };
 
-const getPositionForSite = (site: string): React.CSSProperties => {
+const getPositionForSite = (site: string): { x: number; y: number } => {
   switch (site) {
     case "respiratory":
-      return { top: "30%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 150 };
     case "urinary":
-      return { top: "60%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 220 };
     case "skin":
-      return { top: "40%", left: "85%", transform: "translate(-50%, -50%)" };
+      return { x: 160, y: 180 };
     case "abdominal":
-      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 200 };
     case "cns":
-      return { top: "10%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 50 };
     case "ear":
-      return { top: "15%", left: "70%", transform: "translate(-50%, -50%)" };
+      return { x: 140, y: 60 };
     case "eye":
-      return { top: "15%", left: "30%", transform: "translate(-50%, -50%)" };
+      return { x: 60, y: 60 };
     case "dental":
-      return { top: "20%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 80 };
+    case "bone":
+      return { x: 160, y: 250 };
+    case "wound":
+      return { x: 40, y: 180 };
     default:
-      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+      return { x: 100, y: 200 };
   }
 };
