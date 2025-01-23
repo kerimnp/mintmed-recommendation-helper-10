@@ -1,53 +1,59 @@
-import React, { useState } from 'react';
+import React from "react";
 import { Card } from "./ui/card";
-import { ScrollArea } from "./ui/scroll-area";
-import { DrugSelectionModal } from "./DrugSelectionModal";
-import { DrugProduct } from '@/utils/availableDrugsDatabase';
+import { DrugProduct } from "@/utils/availableDrugsDatabase";
 
-export interface AvailableDrugsProps {
+interface AvailableDrugsProps {
   drugName: string;
   products: DrugProduct[];
-  onProductSelect?: (product: DrugProduct) => void;
+  onProductSelect: (product: DrugProduct) => void;
   selectedProduct?: DrugProduct;
+  externalSelectedProduct?: DrugProduct;
 }
 
-export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({ 
-  drugName, 
+export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
+  drugName,
   products,
   onProductSelect,
-  selectedProduct: externalSelectedProduct 
+  selectedProduct,
+  externalSelectedProduct
 }) => {
-  const [selectedProduct, setSelectedProduct] = useState<DrugProduct | undefined>(externalSelectedProduct);
-
   const handleProductSelect = (product: DrugProduct) => {
-    setSelectedProduct(product);
-    if (onProductSelect) {
-      onProductSelect(product);
-    }
+    onProductSelect(product);
   };
 
-  const displayProducts = products.slice(0, 3); // Show first 3 products in the main view
+  const displayProducts = products.length > 0 
+    ? products 
+    : [{ name: "No products available", manufacturer: "N/A", forms: [] }];
 
   return (
-    <Card className="p-4 bg-white/50">
-      <h3 className="text-xl font-semibold mb-4">Available {drugName} Products</h3>
-      <ScrollArea className="h-[400px] pr-4">
+    <Card className="p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl
+      border border-gray-200 dark:border-gray-800">
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Available {drugName} Products
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Select a product to view detailed information
+          </p>
+        </div>
+
         <div className="space-y-4">
           {displayProducts.map((product, index) => (
             <Card 
               key={index} 
-              className={`p-3 border transition-all duration-200 cursor-pointer ${
+              className={`p-3 border transition-all duration-300 cursor-pointer ${
                 (selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name)
-                  ? 'border-medical-primary bg-medical-primary/5 ring-4 ring-medical-primary ring-opacity-50 shadow-lg transform scale-[1.02]' 
-                  : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-md'
+                  ? 'border-medical-primary bg-medical-primary/10 ring-4 ring-medical-primary/50 shadow-xl transform scale-[1.02]' 
+                  : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-lg hover:scale-[1.01]'
               }`}
               onClick={() => handleProductSelect(product)}
             >
-              <h4 className="font-semibold text-medical-deep">{product.name}</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white">{product.name}</h4>
               <p className="text-sm text-gray-600 mb-2">{product.manufacturer}</p>
               <div className="space-y-2">
                 {product.forms.map((form, formIndex) => (
-                  <div key={formIndex} className="text-sm pl-4 border-l-2 border-medical-primary/20">
+                  <div key={formIndex} className="text-sm pl-4 border-l-2 border-medical-primary/30">
                     <p className="font-medium">{form.type}</p>
                     <p className="text-gray-600">{form.strength}</p>
                     <p className="text-gray-500 text-xs">{form.packaging}</p>
@@ -57,15 +63,7 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
             </Card>
           ))}
         </div>
-        {products.length > 3 && (
-          <DrugSelectionModal
-            drugName={drugName}
-            products={products}
-            selectedProduct={selectedProduct}
-            onSelect={handleProductSelect}
-          />
-        )}
-      </ScrollArea>
+      </div>
     </Card>
   );
 };
