@@ -57,19 +57,21 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 pt-28 pb-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 space-y-6 animate-fade-in">
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-medical-text">
-              {t.title}
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-medical-text-secondary max-w-2xl mx-auto leading-relaxed">
-              {t.subtitle}
-            </p>
-          </div>
-          
-          <div className="form-card p-8">
-            <PatientForm />
+      <main className="relative pt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12 space-y-6 animate-fade-in">
+              <h1 className="text-5xl font-bold text-gray-900 dark:text-medical-text">
+                {t.title}
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-medical-text-secondary max-w-2xl mx-auto leading-relaxed">
+                {t.subtitle}
+              </p>
+            </div>
+            
+            <div className="form-card p-8">
+              <PatientForm />
+            </div>
           </div>
         </div>
       </main>
