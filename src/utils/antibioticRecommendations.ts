@@ -1,8 +1,7 @@
-import { PatientData } from "./types";
-import { calculateBMI, getBMICategory } from "./bmiCalculations";
-import { calculateGFR } from "./renalAdjustments/gfrCalculation";
+import { PatientData } from "./types/patientTypes";
+import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCalculations";
+import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { EnhancedAntibioticRecommendation } from "./types/recommendationTypes";
-import { getRegionalResistance } from "./regionalResistance";
 import { calculateAmoxicillinDose, amoxicillinDosing } from "./antibioticDatabases/amoxicillin";
 
 export const generateAntibioticRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {

@@ -17,7 +17,3 @@ export const getBMICategory = (bmi: number): string => {
   if (bmi < 40) return "obese class II";
   return "obese class III";
 };
-
-export const shouldAdjustForWeight = (bmi: number): boolean => {
-  return bmi >= 30;
-};
