@@ -44,6 +44,7 @@ export const PatientForm = () => {
     severity: "mild",
     creatinine: "",
     recentAntibiotics: false,
+    isHospitalAcquired: false, // Added this line
     allergies: {
       penicillin: false,
       cephalosporin: false,
