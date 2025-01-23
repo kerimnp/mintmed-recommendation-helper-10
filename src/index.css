@@ -4,25 +4,25 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 222 47% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 142 72% 37%;
+    --primary: 210 100% 50%;
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
+    --accent: 210 100% 50%;
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 142 72% 37%;
+    --ring: 210 100% 50%;
     --radius: 0.75rem;
   }
  
@@ -33,19 +33,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 142 72% 37%;
+    --primary: 210 100% 50%;
     --primary-foreground: 144.9 80.4% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --accent: 210 100% 50%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 142 72% 37%;
+    --ring: 210 100% 50%;
   }
 }
  
@@ -59,13 +59,13 @@
 }
 
 .form-card {
-  @apply bg-white/10 dark:bg-medical-bg-secondary/80 
-    backdrop-blur-xl border border-white/10 dark:border-medical-text-secondary/10
+  @apply bg-white/80 dark:bg-medical-bg-secondary/80 
+    backdrop-blur-xl border border-black/5 dark:border-medical-text-secondary/10
     shadow-lg rounded-2xl transition-all duration-300;
 }
 
 .premium-button {
-  @apply bg-gradient-medical text-medical-text font-medium px-6 py-3 rounded-lg
+  @apply bg-gradient-medical text-white font-medium px-6 py-3 rounded-lg
     hover:shadow-lg transition-all duration-300 sticky bottom-6 z-50 w-full;
 }
 
@@ -74,18 +74,18 @@
 }
 
 .input-field {
-  @apply bg-white/80 dark:bg-medical-bg/80 
+  @apply bg-white/90 dark:bg-medical-bg/80 
     border border-gray-200 dark:border-medical-text-secondary/20 
     rounded-lg px-4 py-2 w-full 
     focus:ring-2 focus:ring-medical-primary/20 
     focus:border-medical-primary/40 
-    dark:text-medical-text
+    text-gray-900 dark:text-medical-text
     placeholder:text-gray-400 dark:placeholder:text-medical-text-secondary/50;
 }
 
 .standard-card {
-  @apply bg-white/5 dark:bg-medical-bg-secondary/50
-    backdrop-blur-xl border border-white/10 dark:border-medical-text-secondary/10
+  @apply bg-white/80 dark:bg-medical-bg-secondary/50
+    backdrop-blur-xl border border-black/5 dark:border-medical-text-secondary/10
     shadow-lg rounded-2xl transition-all duration-300;
 }
 
