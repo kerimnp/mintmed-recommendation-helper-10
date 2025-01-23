@@ -12,7 +12,7 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator, Info, Printer } from "lucide-react";
+import { Calculator, Info, Printer, Activity } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { calculateBMI } from "@/utils/antibioticRecommendations/bmiCalculations";
+import { PatientAnalysis } from "./PatientAnalysis";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
@@ -141,6 +142,8 @@ export const PatientForm = () => {
     </div>
   );
 
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -219,6 +222,16 @@ export const PatientForm = () => {
               {language === "en" ? "Generate Recommendation" : "Generiši Preporuku"}
             </Button>
 
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => setShowAnalysis(!showAnalysis)}
+            >
+              <Activity className="h-4 w-4" />
+              {language === "en" ? "Toggle Analysis" : "Prikaži Analizu"}
+            </Button>
+
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -239,6 +252,14 @@ export const PatientForm = () => {
           </div>
         </Card>
       </form>
+
+      {showAnalysis && (
+        <PatientAnalysis
+          infectionSites={formData.infectionSites}
+          severity={formData.severity}
+          symptoms={formData.symptoms}
+        />
+      )}
 
       {recommendation && (
         <AntibioticRecommendation recommendation={recommendation} />

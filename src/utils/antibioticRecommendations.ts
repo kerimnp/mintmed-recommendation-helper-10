@@ -1,8 +1,8 @@
-import { PatientData } from "./antibioticRecommendations/types";
-import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCalculations";
-import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
-import { EnhancedAntibioticRecommendation } from "./antibioticRecommendations/types/recommendationTypes";
-import { getRegionalResistance } from "./antibioticRecommendations/resistanceData";
+import { PatientData } from "./types";
+import { calculateBMI, getBMICategory } from "./bmiCalculations";
+import { calculateGFR } from "./renalAdjustments/gfrCalculation";
+import { EnhancedAntibioticRecommendation } from "./types/recommendationTypes";
+import { getRegionalResistance } from "./regionalResistance";
 import { calculateAmoxicillinDose, amoxicillinDosing } from "./antibioticDatabases/amoxicillin";
 
 export const generateAntibioticRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {
@@ -26,7 +26,12 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
       },
       reasoning: "Please provide infection sites and severity to generate recommendation",
       alternatives: [],
-      precautions: ["Complete all required fields to receive accurate recommendation"]
+      precautions: ["Complete all required fields to receive accurate recommendation"],
+      rationale: {
+        infectionType: "unknown",
+        severity: "unknown",
+        reasons: ["Incomplete information provided"]
+      }
     };
   }
 
