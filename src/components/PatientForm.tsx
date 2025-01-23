@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
@@ -12,13 +12,24 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator } from "lucide-react";
+import { Progress } from "./ui/progress";
+import { Calculator, Info, Printer } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import { calculateBMI } from "@/utils/antibioticRecommendations/bmiCalculations";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<any>(null);
+  const [progress, setProgress] = useState(0);
+  const [bmi, setBmi] = useState<number | null>(null);
+  
   const [formData, setFormData] = useState({
     age: "",
     gender: "male",
@@ -54,14 +65,50 @@ export const PatientForm = () => {
     }
   });
 
+  useEffect(() => {
+    calculateProgress();
+  }, [formData]);
+
+  useEffect(() => {
+    if (formData.weight && formData.height) {
+      const calculatedBMI = calculateBMI(formData.weight, formData.height);
+      setBmi(calculatedBMI);
+    }
+  }, [formData.weight, formData.height]);
+
+  const calculateProgress = () => {
+    const requiredFields = ['age', 'gender', 'weight', 'height', 'nationality'];
+    const filledRequired = requiredFields.filter(field => formData[field]).length;
+    const hasInfectionSite = formData.infectionSites.length > 0;
+    
+    const progressPercentage = Math.round(
+      ((filledRequired + (hasInfectionSite ? 1 : 0)) / (requiredFields.length + 1)) * 100
+    );
+    setProgress(progressPercentage);
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       if (field === "gender" && value === "male") {
-        newData.pregnancy = "not-applicable";
+        newData.pregnancy = "not_applicable";
       }
       return newData;
     });
+  };
+
+  const handlePrint = () => {
+    if (recommendation) {
+      window.print();
+    } else {
+      toast({
+        title: language === "en" ? "No Recommendation" : "Nema Preporuke",
+        description: language === "en" 
+          ? "Please generate a recommendation first"
+          : "Molimo prvo generišite preporuku",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,14 +146,57 @@ export const PatientForm = () => {
     }
   };
 
+  const renderSectionHeader = (number: number, title: string, subtitle: string) => (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mint-100 text-mint-700 font-semibold">
+        {number}
+      </div>
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-medical-text">{title}</h3>
+        <p className="text-sm text-gray-500 dark:text-medical-text-secondary">{subtitle}</p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
+      <div className="sticky top-20 z-40 bg-white/80 dark:bg-medical-bg-secondary/80 backdrop-blur-xl p-4 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-semibold">
+            {language === "en" ? "Form Progress" : "Napredak Forme"}
+          </h2>
+          <span className="text-sm text-gray-500">{progress}%</span>
+        </div>
+        <Progress value={progress} className="h-2" />
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
-          <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
+          <div>
+            {renderSectionHeader(1, 
+              language === "en" ? "Patient Demographics" : "Demografski Podaci",
+              language === "en" ? "Basic patient information" : "Osnovni podaci o pacijentu"
+            )}
+            <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
+            
+            {bmi && (
+              <div className="mt-4 p-3 bg-mint-50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-mint-600" />
+                  <span className="font-medium text-mint-700">
+                    BMI: {bmi.toFixed(1)} kg/m²
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
+          {renderSectionHeader(2,
+            language === "en" ? "Allergies" : "Alergije",
+            language === "en" ? "Known drug allergies" : "Poznate alergije na lijekove"
+          )}
           <AllergySection 
             allergies={formData.allergies} 
             onAllergyChange={(allergy, checked) => handleInputChange(`allergies.${allergy}`, checked)} 
@@ -114,6 +204,10 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
+          {renderSectionHeader(3,
+            language === "en" ? "Renal Function" : "Bubrežna Funkcija",
+            language === "en" ? "Creatinine levels" : "Nivoi kreatinina"
+          )}
           <RenalFunctionSection 
             creatinine={formData.creatinine} 
             onCreatinineChange={(value) => handleInputChange("creatinine", value)} 
@@ -121,23 +215,55 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
+          {renderSectionHeader(4,
+            language === "en" ? "Comorbidities" : "Komorbiditeti",
+            language === "en" ? "Existing conditions" : "Postojeća stanja"
+          )}
           <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
+          {renderSectionHeader(5,
+            language === "en" ? "Infection Details" : "Detalji Infekcije",
+            language === "en" ? "Infection characteristics" : "Karakteristike infekcije"
+          )}
           <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
+          {renderSectionHeader(6,
+            language === "en" ? "Medication History" : "Istorija Lijekova",
+            language === "en" ? "Previous treatments" : "Prethodna liječenja"
+          )}
           <MedicationHistorySection formData={formData} onInputChange={handleInputChange} />
 
-          <Button 
-            type="submit"
-            className="premium-button flex items-center gap-2 mt-6"
-          >
-            <Calculator className="h-4 w-4" />
-            {language === "en" ? "Generate Recommendation" : "Generiši Preporuku"}
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              type="submit"
+              className="premium-button flex-1 flex items-center justify-center gap-2"
+            >
+              <Calculator className="h-4 w-4" />
+              {language === "en" ? "Generate Recommendation" : "Generiši Preporuku"}
+            </Button>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-12 h-12 p-0"
+                    onClick={handlePrint}
+                  >
+                    <Printer className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {language === "en" ? "Print Recommendation" : "Štampaj Preporuku"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </Card>
       </form>
 
