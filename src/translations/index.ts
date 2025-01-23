@@ -102,6 +102,7 @@ export const translations = {
       gender: "Spol",
       weight: "Težina (kg)",
       height: "Visina (cm)",
+      nationality: "Nacionalnost",
       pregnancy: "Status Trudnoće",
       genderOptions: {
         male: "Muško",
