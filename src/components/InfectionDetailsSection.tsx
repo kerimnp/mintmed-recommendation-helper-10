@@ -21,6 +21,11 @@ interface InfectionDetailsSectionProps {
   onInputChange: (field: string, value: any) => void;
 }
 
+type InfectionSite = {
+  id: string;
+  text: string;
+};
+
 export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = ({
   formData,
   onInputChange,
@@ -49,18 +54,18 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
     }
   };
 
-  const availableSites = [
-    { id: "respiratory", text: t.sites.respiratory },
-    { id: "urinary", text: t.sites.urinary },
-    { id: "skin", text: t.sites.skin },
-    { id: "abdominal", text: t.sites.abdominal },
-    { id: "cns", text: t.sites.cns },
-    { id: "wound", text: t.sites.wound },
-    { id: "bloodstream", text: t.sites.bloodstream },
-    { id: "bone", text: t.sites.bone },
-    { id: "ear", text: t.sites.ear },
-    { id: "eye", text: t.sites.eye },
-    { id: "dental", text: t.sites.dental }
+  const availableSites: InfectionSite[] = [
+    { id: "respiratory", text: t.sites.respiratory as string },
+    { id: "urinary", text: t.sites.urinary as string },
+    { id: "skin", text: t.sites.skin as string },
+    { id: "abdominal", text: t.sites.abdominal as string },
+    { id: "cns", text: t.sites.cns as string },
+    { id: "wound", text: t.sites.wound as string },
+    { id: "bloodstream", text: t.sites.bloodstream as string },
+    { id: "bone", text: t.sites.bone as string },
+    { id: "ear", text: t.sites.ear as string },
+    { id: "eye", text: t.sites.eye as string },
+    { id: "dental", text: t.sites.dental as string }
   ];
 
   return (

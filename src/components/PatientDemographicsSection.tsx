@@ -5,6 +5,7 @@ import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
+import { cn } from "@/lib/utils";
 
 interface PatientDemographicsSectionProps {
   formData: {
@@ -16,11 +17,13 @@ interface PatientDemographicsSectionProps {
     pregnancy: string;
   };
   onInputChange: (field: string, value: any) => void;
+  errors?: { [key: string]: string };
 }
 
 export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProps> = ({
   formData,
   onInputChange,
+  errors = {},
 }) => {
   const { language } = useLanguage();
   const t = translations[language].patientDemographics;
@@ -44,14 +47,18 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="age">{t.age}</Label>
+          <Label htmlFor="age" className={cn(errors.age && "text-destructive")}>{t.age}</Label>
           <Input
             id="age"
             type="number"
             value={formData.age}
             onChange={(e) => onInputChange("age", e.target.value)}
+            className={cn(errors.age && "border-destructive")}
             required
           />
+          {errors.age && (
+            <p className="text-sm text-destructive mt-1">{errors.age}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -68,25 +75,33 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="weight">{t.weight}</Label>
+          <Label htmlFor="weight" className={cn(errors.weight && "text-destructive")}>{t.weight}</Label>
           <Input
             id="weight"
             type="number"
             value={formData.weight}
             onChange={(e) => onInputChange("weight", e.target.value)}
+            className={cn(errors.weight && "border-destructive")}
             required
           />
+          {errors.weight && (
+            <p className="text-sm text-destructive mt-1">{errors.weight}</p>
+          )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="height">{t.height}</Label>
+          <Label htmlFor="height" className={cn(errors.height && "text-destructive")}>{t.height}</Label>
           <Input
             id="height"
             type="number"
             value={formData.height}
             onChange={(e) => onInputChange("height", e.target.value)}
+            className={cn(errors.height && "border-destructive")}
             required
           />
+          {errors.height && (
+            <p className="text-sm text-destructive mt-1">{errors.height}</p>
+          )}
         </div>
 
         <div className="space-y-2">
