@@ -90,7 +90,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.sites.label as string}
+            Select Infection Site
           </Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {availableSites.map((site) => (

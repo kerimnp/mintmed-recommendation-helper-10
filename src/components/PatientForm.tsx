@@ -67,6 +67,17 @@ export const PatientForm = () => {
     }
   });
 
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   const getBMIColor = (bmi: number) => {
     if (bmi < 18.5) return "text-blue-500";
     if (bmi < 25) return "text-green-500";
