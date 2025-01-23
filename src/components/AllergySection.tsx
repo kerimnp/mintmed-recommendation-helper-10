@@ -23,6 +23,10 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
   const { language } = useLanguage();
   const t = translations[language].allergies;
 
+  const handleAllergyChange = (allergy: string, checked: boolean) => {
+    onAllergyChange(allergy, checked);
+  };
+
   return (
     <Card className="relative overflow-hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl
       border border-gray-200 dark:border-gray-800">
@@ -45,7 +49,7 @@ export const AllergySection: React.FC<AllergySectionProps> = ({
               <Checkbox
                 id={key}
                 checked={value}
-                onCheckedChange={(checked) => onAllergyChange(key, checked as boolean)}
+                onCheckedChange={(checked) => handleAllergyChange(key, checked as boolean)}
                 className="border-gray-300 dark:border-gray-600"
               />
               <Label 
