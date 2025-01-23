@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/pages/Index";
+import { translations } from "@/translations";
 import { Badge } from "./ui/badge";
 import { X, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";

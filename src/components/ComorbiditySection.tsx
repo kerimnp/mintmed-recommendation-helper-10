@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/pages/Index";
+import { translations } from "@/translations";
 
 interface ComorbiditySectionProps {
   formData: {
@@ -96,3 +96,4 @@ export const ComorbiditySection: React.FC<ComorbiditySectionProps> = ({
     </Card>
   );
 };
+

@@ -10,7 +10,7 @@ import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/pages/Index";
+import { translations } from "@/translations";
 import type { PatientData } from "@/utils/antibioticRecommendations/types";
 
 export const PatientForm = () => {

@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/pages/Index";
+import { translations } from "@/translations";
 
 interface RenalFunctionSectionProps {
   creatinine: string;

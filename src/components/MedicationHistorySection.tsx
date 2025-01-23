@@ -4,7 +4,7 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { Textarea } from "./ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { translations } from "@/pages/Index";
+import { translations } from "@/translations";
 
 interface MedicationHistorySectionProps {
   formData: {
@@ -67,3 +67,4 @@ export const MedicationHistorySection: React.FC<MedicationHistorySectionProps> =
     </Card>
   );
 };
+
