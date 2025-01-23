@@ -36,6 +36,7 @@ export const PatientForm = () => {
     severity: "",
     creatinine: "",
     recentAntibiotics: false,
+    isHospitalAcquired: false,
     allergies: {
       penicillin: false,
       cephalosporin: false,
@@ -112,10 +113,7 @@ export const PatientForm = () => {
 
     setIsSubmitting(true);
     try {
-      const recommendation = generateAntibioticRecommendation({
-        ...formData,
-        isHospitalAcquired: false
-      });
+      const recommendation = generateAntibioticRecommendation(formData);
       setRecommendation(recommendation);
       
       toast({
