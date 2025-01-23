@@ -4,6 +4,7 @@ import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
 import { generateBoneInfectionRecommendation } from "./boneInfections";
+import { generateCNSInfectionRecommendation } from "./cnsInfections";
 import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 
@@ -33,7 +34,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
   }
 
   // Generate recommendations based on infection sites
-  let recommendations: AntibioticRecommendation[] = data.infectionSites.map(site => {
+  let recommendations = data.infectionSites.map(site => {
     switch (site.toLowerCase()) {
       case "respiratory":
         return generateRespiratoryRecommendation(data);
@@ -43,6 +44,8 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateSkinInfectionRecommendation(data);
       case "bone":
         return generateBoneInfectionRecommendation(data);
+      case "cns":
+        return generateCNSInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
