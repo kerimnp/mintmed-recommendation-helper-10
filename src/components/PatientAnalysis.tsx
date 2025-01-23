@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Activity, AlertCircle, Heart, Scale, Thermometer, Tooth, Eye, Bone, Droplet, Bacteria, Bandage, Brain } from "lucide-react";
+import { Activity, AlertCircle, Heart, Scale, Thermometer, Eye, Bone, Droplet, Bandage, Brain, Stethoscope, Syringe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   const getInfectionIcon = (site: string) => {
     switch (site) {
       case "dental":
-        return <Tooth className="h-6 w-6 text-blue-500" />;
+        return <Bone className="h-6 w-6 text-blue-500" />; // Changed from Tooth to Bone
       case "eye":
         return <Eye className="h-6 w-6 text-green-500" />;
       case "bone":
@@ -49,7 +49,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
       case "urinary":
         return <Droplet className="h-6 w-6 text-yellow-500" />;
       case "abdominal":
-        return <Bacteria className="h-6 w-6 text-purple-500" />;
+        return <Stethoscope className="h-6 w-6 text-purple-500" />; // Changed from Bacteria to Stethoscope
       case "surgical":
         return <Bandage className="h-6 w-6 text-red-500" />;
       case "cns":
