@@ -82,7 +82,7 @@ export const PatientForm = () => {
     const color = getBMIColor(bmi);
     
     return (
-      <div className="mt-4 p-4 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+      <Card className="p-4 mt-4 bg-white/90 dark:bg-gray-900/90">
         <div className="flex items-center justify-between">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">BMI</span>
@@ -101,7 +101,7 @@ export const PatientForm = () => {
             style={{ width: `${Math.min((bmi / 40) * 100, 100)}%` }}
           />
         </div>
-      </div>
+      </Card>
     );
   };
 
