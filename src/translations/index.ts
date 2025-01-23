@@ -44,6 +44,7 @@ export const translations = {
     infectionDetails: {
       title: "Infection Details",
       subtitle: "Specify infection site and characteristics",
+      acquisitionType: "Infection Acquisition Type",
       sites: {
         respiratory: "Respiratory",
         urinary: "Urinary Tract",
@@ -125,6 +126,7 @@ export const translations = {
     infectionDetails: {
       title: "Detalji Infekcije",
       subtitle: "Navedite mjesto i karakteristike infekcije",
+      acquisitionType: "Tip Stjecanja Infekcije",
       sites: {
         respiratory: "Respiratorna",
         urinary: "Urinarna",

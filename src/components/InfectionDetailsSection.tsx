@@ -6,8 +6,9 @@ import { Textarea } from "./ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Badge } from "./ui/badge";
-import { X, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle, Building, Hospital } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface InfectionDetailsSectionProps {
   formData: {
@@ -15,6 +16,7 @@ interface InfectionDetailsSectionProps {
     symptoms: string;
     duration: string;
     severity: string;
+    isHospitalAcquired: boolean;
   };
   onInputChange: (field: string, value: any) => void;
 }
@@ -70,6 +72,30 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
       </div>
 
       <div className="space-y-6">
+        <div className="space-y-4">
+          <Label className="text-gray-700 dark:text-gray-300 font-medium">
+            {t.acquisitionType}
+          </Label>
+          <div className="flex gap-2">
+            <Button
+              variant={formData.isHospitalAcquired ? "outline" : "default"}
+              className="flex items-center gap-2 flex-1"
+              onClick={() => onInputChange("isHospitalAcquired", false)}
+            >
+              <Building className="h-4 w-4" />
+              Community Acquired
+            </Button>
+            <Button
+              variant={formData.isHospitalAcquired ? "default" : "outline"}
+              className="flex items-center gap-2 flex-1"
+              onClick={() => onInputChange("isHospitalAcquired", true)}
+            >
+              <Hospital className="h-4 w-4" />
+              Hospital Acquired
+            </Button>
+          </div>
+        </div>
+
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
             {t.sites.respiratory}
