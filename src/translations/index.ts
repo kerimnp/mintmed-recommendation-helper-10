@@ -71,7 +71,13 @@ export const translations = {
       title: "Medication History",
       subtitle: "Previous antibiotic use and other allergies",
       recentAntibiotics: "Recent Antibiotic Use (last 3 months)",
-      otherAllergies: "Other Allergies or Reactions"
+      antibioticAllergies: "Known Antibiotic Allergies",
+      otherAllergies: "Other Allergies or Reactions",
+      penicillin: "Penicillin",
+      cephalosporin: "Cephalosporin",
+      sulfa: "Sulfa Drugs",
+      macrolide: "Macrolides",
+      fluoroquinolone: "Fluoroquinolones"
     },
     renalFunction: {
       title: "Renal Function",
@@ -154,7 +160,13 @@ export const translations = {
       title: "Historija Lijekova",
       subtitle: "Prethodna upotreba antibiotika i druge alergije",
       recentAntibiotics: "Nedavna Upotreba Antibiotika (zadnja 3 mjeseca)",
-      otherAllergies: "Druge Alergije ili Reakcije"
+      antibioticAllergies: "Poznate Alergije na Antibiotike",
+      otherAllergies: "Druge Alergije ili Reakcije",
+      penicillin: "Penicilin",
+      cephalosporin: "Cefalosporin",
+      sulfa: "Sulfa Lijekovi",
+      macrolide: "Makrolidi",
+      fluoroquinolone: "Fluorokinoloni"
     },
     renalFunction: {
       title: "Bubrežna Funkcija",
