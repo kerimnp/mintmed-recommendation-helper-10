@@ -20,35 +20,62 @@ serve(async (req) => {
   try {
     console.log('Received request to get AI recommendation');
 
-    // Get the JWT token from the request headers
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('No authorization header found');
       throw new Error('No authorization header');
     }
 
-    // Initialize Supabase client with service role key
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+    // Initialize Supabase client
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase configuration');
+      throw new Error('Server configuration error');
+    }
 
-    // Verify the JWT token and get the user
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Verify JWT token
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
     if (authError) {
       console.error('Auth error:', authError);
-      throw new Error('Unauthorized');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     if (!user) {
       console.error('No user found');
-      throw new Error('User not found');
+      return new Response(
+        JSON.stringify({ error: 'User not found' }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     console.log('User authenticated successfully:', user.id);
 
+    // Get request body
     const { patientData } = await req.json();
+    if (!patientData) {
+      throw new Error('No patient data provided');
+    }
     console.log('Received patient data:', patientData);
+
+    // Verify Perplexity API key
+    if (!perplexityApiKey) {
+      console.error('Missing Perplexity API key');
+      throw new Error('Server configuration error');
+    }
 
     // Call Perplexity API
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -75,13 +102,13 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error('Perplexity API error:', await response.text());
+      const errorText = await response.text();
+      console.error('Perplexity API error:', errorText);
       throw new Error('Failed to get AI recommendation');
     }
 
     const result = await response.json();
     const recommendation = result.choices[0].message.content;
-
     console.log('Got recommendation from Perplexity');
 
     // Store recommendation in database
