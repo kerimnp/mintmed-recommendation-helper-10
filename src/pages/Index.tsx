@@ -21,7 +21,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 
       dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary">
-      <header className="sticky top-0 z-50 w-full border-b border-black/5 dark:border-medical-text-secondary/10 
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-black/5 dark:border-medical-text-secondary/10 
         bg-white/80 dark:bg-medical-bg-secondary/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -57,7 +57,7 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-28 pb-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 space-y-6 animate-fade-in">
             <h1 className="text-5xl font-bold text-gray-900 dark:text-medical-text">
