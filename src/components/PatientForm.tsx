@@ -12,7 +12,7 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator, Info, Printer, Activity } from "lucide-react";
+import { Calculator, Info, Printer, Activity, AlertCircle } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +21,7 @@ import {
 } from "./ui/tooltip";
 import { calculateBMI } from "@/utils/antibioticRecommendations/bmiCalculations";
 import { PatientAnalysis } from "./PatientAnalysis";
+import { Alert, AlertDescription } from "./ui/alert";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
@@ -28,6 +29,8 @@ export const PatientForm = () => {
   const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<any>(null);
   const [bmi, setBmi] = useState<number | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     age: "",
@@ -71,6 +74,43 @@ export const PatientForm = () => {
     }
   }, [formData.weight, formData.height]);
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.age) {
+      newErrors.age = t.errors?.requiredField || "Age is required";
+    } else if (Number(formData.age) < 0 || Number(formData.age) > 120) {
+      newErrors.age = t.errors?.invalidAge || "Please enter a valid age";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = t.errors?.requiredField || "Gender is required";
+    }
+
+    if (!formData.weight) {
+      newErrors.weight = t.errors?.requiredField || "Weight is required";
+    } else if (Number(formData.weight) <= 0 || Number(formData.weight) > 500) {
+      newErrors.weight = t.errors?.invalidWeight || "Please enter a valid weight";
+    }
+
+    if (!formData.height) {
+      newErrors.height = t.errors?.requiredField || "Height is required";
+    } else if (Number(formData.height) <= 0 || Number(formData.height) > 300) {
+      newErrors.height = t.errors?.invalidHeight || "Please enter a valid height";
+    }
+
+    if (!formData.nationality) {
+      newErrors.nationality = t.errors?.requiredField || "Nationality is required";
+    }
+
+    if (formData.infectionSites.length === 0) {
+      newErrors.infectionSites = t.errors?.requiredField || "At least one infection site is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
@@ -79,6 +119,14 @@ export const PatientForm = () => {
       }
       return newData;
     });
+    // Clear error when field is updated
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const handlePrint = () => {
@@ -95,20 +143,21 @@ export const PatientForm = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.age || !formData.gender || !formData.weight || !formData.height || !formData.nationality || formData.infectionSites.length === 0) {
+    if (!validateForm()) {
       toast({
-        title: language === "en" ? "Missing Information" : "Nedostaju Informacije",
+        title: language === "en" ? "Validation Error" : "Greška Validacije",
         description: language === "en" 
-          ? "Please fill in all required fields including age, gender, weight, height, nationality, and at least one infection site."
-          : "Molimo popunite sva obavezna polja uključujući dob, spol, težinu, visinu, nacionalnost i najmanje jedno mjesto infekcije.",
+          ? "Please check all required fields and correct any errors"
+          : "Molimo provjerite sva obavezna polja i ispravite greške",
         variant: "destructive"
       });
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const recommendation = generateAntibioticRecommendation(formData);
       setRecommendation(recommendation);
@@ -127,12 +176,14 @@ export const PatientForm = () => {
           : "Došlo je do greške prilikom generisanja preporuke. Molimo pokušajte ponovo.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const renderSectionHeader = (number: number, title: string, subtitle: string) => (
     <div className="flex items-center gap-2 mb-4">
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mint-100 text-mint-700 font-semibold">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-primary/10 text-medical-primary font-semibold">
         {number}
       </div>
       <div>
@@ -148,18 +199,38 @@ export const PatientForm = () => {
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
+          {Object.keys(errors).length > 0 && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {language === "en" 
+                  ? "Please correct the following errors:"
+                  : "Molimo ispravite sljedeće greške:"}
+                <ul className="list-disc list-inside mt-2">
+                  {Object.values(errors).map((error, index) => (
+                    <li key={index} className="text-sm">{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div>
             {renderSectionHeader(1, 
               language === "en" ? "Patient Demographics" : "Demografski Podaci",
               language === "en" ? "Basic patient information" : "Osnovni podaci o pacijentu"
             )}
-            <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
+            <PatientDemographicsSection 
+              formData={formData} 
+              onInputChange={handleInputChange}
+              errors={errors}
+            />
             
             {bmi && (
-              <div className="mt-4 p-3 bg-mint-50 rounded-lg">
+              <div className="mt-4 p-3 bg-medical-primary/10 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-mint-600" />
-                  <span className="font-medium text-mint-700">
+                  <Info className="h-5 w-5 text-medical-primary" />
+                  <span className="font-medium text-medical-primary">
                     BMI: {bmi.toFixed(1)} kg/m²
                   </span>
                 </div>
@@ -217,9 +288,13 @@ export const PatientForm = () => {
             <Button 
               type="submit"
               className="premium-button flex-1 flex items-center justify-center gap-2"
+              disabled={isSubmitting}
             >
               <Calculator className="h-4 w-4" />
-              {language === "en" ? "Generate Recommendation" : "Generiši Preporuku"}
+              {isSubmitting 
+                ? (language === "en" ? "Generating..." : "Generisanje...") 
+                : (language === "en" ? "Generate Recommendation" : "Generiši Preporuku")
+              }
             </Button>
 
             <Button
@@ -240,6 +315,7 @@ export const PatientForm = () => {
                     variant="outline"
                     className="w-12 h-12 p-0"
                     onClick={handlePrint}
+                    disabled={!recommendation}
                   >
                     <Printer className="h-4 w-4" />
                   </Button>
