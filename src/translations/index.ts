@@ -80,8 +80,6 @@ export const translations = {
     }
   },
   bs: {
-    // ... Same structure as 'en' but with Bosnian translations
-    // For now, we'll use English as fallback
     title: "Asistent za Propisivanje Antibiotika",
     subtitle: "Preporuke zasnovane na dokazima prilagođene potrebama vašeg pacijenta",
     buttons: {
@@ -94,7 +92,8 @@ export const translations = {
       cephalosporin: "Cefalosporin",
       sulfa: "Sulfa Lijekovi",
       macrolide: "Makrolidi",
-      fluoroquinolone: "Fluorokinoloni"
+      fluoroquinolone: "Fluorokinoloni",
+      otherAllergies: "Druge Alergije"
     },
     patientDemographics: {
       title: "Demografski Podaci",
@@ -112,7 +111,8 @@ export const translations = {
       pregnancyOptions: {
         notPregnant: "Nije Trudna",
         pregnant: "Trudna",
-        breastfeeding: "Doji"
+        breastfeeding: "Doji",
+        notApplicable: "Nije Primjenjivo"
       }
     },
     comorbidities: {
@@ -127,6 +127,7 @@ export const translations = {
       title: "Detalji Infekcije",
       subtitle: "Navedite mjesto i karakteristike infekcije",
       acquisitionType: "Tip Stjecanja Infekcije",
+      hospitalAcquired: "Bolnička Infekcija",
       sites: {
         respiratory: "Respiratorna",
         urinary: "Urinarna",
@@ -159,6 +160,14 @@ export const translations = {
       title: "Bubrežna Funkcija",
       subtitle: "Unesite nivo kreatinina za prilagođavanje doze",
       creatinine: "Serumski Kreatinin (mg/dL)"
+    },
+    resistances: {
+      title: "Rezistencije",
+      mrsa: "MRSA",
+      vre: "VRE",
+      esbl: "ESBL",
+      cre: "CRE",
+      pseudomonas: "Pseudomonas"
     }
   }
 };

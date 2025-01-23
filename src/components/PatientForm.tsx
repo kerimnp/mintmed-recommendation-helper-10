@@ -12,24 +12,12 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { 
-  User, 
-  AlertCircle, 
-  Stethoscope,
-  Heart, 
-  Bug, 
-  PillIcon, 
-  Calculator,
-  ChevronRight,
-  ChevronLeft,
-  Hospital
-} from "lucide-react";
+import { Calculator } from "lucide-react";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
-  const [activeSection, setActiveSection] = useState<number>(0);
   const [recommendation, setRecommendation] = useState<any>(null);
   const [formData, setFormData] = useState({
     age: "",
@@ -44,7 +32,7 @@ export const PatientForm = () => {
     severity: "mild",
     creatinine: "",
     recentAntibiotics: false,
-    isHospitalAcquired: false, // Added this line
+    isHospitalAcquired: false,
     allergies: {
       penicillin: false,
       cephalosporin: false,
@@ -69,11 +57,9 @@ export const PatientForm = () => {
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
-      
       if (field === "gender" && value === "male") {
         newData.pregnancy = "not-applicable";
       }
-      
       return newData;
     });
   };
@@ -83,8 +69,10 @@ export const PatientForm = () => {
     
     if (!formData.age || !formData.gender || !formData.weight || !formData.height || !formData.nationality || formData.infectionSites.length === 0) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields including age, gender, weight, height, nationality, and at least one infection site.",
+        title: language === "en" ? "Missing Information" : "Nedostaju Informacije",
+        description: language === "en" 
+          ? "Please fill in all required fields including age, gender, weight, height, nationality, and at least one infection site."
+          : "Molimo popunite sva obavezna polja uključujući dob, spol, težinu, visinu, nacionalnost i najmanje jedno mjesto infekcije.",
         variant: "destructive"
       });
       return;
@@ -95,118 +83,61 @@ export const PatientForm = () => {
       setRecommendation(recommendation);
       
       toast({
-        title: "Recommendation Generated",
-        description: "Antibiotic recommendation has been generated based on patient data",
+        title: language === "en" ? "Recommendation Generated" : "Preporuka Generisana",
+        description: language === "en"
+          ? "Antibiotic recommendation has been generated based on patient data"
+          : "Preporuka antibiotika je generisana na osnovu podataka o pacijentu",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred while generating the recommendation. Please try again.",
+        title: language === "en" ? "Error" : "Greška",
+        description: language === "en"
+          ? "An error occurred while generating the recommendation. Please try again."
+          : "Došlo je do greške prilikom generisanja preporuke. Molimo pokušajte ponovo.",
         variant: "destructive"
       });
     }
   };
 
-  const sections = [
-    {
-      title: "Patient Demographics",
-      icon: <User className="h-5 w-5" />,
-      component: <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
-    },
-    {
-      title: "Allergies",
-      icon: <AlertCircle className="h-5 w-5" />,
-      component: <AllergySection allergies={formData.allergies} onAllergyChange={(allergy, checked) => 
-        handleInputChange(`allergies.${allergy}`, checked)} />
-    },
-    {
-      title: "Renal Function",
-      icon: <Hospital className="h-5 w-5" />,
-      component: <RenalFunctionSection creatinine={formData.creatinine} 
-        onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
-    },
-    {
-      title: "Comorbidities",
-      icon: <Heart className="h-5 w-5" />,
-      component: <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
-    },
-    {
-      title: "Infection Details",
-      icon: <Bug className="h-5 w-5" />,
-      component: <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
-    },
-    {
-      title: "Medication History",
-      icon: <PillIcon className="h-5 w-5" />,
-      component: <MedicationHistorySection formData={formData} onInputChange={handleInputChange} />
-    }
-  ];
-
-  const nextSection = () => {
-    if (activeSection < sections.length - 1) {
-      setActiveSection(prev => prev + 1);
-    }
-  };
-
-  const previousSection = () => {
-    if (activeSection > 0) {
-      setActiveSection(prev => prev - 1);
-    }
-  };
-
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
-      <div className="flex flex-wrap gap-2 justify-center mb-6">
-        {sections.map((section, index) => (
-          <Button
-            key={index}
-            variant={activeSection === index ? "default" : "outline"}
-            className="flex items-center gap-2"
-            onClick={() => setActiveSection(index)}
-          >
-            {section.icon}
-            <span className="hidden sm:inline">{section.title}</span>
-          </Button>
-        ))}
-      </div>
-
+    <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <form onSubmit={handleSubmit} className="space-y-8">
-        <Card className="p-6">
-          <div className="space-y-6">
-            {sections[activeSection].component}
-          </div>
+        <Card className="p-6 space-y-8">
+          <PatientDemographicsSection formData={formData} onInputChange={handleInputChange} />
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          <AllergySection 
+            allergies={formData.allergies} 
+            onAllergyChange={(allergy, checked) => handleInputChange(`allergies.${allergy}`, checked)} 
+          />
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          <RenalFunctionSection 
+            creatinine={formData.creatinine} 
+            onCreatinineChange={(value) => handleInputChange("creatinine", value)} 
+          />
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          <MedicationHistorySection formData={formData} onInputChange={handleInputChange} />
 
-          <div className="flex justify-between mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={previousSection}
-              disabled={activeSection === 0}
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-
-            {activeSection === sections.length - 1 ? (
-              <Button 
-                type="submit"
-                className="premium-button flex items-center gap-2"
-              >
-                <Calculator className="h-4 w-4" />
-                Generate Recommendation
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={nextSection}
-                className="flex items-center gap-2"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <Button 
+            type="submit"
+            className="premium-button flex items-center gap-2 mt-6"
+          >
+            <Calculator className="h-4 w-4" />
+            {language === "en" ? "Generate Recommendation" : "Generiši Preporuku"}
+          </Button>
         </Card>
       </form>
 
