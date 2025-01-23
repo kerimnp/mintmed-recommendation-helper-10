@@ -66,7 +66,7 @@
 
 .premium-button {
   @apply bg-gradient-medical text-medical-text font-medium px-6 py-3 rounded-lg
-    hover:shadow-lg transition-all duration-300;
+    hover:shadow-lg transition-all duration-300 sticky bottom-6 z-50 w-full;
 }
 
 .form-label {
@@ -81,20 +81,6 @@
     focus:border-medical-primary/40 
     dark:text-medical-text
     placeholder:text-gray-400 dark:placeholder:text-medical-text-secondary/50;
-}
-
-.demographics-card {
-  @apply bg-gradient-to-br from-medical-accent to-medical-accent-tertiary/90 
-    dark:from-medical-accent/20 dark:to-medical-accent-tertiary/30
-    backdrop-blur-xl border border-medical-accent/20 dark:border-medical-accent/10
-    shadow-lg rounded-2xl transition-all duration-300;
-}
-
-.allergies-card {
-  @apply bg-gradient-to-br from-medical-error/10 to-medical-warning/10
-    dark:from-medical-error/5 dark:to-medical-warning/5
-    backdrop-blur-xl border border-medical-error/20 dark:border-medical-warning/10
-    shadow-lg rounded-2xl transition-all duration-300;
 }
 
 .standard-card {

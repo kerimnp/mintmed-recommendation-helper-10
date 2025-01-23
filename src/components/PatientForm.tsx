@@ -139,9 +139,7 @@ export const PatientForm = () => {
         <div className="sticky bottom-6 z-10 px-4">
           <button 
             type="submit"
-            className="w-full bg-medical-deep text-white px-6 py-3 rounded-lg font-medium
-              transition-all duration-300 hover:bg-gradient-to-r hover:from-medical-deep hover:to-medical-electric
-              hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="premium-button"
           >
             {t.buttons.generate}
           </button>
