@@ -1,6 +1,5 @@
 import React from "react";
 import { Card } from "./ui/card";
-import { Button } from "./ui/button";
 import { Activity, AlertCircle, Heart, Scale, Thermometer } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
@@ -40,29 +39,46 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   };
 
   const getBMICategory = (bmi: number) => {
-    if (bmi < 18.5) return { category: "Underweight", color: "text-blue-500" };
-    if (bmi < 25) return { category: "Normal", color: "text-green-500" };
-    if (bmi < 30) return { category: "Overweight", color: "text-yellow-500" };
-    return { category: "Obese", color: "text-red-500" };
+    if (bmi < 16) return { category: "Severe Thinness", color: "text-blue-700", bgColor: "bg-blue-700" };
+    if (bmi < 17) return { category: "Moderate Thinness", color: "text-blue-500", bgColor: "bg-blue-500" };
+    if (bmi < 18.5) return { category: "Mild Thinness", color: "text-blue-400", bgColor: "bg-blue-400" };
+    if (bmi < 25) return { category: "Normal", color: "text-green-500", bgColor: "bg-green-500" };
+    if (bmi < 30) return { category: "Overweight", color: "text-yellow-500", bgColor: "bg-yellow-500" };
+    if (bmi < 35) return { category: "Obese Class I", color: "text-orange-500", bgColor: "bg-orange-500" };
+    if (bmi < 40) return { category: "Obese Class II", color: "text-red-500", bgColor: "bg-red-500" };
+    return { category: "Obese Class III", color: "text-red-700", bgColor: "bg-red-700" };
   };
 
   const renderBMIWheel = () => {
     if (!bmi) return null;
-    const { category, color } = getBMICategory(bmi);
-    const rotation = (bmi / 40) * 180; // Max BMI scale at 40
+    const { category, color, bgColor } = getBMICategory(bmi);
+    const rotation = Math.min((bmi / 50) * 180, 180); // Max BMI scale at 50
 
     return (
-      <div className="relative w-32 h-32">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-24 h-24 rounded-full border-4 border-gray-200">
-            <div 
-              className="w-1 h-12 bg-blue-500 origin-bottom transform transition-transform duration-500"
-              style={{ transform: `translateX(11px) rotate(${rotation}deg)` }}
-            />
+      <div className="relative w-48 h-48 mx-auto">
+        <div className="absolute inset-0">
+          {/* BMI Scale Background */}
+          <div className="absolute inset-0 rounded-full border-4 border-gray-200">
+            <div className="absolute w-full h-full">
+              {/* Colored sections */}
+              <div className="absolute w-1/2 h-full origin-right transform rotate-[-90deg]">
+                <div className="w-full h-full rounded-l-full bg-gradient-to-r from-blue-700 via-green-500 to-red-700" />
+              </div>
+            </div>
           </div>
-          <div className="absolute flex flex-col items-center">
-            <span className="text-2xl font-bold">{bmi.toFixed(1)}</span>
-            <span className={`text-sm ${color}`}>{category}</span>
+          
+          {/* Needle */}
+          <div 
+            className="absolute top-1/2 left-1/2 w-1 h-[45%] bg-gray-800 origin-bottom transform -translate-x-1/2"
+            style={{ transform: `translateX(-50%) rotate(${rotation - 90}deg)` }}
+          >
+            <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-gray-800" />
+          </div>
+          
+          {/* Center display */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-3xl font-bold">{bmi.toFixed(1)}</span>
+            <span className={`text-sm font-medium ${color}`}>{category}</span>
           </div>
         </div>
       </div>
@@ -72,27 +88,39 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   const renderVitalSigns = () => (
     <div className="grid grid-cols-2 gap-4 mt-4">
       {temperature && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20">
           <Thermometer className="h-5 w-5 text-orange-500" />
-          <span>{temperature}°C</span>
+          <div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Temperature</span>
+            <p className="font-medium">{temperature}°C</p>
+          </div>
         </div>
       )}
       {heartRate && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
           <Heart className="h-5 w-5 text-red-500" />
-          <span>{heartRate} BPM</span>
+          <div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Heart Rate</span>
+            <p className="font-medium">{heartRate} BPM</p>
+          </div>
         </div>
       )}
       {bloodPressure && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
           <Activity className="h-5 w-5 text-blue-500" />
-          <span>{bloodPressure} mmHg</span>
+          <div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Blood Pressure</span>
+            <p className="font-medium">{bloodPressure} mmHg</p>
+          </div>
         </div>
       )}
       {bmi && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
           <Scale className="h-5 w-5 text-green-500" />
-          <span>BMI: {bmi.toFixed(1)}</span>
+          <div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">BMI</span>
+            <p className="font-medium">{bmi.toFixed(1)} kg/m²</p>
+          </div>
         </div>
       )}
     </div>
