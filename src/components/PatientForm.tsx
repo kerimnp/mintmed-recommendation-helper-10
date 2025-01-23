@@ -23,7 +23,7 @@ import {
   Calculator,
   ChevronRight,
   ChevronLeft,
-  KidneyIcon
+  Kidney
 } from "lucide-react";
 
 export const PatientForm = () => {
@@ -37,7 +37,7 @@ export const PatientForm = () => {
     gender: "male",
     weight: "",
     height: "",
-    nationality: "Serbia", // Added nationality field with default value
+    nationality: "Serbia",
     pregnancy: "not_applicable",
     infectionSites: [],
     symptoms: "",
@@ -121,7 +121,7 @@ export const PatientForm = () => {
     },
     {
       title: "Renal Function",
-      icon: <KidneyIcon className="h-5 w-5" />,
+      icon: <Kidney className="h-5 w-5" />,
       component: <RenalFunctionSection creatinine={formData.creatinine} 
         onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
     },

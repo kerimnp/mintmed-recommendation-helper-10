@@ -12,6 +12,7 @@ interface PatientDemographicsSectionProps {
     gender: string;
     weight: string;
     height: string;
+    nationality: string;
     pregnancy: string;
   };
   onInputChange: (field: string, value: any) => void;
@@ -23,6 +24,16 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 }) => {
   const { language } = useLanguage();
   const t = translations[language].patientDemographics;
+
+  const balkanCountries = [
+    "Serbia",
+    "Bosnia and Herzegovina",
+    "Croatia",
+    "North Macedonia",
+    "Montenegro",
+    "Albania",
+    "Kosovo"
+  ];
 
   const handleGenderChange = (value: string) => {
     onInputChange("gender", value);
@@ -93,6 +104,24 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
               onChange={(e) => onInputChange("height", e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="nationality" className="text-gray-700 dark:text-gray-300">
+              {t.nationality}
+            </Label>
+            <Select value={formData.nationality} onValueChange={(value) => onInputChange("nationality", value)} required>
+              <SelectTrigger className="bg-white/90 dark:bg-gray-800/90 border-gray-200 dark:border-gray-700">
+                <SelectValue placeholder={t.nationality} />
+              </SelectTrigger>
+              <SelectContent>
+                {balkanCountries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {formData.gender === "female" && (
