@@ -119,6 +119,7 @@ export const PatientForm = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
+    // Only validate essential fields
     if (!formData.age) {
       newErrors.age = t.errors?.requiredField || "Age is required";
     } else if (Number(formData.age) < 0 || Number(formData.age) > 120) {
@@ -141,48 +142,12 @@ export const PatientForm = () => {
       newErrors.height = t.errors?.invalidHeight || "Please enter a valid height";
     }
 
-    if (!formData.nationality) {
-      newErrors.nationality = t.errors?.requiredField || "Nationality is required";
-    }
-
-    if (formData.infectionSites.length === 0) {
-      newErrors.infectionSites = t.errors?.requiredField || "At least one infection site is required";
+    if (!formData.severity) {
+      newErrors.severity = t.errors?.requiredField || "Severity is required";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      if (field === "gender" && value === "male") {
-        newData.pregnancy = "not_applicable";
-      }
-      return newData;
-    });
-    // Clear error when field is updated
-    if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-
-  const handlePrint = () => {
-    if (recommendation) {
-      window.print();
-    } else {
-      toast({
-        title: language === "en" ? "No Recommendation" : "Nema Preporuke",
-        description: language === "en" 
-          ? "Please generate a recommendation first"
-          : "Molimo prvo generišite preporuku",
-        variant: "destructive"
-      });
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -192,8 +157,8 @@ export const PatientForm = () => {
       toast({
         title: language === "en" ? "Validation Error" : "Greška Validacije",
         description: language === "en" 
-          ? "Please check all required fields and correct any errors"
-          : "Molimo provjerite sva obavezna polja i ispravite greške",
+          ? "Please fill in all required fields (Patient Demographics and Infection Details)"
+          : "Molimo popunite sva obavezna polja (Demografski podaci i Detalji infekcije)",
         variant: "destructive"
       });
       return;

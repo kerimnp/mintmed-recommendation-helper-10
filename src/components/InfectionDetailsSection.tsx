@@ -34,24 +34,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
   const t = translations[language].infectionDetails;
 
   const handleSiteSelect = (site: string) => {
-    const currentSites = formData.infectionSites || [];
-    if (!currentSites.includes(site)) {
-      onInputChange("infectionSites", [...currentSites, site]);
-    }
-  };
-
-  const handleSiteRemove = (site: string) => {
-    const updatedSites = formData.infectionSites.filter(s => s !== site);
-    onInputChange("infectionSites", updatedSites);
-  };
-
-  const handleSiteToggle = (site: string) => {
-    const currentSites = formData.infectionSites || [];
-    if (currentSites.includes(site)) {
-      handleSiteRemove(site);
-    } else {
-      handleSiteSelect(site);
-    }
+    onInputChange("infectionSites", [site]); // Changed to only allow one site at a time
   };
 
   const availableSites: InfectionSite[] = [
@@ -107,31 +90,13 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
 
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            {t.sites.respiratory as string}
+            {t.sites.label as string}
           </Label>
-          <div className="flex flex-wrap gap-2 min-h-[40px]">
-            {formData.infectionSites?.map((site) => (
-              <Badge 
-                key={site}
-                variant="secondary"
-                className={cn(
-                  "px-3 py-1.5 flex items-center gap-2 cursor-pointer transition-all duration-200",
-                  "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300",
-                  "hover:bg-blue-100 dark:hover:bg-blue-900/50",
-                  "border border-blue-200 dark:border-blue-800 group"
-                )}
-                onClick={() => handleSiteRemove(site)}
-              >
-                {(t.sites[site as keyof typeof t.sites] as string) || site}
-                <X className="h-3 w-3 opacity-50 group-hover:opacity-100" />
-              </Badge>
-            ))}
-          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {availableSites.map((site) => (
               <button
                 key={site.id}
-                onClick={() => handleSiteToggle(site.id)}
+                onClick={() => handleSiteSelect(site.id)}
                 className={cn(
                   "p-2.5 text-sm rounded-xl transition-all duration-200 border shadow-sm",
                   formData.infectionSites?.includes(site.id)
