@@ -258,7 +258,6 @@ export const PatientForm = () => {
           infectionSites={formData.infectionSites}
           severity={formData.severity}
           symptoms={formData.symptoms}
-          bmi={bmi}
         />
       )}
 
