@@ -20,12 +20,19 @@ export const calculateAdjustedBodyWeight = (
 export const calculateWeightMetrics = (
   patientMetrics: PatientMetrics
 ): WeightCalculations => {
-  const ibw = calculateIdealBodyWeight(patientMetrics.height, patientMetrics.gender);
-  const useAdjustedWeight = patientMetrics.weight > ibw * 1.2;
+  const height = parseFloat(patientMetrics.height);
+  const weight = parseFloat(patientMetrics.weight);
+  
+  if (isNaN(height) || isNaN(weight)) {
+    throw new Error('Invalid height or weight values');
+  }
+
+  const ibw = calculateIdealBodyWeight(height, patientMetrics.gender);
+  const useAdjustedWeight = weight > ibw * 1.2;
   
   return {
     ibw,
-    adjBW: useAdjustedWeight ? calculateAdjustedBodyWeight(patientMetrics.weight, ibw) : undefined,
+    adjBW: useAdjustedWeight ? calculateAdjustedBodyWeight(weight, ibw) : undefined,
     useAdjustedWeight
   };
 };

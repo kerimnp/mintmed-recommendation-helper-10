@@ -1,10 +1,10 @@
 export interface PatientMetrics {
-  age: number;
+  age: string;
   gender: 'male' | 'female';
-  weight: number; // in kg
-  height: number; // in cm
-  creatinine?: number; // in mg/dL
+  weight: string;
+  height: string;
   region: string;
+  creatinine?: string;
 }
 
 export interface WeightCalculations {
@@ -20,26 +20,11 @@ export interface RenalFunction {
 }
 
 export interface AllergiesProfile {
-  penicillin: {
-    isAllergic: boolean;
-    severity: 'mild' | 'moderate' | 'severe' | 'unknown';
-  };
-  cephalosporin: {
-    isAllergic: boolean;
-    severity: 'mild' | 'moderate' | 'severe' | 'unknown';
-  };
-  sulfa: {
-    isAllergic: boolean;
-    severity: 'mild' | 'moderate' | 'severe' | 'unknown';
-  };
-  macrolide: {
-    isAllergic: boolean;
-    severity: 'mild' | 'moderate' | 'severe' | 'unknown';
-  };
-  fluoroquinolone: {
-    isAllergic: boolean;
-    severity: 'mild' | 'moderate' | 'severe' | 'unknown';
-  };
+  penicillin: boolean;
+  cephalosporin: boolean;
+  sulfa: boolean;
+  macrolide: boolean;
+  fluoroquinolone: boolean;
 }
 
 export interface ResistanceProfile {
@@ -53,7 +38,7 @@ export interface ResistanceProfile {
 export interface InfectionDetails {
   sites: string[];
   symptoms: string;
-  duration: number;
+  duration: string;
   severity: 'mild' | 'moderate' | 'severe';
 }
 
@@ -64,12 +49,6 @@ export interface PatientComorbidities {
   immunosuppressed: boolean;
 }
 
-export interface MedicationHistory {
-  recentAntibiotics: boolean;
-  antibioticClass?: string;
-  lastUsed?: Date;
-}
-
 export interface PatientProfile {
   metrics: PatientMetrics;
   weightCalculations: WeightCalculations;
@@ -78,5 +57,4 @@ export interface PatientProfile {
   resistances: ResistanceProfile;
   infection: InfectionDetails;
   comorbidities: PatientComorbidities;
-  medicationHistory: MedicationHistory;
 }

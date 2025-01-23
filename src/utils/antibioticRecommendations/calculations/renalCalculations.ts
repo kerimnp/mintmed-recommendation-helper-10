@@ -5,7 +5,10 @@ export const calculateCrCl = (
   patientMetrics: PatientMetrics,
   weightCalculations: WeightCalculations
 ): RenalFunction => {
-  if (!patientMetrics.creatinine || patientMetrics.creatinine <= 0) {
+  const age = parseFloat(patientMetrics.age);
+  const creatinine = parseFloat(patientMetrics.creatinine || "1.0");
+  
+  if (isNaN(age) || creatinine <= 0) {
     return {
       crCl: 60,
       requiresDoseAdjustment: false
@@ -16,7 +19,7 @@ export const calculateCrCl = (
     ? weightCalculations.adjBW! 
     : weightCalculations.ibw;
 
-  let crCl = ((140 - patientMetrics.age) * weight) / (72 * patientMetrics.creatinine);
+  let crCl = ((140 - age) * weight) / (72 * creatinine);
   
   if (patientMetrics.gender.toLowerCase() === 'female') {
     crCl *= 0.85;
