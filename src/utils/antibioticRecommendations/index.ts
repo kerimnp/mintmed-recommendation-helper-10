@@ -1,5 +1,5 @@
 import { PatientData, AntibioticRecommendation } from "./types";
-import { calculateBMI, getBMICategory, shouldAdjustForWeight } from "./bmiCalculations";
+import { calculateBMI, getBMICategory } from "./bmiCalculations";
 import { generateRespiratoryRecommendation } from "./respiratoryInfections";
 import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
@@ -33,7 +33,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     };
   }
 
-  // Handle multiple infection sites
+  // Generate recommendations based on infection sites
   let recommendations: AntibioticRecommendation[] = data.infectionSites.map(site => {
     switch (site.toLowerCase()) {
       case "respiratory":
@@ -106,7 +106,7 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
     );
     mergedRecommendation.calculations = {
       ...mergedRecommendation.calculations,
-      bmiFactors: `Consider dose adjustment for ${bmiCategory} patient`
+      bmiAdjustment: `Consider dose adjustment for ${bmiCategory} patient`
     };
   }
 

@@ -31,6 +31,21 @@ export interface PatientData {
   };
 }
 
+export interface RegionalResistanceData {
+  Respiratory: {
+    macrolideResistance: number;
+    penicillinResistance: number;
+    fluoroquinoloneResistance: number;
+  };
+  UTI: {
+    ESBL_prevalence: number;
+    FQ_resistance: number;
+    nitrofurantoinResistance: number;
+  };
+  MRSA_prevalence: number;
+  Pseudomonas_prevalence: number;
+}
+
 export interface AntibioticRecommendation {
   primaryRecommendation: {
     name: string;
@@ -51,5 +66,6 @@ export interface AntibioticRecommendation {
     weightBased?: string;
     renalAdjustment?: string;
     pediatricFactors?: string;
+    bmiAdjustment?: string;
   };
 }
