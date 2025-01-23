@@ -41,7 +41,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
   const getInfectionIcon = (site: string) => {
     switch (site) {
       case "dental":
-        return <Bone className="h-6 w-6 text-blue-500" />; // Changed from Tooth to Bone
+        return <Bone className="h-6 w-6 text-blue-500" />;
       case "eye":
         return <Eye className="h-6 w-6 text-green-500" />;
       case "bone":
@@ -49,7 +49,7 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
       case "urinary":
         return <Droplet className="h-6 w-6 text-yellow-500" />;
       case "abdominal":
-        return <Stethoscope className="h-6 w-6 text-purple-500" />; // Changed from Bacteria to Stethoscope
+        return <Stethoscope className="h-6 w-6 text-purple-500" />;
       case "surgical":
         return <Bandage className="h-6 w-6 text-red-500" />;
       case "cns":
@@ -209,88 +209,85 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
               )}
             />
 
-            {/* Body */}
+            {/* Neck */}
             <rect
-              x="35"
-              y="45"
-              width="30"
-              height="60"
+              x="45"
+              y="42"
+              width="10"
+              height="8"
               className="fill-gray-200 dark:fill-gray-700 stroke-gray-400"
             />
 
-            {/* Lungs */}
+            {/* Shoulders */}
             <path
-              d="M30 55 Q25 75 30 95 L40 95 Q35 75 40 55 Z"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("respiratory")
-              )}
-            />
-            <path
-              d="M70 55 Q75 75 70 95 L60 95 Q65 75 60 55 Z"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("respiratory")
-              )}
+              d="M25 55 L75 55"
+              className="stroke-gray-400 stroke-2 fill-none"
             />
 
-            {/* Abdomen */}
-            <ellipse
-              cx="50"
-              cy="120"
-              rx="15"
-              ry="20"
+            {/* Body */}
+            <path
+              d="M35 55 
+                 C35 65, 35 85, 35 95 
+                 L65 95 
+                 C65 85, 65 65, 65 55 
+                 Z"
+              className="fill-gray-200 dark:fill-gray-700 stroke-gray-400"
+            />
+
+            {/* Arms */}
+            <path
+              d="M25 55 
+                 C20 65, 18 75, 15 95"
+              className="stroke-gray-400 stroke-2 fill-none"
+            />
+            <path
+              d="M75 55 
+                 C80 65, 82 75, 85 95"
+              className="stroke-gray-400 stroke-2 fill-none"
+            />
+
+            {/* Lower Body */}
+            <path
+              d="M35 95 
+                 C35 105, 35 115, 35 125 
+                 L65 125 
+                 C65 115, 65 105, 65 95 
+                 Z"
               className={cn(
                 "stroke-gray-400 transition-colors duration-300",
                 getOrganColor("abdominal")
               )}
             />
 
-            {/* Arms */}
-            <rect
-              x="15"
-              y="45"
-              width="10"
-              height="50"
-              rx="5"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("skin")
-              )}
+            {/* Legs */}
+            <path
+              d="M35 125 
+                 C33 145, 32 165, 30 185"
+              className="stroke-gray-400 stroke-2 fill-none"
             />
-            <rect
-              x="75"
-              y="45"
-              width="10"
-              height="50"
-              rx="5"
-              className={cn(
-                "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("skin")
-              )}
+            <path
+              d="M65 125 
+                 C67 145, 68 165, 70 185"
+              className="stroke-gray-400 stroke-2 fill-none"
             />
 
-            {/* Legs */}
-            <rect
-              x="35"
-              y="105"
-              width="12"
-              height="60"
-              rx="6"
+            {/* Organs and infection sites */}
+            <circle
+              cx="50"
+              cy="75"
+              r="8"
               className={cn(
                 "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("skin")
+                getOrganColor("respiratory")
               )}
             />
-            <rect
-              x="53"
-              y="105"
-              width="12"
-              height="60"
-              rx="6"
+            <circle
+              cx="50"
+              cy="110"
+              r="8"
               className={cn(
                 "stroke-gray-400 transition-colors duration-300",
-                getOrganColor("skin")
+                getOrganColor("urinary")
               )}
             />
           </svg>
