@@ -21,7 +21,7 @@ interface PrescriptionModalProps {
   selectedProduct?: DrugProduct;
 }
 
-export const PrescriptionModal = ({ open, onClose, recommendationData }: PrescriptionModalProps) => {
+export const PrescriptionModal = ({ open, onClose, recommendationData, selectedProduct }: PrescriptionModalProps) => {
   const { toast } = useToast();
   const [patientName, setPatientName] = useState("");
   const [patientSurname, setPatientSurname] = useState("");
@@ -41,8 +41,7 @@ export const PrescriptionModal = ({ open, onClose, recommendationData }: Prescri
     const doc = new jsPDF();
     
     // Add logo
-    const logoPath = "/lovable-uploads/cd9530dc-7974-4ff9-af77-057326fea5a9.png";
-    doc.addImage(logoPath, "PNG", 20, 10, 40, 20);
+    doc.addImage("/lovable-uploads/cd9530dc-7974-4ff9-af77-057326fea5a9.png", "PNG", 10, 10, 50, 25);
     
     // Add modern header with gradient-like effect
     doc.setFillColor(248, 250, 252);
@@ -72,9 +71,13 @@ export const PrescriptionModal = ({ open, onClose, recommendationData }: Prescri
     doc.text("Prescribed Medication", 25, 110);
     doc.setTextColor(51, 65, 85);
     doc.text(`Medication: ${recommendationData.primaryRecommendation.name}`, 25, 120);
-    doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 130);
-    doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 140);
-    doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 150);
+    if (selectedProduct) {
+      doc.text(`Selected Product: ${selectedProduct.name}`, 25, 130);
+      doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 25, 140);
+    }
+    doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 150);
+    doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 160);
+    doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 170);
     
     // Add doctor's signature section
     doc.setFillColor(249, 250, 251);

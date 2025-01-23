@@ -14,9 +14,10 @@ export interface AvailableDrugsProps {
 export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({ 
   drugName, 
   products,
-  onProductSelect 
+  onProductSelect,
+  selectedProduct: externalSelectedProduct 
 }) => {
-  const [selectedProduct, setSelectedProduct] = useState<DrugProduct | undefined>();
+  const [selectedProduct, setSelectedProduct] = useState<DrugProduct | undefined>(externalSelectedProduct);
 
   const handleProductSelect = (product: DrugProduct) => {
     setSelectedProduct(product);
@@ -36,8 +37,8 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
             <Card 
               key={index} 
               className={`p-3 border transition-colors cursor-pointer ${
-                selectedProduct?.name === product.name 
-                  ? 'border-mint-500 bg-mint-50' 
+                (selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name)
+                  ? 'border-mint-500 bg-mint-50 ring-2 ring-mint-500 ring-opacity-50' 
                   : 'border-mint-200 bg-white hover:border-mint-300'
               }`}
               onClick={() => handleProductSelect(product)}
