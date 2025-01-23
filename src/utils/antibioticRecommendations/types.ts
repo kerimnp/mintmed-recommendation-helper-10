@@ -18,7 +18,6 @@ export interface PatientData {
     macrolide: boolean;
     fluoroquinolone: boolean;
   };
-  otherAllergies: string;
   kidneyDisease: boolean;
   liverDisease: boolean;
   diabetes: boolean;
@@ -52,30 +51,5 @@ export interface AntibioticRecommendation {
     weightBased?: string;
     renalAdjustment?: string;
     pediatricFactors?: string;
-    bmiFactors?: string;
   };
-}
-
-export interface RegionalResistanceData {
-  Respiratory: {
-    macrolideResistance: number;
-    penicillinResistance: number;
-    fluoroquinoloneResistance: number;
-  };
-  UTI: {
-    ESBL_prevalence: number;
-    FQ_resistance: number;
-    nitrofurantoinResistance: number;
-  };
-  MRSA_prevalence: number;
-  Pseudomonas_prevalence: number;
-}
-
-export type ResistanceThresholds = {
-  macrolide: number;
-  penicillin: number;
-  fluoroquinolone: number;
-  esbl: number;
-  mrsa: number;
-  pseudomonas: number;
 }

@@ -1,4 +1,5 @@
 import { PatientData, AntibioticRecommendation } from './types';
+import { calculateAdjustedDose } from './antibioticDatabase';
 import { isPediatricPatient } from './pediatricAdjustments';
 
 export const generateRespiratoryRecommendation = (data: PatientData): AntibioticRecommendation => {
@@ -15,98 +16,91 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   };
 
   const isPediatric = isPediatricPatient(Number(data.age));
-  const hasMRSA = data.resistances.mrsa;
-  const hasESBL = data.resistances.esbl;
-  const hasPseudomonas = data.resistances.pseudomonas;
 
-  if (data.severity === "mild") {
-    if (!data.allergies.penicillin && !hasESBL) {
+  // Community-acquired vs hospital-acquired logic
+  const isHospitalAcquired = data.duration && parseInt(data.duration) > 2;
+
+  if (data.severity === "mild" && !isHospitalAcquired) {
+    if (!data.allergies.penicillin) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
-        dose: isPediatric ? "45-90mg/kg/day divided BID" : "1g",
+        dose: isPediatric ? "45-90mg/kg/day divided q12h" : "1g",
         route: "oral",
-        duration: isPediatric ? "7-10 days" : "5-7 days"
+        duration: "5-7 days"
       };
-      recommendation.reasoning = "First-line treatment for mild community-acquired respiratory infections";
-
-      if (hasMRSA) {
-        recommendation.alternatives.push({
-          name: "Trimethoprim-Sulfamethoxazole",
-          dose: "160/800mg",
-          route: "oral",
-          duration: "7-10 days",
-          reason: "Added for MRSA coverage"
-        });
-      }
-    } else if (!data.allergies.macrolide) {
+      recommendation.reasoning = "First-line treatment for mild community-acquired pneumonia";
+    } else {
       recommendation.primaryRecommendation = {
         name: "Azithromycin",
-        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
+        dose: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
         route: "oral",
         duration: "5 days"
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
-  } else if (data.severity === "moderate") {
-    if (hasMRSA) {
+  } else if (data.severity === "moderate" || isHospitalAcquired) {
+    if (!data.allergies.cephalosporin) {
       recommendation.primaryRecommendation = {
-        name: "Vancomycin + Ceftriaxone",
-        dose: isPediatric ? "15mg/kg q6h + 50-75mg/kg/day" : "15-20mg/kg q8-12h + 1-2g daily",
+        name: "Ceftriaxone",
+        dose: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
         route: "IV",
         duration: "7-10 days"
       };
-      recommendation.reasoning = "Coverage for MRSA and typical respiratory pathogens";
-    } else if (!data.allergies.cephalosporin && !hasESBL) {
-      recommendation.primaryRecommendation = {
-        name: "Ceftriaxone + Azithromycin",
-        dose: isPediatric ? "50-75mg/kg/day + 10mg/kg/day" : "1-2g daily + 500mg daily",
-        route: "IV",
-        duration: "7-10 days"
-      };
-      recommendation.reasoning = "Moderate respiratory infection requiring parenteral therapy";
+      recommendation.reasoning = "Treatment for moderate CAP or early HAP";
+
+      if (!data.allergies.macrolide) {
+        recommendation.alternatives.push({
+          name: "Azithromycin",
+          dose: isPediatric ? "10mg/kg daily" : "500mg daily",
+          route: "IV",
+          duration: "5 days",
+          reason: "Added for atypical coverage"
+        });
+      }
     }
   } else if (data.severity === "severe") {
-    if (hasMRSA || hasESBL || hasPseudomonas) {
-      recommendation.primaryRecommendation = {
-        name: "Meropenem + Vancomycin",
-        dose: isPediatric ? 
-          "20mg/kg q8h + 15mg/kg q6h" : 
-          "1g q8h + 15-20mg/kg q8-12h",
+    recommendation.primaryRecommendation = {
+      name: "Piperacillin-Tazobactam",
+      dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+      route: "IV",
+      duration: "10-14 days"
+    };
+    recommendation.reasoning = "Broad spectrum coverage for severe pneumonia";
+
+    if (data.resistances.mrsa) {
+      recommendation.alternatives.push({
+        name: "Vancomycin",
+        dose: "15-20mg/kg q8-12h",
         route: "IV",
-        duration: "10-14 days"
-      };
-      recommendation.reasoning = "Broad spectrum coverage needed due to resistant organisms";
-    } else {
-      recommendation.primaryRecommendation = {
-        name: "Piperacillin-Tazobactam + Azithromycin + Vancomycin",
-        dose: isPediatric ? 
-          "100mg/kg q6h + 10mg/kg/day + 15mg/kg q6h" : 
-          "4.5g q6h + 500mg daily + 15-20mg/kg q8-12h",
+        duration: "10-14 days",
+        reason: "Added for MRSA coverage"
+      });
+    }
+
+    if (data.resistances.pseudomonas) {
+      recommendation.alternatives.push({
+        name: "Meropenem",
+        dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
         route: "IV",
-        duration: "10-14 days"
-      };
-      recommendation.reasoning = "Broad spectrum coverage for severe respiratory infection";
+        duration: "10-14 days",
+        reason: "Alternative for suspected Pseudomonas"
+      });
     }
   }
 
-  if (hasMRSA) {
-    recommendation.precautions.push(
-      "MRSA positive - ensure therapeutic vancomycin levels (15-20 µg/mL)"
-    );
-  }
-  if (hasESBL) {
-    recommendation.precautions.push(
-      "ESBL positive - carbapenem therapy recommended"
-    );
-  }
-  if (hasPseudomonas) {
-    recommendation.precautions.push(
-      "Pseudomonas positive - ensure antipseudomonal coverage"
-    );
-  }
+  // Add precautions based on patient factors
   if (data.kidneyDisease) {
     recommendation.precautions.push(
-      "Adjust doses based on renal function"
+      "Renal dose adjustment required",
+      "Monitor renal function closely"
+    );
+  }
+
+  if (data.immunosuppressed) {
+    recommendation.precautions.push(
+      "Consider broader coverage",
+      "Extended duration may be necessary",
+      "Monitor closely for opportunistic infections"
     );
   }
 
