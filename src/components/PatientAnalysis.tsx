@@ -51,16 +51,15 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
 
   const renderBMIWheel = () => {
     if (!bmi) return null;
-    const { category, color, bgColor } = getBMICategory(bmi);
+    const { category, color } = getBMICategory(bmi);
     const rotation = Math.min((bmi / 50) * 180, 180); // Max BMI scale at 50
 
     return (
-      <div className="relative w-48 h-48 mx-auto">
+      <div className="relative w-48 h-48 mx-auto mt-6">
         <div className="absolute inset-0">
           {/* BMI Scale Background */}
-          <div className="absolute inset-0 rounded-full border-4 border-gray-200">
+          <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="absolute w-full h-full">
-              {/* Colored sections */}
               <div className="absolute w-1/2 h-full origin-right transform rotate-[-90deg]">
                 <div className="w-full h-full rounded-l-full bg-gradient-to-r from-blue-700 via-green-500 to-red-700" />
               </div>
@@ -69,16 +68,52 @@ export const PatientAnalysis: React.FC<PatientAnalysisProps> = ({
           
           {/* Needle */}
           <div 
-            className="absolute top-1/2 left-1/2 w-1 h-[45%] bg-gray-800 origin-bottom transform -translate-x-1/2"
+            className="absolute top-1/2 left-1/2 w-1 h-[45%] bg-gray-800 dark:bg-white origin-bottom transform -translate-x-1/2 transition-transform duration-500"
             style={{ transform: `translateX(-50%) rotate(${rotation - 90}deg)` }}
           >
-            <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-gray-800" />
+            <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-gray-800 dark:bg-white" />
           </div>
           
           {/* Center display */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold">{bmi.toFixed(1)}</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-gray-900/90 rounded-full transform scale-[0.85]">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">{bmi.toFixed(1)}</span>
             <span className={`text-sm font-medium ${color}`}>{category}</span>
+          </div>
+        </div>
+
+        {/* BMI Categories Legend */}
+        <div className="absolute -right-32 top-1/2 transform -translate-y-1/2 space-y-1 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-700" />
+            <span>Severe Thinness (&lt;16)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span>Moderate Thinness (16-17)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-400" />
+            <span>Mild Thinness (17-18.5)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500" />
+            <span>Normal (18.5-25)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <span>Overweight (25-30)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-orange-500" />
+            <span>Obese Class I (30-35)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <span>Obese Class II (35-40)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-700" />
+            <span>Obese Class III (&gt;40)</span>
           </div>
         </div>
       </div>
