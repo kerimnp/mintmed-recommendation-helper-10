@@ -11,7 +11,7 @@ export const getAIRecommendation = async (data: PatientData) => {
 
     if (error) {
       console.error('Error from Edge Function:', error);
-      throw new Error(`Failed to get AI recommendation: ${error.message}`);
+      throw new Error(error.message);
     }
 
     if (!response) {

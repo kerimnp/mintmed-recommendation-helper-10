@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,8 +7,6 @@ const corsHeaders = {
 };
 
 const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -19,50 +16,6 @@ serve(async (req) => {
 
   try {
     console.log('Received request to get AI recommendation');
-
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('No authorization header found');
-      throw new Error('No authorization header');
-    }
-
-    // Initialize Supabase client
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase configuration');
-      throw new Error('Server configuration error');
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Verify JWT token
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
-
-    if (authError) {
-      console.error('Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    if (!user) {
-      console.error('No user found');
-      return new Response(
-        JSON.stringify({ error: 'User not found' }),
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    console.log('User authenticated successfully:', user.id);
 
     // Get request body
     const { patientData } = await req.json();
@@ -74,7 +27,13 @@ serve(async (req) => {
     // Verify Perplexity API key
     if (!perplexityApiKey) {
       console.error('Missing Perplexity API key');
-      throw new Error('Server configuration error');
+      return new Response(
+        JSON.stringify({ error: 'Missing API key configuration' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Call Perplexity API
@@ -104,28 +63,18 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Perplexity API error:', errorText);
-      throw new Error('Failed to get AI recommendation');
+      return new Response(
+        JSON.stringify({ error: 'Failed to get AI recommendation' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const result = await response.json();
     const recommendation = result.choices[0].message.content;
     console.log('Got recommendation from Perplexity');
-
-    // Store recommendation in database
-    const { error: insertError } = await supabase
-      .from('ai_recommendations')
-      .insert({
-        patient_data: patientData,
-        recommendation,
-        user_id: user.id
-      });
-
-    if (insertError) {
-      console.error('Database insert error:', insertError);
-      throw new Error(`Failed to store recommendation: ${insertError.message}`);
-    }
-
-    console.log('Stored recommendation in database');
 
     return new Response(
       JSON.stringify({ recommendation }),
