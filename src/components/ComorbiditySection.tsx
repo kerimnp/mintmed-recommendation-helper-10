@@ -37,96 +37,57 @@ export const ComorbiditySection: React.FC<ComorbiditySectionProps> = ({
   };
 
   return (
-    <Card className="p-6 space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900">{t.title}</h2>
-        <p className="text-sm text-gray-500">{t.subtitle}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="kidneyDisease" 
-            checked={formData.kidneyDisease}
-            onCheckedChange={(checked) => onInputChange("kidneyDisease", checked)}
-          />
-          <Label htmlFor="kidneyDisease">{t.kidneyDisease}</Label>
+    <Card className="relative overflow-hidden border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-red-50/50 dark:from-orange-950/50 dark:to-red-950/50" />
+      <div className="relative p-6 space-y-6">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold bg-gradient-to-br from-gray-900 to-gray-700 dark:from-gray-50 dark:to-gray-300 bg-clip-text text-transparent">
+            {t.title}
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t.subtitle}</p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="liverDisease" 
-            checked={formData.liverDisease}
-            onCheckedChange={(checked) => onInputChange("liverDisease", checked)}
-          />
-          <Label htmlFor="liverDisease">{t.liverDisease}</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="diabetes" 
-            checked={formData.diabetes}
-            onCheckedChange={(checked) => onInputChange("diabetes", checked)}
-          />
-          <Label htmlFor="diabetes">{t.diabetes}</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="immunosuppressed" 
-            checked={formData.immunosuppressed}
-            onCheckedChange={(checked) => onInputChange("immunosuppressed", checked)}
-          />
-          <Label htmlFor="immunosuppressed">{t.immunosuppressed}</Label>
-        </div>
-      </div>
-
-      <div className="border-t pt-4">
-        <h3 className="text-lg font-semibold mb-3">Antibiotic Resistance</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="mrsa" 
-              checked={formData.resistances.mrsa}
-              onCheckedChange={(checked) => handleResistanceChange("mrsa", checked as boolean)}
-            />
-            <Label htmlFor="mrsa">MRSA</Label>
-          </div>
+          {[
+            { id: "kidneyDisease", label: t.kidneyDisease },
+            { id: "liverDisease", label: t.liverDisease },
+            { id: "diabetes", label: t.diabetes },
+            { id: "immunosuppressed", label: t.immunosuppressed }
+          ].map(({ id, label }) => (
+            <div key={id} className="flex items-center space-x-3 p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <Checkbox 
+                id={id} 
+                checked={formData[id as keyof typeof formData]}
+                onCheckedChange={(checked) => onInputChange(id, checked)}
+                className="border-gray-400 dark:border-gray-600"
+              />
+              <Label htmlFor={id} className="text-gray-700 dark:text-gray-300">{label}</Label>
+            </div>
+          ))}
+        </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="vre" 
-              checked={formData.resistances.vre}
-              onCheckedChange={(checked) => handleResistanceChange("vre", checked as boolean)}
-            />
-            <Label htmlFor="vre">VRE</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="esbl" 
-              checked={formData.resistances.esbl}
-              onCheckedChange={(checked) => handleResistanceChange("esbl", checked as boolean)}
-            />
-            <Label htmlFor="esbl">ESBL</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="cre" 
-              checked={formData.resistances.cre}
-              onCheckedChange={(checked) => handleResistanceChange("cre", checked as boolean)}
-            />
-            <Label htmlFor="cre">CRE</Label>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="pseudomonas" 
-              checked={formData.resistances.pseudomonas}
-              onCheckedChange={(checked) => handleResistanceChange("pseudomonas", checked as boolean)}
-            />
-            <Label htmlFor="pseudomonas">Pseudomonas</Label>
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">
+            Antibiotic Resistance
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { id: "mrsa", label: "MRSA" },
+              { id: "vre", label: "VRE" },
+              { id: "esbl", label: "ESBL" },
+              { id: "cre", label: "CRE" },
+              { id: "pseudomonas", label: "Pseudomonas" }
+            ].map(({ id, label }) => (
+              <div key={id} className="flex items-center space-x-3 p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                <Checkbox 
+                  id={id} 
+                  checked={formData.resistances[id as keyof typeof formData.resistances]}
+                  onCheckedChange={(checked) => handleResistanceChange(id, checked as boolean)}
+                  className="border-gray-400 dark:border-gray-600"
+                />
+                <Label htmlFor={id} className="text-gray-700 dark:text-gray-300">{label}</Label>
+              </div>
+            ))}
           </div>
         </div>
       </div>
