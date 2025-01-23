@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
+import { getAIRecommendation } from "@/utils/aiRecommendations";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
+import { AIRecommendationSection } from "./AIRecommendationSection";
 import { AllergySection } from "./AllergySection";
 import { RenalFunctionSection } from "./RenalFunctionSection";
 import { PatientDemographicsSection } from "./PatientDemographicsSection";
@@ -22,6 +24,8 @@ export const PatientForm = () => {
   const [recommendation, setRecommendation] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
   
   const [formData, setFormData] = useState({
     age: "",
@@ -135,6 +139,37 @@ export const PatientForm = () => {
     }
   };
 
+  const handleGetAIRecommendation = async () => {
+    if (!validateForm()) {
+      toast({
+        title: language === "en" ? "Validation Error" : "Greška Validacije",
+        description: language === "en" 
+          ? "Please fill in all required fields before getting AI recommendation"
+          : "Molimo popunite sva obavezna polja prije dobivanja AI preporuke",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoadingAI(true);
+    try {
+      const aiResponse = await getAIRecommendation(formData);
+      setAiRecommendation(aiResponse);
+      toast({
+        title: "AI Recommendation Ready",
+        description: "The AI has analyzed the patient data and provided recommendations.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to get AI recommendation. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
   const renderSectionHeader = (number: number, title: string, subtitle: string) => (
     <div className="flex items-center gap-2 mb-4">
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-primary/10 text-medical-primary font-semibold">
@@ -211,6 +246,12 @@ export const PatientForm = () => {
           <InfectionDetailsSection 
             formData={formData} 
             onInputChange={handleInputChange}
+          />
+
+          <AIRecommendationSection
+            isLoading={isLoadingAI}
+            recommendation={aiRecommendation}
+            onGetRecommendation={handleGetAIRecommendation}
           />
 
           <div className="flex gap-4">
