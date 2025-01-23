@@ -11,7 +11,6 @@ import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import type { PatientData } from "@/utils/antibioticRecommendations/types";
 import { Card } from "./ui/card";
 import { 
   User, 
@@ -32,7 +31,7 @@ export const PatientForm = () => {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = useState<number>(0);
   const [recommendation, setRecommendation] = useState<any>(null);
-  const [formData, setFormData] = useState<PatientData>({
+  const [formData, setFormData] = useState({
     age: "",
     gender: "male",
     weight: "",

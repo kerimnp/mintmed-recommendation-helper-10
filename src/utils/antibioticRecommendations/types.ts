@@ -31,3 +31,51 @@ export interface PatientData {
     pseudomonas: boolean;
   };
 }
+
+export interface AntibioticRecommendation {
+  primaryRecommendation: {
+    name: string;
+    dose: string;
+    route: string;
+    duration: string;
+  };
+  reasoning: string;
+  alternatives: Array<{
+    name: string;
+    dose: string;
+    route: string;
+    duration: string;
+    reason: string;
+  }>;
+  precautions: string[];
+  calculations?: {
+    weightBased?: string;
+    renalAdjustment?: string;
+    pediatricFactors?: string;
+    bmiFactors?: string;
+  };
+}
+
+export interface RegionalResistanceData {
+  Respiratory: {
+    macrolideResistance: number;
+    penicillinResistance: number;
+    fluoroquinoloneResistance: number;
+  };
+  UTI: {
+    ESBL_prevalence: number;
+    FQ_resistance: number;
+    nitrofurantoinResistance: number;
+  };
+  MRSA_prevalence: number;
+  Pseudomonas_prevalence: number;
+}
+
+export type ResistanceThresholds = {
+  macrolide: number;
+  penicillin: number;
+  fluoroquinolone: number;
+  esbl: number;
+  mrsa: number;
+  pseudomonas: number;
+}
