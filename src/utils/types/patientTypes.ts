@@ -11,6 +11,7 @@ export interface PatientData {
   severity: string;
   creatinine: string;
   recentAntibiotics: boolean;
+  isHospitalAcquired: boolean;
   allergies: {
     penicillin: boolean;
     cephalosporin: boolean;

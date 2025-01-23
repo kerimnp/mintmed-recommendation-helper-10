@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
 import jsPDF from "jspdf";
+import { DrugProduct } from "@/utils/availableDrugsDatabase";
 
 interface PrescriptionModalProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface PrescriptionModalProps {
       duration: string;
     };
   };
+  selectedProduct?: DrugProduct;
 }
 
 export const PrescriptionModal = ({ open, onClose, recommendationData }: PrescriptionModalProps) => {

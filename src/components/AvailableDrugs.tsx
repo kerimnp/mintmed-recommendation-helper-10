@@ -4,10 +4,11 @@ import { ScrollArea } from "./ui/scroll-area";
 import { DrugSelectionModal } from "./DrugSelectionModal";
 import { DrugProduct } from '@/utils/availableDrugsDatabase';
 
-interface AvailableDrugsProps {
+export interface AvailableDrugsProps {
   drugName: string;
   products: DrugProduct[];
   onProductSelect?: (product: DrugProduct) => void;
+  selectedProduct?: DrugProduct;
 }
 
 export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({ 
