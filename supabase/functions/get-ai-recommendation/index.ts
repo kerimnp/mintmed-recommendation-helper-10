@@ -9,7 +9,6 @@ const corsHeaders = {
 const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,14 +16,12 @@ serve(async (req) => {
   try {
     console.log('Received request to get AI recommendation');
 
-    // Get request body
     const { patientData } = await req.json();
     if (!patientData) {
       throw new Error('No patient data provided');
     }
     console.log('Received patient data:', patientData);
 
-    // Verify Perplexity API key
     if (!perplexityApiKey) {
       console.error('Missing Perplexity API key');
       return new Response(
@@ -36,7 +33,34 @@ serve(async (req) => {
       );
     }
 
-    // Call Perplexity API
+    const systemPrompt = `You are an AI medical assistant specializing in antibiotic recommendations. 
+    Analyze the patient data and provide a recommendation in the following JSON format ONLY:
+    {
+      "primaryRecommendation": {
+        "name": "antibiotic name",
+        "dose": "dosage details",
+        "route": "administration route",
+        "duration": "treatment duration"
+      },
+      "reasoning": "detailed clinical reasoning for the recommendation",
+      "alternatives": [
+        {
+          "name": "alternative antibiotic name",
+          "dose": "alternative dosage",
+          "route": "alternative route",
+          "duration": "alternative duration",
+          "reason": "reason for suggesting this alternative"
+        }
+      ],
+      "precautions": [
+        "list of relevant precautions and warnings"
+      ]
+    }
+    
+    Consider all patient factors including allergies, comorbidities, and infection details. 
+    Ensure dosing is appropriate for patient weight and renal function.
+    IMPORTANT: Return ONLY the JSON object, no additional text.`;
+
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -48,7 +72,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an AI medical assistant specializing in antibiotic recommendations. Provide evidence-based recommendations considering patient factors, local resistance patterns, and current guidelines. Always be precise with dosing and include monitoring requirements.'
+            content: systemPrompt
           },
           {
             role: 'user',
@@ -73,8 +97,25 @@ serve(async (req) => {
     }
 
     const result = await response.json();
-    const recommendation = result.choices[0].message.content;
-    console.log('Got recommendation from Perplexity');
+    let recommendation = result.choices[0].message.content;
+    
+    // Ensure the response is valid JSON
+    try {
+      // If it's a string, parse it to ensure it's valid JSON
+      if (typeof recommendation === 'string') {
+        recommendation = JSON.parse(recommendation);
+      }
+      console.log('Got structured recommendation from Perplexity');
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      return new Response(
+        JSON.stringify({ error: 'Invalid AI response format' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ recommendation }),
