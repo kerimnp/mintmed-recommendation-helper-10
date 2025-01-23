@@ -16,13 +16,14 @@ import { Card } from "./ui/card";
 import { 
   User, 
   AlertCircle, 
-  Kidney, 
+  Stethoscope,
   Heart, 
-  Virus, 
+  Bug, 
   PillIcon, 
   Calculator,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  KidneyIcon
 } from "lucide-react";
 
 export const PatientForm = () => {
@@ -36,6 +37,7 @@ export const PatientForm = () => {
     gender: "male",
     weight: "",
     height: "",
+    nationality: "Serbia", // Added nationality field with default value
     pregnancy: "not_applicable",
     infectionSites: [],
     symptoms: "",
@@ -76,23 +78,13 @@ export const PatientForm = () => {
     });
   };
 
-  const handleAllergyChange = (allergy: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      allergies: {
-        ...prev.allergies,
-        [allergy]: checked
-      }
-    }));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.age || !formData.gender || !formData.weight || !formData.height || formData.infectionSites.length === 0) {
+    if (!formData.age || !formData.gender || !formData.weight || !formData.height || !formData.nationality || formData.infectionSites.length === 0) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields including age, gender, weight, height, and at least one infection site.",
+        description: "Please fill in all required fields including age, gender, weight, height, nationality, and at least one infection site.",
         variant: "destructive"
       });
       return;
@@ -124,12 +116,14 @@ export const PatientForm = () => {
     {
       title: "Allergies",
       icon: <AlertCircle className="h-5 w-5" />,
-      component: <AllergySection allergies={formData.allergies} onAllergyChange={handleAllergyChange} />
+      component: <AllergySection allergies={formData.allergies} onAllergyChange={(allergy, checked) => 
+        handleInputChange(`allergies.${allergy}`, checked)} />
     },
     {
       title: "Renal Function",
-      icon: <Kidney className="h-5 w-5" />,
-      component: <RenalFunctionSection creatinine={formData.creatinine} onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
+      icon: <KidneyIcon className="h-5 w-5" />,
+      component: <RenalFunctionSection creatinine={formData.creatinine} 
+        onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
     },
     {
       title: "Comorbidities",
@@ -138,7 +132,7 @@ export const PatientForm = () => {
     },
     {
       title: "Infection Details",
-      icon: <Virus className="h-5 w-5" />,
+      icon: <Bug className="h-5 w-5" />,
       component: <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
     },
     {
