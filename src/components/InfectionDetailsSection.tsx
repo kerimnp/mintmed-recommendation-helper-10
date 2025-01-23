@@ -72,7 +72,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
       <div className="space-y-6">
         <div className="space-y-4">
           <Label className="text-gray-700 dark:text-gray-300 font-medium">
-            Selected Infection Sites
+            {t.sites.label}
           </Label>
           <div className="flex flex-wrap gap-2 min-h-[40px]">
             {formData.infectionSites?.map((site) => (
@@ -168,7 +168,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
             border border-yellow-200 dark:border-yellow-800 rounded-lg">
             <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-yellow-700 dark:text-yellow-300">
-              Chronic infection detected (>7 days). Consider broader spectrum antibiotics.
+              Chronic infection detected (&gt;7 days). Consider broader spectrum antibiotics.
             </p>
           </div>
         )}

@@ -8,11 +8,7 @@ export interface DrugProduct {
   }>;
 }
 
-interface DrugDatabase {
-  [key: string]: DrugProduct[];
-}
-
-export const availableDrugs: DrugDatabase = {
+export const availableDrugs: Record<string, DrugProduct[]> = {
   "Amoxicillin": [
     {
       name: "ALMACIN",
