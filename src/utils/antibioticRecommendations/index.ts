@@ -5,6 +5,10 @@ import { generateUrinaryRecommendation } from "./urinaryInfections";
 import { generateSkinInfectionRecommendation } from "./skinInfections";
 import { generateBoneInfectionRecommendation } from "./boneInfections";
 import { generateCNSInfectionRecommendation } from "./cnsInfections";
+import { generateAbdominalInfectionRecommendation } from "./abdominalInfections";
+import { generateEarInfectionRecommendation } from "./earInfections";
+import { generateEyeInfectionRecommendation } from "./eyeInfections";
+import { generateDentalInfectionRecommendation } from "./dentalInfections";
 import { isPediatricPatient, getPediatricAgeCategory } from "./pediatricAdjustments";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 
@@ -46,6 +50,14 @@ export const generateAntibioticRecommendation = (data: PatientData): AntibioticR
         return generateBoneInfectionRecommendation(data);
       case "cns":
         return generateCNSInfectionRecommendation(data);
+      case "abdominal":
+        return generateAbdominalInfectionRecommendation(data);
+      case "ear":
+        return generateEarInfectionRecommendation(data);
+      case "eye":
+        return generateEyeInfectionRecommendation(data);
+      case "dental":
+        return generateDentalInfectionRecommendation(data);
       default:
         return {
           primaryRecommendation: {
