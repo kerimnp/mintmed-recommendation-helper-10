@@ -22,7 +22,7 @@ import {
   Calculator,
   ChevronRight,
   ChevronLeft,
-  Kidney
+  Hospital
 } from "lucide-react";
 
 export const PatientForm = () => {
@@ -70,7 +70,7 @@ export const PatientForm = () => {
       const newData = { ...prev, [field]: value };
       
       if (field === "gender" && value === "male") {
-        newData.pregnancy = "not_applicable";
+        newData.pregnancy = "not-applicable";
       }
       
       return newData;
@@ -120,7 +120,7 @@ export const PatientForm = () => {
     },
     {
       title: "Renal Function",
-      icon: <Kidney className="h-5 w-5" />,
+      icon: <Hospital className="h-5 w-5" />,
       component: <RenalFunctionSection creatinine={formData.creatinine} 
         onCreatinineChange={(value) => handleInputChange("creatinine", value)} />
     },

@@ -21,6 +21,7 @@ export const translations = {
       gender: "Gender",
       weight: "Weight (kg)",
       height: "Height (cm)",
+      nationality: "Nationality",
       pregnancy: "Pregnancy Status",
       genderOptions: {
         male: "Male",
