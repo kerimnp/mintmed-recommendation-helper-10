@@ -12,7 +12,6 @@ import { MedicationHistorySection } from "./MedicationHistorySection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Progress } from "./ui/progress";
 import { Calculator, Info, Printer } from "lucide-react";
 import {
   Tooltip,
@@ -27,7 +26,6 @@ export const PatientForm = () => {
   const t = translations[language];
   const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<any>(null);
-  const [progress, setProgress] = useState(0);
   const [bmi, setBmi] = useState<number | null>(null);
   
   const [formData, setFormData] = useState({
@@ -66,31 +64,11 @@ export const PatientForm = () => {
   });
 
   useEffect(() => {
-    calculateProgress();
-  }, [formData]);
-
-  useEffect(() => {
     if (formData.weight && formData.height) {
       const calculatedBMI = calculateBMI(formData.weight, formData.height);
       setBmi(calculatedBMI);
     }
   }, [formData.weight, formData.height]);
-
-  const calculateProgress = () => {
-    const requiredFields = ['age', 'gender', 'weight', 'height', 'nationality'];
-    const filledRequired = requiredFields.filter(field => {
-      const value = formData[field];
-      return value !== "" && value !== undefined && value !== null;
-    }).length;
-    
-    const hasInfectionSite = formData.infectionSites.length > 0;
-    const totalFields = requiredFields.length + 1; // +1 for infection site
-    
-    const progressPercentage = Math.round(
-      ((filledRequired + (hasInfectionSite ? 1 : 0)) / totalFields) * 100
-    );
-    setProgress(progressPercentage);
-  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => {
@@ -165,16 +143,6 @@ export const PatientForm = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
-      <div className="sticky top-20 z-40 bg-white/80 dark:bg-medical-bg-secondary/80 backdrop-blur-xl p-4 rounded-lg shadow-sm">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-lg font-semibold">
-            {language === "en" ? "Form Progress" : "Napredak Forme"}
-          </h2>
-          <span className="text-sm text-gray-500">{progress}%</span>
-        </div>
-        <Progress value={progress} className="h-2" />
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
           <div>
