@@ -12,14 +12,24 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Initialize Supabase client with service role key
     const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
+
+    // Get the JWT token from the request headers
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    // Verify the JWT token and get the user
     const { data: { user }, error: authError } = await supabase.auth.getUser(
-      req.headers.get('Authorization')?.split(' ')[1] ?? ''
+      authHeader.replace('Bearer ', '')
     );
 
     if (authError || !user) {
