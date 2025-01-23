@@ -14,6 +14,18 @@ export const translations = {
       macrolide: "Macrolide",
       fluoroquinolone: "Fluoroquinolone"
     },
+    medicationHistory: {
+      title: "Medication History",
+      subtitle: "Recent antibiotic use and allergies",
+      recentAntibiotics: "Recent antibiotic use (within 90 days)",
+      antibioticAllergies: "Known antibiotic allergies",
+      otherAllergies: "Other medication allergies or notes",
+      penicillin: "Penicillin",
+      cephalosporin: "Cephalosporin",
+      sulfa: "Sulfa",
+      macrolide: "Macrolide",
+      fluoroquinolone: "Fluoroquinolone"
+    },
     comorbidities: {
       title: "Comorbidities",
       subtitle: "Existing conditions",
@@ -50,7 +62,8 @@ export const translations = {
     },
     renalFunction: {
       title: "Renal Function",
-      subtitle: "Creatinine levels"
+      subtitle: "Creatinine levels",
+      creatinine: "Creatinine (mg/dL)"
     },
     patientDemographics: {
       title: "Patient Demographics",
@@ -106,6 +119,18 @@ export const translations = {
       macrolide: "Makrolid",
       fluoroquinolone: "Fluorokinolon"
     },
+    medicationHistory: {
+      title: "Historija lijekova",
+      subtitle: "Nedavna upotreba antibiotika i alergije",
+      recentAntibiotics: "Nedavna upotreba antibiotika (unutar 90 dana)",
+      antibioticAllergies: "Poznate alergije na antibiotike",
+      otherAllergies: "Druge alergije na lijekove ili napomene",
+      penicillin: "Penicilin",
+      cephalosporin: "Cefalosporin",
+      sulfa: "Sulfa",
+      macrolide: "Makrolid",
+      fluoroquinolone: "Fluorokinolon"
+    },
     comorbidities: {
       title: "Komorbiditeti",
       subtitle: "Postojeća stanja",
@@ -142,7 +167,8 @@ export const translations = {
     },
     renalFunction: {
       title: "Bubrežna funkcija",
-      subtitle: "Nivoi kreatinina"
+      subtitle: "Nivoi kreatinina",
+      creatinine: "Kreatinin (mg/dL)"
     },
     patientDemographics: {
       title: "Demografski podaci",
