@@ -3,10 +3,11 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Loader2, Bot } from "lucide-react";
 import { useToast } from "./ui/use-toast";
+import { AntibioticRecommendation } from "./AntibioticRecommendation";
 
 interface AIRecommendationSectionProps {
   isLoading: boolean;
-  recommendation: string | null;
+  recommendation: any | null;
   onGetRecommendation: () => void;
 }
 
@@ -43,10 +44,8 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
       </div>
 
       {recommendation && (
-        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 dark:text-gray-300">
-            {recommendation}
-          </pre>
+        <div className="mt-4">
+          <AntibioticRecommendation recommendation={recommendation} />
         </div>
       )}
     </Card>
