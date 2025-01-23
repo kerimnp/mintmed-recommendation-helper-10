@@ -1,8 +1,9 @@
 import { PatientData } from "./antibioticRecommendations/types";
 import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCalculations";
 import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
-import { EnhancedAntibioticRecommendation, AntibioticRationale } from "./antibioticRecommendations/types/recommendationTypes";
+import { EnhancedAntibioticRecommendation } from "./antibioticRecommendations/types/recommendationTypes";
 import { getRegionalResistance } from "./antibioticRecommendations/resistanceData";
+import { calculateAmoxicillinDose, amoxicillinDosing } from "./antibioticDatabases/amoxicillin";
 
 export const generateAntibioticRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {
   // Calculate BMI and GFR
@@ -13,16 +14,6 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
     weight: data.weight,
     gender: data.gender
   });
-
-  // Initialize rationale
-  const rationale: AntibioticRationale = {
-    infectionType: data.infectionSites[0],
-    severity: data.severity,
-    reasons: [],
-    regionConsiderations: [],
-    allergyConsiderations: [],
-    doseAdjustments: []
-  };
 
   // Validate required fields
   if (!data.infectionSites || data.infectionSites.length === 0 || !data.severity) {
@@ -35,53 +26,45 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
       },
       reasoning: "Please provide infection sites and severity to generate recommendation",
       alternatives: [],
-      precautions: ["Complete all required fields to receive accurate recommendation"],
-      rationale: {
-        infectionType: "unknown",
-        severity: "unknown",
-        reasons: ["Insufficient information provided"]
-      }
+      precautions: ["Complete all required fields to receive accurate recommendation"]
     };
   }
 
-  // Get regional resistance data
-  const resistance = getRegionalResistance(data.nationality);
-
-  // Generate base recommendation
-  let recommendation: EnhancedAntibioticRecommendation;
-
   // Process each infection site
   const site = data.infectionSites[0].toLowerCase();
+  let recommendation: EnhancedAntibioticRecommendation;
+
   switch (site) {
     case "respiratory":
       if (data.severity === "mild" && !data.allergies.penicillin) {
+        const dose = calculateAmoxicillinDose(
+          "pneumonia",
+          Number(data.weight),
+          Number(data.age),
+          "standard",
+          gfr
+        );
+
         recommendation = {
           primaryRecommendation: {
             name: "Amoxicillin",
-            dose: "1g",
+            dose,
             route: "PO",
-            duration: "5-7 days"
+            duration: amoxicillinDosing.pneumonia.adult.standard.duration
           },
           reasoning: "First-line therapy for mild community-acquired pneumonia",
           alternatives: [],
-          precautions: [],
+          precautions: amoxicillinDosing.pneumonia.comments || [],
           rationale: {
-            ...rationale,
+            infectionType: "respiratory",
+            severity: data.severity,
             reasons: [
               "Selected as first-line therapy for mild CAP",
               "Targets common respiratory pathogens including S. pneumoniae"
             ]
           }
         };
-
-        // Check regional resistance
-        if (resistance.Respiratory.macrolideResistance > 30) {
-          recommendation.rationale.regionConsiderations = [
-            `High local macrolide resistance (${resistance.Respiratory.macrolideResistance}%) - avoiding macrolide monotherapy`
-          ];
-        }
       } else {
-        // ... Similar logic for moderate/severe cases
         recommendation = {
           primaryRecommendation: {
             name: "Ceftriaxone",
@@ -93,7 +76,8 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
           alternatives: [],
           precautions: [],
           rationale: {
-            ...rationale,
+            infectionType: "respiratory",
+            severity: data.severity,
             reasons: [
               "Selected for broader coverage in moderate/severe pneumonia",
               "Provides coverage against resistant organisms"
@@ -103,7 +87,51 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
       }
       break;
 
-    // ... Similar logic for other infection types
+    case "urinary":
+      if (data.severity === "mild" && !data.resistances.esbl) {
+        recommendation = {
+          primaryRecommendation: {
+            name: "Nitrofurantoin",
+            dose: "100 mg",
+            route: "PO BID",
+            duration: "5 days"
+          },
+          reasoning: "First-line therapy for uncomplicated UTI with low resistance rates",
+          alternatives: [],
+          precautions: [],
+          rationale: {
+            infectionType: "urinary",
+            severity: data.severity,
+            reasons: [
+              "Selected as first-line therapy for uncomplicated UTI",
+              "Targets common urinary pathogens"
+            ]
+          }
+        };
+      } else {
+        recommendation = {
+          primaryRecommendation: {
+            name: "Ceftriaxone",
+            dose: "1-2 g",
+            route: "IV daily",
+            duration: "10-14 days"
+          },
+          reasoning: "Broad-spectrum coverage for complicated UTI or pyelonephritis",
+          alternatives: [],
+          precautions: [],
+          rationale: {
+            infectionType: "urinary",
+            severity: data.severity,
+            reasons: [
+              "Selected for broader coverage in complicated UTI",
+              "Provides coverage against resistant organisms"
+            ]
+          }
+        };
+      }
+      break;
+
+    // Additional cases for other infection types can be added here
 
     default:
       recommendation = {
@@ -117,18 +145,18 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
         alternatives: [],
         precautions: [],
         rationale: {
-          ...rationale,
+          infectionType: "unknown",
+          severity: "unknown",
           reasons: ["Infection type requires specialist consultation"]
         }
       };
   }
 
-  // Add allergy considerations
+  // Add additional checks and adjustments
   if (data.allergies.penicillin) {
     recommendation.rationale.allergyConsiderations = ["Patient has penicillin allergy - avoiding beta-lactams"];
   }
 
-  // Add dose adjustments based on patient factors
   if (gfr < 60) {
     recommendation.rationale.doseAdjustments = [`Dose adjusted for reduced renal function (GFR: ${Math.round(gfr)} mL/min)`];
   }
