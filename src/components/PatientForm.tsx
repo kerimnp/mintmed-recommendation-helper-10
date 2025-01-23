@@ -39,7 +39,7 @@ export const PatientForm = () => {
     height: "",
     nationality: "",
     pregnancy: "",
-    infectionSites: [],
+    infectionSites: [] as string[],
     symptoms: "",
     duration: "",
     severity: "",
