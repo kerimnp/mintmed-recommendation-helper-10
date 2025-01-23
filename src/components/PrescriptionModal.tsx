@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
 import jsPDF from "jspdf";
-import { DrugProduct } from "@/utils/availableDrugsDatabase";
 
 interface PrescriptionModalProps {
   open: boolean;
@@ -18,15 +17,14 @@ interface PrescriptionModalProps {
       duration: string;
     };
   };
-  selectedProduct?: DrugProduct;
 }
 
-export const PrescriptionModal = ({ open, onClose, recommendationData, selectedProduct }: PrescriptionModalProps) => {
+export const PrescriptionModal = ({ open, onClose, recommendationData }: PrescriptionModalProps) => {
   const { toast } = useToast();
-  const [patientName, setPatientName] = React.useState("");
-  const [patientSurname, setPatientSurname] = React.useState("");
-  const [doctorName, setDoctorName] = React.useState("");
-  const [doctorSurname, setDoctorSurname] = React.useState("");
+  const [patientName, setPatientName] = useState("");
+  const [patientSurname, setPatientSurname] = useState("");
+  const [doctorName, setDoctorName] = useState("");
+  const [doctorSurname, setDoctorSurname] = useState("");
 
   const generatePrescription = () => {
     if (!patientName || !patientSurname || !doctorName || !doctorSurname) {
@@ -75,16 +73,6 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
     doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 130);
     doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 140);
     doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 150);
-    
-    if (selectedProduct) {
-      doc.setFillColor(249, 250, 251);
-      doc.rect(20, 170, 170, 40, "F");
-      doc.setTextColor(71, 85, 105);
-      doc.text("Selected Product", 25, 180);
-      doc.setTextColor(51, 65, 85);
-      doc.text(`Name: ${selectedProduct.name}`, 25, 190);
-      doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 25, 200);
-    }
     
     // Add doctor's signature section
     doc.setFillColor(249, 250, 251);

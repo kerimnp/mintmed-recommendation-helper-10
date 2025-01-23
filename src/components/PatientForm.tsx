@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
@@ -11,16 +11,11 @@ import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator, Info, Printer, Activity, AlertCircle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
-import { calculateBMI, getBMICategory } from "@/utils/antibioticRecommendations/bmiCalculations";
-import { PatientAnalysis } from "./PatientAnalysis";
+import { Calculator, Activity } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
+import { AlertCircle } from "lucide-react";
+import { PatientAnalysis } from "./PatientAnalysis";
+import { PrescriptionModal } from "./PrescriptionModal";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
@@ -30,7 +25,7 @@ export const PatientForm = () => {
   const [bmi, setBmi] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     age: "",
@@ -45,7 +40,6 @@ export const PatientForm = () => {
     severity: "",
     creatinine: "",
     recentAntibiotics: false,
-    isHospitalAcquired: false,
     allergies: {
       penicillin: false,
       cephalosporin: false,
@@ -53,7 +47,6 @@ export const PatientForm = () => {
       macrolide: false,
       fluoroquinolone: false
     },
-    otherAllergies: "",
     kidneyDisease: false,
     liverDisease: false,
     diabetes: false,
@@ -71,59 +64,6 @@ export const PatientForm = () => {
     setFormData(prev => ({
       ...prev,
       [field]: value
-    }));
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const getBMIColor = (bmi: number) => {
-    if (bmi < 18.5) return "text-blue-500";
-    if (bmi < 25) return "text-green-500";
-    if (bmi < 30) return "text-yellow-500";
-    if (bmi < 35) return "text-orange-500";
-    if (bmi < 40) return "text-red-500";
-    return "text-red-700";
-  };
-
-  const renderBMIDisplay = () => {
-    if (!bmi) return null;
-    
-    const category = getBMICategory(bmi);
-    const color = getBMIColor(bmi);
-    
-    return (
-      <Card className="p-4 mt-4 bg-white/90 dark:bg-gray-900/90">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-sm text-gray-500 dark:text-gray-400">BMI</span>
-            <p className={`text-2xl font-bold ${color}`}>{bmi.toFixed(1)}</p>
-          </div>
-          <div className="text-right">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Category</span>
-            <p className={`font-medium ${color}`}>
-              {t.bmi.categories[category as keyof typeof t.bmi.categories]}
-            </p>
-          </div>
-        </div>
-        <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className={`h-full ${color} transition-all duration-500`}
-            style={{ width: `${Math.min((bmi / 40) * 100, 100)}%` }}
-          />
-        </div>
-      </Card>
-    );
-  };
-
-  const handleAllergyChange = (allergy: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      allergies: {
-        ...prev.allergies,
-        [allergy]: checked
-      }
     }));
   };
 
@@ -238,7 +178,6 @@ export const PatientForm = () => {
               onInputChange={handleInputChange}
               errors={errors}
             />
-            {renderBMIDisplay()}
           </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
@@ -246,7 +185,12 @@ export const PatientForm = () => {
           {renderSectionHeader(2, t.allergies.title, t.allergies.subtitle)}
           <AllergySection 
             allergies={formData.allergies} 
-            onAllergyChange={handleAllergyChange}
+            onAllergyChange={(allergy, checked) => {
+              handleInputChange("allergies", {
+                ...formData.allergies,
+                [allergy]: checked
+              });
+            }}
           />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
@@ -260,12 +204,18 @@ export const PatientForm = () => {
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           {renderSectionHeader(4, t.comorbidities.title, t.comorbidities.subtitle)}
-          <ComorbiditySection formData={formData} onInputChange={handleInputChange} />
+          <ComorbiditySection 
+            formData={formData} 
+            onInputChange={handleInputChange}
+          />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           {renderSectionHeader(5, t.infectionDetails.title, t.infectionDetails.subtitle)}
-          <InfectionDetailsSection formData={formData} onInputChange={handleInputChange} />
+          <InfectionDetailsSection 
+            formData={formData} 
+            onInputChange={handleInputChange}
+          />
 
           <div className="flex gap-4">
             <Button 
@@ -279,51 +229,27 @@ export const PatientForm = () => {
                 : t.buttons.generate
               }
             </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => setShowAnalysis(!showAnalysis)}
-            >
-              <Activity className="h-4 w-4" />
-              {language === "en" ? "Toggle Analysis" : "Prikaži Analizu"}
-            </Button>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-12 h-12 p-0"
-                    onClick={handlePrint}
-                    disabled={!recommendation}
-                  >
-                    <Printer className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {language === "en" ? "Print Recommendation" : "Štampaj Preporuku"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </div>
         </Card>
       </form>
 
-      {showAnalysis && (
-        <PatientAnalysis
-          infectionSites={formData.infectionSites}
-          severity={formData.severity}
-          symptoms={formData.symptoms}
-          bmi={bmi || undefined}
-        />
+      {recommendation && (
+        <div>
+          <PatientAnalysis
+            infectionSites={formData.infectionSites}
+            severity={formData.severity}
+            symptoms={formData.symptoms}
+            bmi={bmi || undefined}
+          />
+          <AntibioticRecommendation recommendation={recommendation} />
+        </div>
       )}
 
-      {recommendation && (
-        <AntibioticRecommendation recommendation={recommendation} />
-      )}
+      <PrescriptionModal
+        open={isPrescriptionModalOpen}
+        onClose={() => setIsPrescriptionModalOpen(false)}
+        recommendationData={recommendation}
+      />
     </div>
   );
 };
