@@ -19,6 +19,7 @@ interface InfectionDetailsSectionProps {
     isHospitalAcquired: boolean;
   };
   onInputChange: (field: string, value: any) => void;
+  errors?: { [key: string]: string };
 }
 
 type InfectionSite = {
@@ -29,6 +30,7 @@ type InfectionSite = {
 export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = ({
   formData,
   onInputChange,
+  errors = {}
 }) => {
   const { language } = useLanguage();
   const t = translations[language].infectionDetails;
@@ -108,6 +110,9 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               </button>
             ))}
           </div>
+          {errors.infectionSites && (
+            <p className="text-sm text-red-500 mt-1">{errors.infectionSites}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -117,12 +122,18 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
           <Textarea 
             id="symptoms" 
             placeholder={t.symptoms as string}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
-              focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 min-h-[100px]
-              placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className={cn(
+              "bg-white dark:bg-gray-800 border rounded-xl min-h-[100px] placeholder:text-gray-400 dark:placeholder:text-gray-500",
+              errors.symptoms
+                ? "border-red-500 focus:ring-red-500/20 focus:border-red-500/40"
+                : "border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40"
+            )}
             value={formData.symptoms}
             onChange={(e) => onInputChange("symptoms", e.target.value)}
           />
+          {errors.symptoms && (
+            <p className="text-sm text-red-500 mt-1">{errors.symptoms}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -133,12 +144,18 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
             id="duration" 
             type="number" 
             placeholder={t.duration as string}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl
-              focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40
-              placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className={cn(
+              "bg-white dark:bg-gray-800 border rounded-xl placeholder:text-gray-400 dark:placeholder:text-gray-500",
+              errors.duration
+                ? "border-red-500 focus:ring-red-500/20 focus:border-red-500/40"
+                : "border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40"
+            )}
             value={formData.duration}
             onChange={(e) => onInputChange("duration", e.target.value)}
           />
+          {errors.duration && (
+            <p className="text-sm text-red-500 mt-1">{errors.duration}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -161,6 +178,9 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               </button>
             ))}
           </div>
+          {errors.severity && (
+            <p className="text-sm text-red-500 mt-1">{errors.severity}</p>
+          )}
         </div>
 
         {formData.duration && parseInt(formData.duration) > 7 && (
