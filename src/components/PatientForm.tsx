@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
@@ -23,9 +23,16 @@ export const PatientForm = () => {
   const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<any>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  
+  // Create refs for each section that might have errors
+  const sectionRefs = {
+    demographics: useRef<HTMLDivElement>(null),
+    infection: useRef<HTMLDivElement>(null),
+  };
   
   const [formData, setFormData] = useState({
     age: "",
@@ -66,6 +73,12 @@ export const PatientForm = () => {
       ...prev,
       [field]: value
     }));
+    // Clear the specific error when user starts typing
+    if (errors[field]) {
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+    }
   };
 
   const validateForm = () => {
@@ -98,6 +111,26 @@ export const PatientForm = () => {
     }
 
     setErrors(newErrors);
+    setShowErrors(true);
+
+    // If there are errors, scroll to the first section with an error
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      let sectionToScroll: keyof typeof sectionRefs;
+
+      // Map error fields to their respective sections
+      if (['age', 'gender', 'weight', 'height'].includes(firstErrorField)) {
+        sectionToScroll = 'demographics';
+      } else {
+        sectionToScroll = 'infection';
+      }
+
+      sectionRefs[sectionToScroll]?.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -186,7 +219,7 @@ export const PatientForm = () => {
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
-          {Object.keys(errors).length > 0 && (
+          {showErrors && Object.keys(errors).length > 0 && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
@@ -202,12 +235,12 @@ export const PatientForm = () => {
             </Alert>
           )}
 
-          <div>
+          <div ref={sectionRefs.demographics}>
             {renderSectionHeader(1, t.title, t.subtitle)}
             <PatientDemographicsSection 
               formData={formData} 
               onInputChange={handleInputChange}
-              errors={errors}
+              errors={showErrors ? errors : {}}
             />
           </div>
           
@@ -242,11 +275,14 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(5, t.infectionDetails.title, t.infectionDetails.subtitle)}
-          <InfectionDetailsSection 
-            formData={formData} 
-            onInputChange={handleInputChange}
-          />
+          <div ref={sectionRefs.infection}>
+            {renderSectionHeader(5, t.infectionDetails.title, t.infectionDetails.subtitle)}
+            <InfectionDetailsSection 
+              formData={formData} 
+              onInputChange={handleInputChange}
+              errors={showErrors ? errors : {}}
+            />
+          </div>
 
           <AIRecommendationSection
             isLoading={isLoadingAI}
