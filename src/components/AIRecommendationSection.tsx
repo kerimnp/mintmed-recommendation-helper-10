@@ -19,18 +19,18 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
   const { toast } = useToast();
 
   return (
-    <Card className="p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-4">
-      <div className="flex items-center justify-between">
+    <Card className="p-4 sm:p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Bot className="h-6 w-6 text-blue-500" />
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          <Bot className="h-6 w-6 text-medical-primary" />
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
             AI Recommendation
           </h2>
         </div>
         <Button
           onClick={onGetRecommendation}
           disabled={isLoading}
-          className="bg-blue-500 hover:bg-blue-600"
+          className="w-full sm:w-auto bg-medical-primary hover:bg-medical-primary-hover text-white"
         >
           {isLoading ? (
             <>
