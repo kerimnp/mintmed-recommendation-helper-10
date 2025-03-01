@@ -6,18 +6,12 @@ import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
 import jsPDF from "jspdf";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
+import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 
 interface PrescriptionModalProps {
   open: boolean;
   onClose: () => void;
-  recommendationData: {
-    primaryRecommendation: {
-      name: string;
-      dose: string;
-      route: string;
-      duration: string;
-    };
-  };
+  recommendationData: EnhancedAntibioticRecommendation;
   selectedProduct?: DrugProduct;
 }
 
@@ -78,6 +72,17 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
     doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 150);
     doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 160);
     doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 170);
+    
+    // Add rationale information if available
+    if (recommendationData.rationale) {
+      doc.setFillColor(249, 250, 251);
+      doc.rect(20, 180, 170, 30, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Clinical Rationale", 25, 190);
+      doc.setTextColor(51, 65, 85);
+      doc.text(`Infection Type: ${recommendationData.rationale.infectionType}`, 25, 200);
+      doc.text(`Severity: ${recommendationData.rationale.severity}`, 25, 210);
+    }
     
     // Add doctor's signature section
     doc.setFillColor(249, 250, 251);

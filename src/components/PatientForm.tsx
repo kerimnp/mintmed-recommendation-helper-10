@@ -16,19 +16,19 @@ import { Card } from "./ui/card";
 import { Calculator } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
+import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
-  const [recommendation, setRecommendation] = useState<any>(null);
+  const [recommendation, setRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   
-  // Create refs for each section that might have errors
   const sectionRefs = {
     demographics: useRef<HTMLDivElement>(null),
     infection: useRef<HTMLDivElement>(null),
@@ -73,7 +73,6 @@ export const PatientForm = () => {
       ...prev,
       [field]: value
     }));
-    // Clear the specific error when user starts typing
     if (errors[field]) {
       const newErrors = { ...errors };
       delete newErrors[field];
@@ -113,12 +112,10 @@ export const PatientForm = () => {
     setErrors(newErrors);
     setShowErrors(true);
 
-    // If there are errors, scroll to the first section with an error
     if (Object.keys(newErrors).length > 0) {
       const firstErrorField = Object.keys(newErrors)[0];
       let sectionToScroll: keyof typeof sectionRefs;
 
-      // Map error fields to their respective sections
       if (['age', 'gender', 'weight', 'height'].includes(firstErrorField)) {
         sectionToScroll = 'demographics';
       } else {
