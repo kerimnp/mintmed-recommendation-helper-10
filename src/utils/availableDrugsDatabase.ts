@@ -1,3 +1,4 @@
+
 export interface DrugProduct {
   name: string;
   manufacturer: string;
@@ -150,6 +151,17 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
       ]
     },
     {
+      name: "TIGECYCLINE ANFARM",
+      manufacturer: "ANFARM HELLAS S.A",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "10 staklenih bocica (bočica od bezbojnog stakla tip I od 5 ml sa flip-off zatvaračem) u kutiji"
+        }
+      ]
+    },
+    {
       name: "TYGACIL",
       manufacturer: "PFIZER INC.",
       forms: [
@@ -157,6 +169,28 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
           type: "prašak za otopinu za infuziju",
           strength: "50 mg",
           packaging: "10 staklenih bočica"
+        }
+      ]
+    },
+    {
+      name: "TYGEPOL",
+      manufacturer: "POLIFARMA ILAC SAN VE TIC.A.S.",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "Bezbojna staklena bočica (6 R tip I) prekrivena narandžastim plastičnim zatvaračem sa sivim čepom promjera 20 mm, u kutiji. Pakovanje sadrži 10 bočica."
+        }
+      ]
+    },
+    {
+      name: "TYGEX",
+      manufacturer: "VEM ILAC SANAYI VE TICARET ANONIM SIRKETI",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "10 staklenih bočica sa liofiliziranim praškom za rastvor za infuziju, u kutiji"
         }
       ]
     }
@@ -185,6 +219,17 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
       ]
     },
     {
+      name: "AMPICILLIN ANTIBIOTICE",
+      manufacturer: "ANTIBIOTICE S.A.",
+      forms: [
+        {
+          type: "prašak za rastvor za injekciju",
+          strength: "1 g",
+          packaging: "50 staklenih bočica sa praškom za rastvor za injekciju, u kutiji"
+        }
+      ]
+    },
+    {
       name: "PENTREXYL",
       manufacturer: "GALENIKA A.D. BEOGRAD",
       forms: [
@@ -192,6 +237,33 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
           type: "kapsula, tvrda",
           strength: "500 mg",
           packaging: "16 kapsula (2 Al/PVC blistera po 8 kapsula)"
+        }
+      ]
+    },
+    {
+      name: "SOLICILLIN",
+      manufacturer: "INJECT CARE PARENTERALS PVT. LTD.",
+      forms: [
+        {
+          type: "prašak za rastvor za injekciju/infuziju",
+          strength: "1 g",
+          packaging: "1 staklena bočica sa 1g praška za rastvor za injekciju/infuziju, u kutiji"
+        },
+        {
+          type: "prašak za rastvor za injekciju/infuziju",
+          strength: "500 mg",
+          packaging: "1 staklena bočica sa praškom za rastvor za injekciju/infuziju, u kutiji"
+        }
+      ]
+    },
+    {
+      name: "SWISSCILLIN",
+      manufacturer: "SWISS PARENTERALS LIMITED.",
+      forms: [
+        {
+          type: "prašak za rastvor za injekciju",
+          strength: "1 g",
+          packaging: "1 staklena bočica od 10 ml, u kutiji"
         }
       ]
     }
@@ -219,23 +291,57 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
       ]
     },
     {
-      name: "OSPEN",
+      name: "OSPEN K 1 MIU",
       manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
       forms: [
         {
           type: "filmom obložena tableta",
           strength: "1000000 i.j.",
-          packaging: "30 filmom obloženih tableta (3 ALU/PVC blistera)"
-        },
+          packaging: "30 filmom obloženih tableta (3 PVC/PVDC/Al blistera)"
+        }
+      ]
+    },
+    {
+      name: "OSPEN 1000",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
+        {
+          type: "filmom obložena tableta",
+          strength: "1000000 i.j.",
+          packaging: "30 filmom obloženih tableta (3 ALU/PVC blistera po 10 tableta)"
+        }
+      ]
+    },
+    {
+      name: "OSPEN 1500",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
         {
           type: "filmom obložena tableta",
           strength: "1500000 i.j.",
-          packaging: "30 filmom obloženih tableta (3 ALU/PVC blistera)"
-        },
+          packaging: "30 filmom obloženih tableta (3 ALU/PVC blistera po 10 tableta)"
+        }
+      ]
+    },
+    {
+      name: "OSPEN 750",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
         {
           type: "oralna suspenzija",
           strength: "750000 i.j./5 mL",
           packaging: "1 staklena bočica sa 60 ml oralne suspenzije"
+        }
+      ]
+    },
+    {
+      name: "OSPEN K 1,5 MIU",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
+        {
+          type: "filmom obložena tableta",
+          strength: "1500000 i.j.",
+          packaging: "30 filmom obloženih tableta (3 PVC/PVDC/Al blistera po 10 tableta)"
         }
       ]
     }
