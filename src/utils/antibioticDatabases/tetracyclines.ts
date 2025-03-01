@@ -3,57 +3,65 @@ import { AntibioticDosing } from '../antibioticRecommendations/types';
 
 export const tetracyclineDosing: Record<string, AntibioticDosing> = {
   "doxycycline": {
-    condition: "Various Infections",
-    adult: {
-      standard: {
-        dose: "100mg",
-        frequency: "daily",
-        duration: "Variable, depending on indication"
+    name: "Doxycycline",
+    class: "Tetracycline",
+    standardDosing: {
+      adult: {
+        mild: { dose: "100mg", interval: "q24h" },
+        moderate: { dose: "100mg", interval: "q12h" }, 
+        severe: { dose: "200mg", interval: "q12h" }
       },
-      severe: {
-        dose: "200mg",
-        frequency: "daily (divided into 2 doses)",
-        duration: "Variable, depending on indication"
+      pediatric: {
+        mgPerKg: 2,
+        maxDose: 100,
+        interval: "q12h"
       }
     },
-    pediatric: {
-      standard: {
-        doseCalculation: "Not recommended under 12 years",
-        maxDose: "100mg",
-        frequency: "daily",
-        duration: "Variable, depending on indication"
-      }
-    },
+    routes: ["oral"],
     renalAdjustment: [],
-    comments: [
-      "First day: 200mg (2 doses of 100mg)",
-      "Following days: 100mg daily for most infections",
-      "For severe infections: 200mg daily",
-      "Contraindicated in pregnancy, nursing mothers, and children under 12 years"
+    contraindications: [
+      "pregnancy",
+      "children under 12 years",
+      "nursing mothers"
+    ],
+    commonIndications: [
+      "respiratory tract infections",
+      "urinary tract infections",
+      "sexually transmitted infections",
+      "skin infections",
+      "eye infections",
+      "leptospirosis",
+      "malaria prophylaxis"
     ]
   },
   "tigecycline": {
-    condition: "Complicated skin infections and intra-abdominal infections",
-    adult: {
-      standard: {
-        dose: "Initial 100mg, then 50mg",
-        frequency: "every 12 hours",
-        duration: "5-14 days"
+    name: "Tigecycline",
+    class: "Glycylcycline",
+    standardDosing: {
+      adult: {
+        mild: { dose: "100mg loading then 50mg", interval: "q12h" },
+        moderate: { dose: "100mg loading then 50mg", interval: "q12h" },
+        severe: { dose: "100mg loading then 50mg", interval: "q12h" }
+      },
+      pediatric: {
+        mgPerKg: 0,
+        maxDose: 0,
+        interval: "Not recommended"
       }
     },
-    pediatric: {
-      standard: {
-        doseCalculation: "Not recommended under 18 years",
-        maxDose: "Not applicable",
-        frequency: "Not applicable",
-        duration: "Not applicable"
-      }
-    },
+    routes: ["IV"],
     renalAdjustment: [],
-    comments: [
-      "Only used when other alternative drugs are not applicable",
-      "Intravenous infusion only",
-      "Only for adults over 18 years"
+    weightAdjustment: [
+      { threshold: 120, adjustment: "Consider dose adjustment in severe obesity" }
+    ],
+    contraindications: [
+      "hypersensitivity",
+      "children under 18 years",
+      "pregnancy"
+    ],
+    commonIndications: [
+      "complicated skin infections",
+      "complicated intra-abdominal infections"
     ]
   }
 };
