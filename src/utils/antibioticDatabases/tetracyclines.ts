@@ -5,63 +5,76 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
   "doxycycline": {
     name: "Doxycycline",
     class: "Tetracycline",
+    firstLine: ["respiratory infections", "urinary tract infections", "sexually transmitted diseases"],
     standardDosing: {
       adult: {
-        mild: { dose: "100mg", interval: "q24h" },
-        moderate: { dose: "100mg", interval: "q12h" }, 
-        severe: { dose: "200mg", interval: "q12h" }
+        loading: "200 mg (2 x 100 mg) on first day",
+        maintenance: "100 mg daily",
+        frequency: "Once daily",
+        duration: "7-14 days, depending on infection"
       },
       pediatric: {
-        mgPerKg: 2,
-        maxDose: 100,
-        interval: "q12h"
+        notes: "Not recommended for children under 8 years due to risk of dental discoloration",
+        dosing: "2-4 mg/kg/day divided into 1-2 doses, not to exceed 200 mg/day"
       }
     },
-    routes: ["oral"],
-    renalAdjustment: [],
+    renalDosing: {
+      notes: "No dosage adjustment necessary in renal impairment",
+      dosing: "Standard dosing applies"
+    },
+    hepaticDosing: {
+      notes: "Use with caution in severe hepatic impairment",
+      dosing: "Consider dose reduction in severe impairment"
+    },
+    administration: {
+      oral: "Take with food or milk to reduce GI irritation",
+      iv: "When oral therapy is not feasible, may administer intravenously"
+    },
     contraindications: [
-      "pregnancy",
-      "children under 12 years",
-      "nursing mothers"
+      "Hypersensitivity to tetracyclines",
+      "Pregnancy",
+      "Children under 8 years",
+      "Concurrent use with isotretinoin"
     ],
-    commonIndications: [
-      "respiratory tract infections",
-      "urinary tract infections",
-      "sexually transmitted infections",
-      "skin infections",
-      "eye infections",
-      "leptospirosis",
-      "malaria prophylaxis"
+    sideEffects: [
+      "Photosensitivity",
+      "Gastrointestinal disturbance",
+      "Esophageal irritation",
+      "Dental discoloration in children"
     ]
   },
   "tigecycline": {
     name: "Tigecycline",
-    class: "Glycylcycline",
+    class: "Glycylcycline (tetracycline derivative)",
+    firstLine: ["complicated skin infections", "complicated intra-abdominal infections", "community-acquired pneumonia"],
     standardDosing: {
       adult: {
-        mild: { dose: "100mg loading then 50mg", interval: "q12h" },
-        moderate: { dose: "100mg loading then 50mg", interval: "q12h" },
-        severe: { dose: "100mg loading then 50mg", interval: "q12h" }
-      },
-      pediatric: {
-        mgPerKg: 0,
-        maxDose: 0,
-        interval: "Not recommended"
+        loading: "Initial dose of 100 mg IV",
+        maintenance: "50 mg IV every 12 hours",
+        frequency: "Every 12 hours",
+        duration: "5-14 days depending on site and severity of infection"
       }
     },
-    routes: ["IV"],
-    renalAdjustment: [],
-    weightAdjustment: [
-      { threshold: 120, adjustment: "Consider dose adjustment in severe obesity" }
-    ],
+    renalDosing: {
+      notes: "No dosage adjustment required in renal impairment or hemodialysis",
+      dosing: "Standard dosing applies"
+    },
+    hepaticDosing: {
+      notes: "For severe hepatic impairment (Child-Pugh C)",
+      dosing: "Initial dose of 100 mg followed by 25 mg every 12 hours"
+    },
+    administration: {
+      iv: "Infuse over 30-60 minutes"
+    },
     contraindications: [
-      "hypersensitivity",
-      "children under 18 years",
-      "pregnancy"
+      "Hypersensitivity to tigecycline",
+      "Pregnancy and lactation"
     ],
-    commonIndications: [
-      "complicated skin infections",
-      "complicated intra-abdominal infections"
+    sideEffects: [
+      "Nausea and vomiting (most common)",
+      "Diarrhea",
+      "Increased all-cause mortality in critically ill patients",
+      "Tooth discoloration in developing teeth"
     ]
   }
 };

@@ -1,4 +1,3 @@
-
 export interface DrugProduct {
   name: string;
   manufacturer: string;
@@ -370,7 +369,6 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
       ]
     }
   ],
-  // New additions
   "Ampicillin + Sulbactam": [
     {
       name: "AMPICILIN/SULBAKTAM APTAPHARMA",
@@ -709,5 +707,115 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
         }
       ]
     }
-  ]
-};
+  ],
+  "Cefixime": [
+    {
+      name: "CEFAPAN",
+      manufacturer: "HEMOFARM PROIZVODNJA FARMACEUTSKIH PROIZVODA D.O.O. BANJA LUKA",
+      forms: [
+        {
+          type: "film tableta",
+          strength: "400 mg",
+          packaging: "10 film tableta, kutiji"
+        },
+        {
+          type: "prašak za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "Tamna staklena bočica sa polipropilenskim bijelim CR zatvaračem, u kartonskoj kutiji"
+        }
+      ]
+    },
+    {
+      name: "CEFDIA",
+      manufacturer: "ILKO ILAC SANAYI VE TICARET A.S.",
+      forms: [
+        {
+          type: "film tableta",
+          strength: "400 mg",
+          packaging: "10 film tableta (2 PVC/Al blistera sa po 5 film tableta)"
+        }
+      ]
+    },
+    {
+      name: "NEOCEF",
+      manufacturer: "LABORATORIOS ATRAL S.A.",
+      forms: [
+        {
+          type: "obložena tableta",
+          strength: "400 mg",
+          packaging: "8 obloženih tableta (2 Al/Al blistera sa po 4 obložene tablete), u kutiji"
+        },
+        {
+          type: "prašak za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "1 staklena bočica (120 ml) sa praškom za oralnu suspenziju i kašikom za doziranje od 5 ml, u kutiji"
+        },
+        {
+          type: "prašak za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "1 staklena bočica sa praškom za pripremu 60ml oralne suspenzije i kašikom za doziranje od 5 ml, u kutiji"
+        }
+      ]
+    },
+    {
+      name: "PANCEF",
+      manufacturer: "ALKALOID AD SKOPJE",
+      forms: [
+        {
+          type: "film tableta",
+          strength: "400 mg",
+          packaging: "10 film tableta (2 PVC/PVDC/Al - blistera po 5 tableta) u kutiji"
+        },
+        {
+          type: "film tableta",
+          strength: "400 mg",
+          packaging: "5 film tableta (1 PVC/PVDC/Al - blister) u kutiji"
+        },
+        {
+          type: "granule za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "1 boca sa 32 g praška za pripremu 60 mL oralne suspenzije sa mjernom kašičicom, u kutiji"
+        },
+        {
+          type: "granule za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "1 boca sa 53 g praška za pripremu 100 mL oralne suspenzije sa mjernom kašičicom, u kutiji"
+        }
+      ]
+    },
+    {
+      name: "TRYCCEF",
+      manufacturer: "BOSNALIJEK D.D.",
+      forms: [
+        {
+          type: "film tableta",
+          strength: "400 mg",
+          packaging: "10 film tableta (2 PVC/PVDC/AL blistera sa 5 tableta), u kutiji"
+        },
+        {
+          type: "filmom obložena tableta",
+          strength: "400 mg",
+          packaging: "5 film tableta (1 PVC/PVDC/AL blister sa 5 tableta), u kutiji"
+        },
+        {
+          type: "prašak za oralnu suspenziju",
+          strength: "100 mg/5 mL",
+          packaging: "1 smeđa staklena bočica sa gravurom za oznaku volumena 100 ml sa zatvaračem i kašikom za doziranje, u kutiji"
+        }
+      ]
+    }
+  ],
+  "Cefpodoxime": [
+    {
+      name: "CEFPODOXIM SANDOZ",
+      manufacturer: "SANDOZ PHARMACEUTICALS D.D.",
+      forms: [
+        {
+          type: "filmom obložena tableta",
+          strength: "100 mg",
+          packaging: "10 filmom obloženih tableta (1 Al/Al blister sa 10 tableta), u kutiji"
+        },
+        {
+          type: "filmom obložena tableta",
+          strength: "200 mg",
+          packaging
