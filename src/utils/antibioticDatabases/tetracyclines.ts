@@ -1,5 +1,5 @@
 
-import { AntibioticDosing } from '../antibioticRecommendations/types';
+import { AntibioticDosing } from "../antibioticRecommendations/types";
 
 export const tetracyclineDosing: Record<string, AntibioticDosing> = {
   "doxycycline": {
