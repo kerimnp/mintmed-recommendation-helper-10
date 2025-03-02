@@ -1,4 +1,3 @@
-
 export interface DrugProduct {
   name: string;
   manufacturer: string;
@@ -819,71 +818,4 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
         {
           type: "filmom obložena tableta",
           strength: "200 mg",
-          packaging: "10 filmom obloženih tableta (1 Al/Al blister sa 10 tableta) u kutiji"
-        },
-        {
-          type: "prašak za oralnu suspenziju",
-          strength: "40 mg/5 mL",
-          packaging: "1 smeđa staklena boca sa 40 g praška za pripremu 100 ml oralne suspenzije i šprica od 10 ml za doziranje sa adapterom, u kutiji"
-        }
-      ]
-    },
-    {
-      name: "FOXERO",
-      manufacturer: "ALKALOID AD SKOPJE",
-      forms: [
-        {
-          type: "film tableta",
-          strength: "100 mg",
-          packaging: "10 film tableta (1 Al/Al - blister), u kutiji"
-        },
-        {
-          type: "film tableta",
-          strength: "100 mg",
-          packaging: "20 film tableta (2 Al/Al - blistera po 10 tableta), u kutiji"
-        },
-        {
-          type: "film tableta",
-          strength: "200 mg",
-          packaging: "10 film tableta (1 Al/Al - blister), u kutiji"
-        },
-        {
-          type: "film tableta",
-          strength: "200 mg",
-          packaging: "20 film tableta (2 Al/Al - blistera po 10 tableta), u kutiji"
-        },
-        {
-          type: "prašak za oralnu suspenziju",
-          strength: "40 mg/5 mL",
-          packaging: "HDPE bočica (PP zatvaračem i zaštitnom folijom) sa 64,8 g praška za pripremu 100 mL oralne suspenzije, u kutiji"
-        }
-      ]
-    },
-    {
-      name: "SEFPOTEC",
-      manufacturer: "NOBEL ILAC SANAYII VE TICARET A.S.",
-      forms: [
-        {
-          type: "film tableta",
-          strength: "200 mg",
-          packaging: "14 film tableta (2 Al/Al blistera sa po 7 tableta), u kutiji"
-        },
-        {
-          type: "film tableta",
-          strength: "200 mg",
-          packaging: "20 film tableta (4 Al/Al blistera sa po 5 tableta), u kutiji"
-        },
-        {
-          type: "prašak za oralnu suspenziju",
-          strength: "100 mg/5 mL",
-          packaging: "1 staklena bočica sa 24 g praška za pripremu 60 ml oralne suspenzije i plastična kašika za doziranje, u kutiji"
-        },
-        {
-          type: "prašak za oralnu suspenziju",
-          strength: "100 mg/5 mL",
-          packaging: "1 staklena bočica sa 40 g praška za pripremu 100 ml oralne suspenzije i plastična kašika za doziranje, u kutiji"
-        }
-      ]
-    }
-  ]
-};
+          packaging
