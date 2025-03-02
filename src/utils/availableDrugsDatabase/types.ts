@@ -9,4 +9,5 @@ export interface DrugProduct {
   }>;
 }
 
+export type DrugCategory = Record<string, DrugProduct[]>;
 export type DrugDatabase = Record<string, DrugProduct[]>;

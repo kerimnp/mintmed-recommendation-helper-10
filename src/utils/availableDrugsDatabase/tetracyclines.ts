@@ -1,7 +1,7 @@
 
-import { DrugProduct } from './types';
+import { DrugCategory } from './types';
 
-export const tetracyclines: Record<string, DrugProduct[]> = {
+export const tetracyclines: DrugCategory = {
   "Doxycycline": [
     {
       name: "DOKSICIKLIN HF",
@@ -61,6 +61,17 @@ export const tetracyclines: Record<string, DrugProduct[]> = {
       ]
     },
     {
+      name: "TIGECYCLINE ANFARM",
+      manufacturer: "ANFARM HELLAS S.A",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "10 staklenih bocica (bočica od bezbojnog stakla tip I od 5 ml sa flip-off zatvaračem) u kutiji"
+        }
+      ]
+    },
+    {
       name: "TYGACIL",
       manufacturer: "PFIZER INC.",
       forms: [
@@ -68,6 +79,28 @@ export const tetracyclines: Record<string, DrugProduct[]> = {
           type: "prašak za otopinu za infuziju",
           strength: "50 mg",
           packaging: "10 staklenih bočica"
+        }
+      ]
+    },
+    {
+      name: "TYGEPOL",
+      manufacturer: "POLIFARMA ILAC SAN VE TIC.A.S.",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "Bezbojna staklena bočica (6 R tip I) prekrivena narandžastim plastičnim zatvaračem sa sivim čepom promjera 20 mm, u kutiji. Pakovanje sadrži 10 bočica."
+        }
+      ]
+    },
+    {
+      name: "TYGEX",
+      manufacturer: "VEM ILAC SANAYI VE TICARET ANONIM SIRKETI",
+      forms: [
+        {
+          type: "prašak za rastvor za infuziju",
+          strength: "50 mg",
+          packaging: "10 staklenih bočica sa liofiliziranim praškom za rastvor za infuziju, u kutiji"
         }
       ]
     }
