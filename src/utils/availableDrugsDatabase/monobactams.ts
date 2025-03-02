@@ -22,6 +22,11 @@ export const monobactams: DrugCategory = {
           type: "prašak i rastvarač za rastvor za raspršivač",
           strength: "75 mg",
           packaging: "84 staklene bočice sa praškom + 88 ampula sa rastvaračem"
+        },
+        {
+          type: "prašak i rastvarač za rastvor za raspršivač",
+          strength: "75 mg",
+          packaging: "28 staklene bočice sa praškom + 32 ampule sa rastvaračem"
         }
       ]
     }
