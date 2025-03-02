@@ -5,7 +5,7 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
   "doxycycline": {
     name: "Doxycycline",
     class: "Tetracycline",
-    firstLine: ["respiratory infections", "urinary tract infections", "sexually transmitted diseases"],
+    commonIndications: ["respiratory infections", "urinary tract infections", "sexually transmitted diseases"],
     standardDosing: {
       adult: {
         mild: { dose: "100 mg", interval: "q24h" },
@@ -18,18 +18,8 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
         interval: "q12h"
       }
     },
-    renalDosing: {
-      notes: "No dosage adjustment necessary in renal impairment",
-      dosing: "Standard dosing applies"
-    },
-    hepaticDosing: {
-      notes: "Use with caution in severe hepatic impairment",
-      dosing: "Consider dose reduction in severe impairment"
-    },
-    administration: {
-      oral: "Take with food or milk to reduce GI irritation",
-      iv: "When oral therapy is not feasible, may administer intravenously"
-    },
+    routes: ["oral"],
+    renalAdjustment: [],
     contraindications: [
       "Hypersensitivity to tetracyclines",
       "Pregnancy",
@@ -46,7 +36,7 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
   "tigecycline": {
     name: "Tigecycline",
     class: "Glycylcycline (tetracycline derivative)",
-    firstLine: ["complicated skin infections", "complicated intra-abdominal infections", "community-acquired pneumonia"],
+    commonIndications: ["complicated skin infections", "complicated intra-abdominal infections", "community-acquired pneumonia"],
     standardDosing: {
       adult: {
         mild: { dose: "100 mg loading then 50 mg", interval: "q12h" },
@@ -59,17 +49,8 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
         interval: "Not recommended"
       }
     },
-    renalDosing: {
-      notes: "No dosage adjustment required in renal impairment or hemodialysis",
-      dosing: "Standard dosing applies"
-    },
-    hepaticDosing: {
-      notes: "For severe hepatic impairment (Child-Pugh C)",
-      dosing: "Initial dose of 100 mg followed by 25 mg every 12 hours"
-    },
-    administration: {
-      iv: "Infuse over 30-60 minutes"
-    },
+    routes: ["IV"],
+    renalAdjustment: [],
     contraindications: [
       "Hypersensitivity to tigecycline",
       "Pregnancy and lactation"
