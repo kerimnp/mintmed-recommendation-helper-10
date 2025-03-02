@@ -1,4 +1,3 @@
-<lov-code>
 export interface DrugProduct {
   name: string;
   manufacturer: string;
@@ -819,3 +818,4 @@ export const availableDrugs: Record<string, DrugProduct[]> = {
         {
           type: "filmom obložena tableta",
           strength: "200 mg",
+          packaging
