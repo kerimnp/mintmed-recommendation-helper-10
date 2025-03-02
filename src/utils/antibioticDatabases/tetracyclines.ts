@@ -8,14 +8,14 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
     firstLine: ["respiratory infections", "urinary tract infections", "sexually transmitted diseases"],
     standardDosing: {
       adult: {
-        loading: "200 mg (2 x 100 mg) on first day",
-        maintenance: "100 mg daily",
-        frequency: "Once daily",
-        duration: "7-14 days, depending on infection"
+        mild: { dose: "100 mg", interval: "q24h" },
+        moderate: { dose: "100 mg", interval: "q12h" },
+        severe: { dose: "200 mg", interval: "q12h" }
       },
       pediatric: {
-        notes: "Not recommended for children under 8 years due to risk of dental discoloration",
-        dosing: "2-4 mg/kg/day divided into 1-2 doses, not to exceed 200 mg/day"
+        mgPerKg: 2,
+        maxDose: 100,
+        interval: "q12h"
       }
     },
     renalDosing: {
@@ -49,10 +49,14 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
     firstLine: ["complicated skin infections", "complicated intra-abdominal infections", "community-acquired pneumonia"],
     standardDosing: {
       adult: {
-        loading: "Initial dose of 100 mg IV",
-        maintenance: "50 mg IV every 12 hours",
-        frequency: "Every 12 hours",
-        duration: "5-14 days depending on site and severity of infection"
+        mild: { dose: "100 mg loading then 50 mg", interval: "q12h" },
+        moderate: { dose: "100 mg loading then 50 mg", interval: "q12h" },
+        severe: { dose: "100 mg loading then 50 mg", interval: "q12h" }
+      },
+      pediatric: {
+        mgPerKg: 0,
+        maxDose: 0,
+        interval: "Not recommended"
       }
     },
     renalDosing: {
