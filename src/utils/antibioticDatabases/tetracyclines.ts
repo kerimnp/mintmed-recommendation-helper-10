@@ -25,12 +25,6 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
       "Pregnancy",
       "Children under 8 years",
       "Concurrent use with isotretinoin"
-    ],
-    sideEffects: [
-      "Photosensitivity",
-      "Gastrointestinal disturbance",
-      "Esophageal irritation",
-      "Dental discoloration in children"
     ]
   },
   "tigecycline": {
@@ -54,12 +48,6 @@ export const tetracyclineDosing: Record<string, AntibioticDosing> = {
     contraindications: [
       "Hypersensitivity to tigecycline",
       "Pregnancy and lactation"
-    ],
-    sideEffects: [
-      "Nausea and vomiting (most common)",
-      "Diarrhea",
-      "Increased all-cause mortality in critically ill patients",
-      "Tooth discoloration in developing teeth"
     ]
   }
 };
