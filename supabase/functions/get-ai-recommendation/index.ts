@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -22,39 +23,8 @@ serve(async (req) => {
 
     const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
     if (!perplexityApiKey) {
-      console.error('Missing Perplexity API key');
-      return new Response(
-        JSON.stringify({ error: 'Missing API key configuration' }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      throw new Error('AI service configuration is missing');
     }
-
-    const systemPrompt = `You are an AI medical assistant specializing in antibiotic recommendations. 
-    Given the patient data, provide a recommendation in JSON format. Return ONLY a valid JSON object with NO markdown formatting or additional text. The JSON must follow this structure:
-    {
-      "primaryRecommendation": {
-        "name": "antibiotic name",
-        "dose": "dosage details",
-        "route": "administration route",
-        "duration": "treatment duration"
-      },
-      "reasoning": "detailed clinical reasoning for the recommendation",
-      "alternatives": [
-        {
-          "name": "alternative antibiotic name",
-          "dose": "alternative dosage",
-          "route": "alternative route",
-          "duration": "alternative duration",
-          "reason": "reason for suggesting this alternative"
-        }
-      ],
-      "precautions": [
-        "list of relevant precautions and warnings"
-      ]
-    }`;
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -67,7 +37,8 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: systemPrompt
+            content: `You are an AI medical assistant specializing in antibiotic recommendations. 
+            Given the patient data, provide a recommendation in JSON format. Return ONLY a valid JSON object with NO markdown formatting or additional text.`
           },
           {
             role: 'user',
@@ -82,63 +53,46 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Perplexity API error:', errorText);
-      return new Response(
-        JSON.stringify({ error: 'Failed to get AI recommendation' }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      throw new Error('AI service temporarily unavailable');
     }
 
     const result = await response.json();
+    if (!result?.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response format from AI service');
+    }
+
     const aiResponse = result.choices[0].message.content;
     console.log('Raw AI response:', aiResponse);
 
     try {
-      // Clean and parse the response
       const cleanJson = aiResponse
-        .replace(/```json\n?|\n?```/g, '') // Remove markdown code blocks
-        .replace(/[\u0000-\u001F]+/g, '') // Remove control characters
+        .replace(/```json\n?|\n?```/g, '')
+        .replace(/[\u0000-\u001F]+/g, '')
         .trim();
       
       const parsedRecommendation = JSON.parse(cleanJson);
 
-      // Validate the structure
       if (!parsedRecommendation.primaryRecommendation ||
           !parsedRecommendation.reasoning ||
           !Array.isArray(parsedRecommendation.alternatives) ||
           !Array.isArray(parsedRecommendation.precautions)) {
-        throw new Error('Response missing required fields');
+        throw new Error('Invalid recommendation format');
       }
 
-      console.log('Successfully parsed AI recommendation:', parsedRecommendation);
-      
       return new Response(
         JSON.stringify({ recommendation: parsedRecommendation }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (error) {
       console.error('Error parsing AI response:', error);
-      console.error('Problematic response:', aiResponse);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid AI response format',
-          details: error.message,
-          rawResponse: aiResponse 
-        }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      throw new Error('Failed to parse AI recommendation');
     }
   } catch (error) {
     console.error('Error in get-ai-recommendation:', error);
     return new Response(
-      JSON.stringify({ error: error.message }), 
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      }), 
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

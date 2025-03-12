@@ -26,7 +26,7 @@ export const PatientForm = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+  const [aiRecommendation, setAiRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   
   const sectionRefs = {
@@ -190,9 +190,10 @@ export const PatientForm = () => {
         description: "The AI has analyzed the patient data and provided recommendations.",
       });
     } catch (error) {
+      console.error('AI Recommendation error:', error);
       toast({
         title: "Error",
-        description: "Failed to get AI recommendation. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get AI recommendation. Please try again.",
         variant: "destructive"
       });
     } finally {
