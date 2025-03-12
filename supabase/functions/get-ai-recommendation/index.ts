@@ -21,10 +21,12 @@ serve(async (req) => {
     }
     console.log('Patient data received:', JSON.stringify(patientData));
 
-    const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
-    if (!perplexityApiKey) {
+    // Use API key from environment variable or request body
+    let perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
+    
+    if (!perplexityApiKey || perplexityApiKey.trim() === '') {
       console.error('Perplexity API key not found in environment variables');
-      throw new Error('AI service configuration is missing');
+      throw new Error('API service configuration is missing - please add PERPLEXITY_API_KEY to your Supabase Edge Function Secrets');
     }
 
     console.log('Making request to Perplexity API...');
@@ -49,14 +51,16 @@ serve(async (req) => {
                 "duration": string
               },
               "reasoning": string,
-              "alternatives": Array<{
-                "name": string,
-                "dose": string,
-                "route": string,
-                "duration": string,
-                "reason": string
-              }>,
-              "precautions": string[]
+              "alternatives": [
+                {
+                  "name": string,
+                  "dose": string,
+                  "route": string,
+                  "duration": string,
+                  "reason": string
+                }
+              ],
+              "precautions": [string]
             }
             Return ONLY valid JSON with NO markdown formatting or additional text.`
           },
@@ -72,12 +76,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Perplexity API error:', errorText);
-      throw new Error(`AI service error: ${response.status} - ${errorText}`);
+      console.error(`Perplexity API error (${response.status}):`, errorText);
+      throw new Error(`AI service error: ${response.status} - ${errorText || 'Unknown error'}`);
     }
 
     const result = await response.json();
-    console.log('Raw AI response:', JSON.stringify(result));
+    console.log('Raw AI response received');
 
     if (!result?.choices?.[0]?.message?.content) {
       console.error('Invalid response format from AI:', result);
@@ -90,7 +94,7 @@ serve(async (req) => {
         .replace(/[\u0000-\u001F]+/g, '')
         .trim();
       
-      console.log('Cleaned JSON:', cleanJson);
+      console.log('Cleaned JSON');
       const parsedRecommendation = JSON.parse(cleanJson);
 
       // Validate the response structure
@@ -103,7 +107,10 @@ serve(async (req) => {
       }
 
       return new Response(
-        JSON.stringify({ recommendation: parsedRecommendation }),
+        JSON.stringify({ 
+          recommendation: parsedRecommendation,
+          status: 'success'
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (error) {
@@ -115,7 +122,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
+        status: 'error'
       }), 
       { 
         status: 500,

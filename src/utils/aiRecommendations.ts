@@ -24,12 +24,25 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
 
     if (error) {
       console.error('Error from Edge Function:', error);
+      if (error.message.includes('API service configuration is missing')) {
+        throw new Error('API key missing: Add PERPLEXITY_API_KEY to Supabase Edge Function Secrets');
+      }
       throw new Error(`AI service error: ${error.message}`);
     }
 
-    if (!response?.recommendation) {
-      console.error('Invalid response:', response);
-      throw new Error('Invalid response from AI recommendation service');
+    if (!response) {
+      console.error('Empty response received:', response);
+      throw new Error('Empty response from AI recommendation service');
+    }
+
+    if (response.status === 'error') {
+      console.error('Error response:', response);
+      throw new Error(response.error || 'Error in AI recommendation service');
+    }
+
+    if (!response.recommendation) {
+      console.error('Invalid response format:', response);
+      throw new Error('Invalid response format from AI recommendation service');
     }
 
     console.log('AI recommendation received:', response.recommendation);
