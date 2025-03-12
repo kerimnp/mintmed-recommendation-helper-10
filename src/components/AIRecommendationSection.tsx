@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Loader2, Bot } from "lucide-react";
+import { Loader2, Bot, AlertCircle } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
+import { Alert, AlertDescription } from "./ui/alert";
 
 interface AIRecommendationSectionProps {
   isLoading: boolean;
@@ -35,15 +37,27 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Getting Recommendation...
+              Getting AI Analysis...
             </>
           ) : (
-            "Get AI Recommendation"
+            <>
+              <Bot className="mr-2 h-4 w-4" />
+              Get AI Analysis
+            </>
           )}
         </Button>
       </div>
 
-      {recommendation && (
+      {isLoading && (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-medical-primary" />
+            <p className="text-sm text-gray-600">Analyzing patient data and generating recommendations...</p>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && recommendation && (
         <div className="mt-4">
           <AntibioticRecommendation recommendation={recommendation} />
         </div>
