@@ -19,13 +19,15 @@ serve(async (req) => {
     if (!patientData) {
       throw new Error('No patient data provided');
     }
-    console.log('Received patient data:', patientData);
+    console.log('Patient data received:', JSON.stringify(patientData));
 
     const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
     if (!perplexityApiKey) {
+      console.error('Perplexity API key not found in environment variables');
       throw new Error('AI service configuration is missing');
     }
 
+    console.log('Making request to Perplexity API...');
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -37,8 +39,26 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an AI medical assistant specializing in antibiotic recommendations. 
-            Given the patient data, provide a recommendation in JSON format. Return ONLY a valid JSON object with NO markdown formatting or additional text.`
+            content: `You are a medical AI assistant specializing in antibiotic recommendations. 
+            Given the patient data, provide a detailed recommendation in JSON format with the following structure:
+            {
+              "primaryRecommendation": {
+                "name": string,
+                "dose": string,
+                "route": string,
+                "duration": string
+              },
+              "reasoning": string,
+              "alternatives": Array<{
+                "name": string,
+                "dose": string,
+                "route": string,
+                "duration": string,
+                "reason": string
+              }>,
+              "precautions": string[]
+            }
+            Return ONLY valid JSON with NO markdown formatting or additional text.`
           },
           {
             role: 'user',
@@ -53,30 +73,33 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Perplexity API error:', errorText);
-      throw new Error('AI service temporarily unavailable');
+      throw new Error(`AI service error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
+    console.log('Raw AI response:', JSON.stringify(result));
+
     if (!result?.choices?.[0]?.message?.content) {
+      console.error('Invalid response format from AI:', result);
       throw new Error('Invalid response format from AI service');
     }
 
-    const aiResponse = result.choices[0].message.content;
-    console.log('Raw AI response:', aiResponse);
-
     try {
-      const cleanJson = aiResponse
+      const cleanJson = result.choices[0].message.content
         .replace(/```json\n?|\n?```/g, '')
         .replace(/[\u0000-\u001F]+/g, '')
         .trim();
       
+      console.log('Cleaned JSON:', cleanJson);
       const parsedRecommendation = JSON.parse(cleanJson);
 
-      if (!parsedRecommendation.primaryRecommendation ||
+      // Validate the response structure
+      if (!parsedRecommendation.primaryRecommendation?.name ||
           !parsedRecommendation.reasoning ||
           !Array.isArray(parsedRecommendation.alternatives) ||
           !Array.isArray(parsedRecommendation.precautions)) {
-        throw new Error('Invalid recommendation format');
+        console.error('Invalid recommendation structure:', parsedRecommendation);
+        throw new Error('Invalid recommendation format from AI');
       }
 
       return new Response(
@@ -85,13 +108,14 @@ serve(async (req) => {
       );
     } catch (error) {
       console.error('Error parsing AI response:', error);
-      throw new Error('Failed to parse AI recommendation');
+      throw new Error('Failed to parse AI recommendation: ' + error.message);
     }
   } catch (error) {
     console.error('Error in get-ai-recommendation:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        details: error instanceof Error ? error.stack : undefined
       }), 
       { 
         status: 500,

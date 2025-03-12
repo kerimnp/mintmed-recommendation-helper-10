@@ -5,38 +5,39 @@ import { EnhancedAntibioticRecommendation } from "./types/recommendationTypes";
 
 export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAntibioticRecommendation> => {
   try {
-    console.log('Calling get-ai-recommendation function with data:', data);
+    console.log('Sending data to AI recommendation service:', data);
     
-    // Add validation for required fields
     if (!data.age || !data.weight || !data.infectionSites || data.infectionSites.length === 0) {
-      throw new Error('Missing required patient data');
+      throw new Error('Missing required patient data: age, weight, and infection sites are required');
     }
 
     const { data: response, error } = await supabase.functions.invoke('get-ai-recommendation', {
       body: { 
         patientData: {
           ...data,
-          // Convert string values to numbers where needed
           age: Number(data.age),
           weight: Number(data.weight),
-          height: Number(data.height),
+          height: data.height ? Number(data.height) : undefined,
         }
       }
     });
 
     if (error) {
       console.error('Error from Edge Function:', error);
-      throw new Error(error.message || 'Failed to get AI recommendation');
+      throw new Error(`AI service error: ${error.message}`);
     }
 
     if (!response?.recommendation) {
+      console.error('Invalid response:', response);
       throw new Error('Invalid response from AI recommendation service');
     }
 
-    console.log('Received AI recommendation:', response.recommendation);
-    return response.recommendation;
+    console.log('AI recommendation received:', response.recommendation);
+    return response.recommendation as EnhancedAntibioticRecommendation;
   } catch (error) {
     console.error('Error getting AI recommendation:', error);
-    throw error;
+    throw error instanceof Error 
+      ? error 
+      : new Error('Failed to get AI recommendation');
   }
 };
