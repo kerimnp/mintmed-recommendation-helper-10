@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -6,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { cn } from "@/lib/utils";
+import { User, UserRound, Weight, Ruler, Flag, Baby } from "lucide-react";
 
 interface PatientDemographicsSectionProps {
   formData: {
@@ -39,21 +41,38 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
   ];
 
   return (
-    <Card className="p-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-lg space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{t.title}</h2>
+    <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800">
+      <div className="space-y-2 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <UserRound className="h-5 w-5 text-medical-primary" />
+          {t.title}
+        </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="age" className={cn(errors.age && "text-destructive")}>{t.age}</Label>
+          <Label 
+            htmlFor="age" 
+            className={cn(
+              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
+              errors.age && "text-destructive"
+            )}
+          >
+            <User className="h-3.5 w-3.5" />
+            {t.age}
+          </Label>
           <Input
             id="age"
             type="number"
             value={formData.age}
             onChange={(e) => onInputChange("age", e.target.value)}
-            className={cn(errors.age && "border-destructive")}
+            className={cn(
+              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
+              errors.age 
+                ? "border-destructive focus:ring-destructive/30" 
+                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
+            )}
             required
           />
           {errors.age && (
@@ -62,9 +81,15 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="gender">{t.gender}</Label>
+          <Label 
+            htmlFor="gender"
+            className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
+          >
+            <UserRound className="h-3.5 w-3.5" />
+            {t.gender}
+          </Label>
           <Select value={formData.gender} onValueChange={(value) => onInputChange("gender", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
               <SelectValue placeholder={t.gender} />
             </SelectTrigger>
             <SelectContent>
@@ -75,13 +100,27 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="weight" className={cn(errors.weight && "text-destructive")}>{t.weight}</Label>
+          <Label 
+            htmlFor="weight" 
+            className={cn(
+              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
+              errors.weight && "text-destructive"
+            )}
+          >
+            <Weight className="h-3.5 w-3.5" />
+            {t.weight}
+          </Label>
           <Input
             id="weight"
             type="number"
             value={formData.weight}
             onChange={(e) => onInputChange("weight", e.target.value)}
-            className={cn(errors.weight && "border-destructive")}
+            className={cn(
+              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
+              errors.weight 
+                ? "border-destructive focus:ring-destructive/30" 
+                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
+            )}
             required
           />
           {errors.weight && (
@@ -90,13 +129,27 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="height" className={cn(errors.height && "text-destructive")}>{t.height}</Label>
+          <Label 
+            htmlFor="height" 
+            className={cn(
+              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
+              errors.height && "text-destructive"
+            )}
+          >
+            <Ruler className="h-3.5 w-3.5" />
+            {t.height}
+          </Label>
           <Input
             id="height"
             type="number"
             value={formData.height}
             onChange={(e) => onInputChange("height", e.target.value)}
-            className={cn(errors.height && "border-destructive")}
+            className={cn(
+              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
+              errors.height 
+                ? "border-destructive focus:ring-destructive/30" 
+                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
+            )}
             required
           />
           {errors.height && (
@@ -105,12 +158,18 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nationality">{t.nationality}</Label>
+          <Label 
+            htmlFor="nationality"
+            className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
+          >
+            <Flag className="h-3.5 w-3.5" />
+            {t.nationality}
+          </Label>
           <Select 
             value={formData.nationality} 
             onValueChange={(value) => onInputChange("nationality", value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
               <SelectValue placeholder={t.nationality} />
             </SelectTrigger>
             <SelectContent>
@@ -125,9 +184,15 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         {formData.gender === "female" && (
           <div className="space-y-2">
-            <Label htmlFor="pregnancy">{t.pregnancy}</Label>
+            <Label 
+              htmlFor="pregnancy"
+              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
+            >
+              <Baby className="h-3.5 w-3.5" />
+              {t.pregnancy}
+            </Label>
             <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
                 <SelectValue placeholder={t.pregnancy} />
               </SelectTrigger>
               <SelectContent>

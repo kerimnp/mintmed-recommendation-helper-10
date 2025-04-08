@@ -14,28 +14,28 @@ interface DashboardContentProps {
 
 export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
   return (
-    <Tabs value={activeTab} className="animate-fade-in">
-      <TabsContent value="antibiotics" className="space-y-4">
+    <Tabs value={activeTab} className="animate-fade-in w-full">
+      <TabsContent value="antibiotics" className="space-y-4 mt-0">
         <AntibioticsTab />
       </TabsContent>
       
-      <TabsContent value="effectiveness" className="space-y-4">
+      <TabsContent value="effectiveness" className="space-y-4 mt-0">
         <EffectivenessTab />
       </TabsContent>
       
-      <TabsContent value="resistance" className="space-y-4">
+      <TabsContent value="resistance" className="space-y-4 mt-0">
         <ResistanceTab />
       </TabsContent>
       
-      <TabsContent value="guidelines" className="space-y-4">
+      <TabsContent value="guidelines" className="space-y-4 mt-0">
         <GuidelinesTab />
       </TabsContent>
       
-      <TabsContent value="regional" className="space-y-4">
+      <TabsContent value="regional" className="space-y-4 mt-0">
         <RegionalTab />
       </TabsContent>
       
-      <TabsContent value="education" className="space-y-4">
+      <TabsContent value="education" className="space-y-4 mt-0">
         <EducationTab />
       </TabsContent>
     </Tabs>

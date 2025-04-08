@@ -32,6 +32,35 @@ export const resistanceTrendData: ResistanceTrendData[] = [
   { year: "2024", mrsa: 25.1, vre: 18.7, esbl: 33.1, cre: 12.7, pseudomonas: 28.4 },
 ];
 
+// Regional data transformation helpers
+export const getRegionalDataByName = (region: string): ResistanceData => {
+  return regionData.find(r => r.region === region) || regionData[0];
+};
+
+export const getCountryDataByRegion = (region: string): CountryResistanceData[] => {
+  if (region === "Balkan") return balkanDetailedData;
+  
+  // For other regions, simulate data by adjusting Balkan data
+  const regionMultipliers = {
+    "Southern Europe": 1.2,
+    "Northern Europe": 0.6,
+    "Eastern Europe": 1.1,
+    "Western Europe": 0.8
+  };
+  
+  const multiplier = (regionMultipliers as any)[region] || 1;
+  
+  return balkanDetailedData.map(country => ({
+    ...country,
+    country: `${country.country} (${region})`,
+    mrsa: +(country.mrsa * multiplier).toFixed(1),
+    vre: +(country.vre * multiplier).toFixed(1),
+    esbl: +(country.esbl * multiplier).toFixed(1),
+    cre: +(country.cre * multiplier).toFixed(1),
+    pseudomonas: +(country.pseudomonas * multiplier).toFixed(1)
+  }));
+};
+
 // Antibiotic effectiveness against resistant strains - based on clinical studies and antimicrobial susceptibility data
 export const antibioticEffectivenessData: AntibioticEffectivenessData[] = [
   { antibiotic: "Vancomycin", mrsa: 93.5, vre: 14.2, esbl: 0, cre: 0, pseudomonas: 0 },
