@@ -213,7 +213,7 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
             "Selected for penicillin-allergic patient",
             "Effective against common respiratory and atypical pathogens"
           ],
-          allergyConsiderations: [\"Avoids beta-lactams due to penicillin allergy\"]
+          allergyConsiderations: ["Avoids beta-lactams due to penicillin allergy"]
         }
       };
 
@@ -246,7 +246,7 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
             "Selected for multiple antibiotic allergies",
             "Effective against common respiratory pathogens"
           ],
-          allergyConsiderations: [\"Avoids beta-lactams and macrolides due to allergies\"]
+          allergyConsiderations: ["Avoids beta-lactams and macrolides due to allergies"]
         }
       };
     }
@@ -303,7 +303,7 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
             "Broad-spectrum coverage for moderate severity",
             "Alternative for cephalosporin-allergic patients"
           ],
-          allergyConsiderations: [\"Avoids cephalosporins due to allergy\"]
+          allergyConsiderations: ["Avoids cephalosporins due to allergy"]
         }
       };
     } else if (!hasFluoroquinoloneAllergy) {
@@ -317,7 +317,7 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
         },
         reasoning: "Alternative therapy for patients allergic to beta-lactams",
         alternatives: [],
-        precautions: [\"Use with caution - risk of tendinopathy\", \"QT prolongation risk\"],
+        precautions: ["Use with caution - risk of tendinopathy", "QT prolongation risk"],
         rationale: {
           infectionType: "respiratory",
           severity: data.severity,
@@ -325,7 +325,7 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
             "Selected for beta-lactam allergies",
             "Broad-spectrum coverage including atypical pathogens"
           ],
-          allergyConsiderations: [\"Avoids beta-lactams due to allergies\"]
+          allergyConsiderations: ["Avoids beta-lactams due to allergies"]
         }
       };
     }
@@ -390,14 +390,16 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
   // Add special considerations
   if (hasRenalImpairment) {
     recommendation.precautions = [
-      ...(recommendation.precautions || []),\n      "Monitor renal function closely",
+      ...(recommendation.precautions || []),
+      "Monitor renal function closely",
       "Dose adjustment may be required based on GFR"
     ];
   }
 
   if (isImmunosuppressed) {
     recommendation.precautions = [
-      ...(recommendation.precautions || []),\n      "Consider broader coverage",
+      ...(recommendation.precautions || []),
+      "Consider broader coverage",
       "Extended duration may be necessary",
       "Monitor closely for opportunistic infections"
     ];
@@ -440,7 +442,7 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         duration: "5 days"
       };
       recommendation.reasoning = "First-line therapy for uncomplicated UTI with low resistance rates";
-      recommendation.precautions = [\"Take with food to improve tolerability\", \"Not effective for pyelonephritis\"];
+      recommendation.precautions = ["Take with food to improve tolerability", "Not effective for pyelonephritis"];
       recommendation.rationale.reasons = [
         "First-line for uncomplicated UTI per guidelines",
         "Low resistance rates for E. coli",
@@ -464,12 +466,12 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         duration: "3 days"
       };
       recommendation.reasoning = "Alternative therapy for uncomplicated UTI in patients with sulfa allergies";
-      recommendation.precautions = [\"Not for routine first-line use due to resistance concerns\"];
+      recommendation.precautions = ["Not for routine first-line use due to resistance concerns"];
       recommendation.rationale.reasons = [
         "Alternative for patients with sulfa allergies",
         "Effective against common uropathogens"
       ];
-      recommendation.rationale.allergyConsiderations = [\"Selected due to sulfa allergy\"];
+      recommendation.rationale.allergyConsiderations = ["Selected due to sulfa allergy"];
     } else if (!hasCephalosporinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Cefuroxime",
@@ -519,7 +521,7 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         "Alternative for cephalosporin-allergic patients",
         "Provides coverage against common uropathogens"
       ];
-      recommendation.rationale.allergyConsiderations = [\"Avoids cephalosporins due to allergy\"];
+      recommendation.rationale.allergyConsiderations = ["Avoids cephalosporins due to allergy"];
     } else if (!hasFluoroquinoloneAllergy) {
       recommendation.primaryRecommendation = {
         name: "Ciprofloxacin",
@@ -528,12 +530,12 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         duration: "10-14 days"
       };
       recommendation.reasoning = "Alternative for beta-lactam allergic patients";
-      recommendation.precautions = [\"Use with caution - risk of tendinopathy\"];
+      recommendation.precautions = ["Use with caution - risk of tendinopathy"];
       recommendation.rationale.reasons = [
         "Selected for beta-lactam allergies",
         "Good tissue penetration for pyelonephritis"
       ];
-      recommendation.rationale.allergyConsiderations = [\"Avoids beta-lactams due to allergies\"];
+      recommendation.rationale.allergyConsiderations = ["Avoids beta-lactams due to allergies"];
     }
   }
   // Severe/septic UTI
@@ -546,7 +548,7 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         duration: "14 days"
       };
       recommendation.reasoning = "Carbapenem therapy for severe UTI with ESBL risk";
-      recommendation.precautions = [\"Reserve for confirmed or high-risk ESBL cases\"];
+      recommendation.precautions = ["Reserve for confirmed or high-risk ESBL cases"];
       recommendation.rationale.reasons = [
         "Selected for ESBL-producing organisms",
         "Appropriate for severe/septic presentation"
@@ -569,7 +571,8 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
   // Add special considerations for renal impairment
   if (gfr < 30) {
     recommendation.precautions = [
-      ...(recommendation.precautions || []),\n      "Severe renal impairment - dose adjustment required",
+      ...(recommendation.precautions || []),
+      "Severe renal impairment - dose adjustment required",
       "Avoid nitrofurantoin in severe renal impairment"
     ];
     recommendation.calculations = {
@@ -655,7 +658,7 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
             "Narrow-spectrum coverage for skin pathogens",
             "Active against Staphylococcus aureus"
           ],
-          allergyConsiderations: [\"Avoids cephalosporins due to allergy\"]
+          allergyConsiderations: ["Avoids cephalosporins due to allergy"]
         }
       };
     } else {
@@ -668,7 +671,7 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
         },
         reasoning: "Alternative for beta-lactam allergic patients",
         alternatives: [],
-        precautions: [\"Risk of C. difficile infection\"],
+        precautions: ["Risk of C. difficile infection"],
         rationale: {
           infectionType: "skin",
           severity: data.severity,
@@ -676,7 +679,7 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
             "Option for beta-lactam allergic patients",
             "Effective against Streptococcus and Staphylococcus"
           ],
-          allergyConsiderations: [\"Selected due to beta-lactam allergies\"]
+          allergyConsiderations: ["Selected due to beta-lactam allergies"]
         }
       };
     }
@@ -693,7 +696,7 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
         },
         reasoning: "Coverage for possible MRSA and moderate severity",
         alternatives: [],
-        precautions: [\"Monitor drug levels\", \"Adjust dose based on renal function\"],
+        precautions: ["Monitor drug levels", "Adjust dose based on renal function"],
         rationale: {
           infectionType: "skin",
           severity: data.severity,
@@ -773,7 +776,8 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
   // Add special considerations
   if (isDiabetic) {
     recommendation.precautions = [
-      ...(recommendation.precautions || []),\n      "Diabetic patient - monitor glycemic control",
+      ...(recommendation.precautions || []),
+      "Diabetic patient - monitor glycemic control",
       "Consider longer duration of therapy",
       "Higher risk of treatment failure"
     ];
@@ -781,7 +785,8 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
 
   if (gfr < 30) {
     recommendation.precautions = [
-      ...(recommendation.precautions || []),\n      "Severe renal impairment - dose adjustment required",
+      ...(recommendation.precautions || []),
+      "Severe renal impairment - dose adjustment required",
       "Monitor drug levels if using vancomycin"
     ];
     recommendation.calculations = {
@@ -848,4 +853,6 @@ const generateAbdominalRecommendation = (data: PatientData, gfr: number, isPedia
       }
     } else if (!hasCephalosporinAllergy) {
       recommendation.primaryRecommendation = {
-        name: "Cefuroxime + Met
+        name: "Cefuroxime + Metronidazole",
+        dose: isPediatric
+          ? "30-50mg/kg/day divided q12h + 3
