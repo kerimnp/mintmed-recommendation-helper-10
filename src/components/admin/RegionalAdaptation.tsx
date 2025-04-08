@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -255,7 +254,7 @@ export const RegionalAdaptation = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="resistance" className="space-y-4 pt-4">
+        
           <Card>
             <CardHeader>
               <CardTitle>Regional Resistance Patterns - {selectedRegion}</CardTitle>
@@ -282,9 +281,8 @@ export const RegionalAdaptation = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
         
-        <TabsContent value="usage" className="space-y-4 pt-4">
+        
           <Card>
             <CardHeader>
               <CardTitle>Regional vs. Standard Antibiotic Usage - {selectedRegion}</CardTitle>
@@ -318,7 +316,7 @@ export const RegionalAdaptation = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        
       </Tabs>
     </div>
   );
