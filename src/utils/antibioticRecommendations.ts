@@ -746,7 +746,10 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
       },
       reasoning: "Broad spectrum coverage for severe skin/soft tissue infection",
       alternatives: [],
-      precautions: ["Monitor vancomycin levels", "Consider surgical consultation"],
+      precautions: [
+        "Monitor vancomycin levels",
+        "Consider surgical consultation"
+      ],
       rationale: {
         infectionType: "skin",
         severity: data.severity,
@@ -852,4 +855,4 @@ const generateAbdominalRecommendation = (data: PatientData, gfr: number, isPedia
         name: "Cefuroxime + Metronidazole",
         dose: isPediatric
           ? "30-50mg/kg/day divided q12h + 30mg/kg/day divided q8h"
-          : "500mg q12h + 500mg q
+          : "500mg q12h +
