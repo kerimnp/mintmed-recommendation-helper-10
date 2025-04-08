@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { DashboardTabs } from "@/components/admin/dashboard/DashboardTabs";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
@@ -16,8 +15,8 @@ const AdminDashboard = () => {
     <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="flex-1 overflow-auto w-full pt-16 lg:pt-0">
-        <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      <main className="flex-1 overflow-auto w-full pt-16 lg:pt-6">
+        <div className="max-w-7xl mx-auto p-4 md:p-6">
           {/* Header with back navigation - only visible on mobile */}
           <header className="flex items-center justify-between mb-6 lg:hidden">
             <div>
@@ -36,16 +35,11 @@ const AdminDashboard = () => {
             </Link>
           </header>
           
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl shadow-lg">
-            <div className="p-4 md:p-6 lg:p-8">
-              <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-              <div className="mt-4">
-                <DashboardContent activeTab={activeTab} />
-              </div>
-            </div>
+          <div className="space-y-6">
+            <DashboardContent activeTab={activeTab} />
           </div>
           
-          <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6">
+          <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 mt-8">
             <p>© 2025 Horalix Clinical Decision Support System</p>
             <p className="mt-1">Version 1.0.0 | Last updated: April 8, 2025</p>
           </footer>

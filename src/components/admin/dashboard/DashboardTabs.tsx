@@ -1,11 +1,12 @@
 
 import React from "react";
 import { 
-  Tabs,
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { Shield, PieChart, Microscope, MapPin, BookOpen } from "lucide-react";
+  Shield, 
+  PieChart, 
+  Microscope, 
+  MapPin, 
+  BookOpen 
+} from "lucide-react";
 
 interface DashboardTabsProps {
   activeTab: string;
@@ -13,32 +14,34 @@ interface DashboardTabsProps {
 }
 
 export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) => {
+  const tabs = [
+    { id: "antibiotics", icon: Shield, label: "Antibiotics" },
+    { id: "effectiveness", icon: PieChart, label: "Effectiveness" },
+    { id: "resistance", icon: Microscope, label: "Resistance" },
+    { id: "regional", icon: MapPin, label: "Regional" },
+    { id: "education", icon: BookOpen, label: "Education" }
+  ];
+
   return (
-    <div className="w-full">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full grid grid-cols-3 lg:grid-cols-5 mb-8 bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm shadow-sm">
-          <TabsTrigger value="antibiotics" className="flex items-center gap-2 py-3">
-            <Shield className="h-4 w-4" />
-            <span className="hidden md:inline">Antibiotics</span>
-          </TabsTrigger>
-          <TabsTrigger value="effectiveness" className="flex items-center gap-2 py-3">
-            <PieChart className="h-4 w-4" />
-            <span className="hidden md:inline">Effectiveness</span>
-          </TabsTrigger>
-          <TabsTrigger value="resistance" className="flex items-center gap-2 py-3">
-            <Microscope className="h-4 w-4" />
-            <span className="hidden md:inline">Resistance</span>
-          </TabsTrigger>
-          <TabsTrigger value="regional" className="flex items-center gap-2 py-3">
-            <MapPin className="h-4 w-4" />
-            <span className="hidden md:inline">Regional</span>
-          </TabsTrigger>
-          <TabsTrigger value="education" className="flex items-center gap-2 py-3">
-            <BookOpen className="h-4 w-4" />
-            <span className="hidden md:inline">Education</span>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+    <div className="px-1 py-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-sm mb-6">
+      <div className="flex overflow-x-auto no-scrollbar">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex flex-1 items-center justify-center px-4 py-3 min-w-[120px] rounded-lg transition-all ${
+              activeTab === tab.id 
+                ? "bg-medical-primary text-white font-medium" 
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
+          >
+            <tab.icon className={`h-5 w-5 ${activeTab === tab.id ? "mr-2" : "mx-auto"}`} />
+            <span className={`${activeTab === tab.id ? "block" : "sr-only md:not-sr-only md:block md:mt-1 md:text-xs"}`}>
+              {tab.label}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
