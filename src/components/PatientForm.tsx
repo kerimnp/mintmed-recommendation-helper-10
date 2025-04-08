@@ -1,4 +1,6 @@
+
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
@@ -13,7 +15,7 @@ import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator } from "lucide-react";
+import { Calculator, BarChart2 } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
@@ -211,6 +213,16 @@ export const PatientForm = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-medical-text">{t.title}</h2>
+        <Link to="/admin">
+          <Button variant="outline" size="sm" className="flex items-center gap-2">
+            <BarChart2 className="h-4 w-4" />
+            <span>Admin Dashboard</span>
+          </Button>
+        </Link>
+      </div>
+      
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
           {showErrors && Object.keys(errors).length > 0 && (
