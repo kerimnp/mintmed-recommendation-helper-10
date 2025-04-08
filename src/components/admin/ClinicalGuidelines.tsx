@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ScrollText, BookOpen, Bookmark, FileText, Search, Download, Tree } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, FileText, Search, Download, GitBranch } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DrugInteractionChecker } from "./DrugInteractionChecker";
 import { DecisionTrees } from "./DecisionTrees";
@@ -89,7 +89,7 @@ export const ClinicalGuidelines = () => {
             Drug Interactions
           </TabsTrigger>
           <TabsTrigger value="decision-trees" className="flex items-center gap-2">
-            <Tree className="h-4 w-4" />
+            <GitBranch className="h-4 w-4" />
             Decision Trees
           </TabsTrigger>
         </TabsList>
