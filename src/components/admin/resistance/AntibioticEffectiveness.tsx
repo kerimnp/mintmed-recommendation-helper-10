@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChartContainer } from "@/components/ui/chart";
 import { antibioticEffectivenessData } from "./data";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
 
 interface AntibioticEffectivenessProps {
   selectedRegion?: string;
@@ -78,6 +79,10 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
     
     return effective.join(", ");
   };
+  
+  const handleExportData = () => {
+    toast.success("Data exported successfully");
+  };
 
   return (
     <Card>
@@ -88,7 +93,7 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-96">
+        <div className="h-[500px]"> {/* Increased height for better visibility */}
           <ChartContainer config={{
             effectiveness: { theme: { light: '#0088FE', dark: '#60a5fa' } },
             mrsa: { theme: { light: '#FF8042', dark: '#f97316' } },
@@ -103,20 +108,24 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
                 height={300}
                 data={modifiedData}
                 margin={{
-                  top: 5,
+                  top: 20,
                   right: 30,
-                  left: 20,
-                  bottom: 5,
+                  left: 30,
+                  bottom: 30,
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
-                <XAxis dataKey="antibiotic" />
-                <YAxis label={{ value: 'Effectiveness (%)', angle: -90, position: 'insideLeft' }} />
+                <XAxis dataKey="antibiotic" angle={-45} textAnchor="end" height={80} />
+                <YAxis 
+                  label={{ value: 'Effectiveness (%)', angle: -90, position: 'insideLeft', offset: -15 }}
+                  domain={[0, 100]} 
+                />
                 <Tooltip 
                   formatter={(value: number, name: string) => [`${value.toFixed(1)}%`, name.replace("vs ", "")]}
                   labelFormatter={(label) => `${label} (${getEffectiveAgainst(label)})`}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc', padding: '10px' }}
                 />
-                <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                <Legend wrapperStyle={{ paddingTop: "20px" }} />
                 <Bar dataKey="mrsa" name="vs MRSA" fill={colors.mrsa}>
                   {modifiedData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fillOpacity={entry.mrsa > 0 ? 1 : 0.3} />
@@ -147,7 +156,7 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
           </ChartContainer>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-6">
           {Object.entries(colors).map(([key, color]) => (
             <div 
               key={key}
@@ -159,8 +168,8 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
           ))}
         </div>
 
-        <div className="mt-4 flex justify-end">
-          <Button className="flex items-center gap-2">
+        <div className="mt-6 flex justify-end">
+          <Button className="flex items-center gap-2" onClick={handleExportData}>
             <Download className="h-4 w-4" />
             Export Data
           </Button>

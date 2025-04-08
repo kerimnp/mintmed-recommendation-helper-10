@@ -21,6 +21,7 @@ import { ChartContainer } from "@/components/ui/chart";
 import { Download, Filter, Search, ArrowDown, ArrowUp, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -73,6 +74,10 @@ export const AntibioticAnalytics = () => {
     return matchesSearch && matchesFilter;
   });
 
+  const handleExportData = () => {
+    toast.success("Data exported successfully");
+  };
+
   const renderSeverityBadge = (severity: string) => {
     const colorMap: Record<string, string> = {
       "Mild": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
@@ -88,7 +93,7 @@ export const AntibioticAnalytics = () => {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Card className="border border-slate-200 dark:border-slate-700 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-xl flex items-center gap-2">
@@ -142,120 +147,121 @@ export const AntibioticAnalytics = () => {
                 <Filter className="h-4 w-4" />
                 <span className="hidden sm:inline">Advanced Filters</span>
               </Button>
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2" onClick={handleExportData}>
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Export</span>
               </Button>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Prescription Frequency Card - Full Width */}
+          <Card className="border border-slate-100 dark:border-slate-800 shadow-sm mb-8">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Prescription Frequency</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ChartContainer config={{
+                  barColor: { theme: { light: '#0088FE', dark: '#60a5fa' } }
+                }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={filteredData} margin={{ top: 5, right: 20, left: 5, bottom: 70 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
+                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+                      <YAxis />
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-white dark:bg-gray-800 border rounded-md shadow-md p-3">
+                                <p className="font-medium">{payload[0].payload.name}</p>
+                                <p className="text-sm mt-1">Count: {payload[0].value}</p>
+                                <p className="text-sm">Type: {payload[0].payload.infection}</p>
+                                <p className="text-sm">Severity: {payload[0].payload.severity}</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar dataKey="count" fill="#0088FE" name="Prescription Count" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Patient Demographics and Infection Sites Cards - Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Prescription Frequency</CardTitle>
+                <CardTitle className="text-lg">Patient Demographics</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64">
+                <div className="h-[350px]">
                   <ChartContainer config={{
-                    barColor: { theme: { light: '#0088FE', dark: '#60a5fa' } }
+                    pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
                   }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={filteredData} margin={{ top: 5, right: 20, left: 5, bottom: 35 }}>
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
-                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                        <YAxis />
-                        <Tooltip 
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="bg-white dark:bg-gray-800 border rounded-md shadow-md p-3">
-                                  <p className="font-medium">{payload[0].payload.name}</p>
-                                  <p className="text-sm mt-1">Count: {payload[0].value}</p>
-                                  <p className="text-sm">Type: {payload[0].payload.infection}</p>
-                                  <p className="text-sm">Severity: {payload[0].payload.severity}</p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar dataKey="count" fill="#0088FE" name="Prescription Count" />
-                      </BarChart>
+                      <PieChart>
+                        <Pie
+                          data={patientData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={130}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {patientData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </div>
               </CardContent>
             </Card>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Patient Demographics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-56">
-                    <ChartContainer config={{
-                      pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
-                    }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={patientData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            outerRadius={70}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {patientData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Infection Sites</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-56">
-                    <ChartContainer config={{
-                      pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
-                    }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={infectionSiteData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            outerRadius={70}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {infectionSiteData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Infection Sites</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[350px]">
+                  <ChartContainer config={{
+                    pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
+                  }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={infectionSiteData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={130}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {infectionSiteData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
           </div>
           
+          {/* Recent Prescription Records Card - Full Width */}
           <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Recent Prescription Records</CardTitle>

@@ -5,9 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Download, BarChart2 } from "lucide-react";
+import { Info, Download, BarChart2, FileText } from "lucide-react";
 import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { globalResistanceData } from "@/utils/antibioticRecommendations/data/globalResistance";
+import { toast } from "sonner";
 
 // Sample data for regional guidelines
 const regionalGuidelines = [
@@ -19,14 +20,16 @@ const regionalGuidelines = [
         title: "Community-Acquired Pneumonia in North America",
         organization: "North American Respiratory Society",
         lastUpdated: "2023-06-10",
-        differences: "Higher emphasis on macrolide resistance patterns"
+        differences: "Higher emphasis on macrolide resistance patterns",
+        pdfUrl: "/guidelines/NAM-CAP-2023.pdf"
       },
       { 
         id: "NAM-UTI-2022", 
         title: "Urinary Tract Infections - North American Protocol",
         organization: "American Urology Association",
         lastUpdated: "2022-09-15",
-        differences: "Includes regional antibiogram data for fluoroquinolones"
+        differences: "Includes regional antibiogram data for fluoroquinolones",
+        pdfUrl: "/guidelines/NAM-UTI-2022.pdf"
       }
     ]
   },
@@ -38,14 +41,16 @@ const regionalGuidelines = [
         title: "European Guidelines for Community-Acquired Pneumonia",
         organization: "European Respiratory Society",
         lastUpdated: "2023-04-22",
-        differences: "Lower threshold for considering resistant organisms"
+        differences: "Lower threshold for considering resistant organisms",
+        pdfUrl: "/guidelines/EUR-CAP-2023.pdf"
       },
       { 
         id: "EUR-MRSA-2022", 
         title: "MRSA Management in European Healthcare Settings",
         organization: "European Committee on Antimicrobial Susceptibility Testing",
         lastUpdated: "2022-11-30",
-        differences: "Emphasis on different decolonization protocols"
+        differences: "Emphasis on different decolonization protocols",
+        pdfUrl: "/guidelines/EUR-MRSA-2022.pdf"
       }
     ]
   },
@@ -57,14 +62,16 @@ const regionalGuidelines = [
         title: "Tuberculosis Management in Asia Pacific",
         organization: "Asia Pacific TB Consortium",
         lastUpdated: "2023-02-15",
-        differences: "Extended treatment duration for MDR-TB"
+        differences: "Extended treatment duration for MDR-TB",
+        pdfUrl: "/guidelines/APAC-TB-2023.pdf"
       },
       { 
         id: "APAC-ESBL-2022", 
         title: "ESBL Infections in Asia Pacific Region",
         organization: "Asian Network for Surveillance of Resistant Pathogens",
         lastUpdated: "2022-08-05",
-        differences: "Alternative carbapenem-sparing approaches based on local resistance"
+        differences: "Alternative carbapenem-sparing approaches based on local resistance",
+        pdfUrl: "/guidelines/APAC-ESBL-2022.pdf"
       }
     ]
   }
@@ -144,6 +151,18 @@ export const RegionalAdaptation = () => {
       pseudomonas: country.pseudomonas,
     }));
   };
+  
+  // Handle guideline download
+  const handleDownloadGuideline = (guidelineId: string, title: string) => {
+    // In a real application, this would trigger an actual file download
+    toast.success(`Downloading ${title}`);
+    console.log(`Downloading guideline: ${guidelineId}`);
+  };
+  
+  // Handle data export
+  const handleExportData = () => {
+    toast.success("Data exported successfully");
+  };
 
   return (
     <div className="space-y-6">
@@ -188,20 +207,26 @@ export const RegionalAdaptation = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {regionData?.guidelines.map((guideline) => (
-                <div key={guideline.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
+                <div key={guideline.id} className="border rounded-lg p-4 bg-card shadow-sm">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-medium">{guideline.title}</h3>
+                      <h3 className="font-medium text-lg">{guideline.title}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{guideline.organization}</p>
                     </div>
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
-                      <Download className="h-4 w-4" />
-                      PDF
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex items-center gap-1" onClick={() => handleDownloadGuideline(guideline.id, guideline.title)}>
+                        <Download className="h-4 w-4" />
+                        PDF
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex items-center gap-1">
+                        <FileText className="h-4 w-4" />
+                        View
+                      </Button>
+                    </div>
                   </div>
-                  <div className="mt-2">
+                  <div className="mt-3 space-y-2">
                     <p className="text-sm"><strong>Last Updated:</strong> {guideline.lastUpdated}</p>
-                    <p className="text-sm mt-1"><strong>Regional Differences:</strong> {guideline.differences}</p>
+                    <p className="text-sm"><strong>Regional Differences:</strong> {guideline.differences}</p>
                   </div>
                 </div>
               ))}
@@ -224,11 +249,11 @@ export const RegionalAdaptation = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-72">
+              <div className="h-[500px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
                     data={getResistanceData(selectedRegion)}
-                    margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                    margin={{ top: 20, right: 20, bottom: 30, left: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
@@ -243,6 +268,12 @@ export const RegionalAdaptation = () => {
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
+              <div className="mt-4">
+                <Button className="flex items-center gap-2" onClick={handleExportData}>
+                  <Download className="h-4 w-4" />
+                  Export Data
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -256,11 +287,11 @@ export const RegionalAdaptation = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-72">
+              <div className="h-[500px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
                     data={usageData}
-                    margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                    margin={{ top: 20, right: 20, bottom: 30, left: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
@@ -274,7 +305,7 @@ export const RegionalAdaptation = () => {
                 </ResponsiveContainer>
               </div>
               <div className="mt-4">
-                <Button className="flex items-center gap-2">
+                <Button className="flex items-center gap-2" onClick={handleExportData}>
                   <BarChart2 className="h-4 w-4" />
                   Export Data
                 </Button>

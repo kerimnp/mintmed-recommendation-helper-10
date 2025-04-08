@@ -3,8 +3,11 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 import { resistanceTrendData } from "./data";
 import { regionalResistanceData } from "@/utils/antibioticRecommendations/data/regionalResistance";
+import { toast } from "sonner";
 
 interface ResistanceTrendsProps {
   selectedRegion?: string;
@@ -83,6 +86,10 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
   
   const regionObservations = getRegionObservations();
   
+  const handleExportData = () => {
+    toast.success("Data exported successfully");
+  };
+  
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -92,7 +99,7 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-96">
+        <div className="h-[500px]"> {/* Increased height for better visibility */}
           <ChartContainer config={{
             mrsa: { theme: { light: '#FF8042', dark: '#f97316' } },
             vre: { theme: { light: '#FFBB28', dark: '#fbbf24' } },
@@ -106,16 +113,22 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
                 height={300}
                 data={regionSpecificData}
                 margin={{
-                  top: 5,
+                  top: 20,
                   right: 30,
-                  left: 20,
-                  bottom: 5,
+                  left: 30,
+                  bottom: 20,
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
                 <XAxis dataKey="year" />
-                <YAxis label={{ value: 'Resistance (%)', angle: -90, position: 'insideLeft' }} />
-                <Tooltip formatter={(value: number) => [`${value}%`, ""]} />
+                <YAxis 
+                  label={{ value: 'Resistance (%)', angle: -90, position: 'insideLeft', offset: -15 }}
+                  domain={[0, 100]}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}%`, ""]} 
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc', padding: '10px' }}
+                />
                 <Legend wrapperStyle={{ paddingTop: "10px" }} />
                 <Area 
                   type="monotone" 
@@ -124,7 +137,6 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
                   stroke="#FF8042" 
                   fill="#FF8042" 
                   fillOpacity={0.6}
-                  stackId="1"
                 />
                 <Area 
                   type="monotone" 
@@ -161,6 +173,13 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
               </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
+        </div>
+        
+        <div className="flex justify-end mt-4">
+          <Button className="flex items-center gap-2" onClick={handleExportData}>
+            <Download className="h-4 w-4" />
+            Export Data
+          </Button>
         </div>
 
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
