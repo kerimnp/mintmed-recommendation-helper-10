@@ -4,12 +4,43 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { resistanceTrendData } from "./data";
+import { regionalResistanceData } from "@/utils/antibioticRecommendations/data/regionalResistance";
 
-export const ResistanceTrends = () => {
+interface ResistanceTrendsProps {
+  selectedRegion?: string;
+}
+
+export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrendsProps) => {
+  // Generate region-specific trend data based on selected region
+  const getRegionSpecificTrendData = () => {
+    // Apply a regional modifier based on selected region
+    const regionModifiers: Record<string, number> = {
+      "Balkan": 1,
+      "Southern Europe": 1.2,
+      "Northern Europe": 0.6,
+      "Eastern Europe": 1.1,
+      "Western Europe": 0.8,
+      "Global": 1
+    };
+    
+    const modifier = regionModifiers[selectedRegion] || 1;
+    
+    return resistanceTrendData.map(item => ({
+      ...item,
+      mrsa: +(item.mrsa * modifier).toFixed(1),
+      vre: +(item.vre * modifier).toFixed(1),
+      esbl: +(item.esbl * modifier).toFixed(1),
+      cre: +(item.cre * modifier).toFixed(1),
+      pseudomonas: +(item.pseudomonas * modifier).toFixed(1)
+    }));
+  };
+  
+  const regionSpecificData = getRegionSpecificTrendData();
+  
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Antimicrobial Resistance Trends (2019-2024)</CardTitle>
+        <CardTitle>Antimicrobial Resistance Trends (2019-2024) - {selectedRegion}</CardTitle>
         <CardDescription>
           Data based on European Antimicrobial Resistance Surveillance Network (EARS-Net)
         </CardDescription>
@@ -27,7 +58,7 @@ export const ResistanceTrends = () => {
               <AreaChart
                 width={500}
                 height={300}
-                data={resistanceTrendData}
+                data={regionSpecificData}
                 margin={{
                   top: 5,
                   right: 30,
@@ -87,7 +118,7 @@ export const ResistanceTrends = () => {
         </div>
 
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">Key Observations</h4>
+          <h4 className="text-sm font-medium mb-2">Key Observations for {selectedRegion}</h4>
           <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
             <li>• All resistant bacteria types show an upward trend over the past 6 years</li>
             <li>• ESBL-producing organisms show the fastest rate of increase (+9.6%)</li>

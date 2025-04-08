@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Download, BarChart2, MapPin } from "lucide-react";
+import { Info, Download, BarChart2 } from "lucide-react";
 import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { globalResistanceData } from "@/utils/antibioticRecommendations/data/globalResistance";
 
@@ -114,33 +114,23 @@ const antibioticUsageData = {
   ]
 };
 
-// Sample coordinates for the regions - properly typed to fix TypeScript errors
-const regionCoordinates: Record<string, [number, number, number]> = {
-  "North America": [190, 160, 1],
-  "Europe": [480, 140, 1],
-  "Asia Pacific": [650, 200, 1],
-  "Africa": [490, 300, 1],
-  "Middle East": [540, 220, 1],
-  "Latin America": [300, 330, 1],
-  "Australia": [740, 380, 1]
-};
-
 export const RegionalAdaptation = () => {
   const [activeTab, setActiveTab] = useState("guidelines");
-  const [selectedRegion, setSelectedRegion] = useState("North America");
+  const [selectedRegion, setSelectedRegion] = useState("Europe");
 
   // Find the selected region data
   const regionData = regionalGuidelines.find(region => region.region === selectedRegion);
   const usageData = antibioticUsageData[selectedRegion as keyof typeof antibioticUsageData] || [];
 
   // All available regions
-  const availableRegions = Object.keys(regionCoordinates);
+  const availableRegions = Object.keys(antibioticUsageData);
 
   // Prepare resistance data for the chart
   const getResistanceData = (region: string) => {
-    const regionData = globalResistanceData.find(r => r.region === region);
+    const regionData = globalResistanceData.find(r => r.region === region) || 
+                      globalResistanceData.find(r => r.region === "Balkan");
     
-    if (!regionData) {
+    if (!regionData || !regionData.countries) {
       return [];
     }
     
@@ -153,57 +143,6 @@ export const RegionalAdaptation = () => {
       cre: country.cre,
       pseudomonas: country.pseudomonas,
     }));
-  };
-
-  const renderRegionalMap = () => {
-    return (
-      <div className="relative h-[400px] w-full bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-md">
-        {/* World map background */}
-        <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/20">
-          <svg
-            viewBox="0 0 800 450"
-            className="h-full w-full"
-            style={{ filter: "drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1))" }}
-          >
-            {/* Simplified world map paths */}
-            <path
-              d="M 100 150 Q 150 100 200 150 T 300 150 T 400 150 T 500 150 T 600 150 T 700 150 Q 750 200 700 250 Q 650 300 600 250 T 500 250 T 400 250 T 300 250 T 200 250 Q 150 200 100 150"
-              fill="#e6e6e6"
-              stroke="#cccccc"
-              strokeWidth="1"
-            />
-            
-            {/* Region markers */}
-            {availableRegions.map(region => {
-              const [x, y, scale] = regionCoordinates[region];
-              const isSelected = region === selectedRegion;
-              
-              return (
-                <g key={region} transform={`translate(${x}, ${y}) scale(${scale})`} className="cursor-pointer">
-                  <circle
-                    cx="0"
-                    cy="0"
-                    r={isSelected ? 12 : 8}
-                    fill={isSelected ? "rgb(37, 99, 235)" : "rgb(107, 114, 128)"}
-                    onClick={() => setSelectedRegion(region)}
-                  />
-                  <text
-                    x="15"
-                    y="5"
-                    fontSize="12"
-                    fontWeight={isSelected ? "bold" : "normal"}
-                    fill={isSelected ? "rgb(37, 99, 235)" : "rgb(107, 114, 128)"}
-                    onClick={() => setSelectedRegion(region)}
-                  >
-                    {region}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -231,8 +170,6 @@ export const RegionalAdaptation = () => {
           </SelectContent>
         </Select>
       </div>
-      
-      {renderRegionalMap()}
       
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-3">
@@ -268,6 +205,12 @@ export const RegionalAdaptation = () => {
                   </div>
                 </div>
               ))}
+
+              {(!regionData || regionData.guidelines.length === 0) && (
+                <div className="py-8 text-center text-muted-foreground">
+                  No guidelines available for this region.
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -275,10 +218,7 @@ export const RegionalAdaptation = () => {
         <TabsContent value="resistance" className="pt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-medical-primary" />
-                Regional Resistance Patterns - {selectedRegion}
-              </CardTitle>
+              <CardTitle>Regional Resistance Patterns - {selectedRegion}</CardTitle>
               <CardDescription>
                 Common antibiotics and their effectiveness in this region
               </CardDescription>

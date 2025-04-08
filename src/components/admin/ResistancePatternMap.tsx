@@ -53,7 +53,7 @@ export const ResistancePatternMap = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-96">
-              <ResistanceTrends />
+              <ResistanceTrends selectedRegion={selectedRegion} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -67,7 +67,10 @@ export const ResistancePatternMap = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-96">
-              <AntibioticEffectiveness />
+              <AntibioticEffectiveness 
+                selectedRegion={selectedRegion}
+                selectedResistance={selectedResistance}
+              />
             </CardContent>
           </Card>
         </TabsContent>
