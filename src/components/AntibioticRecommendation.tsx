@@ -26,18 +26,29 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
   };
 
   const getAvailableDrugs = (antibioticName: string) => {
-    return availableDrugs[antibioticName] || [];
+    // Extract just the antibiotic name without any additions
+    const simplifiedName = antibioticName
+      .split('+')[0]  // Take only the first antibiotic if it's a combination
+      .split(' ')[0]  // Take just the drug name without dose or other info
+      .trim();
+    
+    return availableDrugs[simplifiedName] || [];
   };
 
   const handleAlternativeSelect = (index: number) => {
     setActiveAntibioticIndex(index);
     setActiveTab("alternative");
+    // Reset selected product when switching antibiotics
+    setSelectedProduct(undefined);
   };
 
   // Determine which antibiotic data to show based on the active tab
   const currentAntibiotic = activeTab === "primary" 
     ? recommendation.primaryRecommendation
     : recommendation.alternatives[activeAntibioticIndex] || recommendation.primaryRecommendation;
+
+  // Extract just the main antibiotic name for product lookup
+  const currentAntibioticName = currentAntibiotic.name?.split('+')[0]?.trim() || "";
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -90,8 +101,8 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
             </Card>
 
             <AvailableDrugs 
-              drugName={recommendation.primaryRecommendation.name}
-              products={getAvailableDrugs(recommendation.primaryRecommendation.name)}
+              drugName={currentAntibioticName}
+              products={getAvailableDrugs(currentAntibioticName)}
               onProductSelect={handleProductSelect}
               selectedProduct={activeTab === "primary" ? selectedProduct : undefined}
             />
@@ -140,7 +151,7 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               </Card>
 
               <AvailableDrugs 
-                drugName={recommendation.alternatives[activeAntibioticIndex].name}
+                drugName={recommendation.alternatives[activeAntibioticIndex].name.split('+')[0].trim()}
                 products={getAvailableDrugs(recommendation.alternatives[activeAntibioticIndex].name)}
                 onProductSelect={handleProductSelect}
                 selectedProduct={activeTab === "alternative" ? selectedProduct : undefined}

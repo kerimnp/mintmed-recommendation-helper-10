@@ -1,4 +1,3 @@
-
 import { PatientData } from "./types/patientTypes";
 import { calculateBMI, getBMICategory } from "./antibioticRecommendations/bmiCalculations";
 import { calculateGFR } from "./antibioticRecommendations/renalAdjustments/gfrCalculation";
@@ -56,6 +55,14 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
       recommendation = generateSkinRecommendation(data, gfr, isPediatric);
       break;
 
+    case "abdominal":
+      recommendation = generateAbdominalRecommendation(data, gfr, isPediatric);
+      break;
+
+    case "cns":
+      recommendation = generateCNSRecommendation(data, gfr, isPediatric);
+      break;
+
     case "ear":
       recommendation = generateEarRecommendation(data, gfr, isPediatric);
       break;
@@ -64,8 +71,16 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
       recommendation = generateEyeRecommendation(data, gfr, isPediatric);
       break;
 
-    case "sepsis":
-      recommendation = generateSepsisRecommendation(data, gfr, isPediatric);
+    case "bloodstream":
+      recommendation = generateBloodstreamRecommendation(data, gfr, isPediatric);
+      break;
+
+    case "bone":
+      recommendation = generateBoneRecommendation(data, gfr, isPediatric);
+      break;
+
+    case "dental":
+      recommendation = generateDentalRecommendation(data, gfr, isPediatric);
       break;
 
     case "wound":
@@ -123,7 +138,22 @@ const generateRespiratoryRecommendation = (data: PatientData, gfr: number, isPed
   const hasMRSA = data.resistances.mrsa;
   const hasPseudomonas = data.resistances.pseudomonas;
 
-  let recommendation: EnhancedAntibioticRecommendation;
+  let recommendation: EnhancedAntibioticRecommendation = {
+    primaryRecommendation: {
+      name: "",
+      dose: "",
+      route: "",
+      duration: ""
+    },
+    reasoning: "",
+    alternatives: [],
+    precautions: [],
+    rationale: {
+      infectionType: "respiratory",
+      severity: data.severity,
+      reasons: []
+    }
+  };
 
   // Mild community-acquired respiratory infection
   if (data.severity === "mild" && !isHospitalAcquired) {
@@ -384,31 +414,39 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
   const hasFluoroquinoloneAllergy = data.allergies.fluoroquinolone;
   const hasSulfaAllergy = data.allergies.sulfa;
   
-  let recommendation: EnhancedAntibioticRecommendation;
+  let recommendation: EnhancedAntibioticRecommendation = {
+    primaryRecommendation: {
+      name: "",
+      dose: "",
+      route: "",
+      duration: ""
+    },
+    reasoning: "",
+    alternatives: [],
+    precautions: [],
+    rationale: {
+      infectionType: "urinary",
+      severity: data.severity,
+      reasons: []
+    }
+  };
   
   // Simple uncomplicated UTI
   if (data.severity === "mild" && !isComplicated) {
     if (!hasSulfaAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Nitrofurantoin",
-          dose: isPediatric ? "5-7mg/kg/day divided q6h" : "100mg BID",
-          route: "PO",
-          duration: "5 days"
-        },
-        reasoning: "First-line therapy for uncomplicated UTI with low resistance rates",
-        alternatives: [],
-        precautions: ["Take with food to improve tolerability", "Not effective for pyelonephritis"],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "First-line for uncomplicated UTI per guidelines",
-            "Low resistance rates for E. coli",
-            "Achieves high concentrations in urine"
-          ]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Nitrofurantoin",
+        dose: isPediatric ? "5-7mg/kg/day divided q6h" : "100mg BID",
+        route: "PO",
+        duration: "5 days"
       };
+      recommendation.reasoning = "First-line therapy for uncomplicated UTI with low resistance rates";
+      recommendation.precautions = ["Take with food to improve tolerability", "Not effective for pyelonephritis"];
+      recommendation.rationale.reasons = [
+        "First-line for uncomplicated UTI per guidelines",
+        "Low resistance rates for E. coli",
+        "Achieves high concentrations in urine"
+      ];
       
       if (!hasFluoroquinoloneAllergy) {
         recommendation.alternatives.push({
@@ -420,156 +458,112 @@ const generateUrinaryRecommendation = (data: PatientData, gfr: number, isPediatr
         });
       }
     } else if (!hasFluoroquinoloneAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Ciprofloxacin",
-          dose: isPediatric ? "20-30mg/kg/day divided q12h" : "250mg BID",
-          route: "PO",
-          duration: "3 days"
-        },
-        reasoning: "Alternative therapy for uncomplicated UTI in patients with sulfa allergies",
-        alternatives: [],
-        precautions: ["Not for routine first-line use due to resistance concerns"],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Alternative for patients with sulfa allergies",
-            "Effective against common uropathogens"
-          ],
-          allergyConsiderations: ["Selected due to sulfa allergy"]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Ciprofloxacin",
+        dose: isPediatric ? "20-30mg/kg/day divided q12h" : "250mg BID",
+        route: "PO",
+        duration: "3 days"
       };
+      recommendation.reasoning = "Alternative therapy for uncomplicated UTI in patients with sulfa allergies";
+      recommendation.precautions = ["Not for routine first-line use due to resistance concerns"];
+      recommendation.rationale.reasons = [
+        "Alternative for patients with sulfa allergies",
+        "Effective against common uropathogens"
+      ];
+      recommendation.rationale.allergyConsiderations = ["Selected due to sulfa allergy"];
     } else if (!hasCephalosporinAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Cefuroxime",
-          dose: isPediatric ? "20-30mg/kg/day divided q12h" : "250mg BID",
-          route: "PO",
-          duration: "5 days"
-        },
-        reasoning: "Alternative for uncomplicated UTI with multiple allergies",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Selected for patients with multiple allergies",
-            "Adequate coverage for common uropathogens"
-          ]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Cefuroxime",
+        dose: isPediatric ? "20-30mg/kg/day divided q12h" : "250mg BID",
+        route: "PO",
+        duration: "5 days"
       };
+      recommendation.reasoning = "Alternative for uncomplicated UTI with multiple allergies";
+      recommendation.rationale.reasons = [
+        "Selected for patients with multiple allergies",
+        "Adequate coverage for common uropathogens"
+      ];
     }
   } 
   // Complicated UTI or pyelonephritis
   else if (data.severity === "moderate" || isComplicated) {
     if (!hasCephalosporinAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Ceftriaxone",
-          dose: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
-          route: "IV",
-          duration: "10-14 days"
-        },
-        reasoning: "Parenteral therapy for complicated UTI or pyelonephritis",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Broad-spectrum coverage for complicated UTI",
-            "Appropriate for potential resistant pathogens"
-          ]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Ceftriaxone",
+        dose: isPediatric ? "50-75mg/kg/day" : "1g daily",
+        route: "IV",
+        duration: "10-14 days"
       };
+      recommendation.reasoning = "Parenteral therapy for complicated UTI or pyelonephritis";
+      recommendation.rationale.reasons = [
+        "Broad-spectrum coverage for complicated UTI",
+        "Appropriate for potential resistant pathogens"
+      ];
+      
+      // Add alternatives
+      recommendation.alternatives.push({
+        name: "Levofloxacin",
+        dose: isPediatric ? "Not recommended in children" : "750mg daily",
+        route: "IV/PO",
+        duration: "7 days",
+        reason: "Alternative with excellent tissue penetration"
+      });
     } else if (!hasPenicillinAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Ampicillin-Sulbactam",
-          dose: isPediatric ? "100-200mg/kg/day divided q6h" : "3g q6h",
-          route: "IV",
-          duration: "10-14 days"
-        },
-        reasoning: "Alternative for complicated UTI in cephalosporin-allergic patients",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Alternative for cephalosporin-allergic patients",
-            "Provides coverage against common uropathogens"
-          ],
-          allergyConsiderations: ["Avoids cephalosporins due to allergy"]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Ampicillin-Sulbactam",
+        dose: isPediatric ? "100-200mg/kg/day divided q6h" : "3g q6h",
+        route: "IV",
+        duration: "10-14 days"
       };
+      recommendation.reasoning = "Alternative for complicated UTI in cephalosporin-allergic patients";
+      recommendation.rationale.reasons = [
+        "Alternative for cephalosporin-allergic patients",
+        "Provides coverage against common uropathogens"
+      ];
+      recommendation.rationale.allergyConsiderations = ["Avoids cephalosporins due to allergy"];
     } else if (!hasFluoroquinoloneAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Ciprofloxacin",
-          dose: isPediatric ? "20-30mg/kg/day divided q12h" : "400mg q12h",
-          route: "IV",
-          duration: "10-14 days"
-        },
-        reasoning: "Alternative for beta-lactam allergic patients",
-        alternatives: [],
-        precautions: ["Use with caution - risk of tendinopathy"],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Selected for beta-lactam allergies",
-            "Good tissue penetration for pyelonephritis"
-          ],
-          allergyConsiderations: ["Avoids beta-lactams due to allergies"]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Ciprofloxacin",
+        dose: isPediatric ? "20-30mg/kg/day divided q12h" : "400mg q12h",
+        route: "IV",
+        duration: "10-14 days"
       };
+      recommendation.reasoning = "Alternative for beta-lactam allergic patients";
+      recommendation.precautions = ["Use with caution - risk of tendinopathy"];
+      recommendation.rationale.reasons = [
+        "Selected for beta-lactam allergies",
+        "Good tissue penetration for pyelonephritis"
+      ];
+      recommendation.rationale.allergyConsiderations = ["Avoids beta-lactams due to allergies"];
     }
   }
   // Severe/septic UTI
   else if (data.severity === "severe") {
     if (data.resistances.esbl) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Meropenem",
-          dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
-          route: "IV",
-          duration: "14 days"
-        },
-        reasoning: "Carbapenem therapy for severe UTI with ESBL risk",
-        alternatives: [],
-        precautions: ["Reserve for confirmed or high-risk ESBL cases"],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Selected for ESBL-producing organisms",
-            "Appropriate for severe/septic presentation"
-          ]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Meropenem",
+        dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
+        route: "IV",
+        duration: "14 days"
       };
+      recommendation.reasoning = "Carbapenem therapy for severe UTI with ESBL risk";
+      recommendation.precautions = ["Reserve for confirmed or high-risk ESBL cases"];
+      recommendation.rationale.reasons = [
+        "Selected for ESBL-producing organisms",
+        "Appropriate for severe/septic presentation"
+      ];
     } else {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Piperacillin-Tazobactam",
-          dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
-          route: "IV",
-          duration: "14 days"
-        },
-        reasoning: "Broad-spectrum coverage for severe UTI",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "urinary",
-          severity: data.severity,
-          reasons: [
-            "Broad-spectrum coverage for severe infection",
-            "Appropriate for possible resistant organisms"
-          ]
-        }
+      recommendation.primaryRecommendation = {
+        name: "Piperacillin-Tazobactam",
+        dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+        route: "IV",
+        duration: "14 days"
       };
+      recommendation.reasoning = "Broad-spectrum coverage for severe UTI";
+      recommendation.rationale.reasons = [
+        "Broad-spectrum coverage for severe infection",
+        "Appropriate for possible resistant organisms"
+      ];
     }
   }
 
@@ -595,7 +589,22 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
   const isDiabetic = data.diabetes;
   const isImmunosuppressed = data.immunosuppressed;
   
-  let recommendation: EnhancedAntibioticRecommendation;
+  let recommendation: EnhancedAntibioticRecommendation = {
+    primaryRecommendation: {
+      name: "",
+      dose: "",
+      route: "",
+      duration: ""
+    },
+    reasoning: "",
+    alternatives: [],
+    precautions: [],
+    rationale: {
+      infectionType: "skin",
+      severity: data.severity,
+      reasons: []
+    }
+  };
   
   // Uncomplicated skin infection
   if (data.severity === "mild" && !hasMRSA && !isDiabetic && !isImmunosuppressed) {
@@ -785,234 +794,62 @@ const generateSkinRecommendation = (data: PatientData, gfr: number, isPediatric:
   return recommendation;
 };
 
-// Helper functions for other infection types (simplified here, but you can expand them)
-const generateEarRecommendation = (data: PatientData, gfr: number, isPediatric: boolean): EnhancedAntibioticRecommendation => {
-  const hasPenicillinAllergy = data.allergies.penicillin;
-  
-  if (data.severity === "mild") {
-    return {
-      primaryRecommendation: {
-        name: hasPenicillinAllergy ? "Azithromycin" : "Amoxicillin",
-        dose: hasPenicillinAllergy ? 
-          (isPediatric ? "10mg/kg day 1, then 5mg/kg days 2-5" : "500mg day 1, then 250mg days 2-5") : 
-          (isPediatric ? "80-90mg/kg/day divided BID" : "500mg TID"),
-        route: "PO",
-        duration: hasPenicillinAllergy ? "5 days" : "7-10 days"
-      },
-      reasoning: `First-line treatment for ${hasPenicillinAllergy ? "penicillin-allergic patients with" : ""} mild otitis media`,
-      alternatives: [],
-      precautions: [],
-      rationale: {
-        infectionType: "ear",
-        severity: data.severity,
-        reasons: [
-          hasPenicillinAllergy ? "Selected for penicillin allergy" : "First-line therapy for otitis media",
-          "Effective against common ear pathogens"
-        ]
-      }
-    };
-  } else {
-    return {
-      primaryRecommendation: {
-        name: hasPenicillinAllergy ? "Levofloxacin" : "Amoxicillin-Clavulanate",
-        dose: hasPenicillinAllergy ? 
-          "500mg daily" : 
-          (isPediatric ? "90mg/kg/day amoxicillin component divided BID" : "875mg-125mg BID"),
-        route: "PO",
-        duration: "10 days"
-      },
-      reasoning: `Treatment for ${data.severity} ear infection`,
-      alternatives: [],
-      precautions: [],
-      rationale: {
-        infectionType: "ear",
-        severity: data.severity,
-        reasons: [
-          hasPenicillinAllergy ? "Selected for penicillin allergy" : "Covers beta-lactamase-producing organisms",
-          "Appropriate for more severe ear infections"
-        ]
-      }
-    };
-  }
-};
-
-const generateEyeRecommendation = (data: PatientData, gfr: number, isPediatric: boolean): EnhancedAntibioticRecommendation => {
-  if (data.allergies.fluoroquinolone) {
-    return {
-      primaryRecommendation: {
-        name: "Erythromycin",
-        dose: "1 drop",
-        route: "topical",
-        duration: "7 days"
-      },
-      reasoning: "Treatment for conjunctivitis in fluoroquinolone-allergic patients",
-      alternatives: [],
-      precautions: ["Urgent ophthalmology consultation recommended for severe cases"],
-      rationale: {
-        infectionType: "eye",
-        severity: data.severity,
-        reasons: [
-          "Selected due to fluoroquinolone allergy",
-          "Effective for bacterial conjunctivitis"
-        ]
-      }
-    };
-  } else {
-    return {
-      primaryRecommendation: {
-        name: data.severity === "mild" ? "Ciprofloxacin" : "Moxifloxacin",
-        dose: "1 drop q2-4h while awake",
-        route: "topical",
-        duration: "7-10 days"
-      },
-      reasoning: `Treatment for ${data.severity} eye infection`,
-      alternatives: [],
-      precautions: ["Urgent ophthalmology consultation recommended for severe cases"],
-      rationale: {
-        infectionType: "eye",
-        severity: data.severity,
-        reasons: [
-          "Broad-spectrum coverage for ocular pathogens",
-          "Achieves high concentration in eye tissues"
-        ]
-      }
-    };
-  }
-};
-
-const generateSepsisRecommendation = (data: PatientData, gfr: number, isPediatric: boolean): EnhancedAntibioticRecommendation => {
-  const hasCephalosporinAllergy = data.allergies.cephalosporin;
-  
-  if (!hasCephalosporinAllergy) {
-    return {
-      primaryRecommendation: {
-        name: "Cefepime + Vancomycin",
-        dose: isPediatric ? 
-          "50mg/kg q8h + 15mg/kg q6h" : 
-          "2g q8h + 15-20mg/kg q8-12h",
-        route: "IV",
-        duration: "7-14 days"
-      },
-      reasoning: "Broad spectrum coverage for sepsis including MRSA",
-      alternatives: [],
-      precautions: [
-        "Immediate infectious disease consultation recommended",
-        "Monitor blood pressure and organ function",
-        "Adjust duration based on clinical response",
-        "Consider source control if applicable"
-      ],
-      rationale: {
-        infectionType: "sepsis",
-        severity: "severe",
-        reasons: [
-          "Combination therapy for sepsis",
-          "Covers gram-negative, gram-positive, and resistant organisms"
-        ]
-      }
-    };
-  } else {
-    return {
-      primaryRecommendation: {
-        name: "Meropenem + Vancomycin",
-        dose: isPediatric ?
-          "20mg/kg q8h + 15mg/kg q6h" :
-          "1g q8h + 15-20mg/kg q8-12h",
-        route: "IV",
-        duration: "7-14 days"
-      },
-      reasoning: "Alternative coverage for patients with cephalosporin allergy",
-      alternatives: [],
-      precautions: [
-        "Immediate infectious disease consultation recommended",
-        "Monitor blood pressure and organ function",
-        "Adjust duration based on clinical response",
-        "Consider source control if applicable"
-      ],
-      rationale: {
-        infectionType: "sepsis",
-        severity: "severe",
-        reasons: [
-          "Selected for cephalosporin allergy",
-          "Broad coverage for sepsis"
-        ],
-        allergyConsiderations: ["Avoids cephalosporins due to allergy"]
-      }
-    };
-  }
-};
-
-const generateWoundRecommendation = (data: PatientData, gfr: number, isPediatric: boolean): EnhancedAntibioticRecommendation => {
+const generateAbdominalRecommendation = (data: PatientData, gfr: number, isPediatric: boolean): EnhancedAntibioticRecommendation => {
   const hasPenicillinAllergy = data.allergies.penicillin;
   const hasCephalosporinAllergy = data.allergies.cephalosporin;
+  const hasFluoroquinoloneAllergy = data.allergies.fluoroquinolone;
+  const hasRenalImpairment = data.kidneyDisease || gfr < 60;
+  const isImmunosuppressed = data.immunosuppressed;
+  const isHospitalAcquired = data.isHospitalAcquired;
   
-  if (data.severity === "mild" && !hasPenicillinAllergy) {
-    return {
-      primaryRecommendation: {
-        name: "Amoxicillin-Clavulanate",
-        dose: isPediatric ? "25-45mg/kg/day divided q12h" : "875/125mg q12h",
-        route: "PO",
-        duration: "7-10 days"
-      },
-      reasoning: "First-line coverage for mild wound infections",
-      alternatives: [],
-      precautions: [],
-      rationale: {
-        infectionType: "wound",
-        severity: data.severity,
-        reasons: [
-          "Covers most wound pathogens including anaerobes",
-          "Appropriate for mild tissue infections"
-        ]
-      }
-    };
-  } else if (data.severity === "mild" && hasPenicillinAllergy && !hasCephalosporinAllergy) {
-    return {
-      primaryRecommendation: {
-        name: "Cephalexin",
-        dose: isPediatric ? "25-50mg/kg/day divided q6h" : "500mg QID",
-        route: "PO",
-        duration: "7-10 days"
-      },
-      reasoning: "Alternative for penicillin-allergic patients with mild wound infections",
-      alternatives: [],
-      precautions: [],
-      rationale: {
-        infectionType: "wound",
-        severity: data.severity,
-        reasons: [
-          "Selected due to penicillin allergy",
-          "Effective against common wound pathogens"
-        ],
-        allergyConsiderations: ["Avoids penicillins due to allergy"]
-      }
-    };
-  } else {
-    // For moderate to severe cases or multiple allergies
-    return {
-      primaryRecommendation: {
-        name: "Piperacillin-Tazobactam",
-        dose: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
-        route: "IV",
-        duration: "10-14 days"
-      },
-      reasoning: "Broad spectrum coverage for moderate to severe wound infections",
-      alternatives: [],
-      precautions: [],
-      rationale: {
-        infectionType: "wound",
-        severity: data.severity,
-        reasons: [
-          "Broad-spectrum coverage including anaerobes",
-          "Appropriate for serious wound infections"
-        ]
-      }
-    };
-  }
-};
+  let recommendation: EnhancedAntibioticRecommendation = {
+    primaryRecommendation: {
+      name: "",
+      dose: "",
+      route: "",
+      duration: ""
+    },
+    reasoning: "",
+    alternatives: [],
+    precautions: [],
+    rationale: {
+      infectionType: "abdominal",
+      severity: data.severity,
+      reasons: []
+    }
+  };
 
-// Helper function to determine if doxycycline is contraindicated
-const hasDoxycyclineContraindication = (data: PatientData): boolean => {
-  const age = Number(data.age);
-  // Contraindicated in children less than 8 years old and pregnant patients
-  return (age < 8) || data.pregnancy === "pregnant";
-};
+  if (data.severity === "mild" && !isHospitalAcquired) {
+    if (!hasFluoroquinoloneAllergy) {
+      recommendation.primaryRecommendation = {
+        name: "Ciprofloxacin + Metronidazole",
+        dose: isPediatric 
+          ? "20-30mg/kg/day divided q12h + 30mg/kg/day divided q8h" 
+          : "500mg q12h + 500mg q8h",
+        route: "PO",
+        duration: "7-10 days"
+      };
+      recommendation.reasoning = "Coverage for aerobic and anaerobic organisms in mild intra-abdominal infections";
+      recommendation.rationale.reasons = [
+        "Provides both aerobic and anaerobic coverage",
+        "Appropriate for mild, community-acquired infections"
+      ];
+      
+      // Add alternative
+      if (!hasCephalosporinAllergy) {
+        recommendation.alternatives.push({
+          name: "Cefuroxime + Metronidazole",
+          dose: isPediatric
+            ? "30-50mg/kg/day divided q12h + 30mg/kg/day divided q8h"
+            : "500mg q12h + 500mg q8h",
+          route: "PO",
+          duration: "7-10 days",
+          reason: "Alternative with cephalosporin instead of fluoroquinolone"
+        });
+      }
+    } else if (!hasCephalosporinAllergy) {
+      recommendation.primaryRecommendation = {
+        name: "Cefuroxime + Metronidazole",
+        dose: isPediatric
+          ? "30-50mg/kg/day divided q12h + 30mg/kg/day divided q8h"
+          : "500mg q12h + 500mg q

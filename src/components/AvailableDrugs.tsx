@@ -43,8 +43,11 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
       border border-gray-200 dark:border-gray-800">
       <div className="space-y-6">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Available {drugName} Products
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center justify-between">
+            <span>Available {drugName} Products</span>
+            <span className="text-sm font-normal text-gray-500">
+              {products.length} products found
+            </span>
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Select a product to view detailed information
@@ -55,23 +58,33 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
           {displayProducts.map((product, index) => (
             <Card 
               key={index} 
-              className={`p-3 border transition-all duration-300 cursor-pointer ${
+              className={`p-3 border transition-all duration-300 cursor-pointer hover:shadow-lg ${
                 (selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name)
                   ? 'border-medical-primary bg-medical-primary/10 ring-4 ring-medical-primary shadow-xl transform scale-[1.02]' 
-                  : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-lg hover:scale-[1.01]'
+                  : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:scale-[1.01]'
               }`}
               onClick={() => handleProductSelect(product)}
             >
-              <h4 className="font-semibold text-gray-900 dark:text-white">{product.name}</h4>
-              <p className="text-sm text-gray-600 mb-2">{product.manufacturer}</p>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">{product.name}</h4>
+                  <p className="text-sm text-gray-600 mb-2">{product.manufacturer}</p>
+                </div>
+                {(selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name) && (
+                  <Check className="h-5 w-5 text-medical-primary" />
+                )}
+              </div>
               <div className="space-y-2">
-                {product.forms.map((form, formIndex) => (
+                {product.forms.slice(0, 2).map((form, formIndex) => (
                   <div key={formIndex} className="text-sm pl-4 border-l-2 border-medical-primary/30">
                     <p className="font-medium">{form.type}</p>
                     <p className="text-gray-600">{form.strength}</p>
                     <p className="text-gray-500 text-xs">{form.packaging}</p>
                   </div>
                 ))}
+                {product.forms.length > 2 && (
+                  <p className="text-xs text-medical-primary">+{product.forms.length - 2} more forms</p>
+                )}
               </div>
             </Card>
           ))}
@@ -117,8 +130,8 @@ export const AvailableDrugs: React.FC<AvailableDrugsProps> = ({
                     key={index} 
                     className={`p-3 border transition-all duration-300 cursor-pointer ${
                       (selectedProduct?.name === product.name || externalSelectedProduct?.name === product.name)
-                        ? 'border-medical-primary bg-medical-primary/10 ring-4 ring-medical-primary shadow-xl' 
-                        : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-lg'
+                        ? 'border-medical-primary bg-medical-primary/10 ring-2 ring-medical-primary shadow-lg' 
+                        : 'border-medical-accent/20 bg-white hover:border-medical-primary/40 hover:shadow-md'
                     }`}
                     onClick={() => handleProductSelect(product)}
                   >

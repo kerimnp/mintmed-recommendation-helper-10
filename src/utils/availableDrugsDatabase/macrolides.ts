@@ -1,185 +1,250 @@
 
-import { DrugProduct } from "./types";
+import { DrugCategory } from './types';
 
-const azithromycin: DrugProduct[] = [
-  {
-    name: "Zithromax",
-    manufacturer: "Pfizer",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "250 mg",
-        packaging: "6-tablet pack"
-      },
-      {
-        type: "Tablet",
-        strength: "500 mg",
-        packaging: "3-tablet pack"
-      },
-      {
-        type: "Oral suspension",
-        strength: "200 mg/5 mL",
-        packaging: "15 mL, 22.5 mL, 30 mL bottles"
-      },
-      {
-        type: "IV injection",
-        strength: "500 mg",
-        packaging: "Single-dose vial"
-      }
-    ]
-  },
-  {
-    name: "Azithromycin (generic)",
-    manufacturer: "Various",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "250 mg",
-        packaging: "6-tablet pack, 30-tablet pack"
-      },
-      {
-        type: "Tablet",
-        strength: "500 mg",
-        packaging: "3-tablet pack, 30-tablet pack"
-      },
-      {
-        type: "Oral suspension",
-        strength: "200 mg/5 mL",
-        packaging: "15 mL, 22.5 mL, 30 mL bottles"
-      }
-    ]
-  }
-];
-
-const clarithromycin: DrugProduct[] = [
-  {
-    name: "Biaxin",
-    manufacturer: "AbbVie",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "250 mg",
-        packaging: "14-tablet pack, 20-tablet pack"
-      },
-      {
-        type: "Tablet",
-        strength: "500 mg",
-        packaging: "14-tablet pack, 20-tablet pack"
-      },
-      {
-        type: "XL Tablet (Extended Release)",
-        strength: "500 mg",
-        packaging: "14-tablet pack, 20-tablet pack"
-      },
-      {
-        type: "Oral suspension",
-        strength: "125 mg/5 mL",
-        packaging: "50 mL, 100 mL bottles"
-      },
-      {
-        type: "Oral suspension",
-        strength: "250 mg/5 mL",
-        packaging: "50 mL, 100 mL bottles"
-      }
-    ]
-  },
-  {
-    name: "Clarithromycin (generic)",
-    manufacturer: "Various",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "250 mg",
-        packaging: "14-tablet pack, 28-tablet pack"
-      },
-      {
-        type: "Tablet",
-        strength: "500 mg",
-        packaging: "14-tablet pack, 28-tablet pack"
-      },
-      {
-        type: "XL Tablet (Extended Release)",
-        strength: "500 mg",
-        packaging: "7-tablet pack, 14-tablet pack"
-      }
-    ]
-  }
-];
-
-const erythromycin: DrugProduct[] = [
-  {
-    name: "E.E.S.",
-    manufacturer: "Arbor Pharmaceuticals",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "400 mg",
-        packaging: "40-tablet pack, 100-tablet pack"
-      },
-      {
-        type: "Oral suspension",
-        strength: "200 mg/5 mL",
-        packaging: "100 mL, 200 mL bottles"
-      },
-      {
-        type: "Oral suspension",
-        strength: "400 mg/5 mL",
-        packaging: "100 mL, 200 mL bottles"
-      }
-    ]
-  },
-  {
-    name: "Eryc",
-    manufacturer: "Various",
-    forms: [
-      {
-        type: "Capsule (Delayed Release)",
-        strength: "250 mg",
-        packaging: "30-capsule pack, 100-capsule pack"
-      }
-    ]
-  },
-  {
-    name: "Erythrocin",
-    manufacturer: "Various",
-    forms: [
-      {
-        type: "IV Injection",
-        strength: "500 mg",
-        packaging: "Single-dose vial"
-      },
-      {
-        type: "IV Injection",
-        strength: "1 g",
-        packaging: "Single-dose vial"
-      }
-    ]
-  },
-  {
-    name: "Erythromycin (generic)",
-    manufacturer: "Various",
-    forms: [
-      {
-        type: "Tablet",
-        strength: "250 mg",
-        packaging: "30-tablet pack, 100-tablet pack"
-      },
-      {
-        type: "Tablet",
-        strength: "500 mg",
-        packaging: "30-tablet pack, 100-tablet pack"
-      },
-      {
-        type: "Capsule (Delayed Release)",
-        strength: "250 mg",
-        packaging: "30-capsule pack, 100-capsule pack"
-      }
-    ]
-  }
-];
-
-export const macrolides = {
-  "Azithromycin": azithromycin,
-  "Clarithromycin": clarithromycin,
-  "Erythromycin": erythromycin
+export const macrolides: DrugCategory = {
+  "Azithromycin": [
+    {
+      name: "Zithromax",
+      manufacturer: "Pfizer",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "6 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "3 tablets"
+        },
+        {
+          type: "Oral suspension",
+          strength: "200mg/5mL",
+          packaging: "15mL, 22.5mL, 30mL bottle"
+        },
+        {
+          type: "Powder for injection",
+          strength: "500mg",
+          packaging: "10mL vial"
+        }
+      ]
+    },
+    {
+      name: "Azithromycin",
+      manufacturer: "Teva",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "6 tablets, 30 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "3 tablets, 30 tablets"
+        },
+        {
+          type: "Oral suspension",
+          strength: "200mg/5mL",
+          packaging: "15mL, 30mL bottle"
+        }
+      ]
+    },
+    {
+      name: "AzaSite",
+      manufacturer: "Akorn",
+      forms: [
+        {
+          type: "Ophthalmic solution",
+          strength: "1%",
+          packaging: "2.5mL bottle"
+        }
+      ]
+    },
+    {
+      name: "Azithromycin",
+      manufacturer: "Sandoz",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "6 tablets, 30 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "3 tablets, 30 tablets"
+        }
+      ]
+    },
+    {
+      name: "Azithromycin",
+      manufacturer: "Aurobindo",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "6 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "3 tablets"
+        }
+      ]
+    }
+  ],
+  "Erythromycin": [
+    {
+      name: "Erythrocin",
+      manufacturer: "Arbor",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "100 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "100 tablets"
+        }
+      ]
+    },
+    {
+      name: "Ery-Tab",
+      manufacturer: "Arbor",
+      forms: [
+        {
+          type: "Delayed-release tablet",
+          strength: "250mg",
+          packaging: "100 tablets"
+        },
+        {
+          type: "Delayed-release tablet",
+          strength: "333mg",
+          packaging: "100 tablets"
+        },
+        {
+          type: "Delayed-release tablet",
+          strength: "500mg",
+          packaging: "100 tablets"
+        }
+      ]
+    },
+    {
+      name: "Erythromycin",
+      manufacturer: "Teva",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "100 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "100 tablets"
+        }
+      ]
+    },
+    {
+      name: "Erythromycin Base",
+      manufacturer: "Sandoz",
+      forms: [
+        {
+          type: "Delayed-release tablet",
+          strength: "250mg",
+          packaging: "100 tablets"
+        },
+        {
+          type: "Delayed-release tablet",
+          strength: "500mg",
+          packaging: "100 tablets"
+        }
+      ]
+    },
+    {
+      name: "Erythromycin Ophthalmic",
+      manufacturer: "Bausch & Lomb",
+      forms: [
+        {
+          type: "Ophthalmic ointment",
+          strength: "0.5%",
+          packaging: "3.5g tube"
+        }
+      ]
+    }
+  ],
+  "Clarithromycin": [
+    {
+      name: "Biaxin",
+      manufacturer: "AbbVie",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "60 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "60 tablets"
+        }
+      ]
+    },
+    {
+      name: "Biaxin XL",
+      manufacturer: "AbbVie",
+      forms: [
+        {
+          type: "Extended-release tablet",
+          strength: "500mg",
+          packaging: "20 tablets"
+        }
+      ]
+    },
+    {
+      name: "Clarithromycin",
+      manufacturer: "Teva",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "60 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "60 tablets"
+        },
+        {
+          type: "Oral suspension",
+          strength: "125mg/5mL",
+          packaging: "100mL bottle"
+        },
+        {
+          type: "Oral suspension",
+          strength: "250mg/5mL",
+          packaging: "100mL bottle"
+        }
+      ]
+    },
+    {
+      name: "Clarithromycin",
+      manufacturer: "Sandoz",
+      forms: [
+        {
+          type: "Tablet",
+          strength: "250mg",
+          packaging: "60 tablets"
+        },
+        {
+          type: "Tablet",
+          strength: "500mg",
+          packaging: "60 tablets"
+        }
+      ]
+    }
+  ]
 };
