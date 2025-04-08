@@ -42,7 +42,7 @@ export const ClinicalGuidelines = () => {
         </TabsContent>
         
         <TabsContent value="interactions">
-          <Card>
+          <Card className="border-0 shadow-sm">
             <DrugInteractionChecker />
           </Card>
         </TabsContent>

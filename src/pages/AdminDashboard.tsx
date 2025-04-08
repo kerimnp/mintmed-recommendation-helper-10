@@ -36,7 +36,7 @@ const AdminDashboard = () => {
             </Link>
           </header>
           
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-xl shadow-sm overflow-hidden">
             <div className="p-4 md:p-6 lg:p-8">
               <DashboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
               <div className="mt-6">
