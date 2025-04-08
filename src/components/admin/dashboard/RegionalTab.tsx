@@ -1,22 +1,20 @@
 
 import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegionalAdaptation } from "@/components/admin/RegionalAdaptation";
 
 export const RegionalTab = () => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Regional Adaptation</h2>
-        <p className="text-gray-500 dark:text-gray-400 ml-3 text-sm">
-          Region-specific resistance patterns and guidelines
-        </p>
-      </div>
-      
-      <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-sm overflow-hidden">
-        <div className="p-6">
-          <RegionalAdaptation />
-        </div>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Regional Adaptation</CardTitle>
+        <CardDescription>
+          Region-specific resistance patterns and guidelines.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <RegionalAdaptation />
+      </CardContent>
+    </Card>
   );
 };

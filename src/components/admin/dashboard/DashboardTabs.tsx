@@ -1,11 +1,6 @@
 
 import React from "react";
 import { 
-  Tabs, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { 
   Shield, 
   PieChart, 
   Microscope, 
@@ -28,25 +23,25 @@ export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) =
   ];
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={setActiveTab}
-      className="w-full"
-    >
-      <TabsList className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md w-full flex justify-between h-auto p-1 rounded-xl">
+    <div className="px-1 py-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-sm mb-6">
+      <div className="flex overflow-x-auto no-scrollbar">
         {tabs.map(tab => (
-          <TabsTrigger
+          <button
             key={tab.id}
-            value={tab.id}
-            className="flex-1 px-3 py-2.5 data-[state=active]:bg-medical-primary data-[state=active]:text-white rounded-lg transition-colors"
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex flex-1 items-center justify-center px-4 py-3 min-w-[120px] rounded-lg transition-all ${
+              activeTab === tab.id 
+                ? "bg-medical-primary text-white font-medium" 
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
           >
-            <div className="flex flex-col items-center gap-1">
-              <tab.icon className="h-5 w-5" />
-              <span className="text-xs font-medium">{tab.label}</span>
-            </div>
-          </TabsTrigger>
+            <tab.icon className={`h-5 w-5 ${activeTab === tab.id ? "mr-2" : "mx-auto"}`} />
+            <span className={`${activeTab === tab.id ? "block" : "sr-only md:not-sr-only md:block md:mt-1 md:text-xs"}`}>
+              {tab.label}
+            </span>
+          </button>
         ))}
-      </TabsList>
-    </Tabs>
+      </div>
+    </div>
   );
 };

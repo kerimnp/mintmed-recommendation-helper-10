@@ -1,33 +1,43 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
+import { Link } from "react-router-dom";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("antibiotics");
-  
-  // Use URL params to set the active tab
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
-    if (tab) {
-      setActiveTab(tab);
-    }
-  }, []);
-
-  // Update URL when tab changes
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    window.history.pushState(null, '', `?tab=${tab}`);
-  };
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("resistance");
 
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary">
-      <AdminSidebar activeTab={activeTab} setActiveTab={handleTabChange} />
+    <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto">
+      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="flex-1 overflow-auto w-full py-6 px-4">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <DashboardContent activeTab={activeTab} />
+      <main className="flex-1 overflow-auto w-full pt-16 lg:pt-6">
+        <div className="max-w-7xl mx-auto p-4 md:p-6">
+          {/* Header with back navigation - only visible on mobile */}
+          <header className="flex items-center justify-between mb-6 lg:hidden">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                Admin Dashboard
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
+                Monitor resistance patterns and antibiotic effectiveness
+              </p>
+            </div>
+            <Link to="/">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                <span>Back to Home</span>
+              </Button>
+            </Link>
+          </header>
+          
+          <div className="space-y-6">
+            <DashboardContent activeTab={activeTab} />
+          </div>
           
           <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 mt-8">
             <p>© 2025 Horalix Clinical Decision Support System</p>
