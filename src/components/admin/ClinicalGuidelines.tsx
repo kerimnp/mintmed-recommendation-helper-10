@@ -2,10 +2,9 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { ScrollText, BookOpen, Bookmark, GitBranch, Search } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { DrugInteractionChecker } from "./DrugInteractionChecker";
-import { DecisionTrees } from "./DecisionTrees";
 import { GuidelineContent } from "./clinical-guidelines/GuidelineContent";
 
 export const ClinicalGuidelines = () => {
@@ -36,10 +35,6 @@ export const ClinicalGuidelines = () => {
             <Bookmark className="h-4 w-4" />
             Drug Interactions
           </TabsTrigger>
-          <TabsTrigger value="decision-trees" className="flex items-center gap-2">
-            <GitBranch className="h-4 w-4" />
-            Decision Trees
-          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="guidelines" className="space-y-6">
@@ -49,12 +44,6 @@ export const ClinicalGuidelines = () => {
         <TabsContent value="interactions">
           <Card>
             <DrugInteractionChecker />
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="decision-trees">
-          <Card>
-            <DecisionTrees />
           </Card>
         </TabsContent>
       </Tabs>
