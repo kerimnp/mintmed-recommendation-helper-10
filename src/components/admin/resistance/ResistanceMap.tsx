@@ -50,6 +50,11 @@ export const ResistanceMap = ({ selectedResistance, selectedRegion }: Resistance
   
   const threshold = getThresholdForResistance(selectedResistance);
   
+  // Helper function to safely compare resistance values
+  const isAboveThreshold = (value: string | number, threshold: number): boolean => {
+    return Number(value) > threshold;
+  };
+  
   return (
     <div className="space-y-6">
       <Tabs defaultValue="table" className="w-full">
@@ -102,33 +107,33 @@ export const ResistanceMap = ({ selectedResistance, selectedRegion }: Resistance
                     <TableBody>
                       {regionSpecificData.map((country) => (
                         <TableRow key={country.country} className={
-                          country[selectedResistance as keyof typeof country] > threshold 
+                          isAboveThreshold(country[selectedResistance as keyof typeof country], threshold)
                             ? 'bg-red-50/50 dark:bg-red-900/10' 
                             : ''
                         }>
                           <TableCell className="font-medium">{country.country}</TableCell>
                           <TableCell className={`text-right ${selectedResistance === 'mrsa' ? 'font-semibold' : ''}`}>
-                            <span className={country.mrsa > 25 ? 'text-red-600 dark:text-red-400' : ''}>
+                            <span className={isAboveThreshold(country.mrsa, 25) ? 'text-red-600 dark:text-red-400' : ''}>
                               {country.mrsa.toFixed(1)}%
                             </span>
                           </TableCell>
                           <TableCell className={`text-right ${selectedResistance === 'vre' ? 'font-semibold' : ''}`}>
-                            <span className={country.vre > 18 ? 'text-red-600 dark:text-red-400' : ''}>
+                            <span className={isAboveThreshold(country.vre, 18) ? 'text-red-600 dark:text-red-400' : ''}>
                               {country.vre.toFixed(1)}%
                             </span>
                           </TableCell>
                           <TableCell className={`text-right ${selectedResistance === 'esbl' ? 'font-semibold' : ''}`}>
-                            <span className={country.esbl > 30 ? 'text-red-600 dark:text-red-400' : ''}>
+                            <span className={isAboveThreshold(country.esbl, 30) ? 'text-red-600 dark:text-red-400' : ''}>
                               {country.esbl.toFixed(1)}%
                             </span>
                           </TableCell>
                           <TableCell className={`text-right ${selectedResistance === 'cre' ? 'font-semibold' : ''}`}>
-                            <span className={country.cre > 12 ? 'text-red-600 dark:text-red-400' : ''}>
+                            <span className={isAboveThreshold(country.cre, 12) ? 'text-red-600 dark:text-red-400' : ''}>
                               {country.cre.toFixed(1)}%
                             </span>
                           </TableCell>
                           <TableCell className={`text-right ${selectedResistance === 'pseudomonas' ? 'font-semibold' : ''}`}>
-                            <span className={country.pseudomonas > 27 ? 'text-red-600 dark:text-red-400' : ''}>
+                            <span className={isAboveThreshold(country.pseudomonas, 27) ? 'text-red-600 dark:text-red-400' : ''}>
                               {country.pseudomonas.toFixed(1)}%
                             </span>
                           </TableCell>
