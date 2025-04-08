@@ -25,7 +25,7 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
         <div className="flex items-center gap-2">
           <Bot className="h-6 w-6 text-medical-primary" />
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
-            AI Recommendation (GPT-4o)
+            AI Recommendation
           </h2>
         </div>
         <Button
