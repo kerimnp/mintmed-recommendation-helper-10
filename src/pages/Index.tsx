@@ -36,7 +36,7 @@ const Index = () => {
       </Helmet>
 
       <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 
-        dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary">
+        dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto">
         <header className="fixed top-0 right-0 z-50 p-4">
           <div className="flex items-center gap-2 sm:gap-4">
             <Button
@@ -56,7 +56,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="w-full">
+        <main className="w-full overflow-auto">
           <div className="w-full px-4 py-8">
             <div className="max-w-4xl mx-auto">
               <div className="flex justify-center mb-8 pt-16">

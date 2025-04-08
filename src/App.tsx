@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="w-full h-full overflow-auto">
       <BrowserRouter>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LanguageProvider>

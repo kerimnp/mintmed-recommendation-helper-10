@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("resistance");
 
   return (
-    <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary">
+    <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="flex-1 overflow-auto w-full">
