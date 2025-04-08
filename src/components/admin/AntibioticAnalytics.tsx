@@ -17,12 +17,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { DownloadIcon, FilterIcon, SearchIcon } from "lucide-react";
+import { ChartContainer } from "@/components/ui/chart";
+import { Download, Filter, Search, ArrowDown, ArrowUp, Calendar } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-// Sample data - in a real app, this would come from an API
+// Sample data
 const antibioticData = [
   { id: 1, name: "Amoxicillin", count: 124, patientType: "Adult", severity: "Mild", infection: "Respiratory" },
   { id: 2, name: "Azithromycin", count: 98, patientType: "Adult", severity: "Moderate", infection: "Respiratory" },
@@ -62,6 +64,7 @@ const prescriptionRecords = [
 export const AntibioticAnalytics = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [dateRange, setDateRange] = useState("7");
   
   // Filter data based on search term and filter type
   const filteredData = antibioticData.filter(item => {
@@ -69,182 +72,232 @@ export const AntibioticAnalytics = () => {
     const matchesFilter = filterType === "all" || item.infection.toLowerCase() === filterType.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const renderSeverityBadge = (severity: string) => {
+    const colorMap: Record<string, string> = {
+      "Mild": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      "Moderate": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      "Severe": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+    };
+    
+    return (
+      <span className={`inline-block px-2 py-1 rounded-full text-xs ${colorMap[severity]}`}>
+        {severity}
+      </span>
+    );
+  };
   
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
-            <SearchIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search antibiotics..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="respiratory">Respiratory</SelectItem>
-              <SelectItem value="urinary">Urinary</SelectItem>
-              <SelectItem value="skin">Skin</SelectItem>
-              <SelectItem value="abdominal">Abdominal</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button variant="outline" className="w-full sm:w-auto">
-            <FilterIcon className="h-4 w-4 mr-2" />
-            Advanced Filters
-          </Button>
-          <Button variant="outline" className="w-full sm:w-auto">
-            <DownloadIcon className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="h-80 bg-card rounded-md border p-4">
-          <h3 className="text-lg font-medium mb-4">Antibiotic Prescription Frequency</h3>
-          <ChartContainer config={{
-            bar1: { color: '#0088FE' }
-          }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                <YAxis />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-background border rounded-md shadow-md p-4">
-                          <p className="font-medium">{payload[0].payload.name}</p>
-                          <p className="text-sm">Count: {payload[0].value}</p>
-                          <p className="text-sm">Type: {payload[0].payload.infection}</p>
-                          <p className="text-sm">Severity: {payload[0].payload.severity}</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
+    <div className="space-y-6">
+      <Card className="border border-slate-200 dark:border-slate-700 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <span className="text-medical-primary">Analytics Overview</span>
+            <Badge variant="outline" className="ml-auto">Last {dateRange} Days</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search antibiotics..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 w-full sm:w-64"
                 />
-                <Legend />
-                <Bar dataKey="count" fill="#0088FE" name="Prescription Count" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="h-80 bg-card rounded-md border p-4">
-            <h3 className="text-lg font-medium mb-4">Patient Demographics</h3>
-            <ChartContainer config={{
-              sections: { theme: { light: '#0088FE', dark: '#60a5fa' } }
-            }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={patientData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {patientData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+              </div>
+              
+              <div className="flex gap-2">
+                <Select value={filterType} onValueChange={setFilterType}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Filter by type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="respiratory">Respiratory</SelectItem>
+                    <SelectItem value="urinary">Urinary</SelectItem>
+                    <SelectItem value="skin">Skin</SelectItem>
+                    <SelectItem value="abdominal">Abdominal</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Time period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Last 7 Days</SelectItem>
+                    <SelectItem value="30">Last 30 Days</SelectItem>
+                    <SelectItem value="90">Last 90 Days</SelectItem>
+                    <SelectItem value="365">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <span className="hidden sm:inline">Advanced Filters</span>
+              </Button>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+            </div>
           </div>
           
-          <div className="h-80 bg-card rounded-md border p-4">
-            <h3 className="text-lg font-medium mb-4">Infection Sites</h3>
-            <ChartContainer config={{
-              sections: { theme: { light: '#00C49F', dark: '#34d399' } }
-            }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={infectionSiteData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {infectionSiteData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Prescription Frequency</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ChartContainer>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={filteredData} margin={{ top: 5, right: 20, left: 5, bottom: 35 }}>
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
+                        <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+                        <YAxis />
+                        <Tooltip 
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="bg-white dark:bg-gray-800 border rounded-md shadow-md p-3">
+                                  <p className="font-medium">{payload[0].payload.name}</p>
+                                  <p className="text-sm mt-1">Count: {payload[0].value}</p>
+                                  <p className="text-sm">Type: {payload[0].payload.infection}</p>
+                                  <p className="text-sm">Severity: {payload[0].payload.severity}</p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Bar dataKey="count" fill="#0088FE" name="Prescription Count" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Patient Demographics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-56">
+                    <ChartContainer>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={patientData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={70}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {patientData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Infection Sites</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-56">
+                    <ChartContainer>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={infectionSiteData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={70}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {infectionSiteData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      </div>
-      
-      <div className="bg-card rounded-md border p-4">
-        <h3 className="text-lg font-medium mb-4">Recent Prescription Records</h3>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Patient</TableHead>
-                <TableHead>Antibiotic</TableHead>
-                <TableHead>Infection Type</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {prescriptionRecords.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell className="font-medium">{record.id}</TableCell>
-                  <TableCell>{record.patient}</TableCell>
-                  <TableCell>{record.antibiotic}</TableCell>
-                  <TableCell>{record.infection}</TableCell>
-                  <TableCell>
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                      record.severity === "Mild" 
-                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" 
-                        : record.severity === "Moderate"
-                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                    }`}>
-                      {record.severity}
-                    </span>
-                  </TableCell>
-                  <TableCell>{record.date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="mt-4 flex justify-end">
-          <Button variant="ghost" size="sm">Previous</Button>
-          <Button variant="ghost" size="sm">Next</Button>
-        </div>
-      </div>
+          
+          <Card className="border border-slate-100 dark:border-slate-800 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Recent Prescription Records</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-24">ID</TableHead>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Antibiotic</TableHead>
+                      <TableHead>Infection Type</TableHead>
+                      <TableHead>Severity</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {prescriptionRecords.map((record) => (
+                      <TableRow key={record.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <TableCell className="font-medium">{record.id}</TableCell>
+                        <TableCell>{record.patient}</TableCell>
+                        <TableCell>{record.antibiotic}</TableCell>
+                        <TableCell>{record.infection}</TableCell>
+                        <TableCell>{renderSeverityBadge(record.severity)}</TableCell>
+                        <TableCell>{record.date}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                  Showing 5 of 42 records
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <ArrowUp className="h-4 w-4 mr-1" /> Newer
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Older <ArrowDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 };

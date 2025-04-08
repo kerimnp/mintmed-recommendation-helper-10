@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Download, BarChart2 } from "lucide-react";
+import { Info, Download, BarChart2, MapPin } from "lucide-react";
 import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { globalResistanceData } from "@/utils/antibioticRecommendations/data/globalResistance";
 
@@ -114,7 +114,7 @@ const antibioticUsageData = {
   ]
 };
 
-// Sample coordinates for the regions - now with 3 values [x, y, scale] to fix the TypeScript errors
+// Sample coordinates for the regions - properly typed to fix TypeScript errors
 const regionCoordinates: Record<string, [number, number, number]> = {
   "North America": [190, 160, 1],
   "Europe": [480, 140, 1],
@@ -157,16 +157,15 @@ export const RegionalAdaptation = () => {
 
   const renderRegionalMap = () => {
     return (
-      <div className="relative h-[400px] w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-        {/* World map background - simplified for example */}
+      <div className="relative h-[400px] w-full bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-md">
+        {/* World map background */}
         <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/20">
-          {/* This would be where an actual map component would go */}
           <svg
             viewBox="0 0 800 450"
             className="h-full w-full"
             style={{ filter: "drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1))" }}
           >
-            {/* Simplified world map paths would be here */}
+            {/* Simplified world map paths */}
             <path
               d="M 100 150 Q 150 100 200 150 T 300 150 T 400 150 T 500 150 T 600 150 T 700 150 Q 750 200 700 250 Q 650 300 600 250 T 500 250 T 400 250 T 300 250 T 200 250 Q 150 200 100 150"
               fill="#e6e6e6"
@@ -276,7 +275,10 @@ export const RegionalAdaptation = () => {
         <TabsContent value="resistance" className="pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Regional Resistance Patterns - {selectedRegion}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-medical-primary" />
+                Regional Resistance Patterns - {selectedRegion}
+              </CardTitle>
               <CardDescription>
                 Common antibiotics and their effectiveness in this region
               </CardDescription>
