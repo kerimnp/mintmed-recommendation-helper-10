@@ -21,23 +21,23 @@ serve(async (req) => {
     }
     console.log('Patient data received:', JSON.stringify(patientData));
 
-    // Use API key from environment variable or request body
-    let perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
+    // Use OpenAI API key from environment variable
+    const openAiApiKey = Deno.env.get('OPENAI_API_KEY');
     
-    if (!perplexityApiKey || perplexityApiKey.trim() === '') {
-      console.error('Perplexity API key not found in environment variables');
-      throw new Error('API service configuration is missing - please add PERPLEXITY_API_KEY to your Supabase Edge Function Secrets');
+    if (!openAiApiKey || openAiApiKey.trim() === '') {
+      console.error('OpenAI API key not found in environment variables');
+      throw new Error('API service configuration is missing - please add OPENAI_API_KEY to your Supabase Edge Function Secrets');
     }
 
-    console.log('Making request to Perplexity API...');
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+    console.log('Making request to OpenAI API...');
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Authorization': `Bearer ${openAiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
@@ -76,7 +76,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Perplexity API error (${response.status}):`, errorText);
+      console.error(`OpenAI API error (${response.status}):`, errorText);
       throw new Error(`AI service error: ${response.status} - ${errorText || 'Unknown error'}`);
     }
 

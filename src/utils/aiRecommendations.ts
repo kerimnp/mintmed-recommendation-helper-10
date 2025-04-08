@@ -25,7 +25,7 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
     if (error) {
       console.error('Error from Edge Function:', error);
       if (error.message.includes('API service configuration is missing')) {
-        throw new Error('API key missing: Add PERPLEXITY_API_KEY to Supabase Edge Function Secrets');
+        throw new Error('API key missing: Add OPENAI_API_KEY to Supabase Edge Function Secrets');
       }
       throw new Error(`AI service error: ${error.message}`);
     }
