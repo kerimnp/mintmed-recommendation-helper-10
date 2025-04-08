@@ -4,7 +4,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AntibioticsTab } from "./AntibioticsTab";
 import { EffectivenessTab } from "./EffectivenessTab";
 import { ResistanceTab } from "./ResistanceTab";
-import { GuidelinesTab } from "./GuidelinesTab";
 import { RegionalTab } from "./RegionalTab";
 import { EducationTab } from "./EducationTab";
 
@@ -25,10 +24,6 @@ export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
       
       <TabsContent value="resistance" className="space-y-4 mt-0">
         <ResistanceTab />
-      </TabsContent>
-      
-      <TabsContent value="guidelines" className="space-y-4 mt-0">
-        <GuidelinesTab />
       </TabsContent>
       
       <TabsContent value="regional" className="space-y-4 mt-0">

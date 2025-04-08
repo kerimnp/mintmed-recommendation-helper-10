@@ -16,7 +16,7 @@ const AdminDashboard = () => {
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="flex-1 p-4 md:p-6 lg:p-8 pt-24 lg:pt-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 pt-8 overflow-auto">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header with back navigation */}
           <header className="flex items-center justify-between mb-6">

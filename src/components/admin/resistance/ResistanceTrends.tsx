@@ -2,7 +2,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { resistanceTrendData } from "./data";
@@ -87,108 +86,130 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
   const regionObservations = getRegionObservations();
   
   const handleExportData = () => {
-    toast.success("Data exported successfully");
+    toast.success(`${selectedRegion} resistance data exported successfully`);
+  };
+  
+  const handleDownloadGuidelines = () => {
+    toast.success(`${selectedRegion} regional guidelines downloaded successfully`);
   };
   
   return (
-    <Card>
+    <Card className="mb-8 shadow-lg border border-gray-100 dark:border-gray-800">
       <CardHeader className="pb-2">
-        <CardTitle>Antimicrobial Resistance Trends (2019-2024) - {selectedRegion}</CardTitle>
-        <CardDescription>
-          Data based on European Antimicrobial Resistance Surveillance Network (EARS-Net)
-        </CardDescription>
+        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+          <div>
+            <CardTitle className="text-xl text-medical-primary">Resistance Trends (2019-2024) - {selectedRegion}</CardTitle>
+            <CardDescription>
+              Data based on European Antimicrobial Resistance Surveillance Network (EARS-Net)
+            </CardDescription>
+          </div>
+          <Button onClick={handleDownloadGuidelines} variant="outline" className="flex items-center gap-2 whitespace-nowrap">
+            <Download className="h-4 w-4" />
+            Download {selectedRegion} Guidelines
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[500px]"> {/* Increased height for better visibility */}
-          <ChartContainer config={{
-            mrsa: { theme: { light: '#FF8042', dark: '#f97316' } },
-            vre: { theme: { light: '#FFBB28', dark: '#fbbf24' } },
-            esbl: { theme: { light: '#0088FE', dark: '#60a5fa' } },
-            cre: { theme: { light: '#8884d8', dark: '#a78bfa' } },
-            pseudomonas: { theme: { light: '#00C49F', dark: '#34d399' } }
-          }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                width={500}
-                height={300}
-                data={regionSpecificData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 30,
-                  bottom: 20,
+        <div className="h-[600px]"> {/* Increased height for better visibility */}
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              width={500}
+              height={300}
+              data={regionSpecificData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 30,
+                bottom: 20,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
+              <XAxis 
+                dataKey="year"
+                tick={{ fontSize: 13 }}
+              />
+              <YAxis 
+                label={{ value: 'Resistance (%)', angle: -90, position: 'insideLeft', offset: -15 }}
+                domain={[0, 100]}
+                tick={{ fontSize: 13 }}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`${value}%`, ""]} 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  borderRadius: '8px', 
+                  border: '1px solid #ccc', 
+                  padding: '12px',
+                  fontSize: '13px'
                 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
-                <XAxis dataKey="year" />
-                <YAxis 
-                  label={{ value: 'Resistance (%)', angle: -90, position: 'insideLeft', offset: -15 }}
-                  domain={[0, 100]}
-                />
-                <Tooltip 
-                  formatter={(value: number) => [`${value}%`, ""]} 
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc', padding: '10px' }}
-                />
-                <Legend wrapperStyle={{ paddingTop: "10px" }} />
-                <Area 
-                  type="monotone" 
-                  dataKey="mrsa" 
-                  name="MRSA" 
-                  stroke="#FF8042" 
-                  fill="#FF8042" 
-                  fillOpacity={0.6}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="vre" 
-                  name="VRE" 
-                  stroke="#FFBB28" 
-                  fill="#FFBB28" 
-                  fillOpacity={0.6}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="esbl" 
-                  name="ESBL" 
-                  stroke="#0088FE" 
-                  fill="#0088FE" 
-                  fillOpacity={0.6}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="cre" 
-                  name="CRE" 
-                  stroke="#8884d8" 
-                  fill="#8884d8" 
-                  fillOpacity={0.6}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="pseudomonas" 
-                  name="Pseudomonas" 
-                  stroke="#00C49F" 
-                  fill="#00C49F" 
-                  fillOpacity={0.6}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+              />
+              <Legend wrapperStyle={{ paddingTop: "10px" }} formatter={(value) => value.toUpperCase()} />
+              <Area 
+                type="monotone" 
+                dataKey="mrsa" 
+                name="MRSA" 
+                stroke="#FF8042" 
+                fill="#FF8042" 
+                fillOpacity={0.6}
+                strokeWidth={2}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="vre" 
+                name="VRE" 
+                stroke="#FFBB28" 
+                fill="#FFBB28" 
+                fillOpacity={0.6}
+                strokeWidth={2}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="esbl" 
+                name="ESBL" 
+                stroke="#0088FE" 
+                fill="#0088FE" 
+                fillOpacity={0.6}
+                strokeWidth={2}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="cre" 
+                name="CRE" 
+                stroke="#8884d8" 
+                fill="#8884d8" 
+                fillOpacity={0.6}
+                strokeWidth={2}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="pseudomonas" 
+                name="Pseudomonas" 
+                stroke="#00C49F" 
+                fill="#00C49F" 
+                fillOpacity={0.6}
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
         
-        <div className="flex justify-end mt-4">
+        <div className="mt-8 flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4">
+          <div className="p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg w-full md:w-3/4">
+            <h4 className="text-sm font-medium mb-2">Key Observations for {selectedRegion}</h4>
+            <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+              {regionObservations.map((observation, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="text-medical-primary">•</span>
+                  <span>{observation}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <Button className="flex items-center gap-2" onClick={handleExportData}>
             <Download className="h-4 w-4" />
             Export Data
           </Button>
-        </div>
-
-        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">Key Observations for {selectedRegion}</h4>
-          <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
-            {regionObservations.map((observation, index) => (
-              <li key={index}>• {observation}</li>
-            ))}
-          </ul>
         </div>
       </CardContent>
     </Card>

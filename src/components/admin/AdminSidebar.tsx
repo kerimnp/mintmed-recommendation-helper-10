@@ -3,12 +3,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { 
   Shield, 
-  ScrollText, 
   PieChart, 
   Microscope, 
   MapPin, 
   BookOpen, 
-  BarChart3, 
   Home,
   Settings,
   Users
@@ -29,7 +27,6 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
     { id: "antibiotics", label: "Antibiotics", icon: Shield },
     { id: "effectiveness", label: "Effectiveness", icon: PieChart },
     { id: "resistance", label: "Resistance", icon: Microscope },
-    { id: "guidelines", label: "Guidelines", icon: ScrollText },
     { id: "regional", label: "Regional", icon: MapPin },
     { id: "education", label: "Education", icon: BookOpen },
   ];

@@ -3,9 +3,8 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer, Cell } from "recharts";
 import { Button } from "@/components/ui/button";
-import { ChartContainer } from "@/components/ui/chart";
-import { antibioticEffectivenessData } from "./data";
 import { Download } from "lucide-react";
+import { antibioticEffectivenessData } from "./data";
 import { toast } from "sonner";
 
 interface AntibioticEffectivenessProps {
@@ -13,7 +12,7 @@ interface AntibioticEffectivenessProps {
   selectedResistance?: string;
 }
 
-// Update the interface for effectiveness data items
+// Define interface for effectiveness data items
 interface EffectivenessDataItem {
   antibiotic: string;
   mrsa: number;
@@ -71,11 +70,11 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
     const item = modifiedData.find(a => a.antibiotic === antibiotic);
     if (!item) return "";
     
-    if (item.mrsa > 50) effective.push("MRSA");
-    if (item.vre > 50) effective.push("VRE");
-    if (item.esbl > 50) effective.push("ESBL");
-    if (item.cre > 50) effective.push("CRE");
-    if (item.pseudomonas > 50) effective.push("Pseudomonas");
+    if ((item.mrsa as number) > 50) effective.push("MRSA");
+    if ((item.vre as number) > 50) effective.push("VRE");
+    if ((item.esbl as number) > 50) effective.push("ESBL");
+    if ((item.cre as number) > 50) effective.push("CRE");
+    if ((item.pseudomonas as number) > 50) effective.push("Pseudomonas");
     
     return effective.join(", ");
   };
@@ -85,82 +84,97 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
   };
 
   return (
-    <Card>
+    <Card className="mb-8 shadow-lg border border-gray-100 dark:border-gray-800">
       <CardHeader className="pb-2">
-        <CardTitle>Antibiotic Effectiveness Against Resistant Strains - {selectedRegion}</CardTitle>
+        <CardTitle className="text-xl text-medical-primary">Antibiotic Effectiveness - {selectedRegion}</CardTitle>
         <CardDescription>
           Comparative effectiveness based on clinical studies and regional resistance patterns
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[500px]"> {/* Increased height for better visibility */}
-          <ChartContainer config={{
-            effectiveness: { theme: { light: '#0088FE', dark: '#60a5fa' } },
-            mrsa: { theme: { light: '#FF8042', dark: '#f97316' } },
-            vre: { theme: { light: '#FFBB28', dark: '#fbbf24' } },
-            esbl: { theme: { light: '#0088FE', dark: '#60a5fa' } },
-            cre: { theme: { light: '#8884d8', dark: '#a78bfa' } },
-            pseudomonas: { theme: { light: '#00C49F', dark: '#34d399' } }
-          }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                width={500}
-                height={300}
-                data={modifiedData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 30,
-                  bottom: 30,
+        <div className="h-[600px] mt-4"> {/* Increased height significantly for better visibility */}
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              width={500}
+              height={300}
+              data={modifiedData}
+              margin={{
+                top: 20,
+                right: 30,
+                left: 30,
+                bottom: 60,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
+              <XAxis 
+                dataKey="antibiotic" 
+                angle={-45} 
+                textAnchor="end" 
+                height={100} 
+                tick={{ fontSize: 12 }} 
+                interval={0}
+              />
+              <YAxis 
+                label={{ value: 'Effectiveness (%)', angle: -90, position: 'insideLeft', offset: -15 }}
+                domain={[0, 100]} 
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip 
+                formatter={(value: number, name: string) => [
+                  `${value.toFixed(1)}%`, 
+                  name.replace("mrsa", "MRSA")
+                    .replace("vre", "VRE")
+                    .replace("esbl", "ESBL")
+                    .replace("cre", "CRE")
+                    .replace("pseudomonas", "Pseudomonas")
+                ]}
+                labelFormatter={(label) => `${label} ${getEffectiveAgainst(label) ? `(Effective against: ${getEffectiveAgainst(label)})` : ''}`}
+                contentStyle={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                  borderRadius: '8px', 
+                  border: '1px solid #ccc', 
+                  padding: '12px',
+                  fontSize: '13px'
                 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
-                <XAxis dataKey="antibiotic" angle={-45} textAnchor="end" height={80} />
-                <YAxis 
-                  label={{ value: 'Effectiveness (%)', angle: -90, position: 'insideLeft', offset: -15 }}
-                  domain={[0, 100]} 
-                />
-                <Tooltip 
-                  formatter={(value: number, name: string) => [`${value.toFixed(1)}%`, name.replace("vs ", "")]}
-                  labelFormatter={(label) => `${label} (${getEffectiveAgainst(label)})`}
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc', padding: '10px' }}
-                />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Bar dataKey="mrsa" name="vs MRSA" fill={colors.mrsa}>
-                  {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={entry.mrsa > 0 ? 1 : 0.3} />
-                  ))}
-                </Bar>
-                <Bar dataKey="vre" name="vs VRE" fill={colors.vre}>
-                  {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={entry.vre > 0 ? 1 : 0.3} />
-                  ))}
-                </Bar>
-                <Bar dataKey="esbl" name="vs ESBL" fill={colors.esbl}>
-                  {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={entry.esbl > 0 ? 1 : 0.3} />
-                  ))}
-                </Bar>
-                <Bar dataKey="cre" name="vs CRE" fill={colors.cre}>
-                  {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={entry.cre > 0 ? 1 : 0.3} />
-                  ))}
-                </Bar>
-                <Bar dataKey="pseudomonas" name="vs Pseudomonas" fill={colors.pseudomonas}>
-                  {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={entry.pseudomonas > 0 ? 1 : 0.3} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+              />
+              <Legend 
+                wrapperStyle={{ paddingTop: "20px" }} 
+                formatter={(value) => value.toUpperCase()}
+              />
+              <Bar dataKey="mrsa" name="MRSA" fill={colors.mrsa}>
+                {modifiedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fillOpacity={(entry.mrsa as number) > 0 ? 1 : 0.3} />
+                ))}
+              </Bar>
+              <Bar dataKey="vre" name="VRE" fill={colors.vre}>
+                {modifiedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fillOpacity={(entry.vre as number) > 0 ? 1 : 0.3} />
+                ))}
+              </Bar>
+              <Bar dataKey="esbl" name="ESBL" fill={colors.esbl}>
+                {modifiedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fillOpacity={(entry.esbl as number) > 0 ? 1 : 0.3} />
+                ))}
+              </Bar>
+              <Bar dataKey="cre" name="CRE" fill={colors.cre}>
+                {modifiedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fillOpacity={(entry.cre as number) > 0 ? 1 : 0.3} />
+                ))}
+              </Bar>
+              <Bar dataKey="pseudomonas" name="Pseudomonas" fill={colors.pseudomonas}>
+                {modifiedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fillOpacity={(entry.pseudomonas as number) > 0 ? 1 : 0.3} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mt-8">
           {Object.entries(colors).map(([key, color]) => (
             <div 
               key={key}
-              className="flex items-center justify-center p-2 rounded-lg font-medium text-sm"
+              className="flex items-center justify-center p-3 rounded-lg font-medium text-sm shadow-sm"
               style={{ backgroundColor: `${color}20`, color: color }}
             >
               {key.toUpperCase()}
@@ -168,7 +182,7 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
           ))}
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-8 flex justify-end">
           <Button className="flex items-center gap-2" onClick={handleExportData}>
             <Download className="h-4 w-4" />
             Export Data

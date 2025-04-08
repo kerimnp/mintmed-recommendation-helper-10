@@ -13,7 +13,7 @@ interface DashboardTabsProps {
 export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) => {
   return (
     <Tabs defaultValue="antibiotics" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-      <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-8">
+      <TabsList className="grid grid-cols-3 lg:grid-cols-5 mb-8">
         <TabsTrigger value="antibiotics" className="flex items-center gap-2">
           <Shield className="h-4 w-4" />
           <span className="hidden md:inline">Antibiotics</span>
@@ -25,10 +25,6 @@ export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) =
         <TabsTrigger value="resistance" className="flex items-center gap-2">
           <Microscope className="h-4 w-4" />
           <span className="hidden md:inline">Resistance</span>
-        </TabsTrigger>
-        <TabsTrigger value="guidelines" className="flex items-center gap-2">
-          <ScrollText className="h-4 w-4" />
-          <span className="hidden md:inline">Guidelines</span>
         </TabsTrigger>
         <TabsTrigger value="regional" className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />
