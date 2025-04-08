@@ -12,6 +12,17 @@ interface AntibioticEffectivenessProps {
   selectedResistance?: string;
 }
 
+// Update the interface for effectiveness data items
+interface EffectivenessDataItem {
+  antibiotic: string;
+  mrsa: number;
+  vre: number;
+  esbl: number;
+  cre: number;
+  pseudomonas: number;
+  [key: string]: string | number;
+}
+
 export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedResistance = "mrsa" }: AntibioticEffectivenessProps) => {
   // Color scheme for different resistance types
   const colors: Record<string, string> = {
@@ -37,13 +48,13 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
     
     // Create region-specific data
     return antibioticEffectivenessData.map(item => {
-      const result = {...item};
+      const result: EffectivenessDataItem = {...item} as EffectivenessDataItem;
       
       for (const key of Object.keys(item)) {
         if (key !== 'antibiotic' && typeof item[key as keyof typeof item] === 'number') {
           const value = item[key as keyof typeof item] as number;
           const adjustedValue = Math.min(100, value * modifier); // Cap at 100%
-          result[key as keyof typeof result] = adjustedValue.toFixed(1) as any;
+          result[key] = Number(adjustedValue.toFixed(1));
         }
       }
       
@@ -59,11 +70,11 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
     const item = modifiedData.find(a => a.antibiotic === antibiotic);
     if (!item) return "";
     
-    if (parseFloat(item.mrsa as string) > 50) effective.push("MRSA");
-    if (parseFloat(item.vre as string) > 50) effective.push("VRE");
-    if (parseFloat(item.esbl as string) > 50) effective.push("ESBL");
-    if (parseFloat(item.cre as string) > 50) effective.push("CRE");
-    if (parseFloat(item.pseudomonas as string) > 50) effective.push("Pseudomonas");
+    if (item.mrsa > 50) effective.push("MRSA");
+    if (item.vre > 50) effective.push("VRE");
+    if (item.esbl > 50) effective.push("ESBL");
+    if (item.cre > 50) effective.push("CRE");
+    if (item.pseudomonas > 50) effective.push("Pseudomonas");
     
     return effective.join(", ");
   };
@@ -102,33 +113,33 @@ export const AntibioticEffectiveness = ({ selectedRegion = "Balkan", selectedRes
                 <XAxis dataKey="antibiotic" />
                 <YAxis label={{ value: 'Effectiveness (%)', angle: -90, position: 'insideLeft' }} />
                 <Tooltip 
-                  formatter={(value: string, name: string) => [`${parseFloat(value).toFixed(1)}%`, name.replace("vs ", "")]}
+                  formatter={(value: number, name: string) => [`${value.toFixed(1)}%`, name.replace("vs ", "")]}
                   labelFormatter={(label) => `${label} (${getEffectiveAgainst(label)})`}
                 />
                 <Legend wrapperStyle={{ paddingTop: "10px" }} />
                 <Bar dataKey="mrsa" name="vs MRSA" fill={colors.mrsa}>
                   {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={parseFloat(entry.mrsa as string) > 0 ? 1 : 0.3} />
+                    <Cell key={`cell-${index}`} fillOpacity={entry.mrsa > 0 ? 1 : 0.3} />
                   ))}
                 </Bar>
                 <Bar dataKey="vre" name="vs VRE" fill={colors.vre}>
                   {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={parseFloat(entry.vre as string) > 0 ? 1 : 0.3} />
+                    <Cell key={`cell-${index}`} fillOpacity={entry.vre > 0 ? 1 : 0.3} />
                   ))}
                 </Bar>
                 <Bar dataKey="esbl" name="vs ESBL" fill={colors.esbl}>
                   {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={parseFloat(entry.esbl as string) > 0 ? 1 : 0.3} />
+                    <Cell key={`cell-${index}`} fillOpacity={entry.esbl > 0 ? 1 : 0.3} />
                   ))}
                 </Bar>
                 <Bar dataKey="cre" name="vs CRE" fill={colors.cre}>
                   {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={parseFloat(entry.cre as string) > 0 ? 1 : 0.3} />
+                    <Cell key={`cell-${index}`} fillOpacity={entry.cre > 0 ? 1 : 0.3} />
                   ))}
                 </Bar>
                 <Bar dataKey="pseudomonas" name="vs Pseudomonas" fill={colors.pseudomonas}>
                   {modifiedData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fillOpacity={parseFloat(entry.pseudomonas as string) > 0 ? 1 : 0.3} />
+                    <Cell key={`cell-${index}`} fillOpacity={entry.pseudomonas > 0 ? 1 : 0.3} />
                   ))}
                 </Bar>
               </BarChart>

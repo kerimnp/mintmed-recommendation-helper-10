@@ -34,4 +34,5 @@ export interface AntibioticEffectivenessData {
   esbl: number;
   cre: number;
   pseudomonas: number;
+  [key: string]: string | number;
 }
