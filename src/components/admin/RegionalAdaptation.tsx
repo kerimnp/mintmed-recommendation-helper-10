@@ -342,7 +342,7 @@ export const RegionalAdaptation = () => {
                 <div className="border-l-4 border-amber-500 pl-4 py-2">
                   <h4 className="font-medium">ESBL Risk Assessment</h4>
                   <p className="text-sm text-muted-foreground">
-                    In regions with ESBL prevalence >20%, empiric therapy for severe UTIs and intra-abdominal infections
+                    In regions with ESBL prevalence {'>'}20%, empiric therapy for severe UTIs and intra-abdominal infections
                     is adjusted to include carbapenem coverage, especially in patients with healthcare exposure.
                   </p>
                 </div>
