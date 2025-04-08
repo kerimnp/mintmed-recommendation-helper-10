@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AntibioticsTab } from "./AntibioticsTab";
 import { EffectivenessTab } from "./EffectivenessTab";
 import { ResistanceTab } from "./ResistanceTab";
@@ -14,7 +14,7 @@ interface DashboardContentProps {
 
 export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
   return (
-    <>
+    <Tabs value={activeTab}>
       <TabsContent value="antibiotics" className="space-y-4">
         <AntibioticsTab />
       </TabsContent>
@@ -38,6 +38,6 @@ export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
       <TabsContent value="education" className="space-y-4">
         <EducationTab />
       </TabsContent>
-    </>
+    </Tabs>
   );
 };
