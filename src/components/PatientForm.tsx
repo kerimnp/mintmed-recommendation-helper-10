@@ -79,34 +79,30 @@ export const PatientForm = () => {
       setErrors(newErrors);
     }
   };
-
+  
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.age) {
-      newErrors.age = t.errors?.requiredField || "Age is required";
-    } else if (Number(formData.age) < 0 || Number(formData.age) > 120) {
+    // Only validate the truly required fields
+    if (!formData.infectionSites || formData.infectionSites.length === 0) {
+      newErrors.infectionSites = t.errors?.requiredField || "Infection site is required";
+    }
+    
+    if (!formData.severity) {
+      newErrors.severity = t.errors?.requiredField || "Severity is required";
+    }
+
+    // Only validate other fields if they're provided but invalid
+    if (formData.age && (Number(formData.age) < 0 || Number(formData.age) > 120)) {
       newErrors.age = t.errors?.invalidAge || "Please enter a valid age";
     }
 
-    if (!formData.gender) {
-      newErrors.gender = t.errors?.requiredField || "Gender is required";
-    }
-
-    if (!formData.weight) {
-      newErrors.weight = t.errors?.requiredField || "Weight is required";
-    } else if (Number(formData.weight) <= 0 || Number(formData.weight) > 500) {
+    if (formData.weight && (Number(formData.weight) <= 0 || Number(formData.weight) > 500)) {
       newErrors.weight = t.errors?.invalidWeight || "Please enter a valid weight";
     }
 
-    if (!formData.height) {
-      newErrors.height = t.errors?.requiredField || "Height is required";
-    } else if (Number(formData.height) <= 0 || Number(formData.height) > 300) {
+    if (formData.height && (Number(formData.height) <= 0 || Number(formData.height) > 300)) {
       newErrors.height = t.errors?.invalidHeight || "Please enter a valid height";
-    }
-
-    if (!formData.severity) {
-      newErrors.severity = t.errors?.requiredField || "Severity is required";
     }
 
     setErrors(newErrors);
@@ -138,8 +134,8 @@ export const PatientForm = () => {
       toast({
         title: language === "en" ? "Validation Error" : "Greška Validacije",
         description: language === "en" 
-          ? "Please fill in all required fields (Patient Demographics and Infection Details)"
-          : "Molimo popunite sva obavezna polja (Demografski podaci i Detalji infekcije)",
+          ? "Please fill in all required fields (Infection Details)"
+          : "Molimo popunite sva obavezna polja (Detalji infekcije)",
         variant: "destructive"
       });
       return;
