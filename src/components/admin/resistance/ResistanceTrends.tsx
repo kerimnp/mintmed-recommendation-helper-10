@@ -37,6 +37,52 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
   
   const regionSpecificData = getRegionSpecificTrendData();
   
+  // Generate region-specific observations
+  const getRegionObservations = () => {
+    const observations = {
+      "Balkan": [
+        "All resistant bacteria types show an upward trend over the past 6 years",
+        "ESBL-producing organisms show the fastest rate of increase (+9.6%)",
+        "CRE remains the least prevalent but has almost doubled since 2019",
+        "Resistance rates appear to be stabilizing in 2024 with slower growth"
+      ],
+      "Southern Europe": [
+        "Higher overall resistance rates compared to other European regions",
+        "MRSA prevalence remains concerning at 35.2%",
+        "ESBL-producing organisms have increased by 12.3% since 2019",
+        "Vancomycin resistance is growing particularly rapidly"
+      ],
+      "Northern Europe": [
+        "Lowest overall resistance rates in Europe due to strict stewardship programs",
+        "CRE remains rare at under 6% prevalence",
+        "MRSA rates have been successfully contained below 12%",
+        "Annual increase rate is significantly lower than other European regions"
+      ],
+      "Eastern Europe": [
+        "Notable variability between countries in the region",
+        "ESBL prevalence is of particular concern at 34.7%",
+        "Limited access to newer antibiotics may be contributing to resistance patterns",
+        "High carbapenem usage driving increasing CRE rates"
+      ],
+      "Western Europe": [
+        "Moderate resistance rates with significant regional variation",
+        "MRSA rates have declined over the last 3 years",
+        "Fluoroquinolone resistance is notably high in several countries",
+        "Effective antibiotic stewardship programs showing positive impact"
+      ],
+      "Global": [
+        "Significant variation between high and low-income regions",
+        "Highest resistance rates observed in South Asia and parts of Africa",
+        "CRE is rapidly emerging as a global threat with alarming growth",
+        "Access to newer antibiotics remains a challenge in many regions"
+      ]
+    };
+    
+    return observations[selectedRegion as keyof typeof observations] || observations["Global"];
+  };
+  
+  const regionObservations = getRegionObservations();
+  
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -120,10 +166,9 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrends
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
           <h4 className="text-sm font-medium mb-2">Key Observations for {selectedRegion}</h4>
           <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
-            <li>• All resistant bacteria types show an upward trend over the past 6 years</li>
-            <li>• ESBL-producing organisms show the fastest rate of increase (+9.6%)</li>
-            <li>• CRE remains the least prevalent but has almost doubled since 2019</li>
-            <li>• Resistance rates appear to be stabilizing in 2024 with slower growth</li>
+            {regionObservations.map((observation, index) => (
+              <li key={index}>• {observation}</li>
+            ))}
           </ul>
         </div>
       </CardContent>

@@ -154,7 +154,12 @@ export const TreatmentEffectiveness = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
-              <ChartContainer>
+              <ChartContainer config={{
+                amoxicillin: { theme: { light: '#0088FE', dark: '#60a5fa' } },
+                azithromycin: { theme: { light: '#00C49F', dark: '#34d399' } },
+                ceftriaxone: { theme: { light: '#FFBB28', dark: '#fbbf24' } },
+                ciprofloxacin: { theme: { light: '#FF8042', dark: '#f97316' } }
+              }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={effectivenessOverTime}
@@ -187,7 +192,11 @@ export const TreatmentEffectiveness = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="h-80">
-                <ChartContainer>
+                <ChartContainer config={{
+                  effectiveness: { theme: { light: '#0088FE', dark: '#60a5fa' } },
+                  resistanceRate: { theme: { light: '#FF8042', dark: '#f97316' } },
+                  sideEffectRate: { theme: { light: '#FFBB28', dark: '#fbbf24' } }
+                }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={antibioticComparison}
@@ -242,7 +251,11 @@ export const TreatmentEffectiveness = () => {
                     <TabsTrigger value="outcomes" className="flex-1">Outcomes</TabsTrigger>
                   </TabsList>
                   <TabsContent value="radar">
-                    <ChartContainer>
+                    <ChartContainer config={{
+                      amoxicillin: { theme: { light: '#0088FE', dark: '#60a5fa' } },
+                      azithromycin: { theme: { light: '#00C49F', dark: '#34d399' } },
+                      ceftriaxone: { theme: { light: '#FFBB28', dark: '#fbbf24' } }
+                    }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart outerRadius={90} width={730} height={250} data={radarData}>
                           <PolarGrid />
@@ -258,7 +271,9 @@ export const TreatmentEffectiveness = () => {
                     </ChartContainer>
                   </TabsContent>
                   <TabsContent value="outcomes">
-                    <ChartContainer>
+                    <ChartContainer config={{
+                      outcome: { theme: { light: '#8884d8', dark: '#a78bfa' } }
+                    }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                           data={treatmentOutcomes}

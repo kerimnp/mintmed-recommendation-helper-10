@@ -156,7 +156,9 @@ export const AntibioticAnalytics = () => {
               </CardHeader>
               <CardContent>
                 <div className="h-64">
-                  <ChartContainer>
+                  <ChartContainer config={{
+                    barColor: { theme: { light: '#0088FE', dark: '#60a5fa' } }
+                  }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={filteredData} margin={{ top: 5, right: 20, left: 5, bottom: 35 }}>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.7} />
@@ -192,7 +194,9 @@ export const AntibioticAnalytics = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-56">
-                    <ChartContainer>
+                    <ChartContainer config={{
+                      pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
+                    }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
@@ -223,7 +227,9 @@ export const AntibioticAnalytics = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-56">
-                    <ChartContainer>
+                    <ChartContainer config={{
+                      pieColors: { theme: { light: '#8884d8', dark: '#a78bfa' } }
+                    }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
