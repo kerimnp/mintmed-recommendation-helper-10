@@ -13,10 +13,19 @@ interface DashboardContentProps {
 
 export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          Admin Dashboard
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Monitor resistance patterns and antibiotic effectiveness
+        </p>
+      </div>
+      
       <DashboardTabs activeTab={activeTab} setActiveTab={(tab) => window.history.pushState(null, '', `?tab=${tab}`)} />
       
-      <div className="animate-fade-in">
+      <div className="animate-fade-in pt-6">
         {activeTab === "antibiotics" && <AntibioticsTab />}
         {activeTab === "effectiveness" && <EffectivenessTab />}
         {activeTab === "resistance" && <ResistanceTab />}
