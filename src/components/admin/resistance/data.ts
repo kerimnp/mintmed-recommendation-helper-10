@@ -37,6 +37,3 @@ export const antibioticEffectivenessData: AntibioticEffectivenessData[] = [
   { antibiotic: "Meropenem", mrsa: 0, vre: 0, esbl: 95, cre: 40, pseudomonas: 85 },
   { antibiotic: "Colistin", mrsa: 0, vre: 0, esbl: 0, cre: 85, pseudomonas: 90 },
 ];
-
-// URL for world map
-export const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
