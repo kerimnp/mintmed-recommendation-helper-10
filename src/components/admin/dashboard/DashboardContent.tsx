@@ -14,7 +14,7 @@ interface DashboardContentProps {
 
 export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
   return (
-    <Tabs value={activeTab}>
+    <Tabs value={activeTab} className="animate-fade-in">
       <TabsContent value="antibiotics" className="space-y-4">
         <AntibioticsTab />
       </TabsContent>
