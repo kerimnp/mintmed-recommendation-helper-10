@@ -1,12 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ScrollText, BookOpen, Bookmark, FileText, Search, Download } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, FileText, Search, Download, Tree } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DrugInteractionChecker } from "./DrugInteractionChecker";
+import { DecisionTrees } from "./DecisionTrees";
 
 // Sample clinical guidelines data
 const guidelinesData = [
@@ -52,97 +54,15 @@ const guidelinesData = [
   }
 ];
 
-// Sample drug interaction data
-const drugInteractionData = [
-  {
-    antibiotic: "Ciprofloxacin",
-    interactsWith: "Warfarin",
-    severity: "Major",
-    effect: "Increased anticoagulant effect and bleeding risk",
-    recommendation: "Avoid combination; monitor INR closely if co-administered"
-  },
-  {
-    antibiotic: "Clarithromycin",
-    interactsWith: "Simvastatin",
-    severity: "Major",
-    effect: "Increased risk of myopathy and rhabdomyolysis",
-    recommendation: "Avoid combination or reduce statin dose"
-  },
-  {
-    antibiotic: "Azithromycin",
-    interactsWith: "QT-prolonging drugs",
-    severity: "Moderate",
-    effect: "Increased risk of QT prolongation and arrhythmias",
-    recommendation: "Use with caution; monitor ECG if possible"
-  },
-  {
-    antibiotic: "Doxycycline",
-    interactsWith: "Antacids, calcium, iron",
-    severity: "Moderate",
-    effect: "Decreased antibiotic absorption",
-    recommendation: "Separate administration by at least 2 hours"
-  },
-  {
-    antibiotic: "Sulfamethoxazole-Trimethoprim",
-    interactsWith: "Methotrexate",
-    severity: "Major",
-    effect: "Increased methotrexate toxicity",
-    recommendation: "Avoid combination when possible"
-  }
-];
-
-// Sample decision tree data
-const decisionTreeSteps = [
-  {
-    id: "step-1",
-    title: "Community-Acquired Pneumonia Treatment Algorithm",
-    steps: [
-      { 
-        id: "s1", 
-        text: "Determine severity of infection", 
-        options: ["Mild", "Moderate", "Severe"]
-      },
-      { 
-        id: "s2", 
-        text: "Check for risk factors for drug-resistant pathogens",
-        options: ["None", "Prior antibiotics", "Healthcare exposure", "Immunosuppression"]
-      },
-      {
-        id: "s3",
-        text: "Assess patient allergies",
-        options: ["No allergies", "Penicillin allergy", "Cephalosporin allergy", "Multiple allergies"]
-      },
-      {
-        id: "s4",
-        text: "Evaluate patient age and comorbidities",
-        options: ["Young healthy", "Elderly", "Multiple comorbidities"]
-      }
-    ]
-  },
-  {
-    id: "step-2",
-    title: "Urinary Tract Infection Treatment Algorithm",
-    steps: [
-      { 
-        id: "u1", 
-        text: "Determine if uncomplicated or complicated UTI", 
-        options: ["Uncomplicated", "Complicated"]
-      },
-      { 
-        id: "u2", 
-        text: "Check for risk factors for drug-resistant pathogens",
-        options: ["None", "Prior UTIs", "Recent antibiotics", "Catheterized"]
-      },
-      {
-        id: "u3",
-        text: "Assess renal function",
-        options: ["Normal", "Moderate impairment", "Severe impairment"]
-      }
-    ]
-  }
-];
-
 export const ClinicalGuidelines = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const filteredGuidelines = guidelinesData.filter(
+    guide => guide.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+             guide.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             guide.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -152,6 +72,8 @@ export const ClinicalGuidelines = () => {
           <Input
             placeholder="Search guidelines..."
             className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -167,7 +89,7 @@ export const ClinicalGuidelines = () => {
             Drug Interactions
           </TabsTrigger>
           <TabsTrigger value="decision-trees" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
+            <Tree className="h-4 w-4" />
             Decision Trees
           </TabsTrigger>
         </TabsList>
@@ -194,7 +116,7 @@ export const ClinicalGuidelines = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {guidelinesData.map((guideline) => (
+                    {filteredGuidelines.map((guideline) => (
                       <TableRow key={guideline.id}>
                         <TableCell className="font-medium">{guideline.title}</TableCell>
                         <TableCell>{guideline.organization}</TableCell>
@@ -279,62 +201,7 @@ export const ClinicalGuidelines = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="mb-6 flex flex-col sm:flex-row gap-4">
-                <div className="w-full sm:w-1/3">
-                  <label className="block text-sm font-medium mb-2">Select Antibiotic</label>
-                  <Input placeholder="Type to search antibiotics..." />
-                </div>
-                <div className="w-full sm:w-1/3">
-                  <label className="block text-sm font-medium mb-2">Current Medications</label>
-                  <Input placeholder="Type to search medications..." />
-                </div>
-                <div className="w-full sm:w-1/3 flex items-end">
-                  <Button className="w-full">Check Interactions</Button>
-                </div>
-              </div>
-              
-              <h3 className="text-lg font-medium mb-4">Common Antibiotic Interactions</h3>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Antibiotic</TableHead>
-                      <TableHead>Interacts With</TableHead>
-                      <TableHead>Severity</TableHead>
-                      <TableHead>Effect</TableHead>
-                      <TableHead>Recommendation</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {drugInteractionData.map((interaction, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{interaction.antibiotic}</TableCell>
-                        <TableCell>{interaction.interactsWith}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={
-                              interaction.severity === "Major" ? "destructive" :
-                              interaction.severity === "Moderate" ? "default" :
-                              "outline"
-                            }
-                          >
-                            {interaction.severity}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{interaction.effect}</TableCell>
-                        <TableCell>{interaction.recommendation}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              <div className="mt-6">
-                <p className="text-sm text-muted-foreground">
-                  The drug interaction database is updated weekly from multiple pharmacological resources
-                  including Lexicomp, Micromedex, and FDA guidelines.
-                </p>
-              </div>
+              <DrugInteractionChecker />
             </CardContent>
           </Card>
         </TabsContent>
@@ -347,44 +214,8 @@ export const ClinicalGuidelines = () => {
                 Step-by-step decision algorithms for antibiotic selection
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8">
-              {decisionTreeSteps.map((tree) => (
-                <div key={tree.id} className="border rounded-md p-4">
-                  <h3 className="text-lg font-medium mb-4">{tree.title}</h3>
-                  <div className="space-y-4">
-                    {tree.steps.map((step, index) => (
-                      <div key={step.id} className="relative pl-8">
-                        <div className="absolute left-0 top-0 flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs">
-                          {index + 1}
-                        </div>
-                        <h4 className="font-medium">{step.text}</h4>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {step.options.map((option, optIndex) => (
-                            <Badge key={optIndex} variant="outline">{option}</Badge>
-                          ))}
-                        </div>
-                        
-                        {index < tree.steps.length - 1 && (
-                          <div className="absolute left-3 top-6 bottom-0 w-px bg-border h-8"></div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6 flex justify-end">
-                    <Button variant="outline" size="sm">
-                      View Full Algorithm
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="mt-4">
-                <p className="text-sm text-muted-foreground">
-                  Decision trees are regularly updated based on the latest clinical guidelines and local resistance patterns.
-                  The recommendation engine uses these decision pathways when generating patient-specific antibiotic recommendations.
-                </p>
-              </div>
+            <CardContent>
+              <DecisionTrees />
             </CardContent>
           </Card>
         </TabsContent>

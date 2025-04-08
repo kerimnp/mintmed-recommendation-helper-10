@@ -2,10 +2,10 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { balkanDetailedData, regionData } from "./data";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info as InfoIcon, AlertTriangle, MapPin } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { globalResistanceData } from "@/utils/antibioticRecommendations/data/globalResistance";
 
 interface ResistanceMapProps {
   selectedResistance: string;
@@ -13,29 +13,10 @@ interface ResistanceMapProps {
 }
 
 export const ResistanceMap = ({ selectedResistance, selectedRegion }: ResistanceMapProps) => {
-  // Filter data based on selected region
-  let regionSpecificData = balkanDetailedData;
+  // Find the selected region data
+  const regionData = globalResistanceData.find(region => region.region === selectedRegion);
+  const regionSpecificData = regionData?.countries || [];
   
-  if (selectedRegion !== "Balkan") {
-    // For regions other than Balkan, we'll simulate data by adjusting values
-    const regionMultiplier = {
-      "Southern Europe": 1.2,
-      "Northern Europe": 0.6,
-      "Eastern Europe": 1.1,
-      "Western Europe": 0.8
-    }[selectedRegion] || 1;
-    
-    regionSpecificData = balkanDetailedData.map(country => ({
-      ...country,
-      country: country.country + ` (${selectedRegion})`,
-      mrsa: +(country.mrsa * regionMultiplier).toFixed(1),
-      vre: +(country.vre * regionMultiplier).toFixed(1),
-      esbl: +(country.esbl * regionMultiplier).toFixed(1),
-      cre: +(country.cre * regionMultiplier).toFixed(1),
-      pseudomonas: +(country.pseudomonas * regionMultiplier).toFixed(1)
-    }));
-  }
-
   // Get threshold value for the selected resistance type
   const getThresholdForResistance = (resistanceType: string): number => {
     switch(resistanceType) {

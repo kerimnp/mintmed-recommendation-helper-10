@@ -1,6 +1,9 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { globalResistanceData } from "@/utils/antibioticRecommendations/data/globalResistance";
 
 interface ResistanceControlsProps {
   selectedResistance: string;
@@ -15,37 +18,50 @@ export const ResistanceControls = ({
   selectedRegion,
   setSelectedRegion
 }: ResistanceControlsProps) => {
+  // Available regions from global data
+  const availableRegions = globalResistanceData.map(region => region.region);
+  
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <h2 className="text-2xl font-bold">Antibiotic Resistance Patterns</h2>
-      
-      <div className="flex gap-2 w-full sm:w-auto">
-        <Select value={selectedResistance} onValueChange={setSelectedResistance}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue placeholder="Select Resistance Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="mrsa">MRSA</SelectItem>
-            <SelectItem value="vre">VRE</SelectItem>
-            <SelectItem value="esbl">ESBL</SelectItem>
-            <SelectItem value="cre">CRE</SelectItem>
-            <SelectItem value="pseudomonas">Pseudomonas</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue placeholder="Select Region" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Balkan">Balkan</SelectItem>
-            <SelectItem value="Southern Europe">Southern Europe</SelectItem>
-            <SelectItem value="Northern Europe">Northern Europe</SelectItem>
-            <SelectItem value="Eastern Europe">Eastern Europe</SelectItem>
-            <SelectItem value="Western Europe">Western Europe</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
+    <Card className="bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800">
+      <CardContent className="pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="resistance-type">Resistance Type</Label>
+            <Select
+              value={selectedResistance}
+              onValueChange={setSelectedResistance}
+            >
+              <SelectTrigger id="resistance-type" className="w-full">
+                <SelectValue placeholder="Select resistance type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mrsa">MRSA (Methicillin-resistant Staphylococcus aureus)</SelectItem>
+                <SelectItem value="vre">VRE (Vancomycin-resistant Enterococcus)</SelectItem>
+                <SelectItem value="esbl">ESBL (Extended-spectrum beta-lactamase)</SelectItem>
+                <SelectItem value="cre">CRE (Carbapenem-resistant Enterobacteriaceae)</SelectItem>
+                <SelectItem value="pseudomonas">Pseudomonas aeruginosa</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="region">Select Region</Label>
+            <Select
+              value={selectedRegion}
+              onValueChange={setSelectedRegion}
+            >
+              <SelectTrigger id="region" className="w-full">
+                <SelectValue placeholder="Select region" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableRegions.map(region => (
+                  <SelectItem key={region} value={region}>{region}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

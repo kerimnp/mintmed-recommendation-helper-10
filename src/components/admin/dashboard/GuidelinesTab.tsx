@@ -7,9 +7,9 @@ export const GuidelinesTab = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Clinical Guidelines</CardTitle>
+        <CardTitle>Clinical Guidelines & Decision Support</CardTitle>
         <CardDescription>
-          Reference guidelines and decision support tools.
+          Evidence-based treatment protocols and drug interaction information.
         </CardDescription>
       </CardHeader>
       <CardContent>
