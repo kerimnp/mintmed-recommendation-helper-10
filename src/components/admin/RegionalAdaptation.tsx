@@ -136,6 +136,25 @@ export const RegionalAdaptation = () => {
   // All available regions
   const availableRegions = Object.keys(regionCoordinates);
 
+  // Prepare resistance data for the chart
+  const getResistanceData = (region: string) => {
+    const regionData = globalResistanceData.find(r => r.region === region);
+    
+    if (!regionData) {
+      return [];
+    }
+    
+    // Transform the countries data to format needed for the chart
+    return regionData.countries.map(country => ({
+      name: country.country,
+      mrsa: country.mrsa,
+      vre: country.vre,
+      esbl: country.esbl,
+      cre: country.cre,
+      pseudomonas: country.pseudomonas,
+    }));
+  };
+
   const renderRegionalMap = () => {
     return (
       <div className="relative h-[400px] w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
@@ -254,7 +273,7 @@ export const RegionalAdaptation = () => {
           </Card>
         </TabsContent>
         
-        
+        <TabsContent value="resistance" className="pt-4">
           <Card>
             <CardHeader>
               <CardTitle>Regional Resistance Patterns - {selectedRegion}</CardTitle>
@@ -266,7 +285,7 @@ export const RegionalAdaptation = () => {
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
-                    data={globalResistanceData.find(r => r.region === selectedRegion)?.pathogens || []}
+                    data={getResistanceData(selectedRegion)}
                     margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
@@ -274,15 +293,19 @@ export const RegionalAdaptation = () => {
                     <YAxis label={{ value: 'Resistance Rate (%)', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="resistanceRate" name="Resistance Rate (%)" fill="#8884d8" />
-                    <Line type="monotone" dataKey="trendLine" name="5-Year Trend" stroke="#ff7300" />
+                    <Bar dataKey="mrsa" name="MRSA" fill="#8884d8" />
+                    <Bar dataKey="vre" name="VRE" fill="#82ca9d" />
+                    <Bar dataKey="esbl" name="ESBL" fill="#ffc658" />
+                    <Bar dataKey="cre" name="CRE" fill="#ff8042" />
+                    <Bar dataKey="pseudomonas" name="Pseudomonas" fill="#0088fe" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
         
-        
+        <TabsContent value="usage" className="pt-4">
           <Card>
             <CardHeader>
               <CardTitle>Regional vs. Standard Antibiotic Usage - {selectedRegion}</CardTitle>
@@ -316,7 +339,7 @@ export const RegionalAdaptation = () => {
               </div>
             </CardContent>
           </Card>
-        
+        </TabsContent>
       </Tabs>
     </div>
   );
