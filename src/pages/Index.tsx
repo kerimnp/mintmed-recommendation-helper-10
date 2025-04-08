@@ -56,10 +56,10 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="relative pt-20">
-          <div className="container mx-auto px-4 py-8">
+        <main className="w-full">
+          <div className="w-full px-4 py-8">
             <div className="max-w-4xl mx-auto">
-              <div className="flex justify-center mb-8">
+              <div className="flex justify-center mb-8 pt-16">
                 <img 
                   src={theme === 'dark' 
                     ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png"

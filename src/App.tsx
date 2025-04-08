@@ -15,23 +15,25 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="*" element={<Index />} />
-              </Routes>
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <div className="w-full h-full overflow-hidden">
+      <BrowserRouter>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <LanguageProvider>
+            <QueryClientProvider client={queryClient}>
+              <TooltipProvider>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="*" element={<Index />} />
+                </Routes>
+                <Toaster />
+                <Sonner />
+              </TooltipProvider>
+            </QueryClientProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </div>
   );
 }
 

@@ -52,7 +52,15 @@
 @layer base {
   * {
     @apply border-border;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
+  
+  html, body {
+    @apply w-full h-full overflow-x-hidden;
+  }
+  
   body {
     @apply bg-background text-foreground antialiased;
   }
