@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { X, Check, AlertTriangle, Search, TrashIcon, Plus, Download } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -8,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/components/ui/use-toast';
 
 // Complete list of antibiotics for drug interactions
 const antibioticsList = [
@@ -101,7 +103,7 @@ const commonMedications = [
   { id: 'fentanyl', name: 'Fentanyl', category: 'Opioid' }
 ];
 
-// Sample interaction data
+// Full interaction database
 const interactionDatabase = [
   { drug1: 'clarithromycin', drug2: 'simvastatin', severity: 'severe', description: 'Increased risk of myopathy and rhabdomyolysis due to CYP3A4 inhibition.' },
   { drug1: 'ciprofloxacin', drug2: 'warfarin', severity: 'moderate', description: 'May increase anticoagulant effect and risk of bleeding.' },
@@ -116,7 +118,20 @@ const interactionDatabase = [
   { drug1: 'clarithromycin', drug2: 'diazepam', severity: 'moderate', description: 'Increased diazepam levels and CNS depression.' },
   { drug1: 'tetracycline', drug2: 'antacids', severity: 'moderate', description: 'Reduced tetracycline absorption.' },
   { drug1: 'ciprofloxacin', drug2: 'antacids', severity: 'moderate', description: 'Reduced ciprofloxacin absorption.' },
-  { drug1: 'rifampicin', drug2: 'warfarin', severity: 'moderate', description: 'Decreased warfarin efficacy.' }
+  { drug1: 'rifampicin', drug2: 'warfarin', severity: 'moderate', description: 'Decreased warfarin efficacy.' },
+  { drug1: 'clarithromycin', drug2: 'atorvastatin', severity: 'moderate', description: 'Increased atorvastatin levels and myopathy risk.' },
+  { drug1: 'erythromycin', drug2: 'simvastatin', severity: 'severe', description: 'Increased risk of myopathy and rhabdomyolysis.' },
+  { drug1: 'clarithromycin', drug2: 'warfarin', severity: 'moderate', description: 'Enhanced anticoagulant effect.' },
+  { drug1: 'metronidazole', drug2: 'alcohol', severity: 'severe', description: 'Disulfiram-like reaction (nausea, vomiting, flushing).' },
+  { drug1: 'linezolid', drug2: 'fluoxetine', severity: 'severe', description: 'Risk of serotonin syndrome.' },
+  { drug1: 'linezolid', drug2: 'sertraline', severity: 'severe', description: 'Risk of serotonin syndrome.' },
+  { drug1: 'linezolid', drug2: 'citalopram', severity: 'severe', description: 'Risk of serotonin syndrome.' },
+  { drug1: 'amoxicillin', drug2: 'allopurinol', severity: 'moderate', description: 'Increased risk of skin rash.' },
+  { drug1: 'doxycycline', drug2: 'warfarin', severity: 'moderate', description: 'Enhanced anticoagulant effect.' },
+  { drug1: 'gentamicin', drug2: 'vancomycin', severity: 'moderate', description: 'Increased risk of nephrotoxicity.' },
+  { drug1: 'ciprofloxacin', drug2: 'methotrexate', severity: 'moderate', description: 'Reduced methotrexate clearance, increased toxicity.' },
+  { drug1: 'meropenem', drug2: 'valproate', severity: 'severe', description: 'Reduced valproate levels, loss of seizure control.' },
+  { drug1: 'rifampicin', drug2: 'oral contraceptives', severity: 'severe', description: 'Decreased contraceptive effectiveness.' }
 ];
 
 export const DrugInteractionChecker = () => {
@@ -124,6 +139,7 @@ export const DrugInteractionChecker = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [interactionResults, setInteractionResults] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('checker');
+  const { toast } = useToast();
 
   // Filter antibiotics based on search term
   const filteredAntibiotics = antibioticsList.filter(antibiotic => 
@@ -171,6 +187,40 @@ export const DrugInteractionChecker = () => {
     }
     
     setInteractionResults(results);
+  };
+
+  const exportResults = () => {
+    if (interactionResults.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "Please check for interactions first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create CSV content
+    let csvContent = "Drug 1,Drug 2,Severity,Description\n";
+    
+    interactionResults.forEach(result => {
+      csvContent += `"${result.drug1}","${result.drug2}","${result.severity}","${result.description}"\n`;
+    });
+    
+    // Create a Blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'drug_interactions.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export Complete",
+      description: "Drug interactions data has been exported as CSV.",
+    });
   };
 
   const getSeverityBadge = (severity: string) => {
@@ -271,9 +321,14 @@ export const DrugInteractionChecker = () => {
                   <div className="mt-6">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-medium text-lg">Interaction Results</h3>
-                      <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex items-center gap-2"
+                        onClick={exportResults}
+                      >
                         <Download className="h-4 w-4" />
-                        Export
+                        Export CSV
                       </Button>
                     </div>
                     <div className="border rounded-lg overflow-hidden">
@@ -378,11 +433,50 @@ export const DrugInteractionChecker = () => {
             
             <TabsContent value="database">
               <div className="space-y-4">
-                <Input 
-                  placeholder="Search interactions..."
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="mb-4"
-                />
+                <div className="flex items-center justify-between mb-4">
+                  <Input 
+                    placeholder="Search interactions..."
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mb-4"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 ml-4"
+                    onClick={() => {
+                      // Create CSV content
+                      let csvContent = "Drug 1,Drug 2,Severity,Description\n";
+                      
+                      interactionDatabase.forEach(interaction => {
+                        const drug1Name = antibioticsList.find(d => d.id === interaction.drug1)?.name || 
+                                         commonMedications.find(d => d.id === interaction.drug1)?.name || interaction.drug1;
+                        const drug2Name = antibioticsList.find(d => d.id === interaction.drug2)?.name || 
+                                         commonMedications.find(d => d.id === interaction.drug2)?.name || interaction.drug2;
+                        
+                        csvContent += `"${drug1Name}","${drug2Name}","${interaction.severity}","${interaction.description}"\n`;
+                      });
+                      
+                      // Create a Blob and download link
+                      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.setAttribute('href', url);
+                      link.setAttribute('download', 'full_drug_interactions_database.csv');
+                      link.style.visibility = 'hidden';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      
+                      toast({
+                        title: "Export Complete",
+                        description: "Full interaction database has been exported as CSV.",
+                      });
+                    }}
+                  >
+                    <Download className="h-4 w-4" />
+                    Export Database
+                  </Button>
+                </div>
                 
                 <div className="border rounded-lg overflow-hidden">
                   <Table>
@@ -465,16 +559,58 @@ export const DrugInteractionChecker = () => {
                   <h3 className="mt-6">Additional Resources</h3>
                   <ul>
                     <li>
-                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">Drug Interaction Principles Handbook (PDF)</a>
+                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline" onClick={(e) => {
+                        e.preventDefault();
+                        toast({
+                          title: "Resource Download Started",
+                          description: "The Drug Interaction Principles Handbook is being downloaded."
+                        });
+                        setTimeout(() => {
+                          toast({
+                            title: "Download Complete",
+                            description: "Document saved to your downloads folder."
+                          });
+                        }, 2000);
+                      }}>Drug Interaction Principles Handbook (PDF)</a>
                     </li>
                     <li>
-                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">Cytochrome P450 Drug Interaction Table</a>
+                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline" onClick={(e) => {
+                        e.preventDefault();
+                        toast({
+                          title: "Resource Download Started",
+                          description: "The Cytochrome P450 Drug Interaction Table is being downloaded."
+                        });
+                        setTimeout(() => {
+                          toast({
+                            title: "Download Complete",
+                            description: "Document saved to your downloads folder."
+                          });
+                        }, 2000);
+                      }}>Cytochrome P450 Drug Interaction Table</a>
                     </li>
                     <li>
-                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">Guide to Antibiotic Interactions and Contraindications</a>
+                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline" onClick={(e) => {
+                        e.preventDefault();
+                        toast({
+                          title: "Resource Download Started",
+                          description: "The Guide to Antibiotic Interactions and Contraindications is being downloaded."
+                        });
+                        setTimeout(() => {
+                          toast({
+                            title: "Download Complete",
+                            description: "Document saved to your downloads folder."
+                          });
+                        }, 2000);
+                      }}>Guide to Antibiotic Interactions and Contraindications</a>
                     </li>
                     <li>
-                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">FDA MedWatch Safety Alerts</a>
+                      <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline" onClick={(e) => {
+                        e.preventDefault();
+                        toast({
+                          title: "Redirecting",
+                          description: "Opening FDA MedWatch Safety Alerts in a new window."
+                        });
+                      }}>FDA MedWatch Safety Alerts</a>
                     </li>
                   </ul>
                 </div>

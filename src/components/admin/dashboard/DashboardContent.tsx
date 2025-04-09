@@ -5,6 +5,7 @@ import { EffectivenessTab } from "./EffectivenessTab";
 import { ResistanceTab } from "./ResistanceTab";
 import { RegionalTab } from "./RegionalTab";
 import { EducationTab } from "./EducationTab";
+import { GuidelinesTab } from "./GuidelinesTab";
 import { DashboardTabs } from "./DashboardTabs";
 
 interface DashboardContentProps {
@@ -22,6 +23,7 @@ export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
         {activeTab === "resistance" && <ResistanceTab />}
         {activeTab === "regional" && <RegionalTab />}
         {activeTab === "education" && <EducationTab />}
+        {activeTab === "guidelines" && <GuidelinesTab />}
       </div>
     </div>
   );
