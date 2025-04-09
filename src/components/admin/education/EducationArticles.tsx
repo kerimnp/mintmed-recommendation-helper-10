@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ArticleCard } from './ArticleCard';
 import { ArticleDetail } from './ArticleDetail';
-import { articles, categories } from './educationArticlesData';
+import { articles, categories } from './data';
 
 export const EducationArticles = () => {
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Clock, FileText, ChevronRight } from 'lucide-react';
-import { Article } from './educationArticlesData';
+import { Article } from './types/articleTypes';
 
 interface ArticleCardProps {
   article: Article;

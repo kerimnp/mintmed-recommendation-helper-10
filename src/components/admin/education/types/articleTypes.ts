@@ -1,0 +1,22 @@
+
+import { LucideIcon } from "lucide-react";
+
+export type ArticleCategory = "fundamentals" | "clinical" | "advanced" | "specialized" | "guidelines" | "research" | "interactive";
+
+export interface CategoryOption {
+  id: string;
+  label: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  category: ArticleCategory;
+  readTime: string;
+  lastUpdated: string;
+  author: string;
+  authorCredentials: string;
+  content: string;
+}
