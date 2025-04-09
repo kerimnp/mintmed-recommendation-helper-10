@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ScrollText, BookOpen, Bookmark, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { DrugInteractionChecker } from "./DrugInteractionChecker";
+import { DrugInteractionChecker } from "./drug-interactions/DrugInteractionChecker";
 import { GuidelineContent } from "./clinical-guidelines/GuidelineContent";
 
 export const ClinicalGuidelines = () => {
