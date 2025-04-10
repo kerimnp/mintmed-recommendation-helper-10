@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Activity, AlertCircle, TrendingDown, Kidney, Check } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, Heart, Check } from "lucide-react";
 import { calculateGFR, getRenalAdjustmentMessage } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { Badge } from "./ui/badge";
 import { Alert, AlertDescription } from "./ui/alert";
@@ -117,7 +117,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   };
 
   const getRenalStatusIcon = () => {
-    if (!renalStatus) return <Kidney className="h-5 w-5 text-gray-400" />;
+    if (!renalStatus) return <Heart className="h-5 w-5 text-gray-400" />;
     
     switch (renalStatus) {
       case "normal":
@@ -129,7 +129,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       case "severe":
         return <TrendingDown className="h-5 w-5 text-red-500" />;
       default:
-        return <Kidney className="h-5 w-5 text-gray-400" />;
+        return <Heart className="h-5 w-5 text-gray-400" />;
     }
   };
 
@@ -221,7 +221,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
                   className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 mb-2 cursor-help"
                 >
                   {translationWithDefaults.creatinineLabel}
-                  <Kidney className="h-4 w-4 text-gray-400" />
+                  <Heart className="h-4 w-4 text-gray-400" />
                 </Label>
               </TooltipTrigger>
               <TooltipContent>
