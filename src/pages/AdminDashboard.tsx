@@ -63,11 +63,13 @@ const AdminDashboard = () => {
         <header className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4 md:px-6">
             <div className="flex items-center gap-4">
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
+              <Sheet>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+              </Sheet>
               
               <Link to="/" className="flex items-center gap-2">
                 <img 
