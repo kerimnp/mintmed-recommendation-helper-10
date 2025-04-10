@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -9,11 +10,14 @@ import {
   Home,
   Settings,
   Users,
-  PillIcon
+  PillIcon,
+  LogOut
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/use-toast";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -24,18 +28,27 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
   const { theme } = useTheme();
   
   const navItems = [
-    { id: "antibiotics", label: "Antibiotics", icon: Shield },
-    { id: "effectiveness", label: "Effectiveness", icon: PieChart },
-    { id: "resistance", label: "Resistance", icon: Microscope },
-    { id: "regional", label: "Regional", icon: MapPin },
-    { id: "education", label: "Education", icon: BookOpen },
-    { id: "guidelines", label: "Guidelines", icon: PillIcon },
+    { id: "antibiotics", label: "Antibiotics", icon: Shield, description: "Antibiotic guidelines and usage" },
+    { id: "effectiveness", label: "Effectiveness", icon: PieChart, description: "Treatment effectiveness data" },
+    { id: "resistance", label: "Resistance", icon: Microscope, description: "Resistance pattern mapping" },
+    { id: "regional", label: "Regional", icon: MapPin, description: "Regional adaptation" },
+    { id: "education", label: "Education", icon: BookOpen, description: "Educational resources" },
+    { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
   ];
 
+  const handleLogout = () => {
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
+    // Navigate to home page
+    setTimeout(() => window.location.href = "/", 500);
+  };
+
   return (
-    <aside className="fixed top-0 left-0 right-0 z-20 lg:relative lg:top-auto lg:left-auto lg:right-auto bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b lg:border-r lg:border-b-0 border-gray-200 dark:border-gray-800">
+    <aside className="fixed top-0 left-0 right-0 z-20 lg:relative lg:top-auto lg:left-auto lg:right-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b lg:border-r lg:border-b-0 border-gray-200 dark:border-gray-800 h-full">
       <div className="flex flex-col h-full lg:h-screen lg:w-64 p-4">
-        <Link to="/" className="flex items-center gap-3 mb-8 px-2">
+        <Link to="/" className="flex items-center gap-3 mb-8 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800/50 rounded-lg transition-colors">
           <img 
             src={theme === 'dark' 
               ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png"
@@ -66,7 +79,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
                 key={item.id}
                 variant="ghost"
                 className={cn(
-                  "justify-start w-full rounded-lg",
+                  "justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors",
                   activeTab === item.id 
                     ? "bg-medical-primary/10 text-medical-primary font-medium" 
                     : ""
@@ -82,12 +95,30 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           <div className="border-t border-gray-200 dark:border-gray-800 my-4 pt-4">
             <p className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">Administration</p>
             
-            <Button variant="ghost" className="justify-start w-full rounded-lg">
+            <Button 
+              variant="ghost" 
+              className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
+              onClick={() => {
+                toast({
+                  title: "User Management",
+                  description: "User management will be implemented soon.",
+                });
+              }}
+            >
               <Users className="h-4 w-4 mr-3" />
               User Management
             </Button>
             
-            <Button variant="ghost" className="justify-start w-full rounded-lg">
+            <Button 
+              variant="ghost" 
+              className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
+              onClick={() => {
+                toast({
+                  title: "Settings",
+                  description: "Settings will be implemented soon.",
+                });
+              }}
+            >
               <Settings className="h-4 w-4 mr-3" />
               Settings
             </Button>
@@ -112,7 +143,17 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
         </div>
         
         <div className="mt-auto hidden lg:block pt-4">
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+          <Separator className="mb-4" />
+          <Button 
+            variant="ghost" 
+            className="justify-start w-full rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-3" />
+            Log out
+          </Button>
+          
+          <div className="border-t border-gray-200 dark:border-gray-800 mt-4 pt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Horalix © 2025
             </p>

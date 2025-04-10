@@ -1,78 +1,50 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResistanceControls } from "./resistance/ResistanceControls";
 import { ResistanceMap } from "./resistance/ResistanceMap";
 import { ResistanceTrends } from "./resistance/ResistanceTrends";
 import { AntibioticEffectiveness } from "./resistance/AntibioticEffectiveness";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const ResistancePatternMap = () => {
   const [selectedResistance, setSelectedResistance] = useState("mrsa");
   const [selectedRegion, setSelectedRegion] = useState("Balkan");
-  
+
   return (
     <div className="space-y-6">
-      <ResistanceControls 
+      <ResistanceControls
         selectedResistance={selectedResistance}
         setSelectedResistance={setSelectedResistance}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
       />
-      
-      <Tabs defaultValue="map">
-        <TabsList>
-          <TabsTrigger value="map">Map View</TabsTrigger>
-          <TabsTrigger value="trends">Resistance Trends</TabsTrigger>
-          <TabsTrigger value="effectiveness">Antibiotic Effectiveness</TabsTrigger>
+
+      <Tabs defaultValue="map" className="w-full">
+        <TabsList className="grid grid-cols-3 w-full mb-4">
+          <TabsTrigger value="map">Geographic Map</TabsTrigger>
+          <TabsTrigger value="trends">Trends</TabsTrigger>
+          <TabsTrigger value="effectiveness">Effectiveness</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="map">
-          <Card>
-            <CardHeader>
-              <CardTitle>Regional Resistance Map</CardTitle>
-              <CardDescription>
-                Geographic distribution of {selectedResistance.toUpperCase()} resistance patterns
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResistanceMap 
-                selectedResistance={selectedResistance} 
-                selectedRegion={selectedRegion} 
-              />
-            </CardContent>
-          </Card>
+        <TabsContent value="map" className="mt-0">
+          <div className="h-[400px]">
+            <ResistanceMap 
+              selectedResistance={selectedResistance}
+              selectedRegion={selectedRegion}
+            />
+          </div>
         </TabsContent>
         
-        <TabsContent value="trends">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resistance Trends Over Time</CardTitle>
-              <CardDescription>
-                Tracking resistance patterns from 2020 to 2025
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-96">
-              <ResistanceTrends selectedRegion={selectedRegion} />
-            </CardContent>
-          </Card>
+        <TabsContent value="trends" className="mt-0">
+          <div className="h-[400px]">
+            <ResistanceTrends selectedResistance={selectedResistance} />
+          </div>
         </TabsContent>
         
-        <TabsContent value="effectiveness">
-          <Card>
-            <CardHeader>
-              <CardTitle>Antibiotic Effectiveness Against Resistant Strains</CardTitle>
-              <CardDescription>
-                Comparative effectiveness of various antibiotics against resistant bacteria
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-96">
-              <AntibioticEffectiveness 
-                selectedRegion={selectedRegion}
-                selectedResistance={selectedResistance}
-              />
-            </CardContent>
-          </Card>
+        <TabsContent value="effectiveness" className="mt-0">
+          <div className="h-[400px]">
+            <AntibioticEffectiveness selectedResistance={selectedResistance} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
