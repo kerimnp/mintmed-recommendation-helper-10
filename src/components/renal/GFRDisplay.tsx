@@ -1,5 +1,6 @@
+
 import React from "react";
-import { Activity, AlertCircle, TrendingDown, Check } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, Check, FilePlus } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
 import { getGFRCategory, getGFRInterpretation } from "@/utils/antibioticRecommendations/renalAdjustments/renalReferenceRanges";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -50,12 +51,18 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
   };
 
   const getStatusClass = () => {
-    if (!renalStatus) return "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300";
+    if (!renalStatus) return "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700";
     
-    if (gfr === null) return "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300";
+    if (gfr === null) return "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700";
     
-    const category = getGFRCategory(gfr);
-    return category.colorClass;
+    const statusClasses = {
+      normal: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-900/30",
+      mild: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-900/30",
+      moderate: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-900/30",
+      severe: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/30"
+    };
+    
+    return statusClasses[renalStatus as keyof typeof statusClasses] || "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700";
   };
 
   const getProgressColor = () => {
@@ -76,12 +83,37 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
     return (gfr / 90) * 100;
   };
 
+  const getTextColor = () => {
+    if (!renalStatus) return "text-gray-600 dark:text-gray-400";
+    
+    switch (renalStatus) {
+      case "normal": return "text-green-700 dark:text-green-400";
+      case "mild": return "text-yellow-700 dark:text-yellow-400";
+      case "moderate": return "text-orange-700 dark:text-orange-400";
+      case "severe": return "text-red-700 dark:text-red-400";
+      default: return "text-gray-600 dark:text-gray-400";
+    }
+  };
+
+  if (!gfr && !isCalculating && !renalStatus) {
+    return (
+      <div className="mt-4 border border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center text-gray-500 dark:text-gray-400">
+        <FilePlus className="h-6 w-6 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">
+          {language === "en" 
+            ? "Enter patient data and creatinine value to calculate renal function"
+            : "Unesite podatke o pacijentu i vrijednost kreatinina za izračun bubrežne funkcije"}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 space-y-3">
-      <div className={`rounded-lg ${getStatusClass()} border p-3 transition-all duration-300 animate-fade-in`}>
+      <div className={`rounded-lg ${getStatusClass()} border p-4 transition-all duration-300 animate-fade-in`}>
         <div className="flex items-center gap-2">
           {getRenalStatusIcon()}
-          <span className="font-medium">
+          <span className={`font-medium ${getTextColor()}`}>
             {isCalculating ? (
               <span className="flex items-center gap-2">
                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
@@ -92,7 +124,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
                 <div className="flex items-center gap-2">
                   {getStatusText()}
                   <Badge variant="outline" className="ml-2 font-mono">
-                    GFR: {Math.round(gfr)} mL/min
+                    {Math.round(gfr)} mL/min
                   </Badge>
                 </div>
               ) : getStatusText()
@@ -108,6 +140,21 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
             <p className="mt-2 text-sm">
               {getGFRInterpretation(gfr)}
             </p>
+            
+            <div className="grid grid-cols-4 gap-2 mt-4 text-center text-xs">
+              <div className={`p-1 rounded ${renalStatus === "severe" ? "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
+                &lt; 30
+              </div>
+              <div className={`p-1 rounded ${renalStatus === "moderate" ? "bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
+                30-59
+              </div>
+              <div className={`p-1 rounded ${renalStatus === "mild" ? "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
+                60-89
+              </div>
+              <div className={`p-1 rounded ${renalStatus === "normal" ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
+                &gt;= 90
+              </div>
+            </div>
           </>
         )}
       </div>

@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "next-themes";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlarmClock, ShieldAlert, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const AntibioticAdvisor = () => {
@@ -37,7 +37,7 @@ const AntibioticAdvisor = () => {
               </h1>
             </div>
             <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800">
                 <ArrowLeft className="h-4 w-4" />
                 <span>{language === "en" ? "Back to Home" : "Natrag na Početnu"}</span>
               </Button>
@@ -61,6 +61,33 @@ const AntibioticAdvisor = () => {
               ? "Use the form below to get personalized, evidence-based antibiotic recommendations."
               : "Koristite obrazac ispod da biste dobili personalizirane preporuke za antibiotike temeljene na dokazima."}
           </p>
+          
+          <div className="flex justify-center gap-8 mt-8">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2">
+                <Stethoscope className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {language === "en" ? "Clinical Excellence" : "Klinička Izvrsnost"}
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-2">
+                <ShieldAlert className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {language === "en" ? "Patient Safety" : "Sigurnost Pacijenta"}
+              </span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-2">
+                <AlarmClock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {language === "en" ? "Rapid Results" : "Brzi Rezultati"}
+              </span>
+            </div>
+          </div>
         </motion.div>
         
         <motion.div 
