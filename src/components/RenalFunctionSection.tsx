@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import { Activity, KidneyIcon } from "lucide-react";
+import { Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
