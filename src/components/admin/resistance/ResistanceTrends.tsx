@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -10,9 +9,10 @@ import { toast } from "sonner";
 
 interface ResistanceTrendsProps {
   selectedRegion?: string;
+  selectedResistance?: string; // Add the missing prop to fix the TypeScript error
 }
 
-export const ResistanceTrends = ({ selectedRegion = "Balkan" }: ResistanceTrendsProps) => {
+export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance = "mrsa" }: ResistanceTrendsProps) => {
   // Generate region-specific trend data based on selected region
   const getRegionSpecificTrendData = () => {
     // Apply a regional modifier based on selected region
