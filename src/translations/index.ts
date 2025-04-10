@@ -141,7 +141,7 @@ export const translations = {
       kidneyDisease: "Bubrežna bolest",
       liverDisease: "Bolest jetre",
       diabetes: "Dijabetes",
-      immunosuppressed: "Imunosupresija"
+      immunosupresija: "Imunosupresija"
     },
     infectionDetails: {
       title: "Detalji infekcije",

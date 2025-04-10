@@ -47,8 +47,8 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     severe: "Severe Impairment"
   };
   
-  // Cast the translation to ensure TypeScript knows all required fields exist
-  const translationData = translations[language].renalFunction || {};
+  // Get translations with type safety
+  const translationData = translations[language].renalFunction as Partial<RenalFunctionTranslation> || {};
   const translationWithDefaults: RenalFunctionTranslation = {
     title: translationData.title || defaultTranslation.title,
     subtitle: translationData.subtitle || defaultTranslation.subtitle,
