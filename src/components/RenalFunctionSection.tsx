@@ -3,11 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Activity } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, TrendingUp, Check } from "lucide-react";
 import { calculateGFR } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { Badge } from "./ui/badge";
 import { Alert, AlertDescription } from "./ui/alert";
-import { AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 
@@ -62,14 +61,25 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   const [gfr, setGfr] = useState<number | null>(null);
   const [renalStatus, setRenalStatus] = useState<string>("");
   
+  // Calculate GFR and renal status immediately when creatinine changes or when component mounts
   useEffect(() => {
-    if (creatinine && age && weight && gender) {
+    calculateRenalFunction();
+  }, [creatinine, age, weight, gender]);
+
+  // Calculate renal function based on input values
+  const calculateRenalFunction = () => {
+    if (creatinine) {
       const creatinineValue = parseFloat(creatinine);
+      // Default values if parameters are missing
+      const ageValue = age ? parseFloat(age) : 50;
+      const weightValue = weight ? parseFloat(weight) : 70;
+      const genderValue = gender || "male";
+      
       if (!isNaN(creatinineValue) && creatinineValue > 0) {
         const calculatedGFR = calculateGFR({
-          age,
-          weight,
-          gender,
+          age: ageValue.toString(),
+          weight: weightValue.toString(),
+          gender: genderValue,
           creatinine: creatinineValue
         });
         
@@ -93,10 +103,27 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       setGfr(null);
       setRenalStatus("");
     }
-  }, [creatinine, age, weight, gender]);
+  };
+
+  const getRenalStatusIcon = () => {
+    if (!renalStatus) return null;
+    
+    switch (renalStatus) {
+      case "normal":
+        return <Check className="h-5 w-5 text-green-500" />;
+      case "mild":
+        return <TrendingDown className="h-5 w-5 text-yellow-500" />;
+      case "moderate":
+        return <TrendingDown className="h-5 w-5 text-orange-500" />;
+      case "severe":
+        return <TrendingDown className="h-5 w-5 text-red-500" />;
+      default:
+        return null;
+    }
+  };
 
   const renderRenalStatus = () => {
-    if (!gfr) return null;
+    if (creatinine === "") return null;
     
     let color = "bg-green-500";
     let text = translationWithDefaults.normal;
@@ -114,8 +141,9 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     
     return (
       <div className="mt-4">
-        <Badge variant="outline" className={`text-white ${color} px-2 py-1`}>
-          {text} - GFR: {Math.round(gfr)} mL/min
+        <Badge variant="outline" className={`text-white ${color} px-2 py-1 flex items-center gap-2`}>
+          {getRenalStatusIcon()}
+          {gfr ? `${text} - GFR: ${Math.round(gfr)} mL/min` : "Enter valid creatinine value"}
         </Badge>
         
         {renalStatus === "severe" && (
