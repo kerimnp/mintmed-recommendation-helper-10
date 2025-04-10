@@ -4,6 +4,8 @@ export interface DrugInteraction {
   drug2: string;
   severity: 'severe' | 'moderate' | 'mild';
   description: string;
+  mechanism?: string; // Added optional mechanism property
+  reference?: string; // Added optional reference property
 }
 
 // Full interaction database
