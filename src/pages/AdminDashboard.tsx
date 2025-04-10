@@ -32,6 +32,7 @@ const AdminDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   // Ensure theme is available on client side
@@ -60,10 +61,31 @@ const AdminDashboard = () => {
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Search",
-      description: "Search functionality will be implemented soon.",
-    });
+    
+    if (searchTerm.trim()) {
+      // Show success toast
+      toast({
+        title: "Search executed",
+        description: `Searching for: "${searchTerm}"`,
+      });
+      
+      // Determine which tab to navigate to based on search term
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      
+      if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) {
+        setActiveTab("antibiotics");
+      } else if (lowerSearchTerm.includes("resist") || lowerSearchTerm.includes("pattern")) {
+        setActiveTab("resistance");
+      } else if (lowerSearchTerm.includes("region") || lowerSearchTerm.includes("local")) {
+        setActiveTab("regional");
+      } else if (lowerSearchTerm.includes("guide") || lowerSearchTerm.includes("protocol")) {
+        setActiveTab("guidelines");
+      } else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) {
+        setActiveTab("effectiveness");
+      } else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) {
+        setActiveTab("education");
+      }
+    }
   };
 
   if (!mounted) return null;
@@ -227,6 +249,8 @@ const AdminDashboard = () => {
                 <Input
                   placeholder="Search guidelines, drugs, or resistance data..."
                   className="pl-9 border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/50 h-9 rounded-full w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </form>
@@ -311,6 +335,19 @@ const AdminDashboard = () => {
                   </p>
                 </div>
                 
+                {/* Mobile search bar */}
+                <form onSubmit={handleSearch} className="md:hidden w-full">
+                  <div className="relative w-full">
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="Search..."
+                      className="pl-9 w-full"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </form>
+                
                 <div className="flex items-center gap-3">
                   <Link to="/">
                     <Button variant="outline" className="flex items-center gap-2 rounded-full">
@@ -318,6 +355,7 @@ const AdminDashboard = () => {
                       <span className="hidden md:inline">Back to Home</span>
                     </Button>
                   </Link>
+                  
                   {/* Fixed Dialog to have proper trigger */}
                   <Dialog>
                     <DialogTrigger asChild>
@@ -437,7 +475,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              <DashboardContent activeTab={activeTab} />
+              <DashboardContent activeTab={activeTab} searchTerm={searchTerm} />
             </motion.div>
             
             <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 mt-8">

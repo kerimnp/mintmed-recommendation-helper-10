@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { 
   Command, 
   CommandEmpty, 
@@ -20,15 +21,28 @@ import {
 interface SearchableDrugSelectorProps {
   onSelectDrug: (drugId: string) => void;
   selectedDrugs: string[];
+  initialSearchValue?: string;
 }
 
 export const SearchableDrugSelector: React.FC<SearchableDrugSelectorProps> = ({ 
   onSelectDrug,
-  selectedDrugs
+  selectedDrugs,
+  initialSearchValue = ""
 }) => {
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
+  // Set initial search value based on prop
+  useEffect(() => {
+    if (initialSearchValue) {
+      setSearchValue(initialSearchValue);
+      // Automatically open popover if there's an initial search
+      if (initialSearchValue.trim().length > 0) {
+        setOpen(true);
+      }
+    }
+  }, [initialSearchValue]);
   
   const allDrugs = [...antibioticsList, ...commonMedications];
   

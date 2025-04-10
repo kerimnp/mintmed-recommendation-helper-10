@@ -1,39 +1,31 @@
 
 import React from "react";
-import { AntibioticsTab } from "./AntibioticsTab";
-import { EffectivenessTab } from "./EffectivenessTab";
 import { ResistanceTab } from "./ResistanceTab";
+import { AntibioticsTab } from "./AntibioticsTab";
 import { RegionalTab } from "./RegionalTab";
-import { EducationTab } from "./EducationTab";
+import { EffectivenessTab } from "./EffectivenessTab";
 import { GuidelinesTab } from "./GuidelinesTab";
-import { DashboardTabs } from "./DashboardTabs";
-import { motion, AnimatePresence } from "framer-motion";
+import { EducationTab } from "./EducationTab";
+import { ClinicalGuidelines } from "../ClinicalGuidelines";
 
 interface DashboardContentProps {
   activeTab: string;
+  searchTerm?: string; // Make searchTerm optional
 }
 
-export const DashboardContent = ({ activeTab }: DashboardContentProps) => {
+export const DashboardContent: React.FC<DashboardContentProps> = ({ 
+  activeTab,
+  searchTerm = "" // Default to empty string if not provided
+}) => {
   return (
-    <div className="space-y-6">
-      <DashboardTabs activeTab={activeTab} setActiveTab={(tab) => window.history.pushState(null, '', `?tab=${tab}`)} />
-      
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === "antibiotics" && <AntibioticsTab />}
-          {activeTab === "effectiveness" && <EffectivenessTab />}
-          {activeTab === "resistance" && <ResistanceTab />}
-          {activeTab === "regional" && <RegionalTab />}
-          {activeTab === "education" && <EducationTab />}
-          {activeTab === "guidelines" && <GuidelinesTab />}
-        </motion.div>
-      </AnimatePresence>
+    <div className="w-full">
+      {activeTab === "resistance" && <ResistanceTab searchTerm={searchTerm} />}
+      {activeTab === "antibiotics" && <AntibioticsTab searchTerm={searchTerm} />}
+      {activeTab === "regional" && <RegionalTab searchTerm={searchTerm} />}
+      {activeTab === "effectiveness" && <EffectivenessTab searchTerm={searchTerm} />}
+      {activeTab === "guidelines" && <GuidelinesTab searchTerm={searchTerm} />}
+      {activeTab === "education" && <EducationTab searchTerm={searchTerm} />}
+      {activeTab === "clinical-guidelines" && <ClinicalGuidelines searchTerm={searchTerm} />}
     </div>
   );
 };

@@ -12,11 +12,16 @@ interface ArticleCardProps {
 export const ArticleCard = ({ article, onSelect }: ArticleCardProps) => {
   const isMobile = useIsMobile();
   
+  // Highlight matching text if needed based on search terms (could be enhanced in the future)
+  const handleCardClick = () => {
+    onSelect(article.id);
+  };
+  
   return (
     <div 
       key={article.id}
       className="group overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer"
-      onClick={() => onSelect(article.id)}
+      onClick={handleCardClick}
     >
       <div className="p-4 sm:p-6">
         <div className="flex items-start space-x-3 sm:space-x-4">

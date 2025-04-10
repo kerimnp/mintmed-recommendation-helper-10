@@ -1,12 +1,21 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { EducationArticles } from "@/components/admin/education/EducationArticles";
 import { Card } from "@/components/ui/card";
 import { Book, School, Award, Brain } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export const EducationTab = () => {
+interface EducationTabProps {
+  searchTerm?: string;
+}
+
+export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) => {
   const isMobile = useIsMobile();
+  const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
+  
+  useEffect(() => {
+    setFilteredSearchTerm(searchTerm);
+  }, [searchTerm]);
   
   return (
     <div className="space-y-6">
@@ -57,7 +66,7 @@ export const EducationTab = () => {
         </div>
       </div>
       
-      <EducationArticles />
+      <EducationArticles searchTerm={filteredSearchTerm} />
     </div>
   );
 };

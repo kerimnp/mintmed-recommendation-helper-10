@@ -1,187 +1,137 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import React, { useState, useEffect } from 'react';
 import { ArticleCard } from './ArticleCard';
 import { ArticleDetail } from './ArticleDetail';
-import { articles, categories } from './data';
-import { QuizComponent } from './QuizComponent';
-import { quizzes } from './data/quizData';
-import { toast } from '@/components/ui/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { ArticleType } from './types/articleTypes';
+import { categories } from './data/categories';
+import { articles } from './data/index';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Book, Brain, Trophy, BookText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Search, Filter } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-export const EducationArticles = () => {
-  const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedQuiz, setSelectedQuiz] = useState<string | null>(null);
-  const [showQuizzes, setShowQuizzes] = useState(false);
+interface EducationArticlesProps {
+  searchTerm?: string;
+}
+
+export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm = "" }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [localSearchTerm, setLocalSearchTerm] = useState('');
+  const [showCategories, setShowCategories] = useState(false);
   const isMobile = useIsMobile();
-
-  const handleSelectArticle = (id: string) => {
-    setSelectedArticle(id);
-    setSelectedQuiz(null);
-  };
-
-  const handleSelectQuiz = (id: string) => {
-    setSelectedQuiz(id);
-    setSelectedArticle(null);
-  };
-
-  const handleBackToList = () => {
-    setSelectedArticle(null);
-    setSelectedQuiz(null);
-  };
-
-  const handleQuizComplete = (score: number, total: number) => {
-    toast({
-      title: "Quiz Completed!",
-      description: `You scored ${score} out of ${total}. Great job!`,
-    });
-  };
-
-  const selectedArticleData = articles.find(article => article.id === selectedArticle);
-  const selectedQuizData = quizzes.find(quiz => quiz.id === selectedQuiz);
   
-  // Filter articles by category
-  const filteredArticles = activeCategory === "all" 
-    ? articles 
-    : articles.filter(article => article.category === activeCategory);
-
-  // Filter quizzes by category
-  const filteredQuizzes = activeCategory === "all" 
-    ? quizzes 
-    : quizzes.filter(quiz => quiz.category === activeCategory);
-
-  // Get related articles (different from the selected one)
-  const relatedArticles = selectedArticle 
-    ? articles
-        .filter(article => article.id !== selectedArticle)
-        .slice(0, 3) 
-    : [];
-
+  // Sync external search term to local search
+  useEffect(() => {
+    if (searchTerm) {
+      setLocalSearchTerm(searchTerm);
+    }
+  }, [searchTerm]);
+  
+  const effectiveSearchTerm = searchTerm || localSearchTerm;
+  
+  const handleArticleSelect = (id: string) => {
+    setSelectedArticleId(id);
+  };
+  
+  const handleBackToArticles = () => {
+    setSelectedArticleId(null);
+  };
+  
+  const toggleCategories = () => {
+    setShowCategories(!showCategories);
+  };
+  
+  const filteredArticles = articles.filter(article => {
+    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
+    const matchesSearch = effectiveSearchTerm 
+      ? article.title.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) || 
+        article.description.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) ||
+        article.category.toLowerCase().includes(effectiveSearchTerm.toLowerCase())
+      : true;
+    
+    return matchesCategory && matchesSearch;
+  });
+  
+  const selectedArticle = articles.find(article => article.id === selectedArticleId);
+  
+  if (selectedArticle) {
+    return <ArticleDetail article={selectedArticle} onBack={handleBackToArticles} />;
+  }
+  
   return (
-    <div>
-      {selectedArticle === null && selectedQuiz === null ? (
-        <div className="space-y-6">
-          <Tabs defaultValue="all" className="w-full" onValueChange={setActiveCategory}>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-              <ScrollArea className="w-full sm:w-auto">
-                <TabsList className="bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto justify-start">
-                  {categories.map(category => (
-                    <TabsTrigger 
-                      key={category.id} 
-                      value={category.id} 
-                      className="px-4 py-2 data-[state=active]:bg-medical-primary data-[state=active]:text-white whitespace-nowrap"
-                    >
-                      {category.label}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </ScrollArea>
-              
-              <div className="flex items-center">
-                <Button 
-                  onClick={() => setShowQuizzes(!showQuizzes)}
-                  className="text-sm font-medium px-4 py-2 rounded-lg bg-medical-primary/10 text-medical-primary hover:bg-medical-primary/20 transition-colors flex items-center gap-2"
-                >
-                  {showQuizzes ? <BookText className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
-                  <span>{showQuizzes ? "Show Articles" : "Show Quizzes"}</span>
-                </Button>
-              </div>
-            </div>
-
-            <TabsContent value={activeCategory} className="mt-0">
-              {showQuizzes ? (
-                <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
-                  {filteredQuizzes.length > 0 ? (
-                    filteredQuizzes.map((quiz) => (
-                      <div 
-                        key={quiz.id}
-                        className="group overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                        onClick={() => handleSelectQuiz(quiz.id)}
-                      >
-                        <div className="p-4 sm:p-6">
-                          <div className="flex items-start space-x-4">
-                            <div className="rounded-full bg-medical-primary/10 p-3 flex-shrink-0">
-                              <Trophy className="h-5 w-5 text-medical-primary" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-lg font-medium mb-1 group-hover:text-medical-accent transition-colors line-clamp-1">
-                                {quiz.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{quiz.description}</p>
-                              
-                              <div className="flex flex-wrap items-center mt-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                <div className="flex items-center">
-                                  <span className="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
-                                    {quiz.questions.length} questions
-                                  </span>
-                                </div>
-                                <div className="flex items-center">
-                                  <span className="capitalize px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
-                                    {quiz.difficulty}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="col-span-full p-6 text-center text-gray-500 dark:text-gray-400">
-                      No quizzes available for this category. Please select another category.
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
-                  {filteredArticles.length > 0 ? (
-                    filteredArticles.map((article) => (
-                      <ArticleCard 
-                        key={article.id} 
-                        article={article} 
-                        onSelect={handleSelectArticle}
-                      />
-                    ))
-                  ) : (
-                    <div className="col-span-full p-6 text-center text-gray-500 dark:text-gray-400">
-                      No articles available for this category. Please select another category.
-                    </div>
-                  )}
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row gap-4 justify-between">
+        <div className="flex-1">
+          <h2 className="text-xl font-semibold mb-2">Education Articles</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
+            Browse through our curated collection of evidence-based articles and educational resources
+          </p>
         </div>
-      ) : selectedQuiz ? (
-        <div>
-          <button 
-            onClick={handleBackToList}
-            className="mb-4 flex items-center text-sm font-medium text-medical-primary hover:text-medical-accent"
+        
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search articles..."
+              className="pl-9 w-full"
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" onClick={toggleCategories} className="sm:w-auto">
+            <Filter className="h-4 w-4 mr-2" />
+            Categories
+          </Button>
+        </div>
+      </div>
+      
+      {showCategories && (
+        <div className="flex flex-wrap gap-2 pb-2">
+          <Badge 
+            variant={selectedCategory === 'all' ? "default" : "outline"}
+            className="cursor-pointer hover:bg-primary/90 transition-colors"
+            onClick={() => setSelectedCategory('all')}
           >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to all resources
-          </button>
-          <QuizComponent 
-            title={selectedQuizData.title} 
-            questions={selectedQuizData.questions} 
-            onComplete={handleQuizComplete}
-          />
+            All Categories
+          </Badge>
+          {categories.map(category => (
+            <Badge 
+              key={category.id} 
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary/90 transition-colors"
+              onClick={() => setSelectedCategory(category.id)}
+            >
+              {category.name}
+            </Badge>
+          ))}
+        </div>
+      )}
+      
+      {filteredArticles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredArticles.map(article => (
+            <ArticleCard 
+              key={article.id} 
+              article={article as ArticleType} 
+              onSelect={handleArticleSelect} 
+            />
+          ))}
         </div>
       ) : (
-        selectedArticleData && (
-          <ArticleDetail
-            article={selectedArticleData}
-            onBack={handleBackToList}
-            relatedArticles={relatedArticles}
-            onSelectRelated={handleSelectArticle}
-          />
-        )
+        <div className="text-center py-10 bg-gray-50 dark:bg-gray-800/30 rounded-lg">
+          <h3 className="text-lg font-medium mb-2">No articles found</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            Try adjusting your search or category filters
+          </p>
+          <Button onClick={() => {
+            setLocalSearchTerm('');
+            setSelectedCategory('all');
+          }}>
+            Reset Filters
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { ScrollText, BookOpen, Bookmark, Search } from "lucide-react";
@@ -7,8 +7,21 @@ import { Card } from "@/components/ui/card";
 import { DrugInteractionChecker } from "./drug-interactions/DrugInteractionChecker";
 import { GuidelineContent } from "./clinical-guidelines/GuidelineContent";
 
-export const ClinicalGuidelines = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+interface ClinicalGuidelinesProps {
+  searchTerm?: string;
+}
+
+export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTerm: externalSearchTerm = "" }) => {
+  const [internalSearchTerm, setInternalSearchTerm] = useState("");
+  
+  // Sync external search term to internal state
+  useEffect(() => {
+    if (externalSearchTerm) {
+      setInternalSearchTerm(externalSearchTerm);
+    }
+  }, [externalSearchTerm]);
+
+  const effectiveSearchTerm = externalSearchTerm || internalSearchTerm;
   
   return (
     <div className="space-y-6">
@@ -19,8 +32,8 @@ export const ClinicalGuidelines = () => {
           <Input
             placeholder="Search guidelines..."
             className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={internalSearchTerm}
+            onChange={(e) => setInternalSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -38,12 +51,12 @@ export const ClinicalGuidelines = () => {
         </TabsList>
         
         <TabsContent value="guidelines" className="space-y-6">
-          <GuidelineContent searchTerm={searchTerm} />
+          <GuidelineContent searchTerm={effectiveSearchTerm} />
         </TabsContent>
         
         <TabsContent value="interactions">
           <Card className="border-0 shadow-sm">
-            <DrugInteractionChecker />
+            <DrugInteractionChecker searchTerm={effectiveSearchTerm} />
           </Card>
         </TabsContent>
       </Tabs>
