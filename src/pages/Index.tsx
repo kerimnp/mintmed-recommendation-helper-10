@@ -17,28 +17,28 @@ const Index = () => {
 
   const features = [
     {
-      icon: <Brain className="h-10 w-10 text-blue-500" />,
+      icon: <Brain className="h-12 w-12 text-blue-500" />,
       title: language === "en" ? "AI-Powered Recommendations" : "Preporuke Temeljene na AI",
       description: language === "en" 
         ? "Get evidence-based antibiotic recommendations tailored to each patient's unique profile."
         : "Dobijte preporuke antibiotika temeljene na dokazima i prilagođene jedinstvenom profilu svakog pacijenta."
     },
     {
-      icon: <Microscope className="h-10 w-10 text-green-500" />,
+      icon: <Microscope className="h-12 w-12 text-green-500" />,
       title: language === "en" ? "Clinical Precision" : "Klinička Preciznost",
       description: language === "en"
         ? "Factor in allergies, renal function, and comorbidities for safer prescribing."
         : "Uzmite u obzir alergije, bubrežnu funkciju i komorbiditete za sigurnije propisivanje."
     },
     {
-      icon: <Globe className="h-10 w-10 text-purple-500" />,
+      icon: <Globe className="h-12 w-12 text-purple-500" />,
       title: language === "en" ? "Regional Adaptation" : "Regionalna Prilagodba",
       description: language === "en"
         ? "Recommendations consider local resistance patterns for optimal outcomes."
         : "Preporuke uzimaju u obzir lokalne obrasce otpornosti za optimalne ishode."
     },
     {
-      icon: <BookOpen className="h-10 w-10 text-amber-500" />,
+      icon: <BookOpen className="h-12 w-12 text-amber-500" />,
       title: language === "en" ? "Continuous Learning" : "Kontinuirano Učenje",
       description: language === "en"
         ? "Access educational resources to stay updated with the latest clinical guidelines."
@@ -48,21 +48,21 @@ const Index = () => {
 
   const sections = [
     {
-      icon: <Hospital className="h-12 w-12 text-blue-600" />,
+      icon: <Hospital className="h-14 w-14 text-blue-600" />,
       title: language === "en" ? "Clinical Decision Support" : "Podrška Kliničkom Odlučivanju",
       description: language === "en"
         ? "Our system integrates the latest clinical guidelines with patient-specific data to provide personalized antibiotic recommendations that optimize treatment outcomes while minimizing risks."
         : "Naš sustav integrira najnovije kliničke smjernice s podacima specifičnim za pacijenta kako bi pružio personalizirane preporuke antibiotika koje optimiziraju ishode liječenja uz minimiziranje rizika."
     },
     {
-      icon: <HeartPulse className="h-12 w-12 text-red-500" />,
+      icon: <HeartPulse className="h-14 w-14 text-red-500" />,
       title: language === "en" ? "Patient Safety Focus" : "Fokus na Sigurnost Pacijenata",
       description: language === "en"
         ? "Every recommendation accounts for patient allergies, drug interactions, renal/hepatic function, and other critical factors to ensure the safest possible antibiotic regimen for each individual."
         : "Svaka preporuka uzima u obzir alergije pacijenta, interakcije lijekova, bubrežnu/jetrenu funkciju i druge kritične faktore kako bi se osigurao najsigurniji mogući režim antibiotika za svakog pojedinca."
     },
     {
-      icon: <GraduationCap className="h-12 w-12 text-green-600" />,
+      icon: <GraduationCap className="h-14 w-14 text-green-600" />,
       title: language === "en" ? "Educational Resources" : "Obrazovni Resursi",
       description: language === "en"
         ? "Beyond recommendations, we provide comprehensive educational materials to help clinicians stay current with evolving best practices in antibiotic stewardship and infectious disease management."
@@ -78,9 +78,8 @@ const Index = () => {
         <meta name="keywords" content="Horalix, AI in medicine, medical AI, antibiotic recommendations, healthcare AI, clinical decision support, medical software" />
       </Helmet>
 
-      <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 
-        dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto">
-        <header className="fixed top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm">
+      <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 overflow-auto">
+        <header className="fixed top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-gray-900/70">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
@@ -98,18 +97,17 @@ const Index = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="rounded-full bg-gray-100/80 dark:bg-medical-bg-secondary hover:bg-gray-200/80 
-                    dark:hover:bg-medical-bg"
+                  className="rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
                 >
                   {theme === "dark" ? (
-                    <Sun className="h-5 w-5 text-gray-900 dark:text-medical-text" />
+                    <Sun className="h-5 w-5 text-gray-200" />
                   ) : (
-                    <Moon className="h-5 w-5 text-gray-900 dark:text-medical-text" />
+                    <Moon className="h-5 w-5 text-gray-700" />
                   )}
                 </Button>
                 <LanguageToggle />
                 <Link to="/auth">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2 bg-white/80 dark:bg-gray-800/80">
+                  <Button size="sm" className="flex items-center gap-2 bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-sm">
                     <LogIn className="h-4 w-4" />
                     <span>{language === "en" ? "Sign In" : "Prijava"}</span>
                   </Button>
@@ -121,16 +119,16 @@ const Index = () => {
 
         <main className="w-full overflow-auto pt-20">
           {/* Hero Section */}
-          <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+          <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
             <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
                   className="space-y-8"
                 >
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent leading-tight">
                     {language === "en" 
                       ? "Evidence-Based Antibiotic Recommendations" 
                       : "Preporuke Antibiotika Temeljene na Dokazima"}
@@ -142,31 +140,31 @@ const Index = () => {
                   </p>
                   <div className="flex flex-wrap gap-4">
                     <Link to="/advisor">
-                      <Button size="lg" className="bg-medical-primary hover:bg-medical-primary-hover text-white group">
+                      <Button size="lg" className="bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-md group">
                         {language === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
-                    <Link to="/admin">
-                      <Button variant="outline" size="lg">
-                        {language === "en" ? "Explore Dashboard" : "Istražite Nadzornu Ploču"}
+                    <Link to="/about">
+                      <Button variant="outline" size="lg" className="rounded-full">
+                        {language === "en" ? "Learn More" : "Saznaj Više"}
                       </Button>
                     </Link>
                   </div>
                 </motion.div>
                 <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
                   className="relative"
                 >
-                  <div className="relative overflow-hidden rounded-3xl shadow-xl">
+                  <div className="relative overflow-hidden rounded-3xl shadow-2xl">
                     <img 
                       src="/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png" 
                       alt="Horalix Dashboard" 
                       className="w-full h-auto object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
                 </motion.div>
               </div>
@@ -174,10 +172,10 @@ const Index = () => {
           </section>
 
           {/* Features Section */}
-          <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800/50">
+          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50/80 dark:bg-gray-800/30 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent mb-4">
                   {language === "en" ? "Key Features" : "Ključne Značajke"}
                 </h2>
                 <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -192,15 +190,16 @@ const Index = () => {
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 * index }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border border-gray-100 dark:border-gray-700 ios-card-shadow"
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 shadow-lg"
                   >
-                    <div className="rounded-full w-16 h-16 bg-gray-50 dark:bg-gray-700 flex items-center justify-center mb-4">
+                    <div className="mb-6 flex items-center justify-center">
                       {feature.icon}
                     </div>
-                    <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+                    <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white text-center">{feature.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-center">{feature.description}</p>
                   </motion.div>
                 ))}
               </div>
@@ -208,23 +207,23 @@ const Index = () => {
           </section>
 
           {/* In-Depth Sections */}
-          <section className="py-16 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto space-y-24">
+          <section className="py-20 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto space-y-32">
               {sections.map((section, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-12 items-center`}
+                  transition={{ duration: 0.7 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-16 items-center`}
                 >
                   <div className="md:w-1/2">
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-3xl p-10 flex items-center justify-center ios-card-shadow">
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-12 flex items-center justify-center shadow-lg">
                       {section.icon}
                     </div>
                   </div>
-                  <div className="md:w-1/2 space-y-4">
+                  <div className="md:w-1/2 space-y-6">
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{section.title}</h3>
                     <p className="text-lg text-gray-600 dark:text-gray-300">{section.description}</p>
                   </div>
@@ -234,16 +233,16 @@ const Index = () => {
           </section>
 
           {/* CTA Section */}
-          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-blue-50 dark:bg-blue-900/20">
+          <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 backdrop-blur-sm">
             <div className="max-w-5xl mx-auto text-center">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
                 className="space-y-8"
               >
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
                   {language === "en" 
                     ? "Ready to transform your antibiotic prescribing practice?" 
                     : "Spremni za transformaciju vaše prakse propisivanja antibiotika?"}
@@ -254,7 +253,7 @@ const Index = () => {
                     : "Pridružite se tisućama zdravstvenih djelatnika koji vjeruju Horalixu u podršci njihovom kliničkom odlučivanju."}
                 </p>
                 <Link to="/advisor">
-                  <Button size="lg" className="bg-medical-primary hover:bg-medical-primary-hover text-white">
+                  <Button size="lg" className="bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-md">
                     {language === "en" ? "Try Antibiotic Advisor Now" : "Isprobajte Savjetnik za Antibiotike Sada"}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -264,7 +263,7 @@ const Index = () => {
           </section>
         </main>
         
-        <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8">
+        <footer className="py-12 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="md:flex md:items-center md:justify-between">
               <div className="flex justify-center md:justify-start">
