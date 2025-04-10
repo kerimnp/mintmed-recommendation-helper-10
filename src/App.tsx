@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "@/pages/Index";
 import AdminDashboard from "@/pages/AdminDashboard";
+import Auth from "@/pages/Auth";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="*" element={<Index />} />
                 </Routes>
                 <Toaster />
