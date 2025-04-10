@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -198,11 +198,14 @@ const AdminDashboard = () => {
         <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4 md:px-6">
             <div className="flex items-center gap-4">
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
+              {/* Fixed SheetTrigger to be wrapped in SheetRoot */}
+              <Sheet>
+                <SheetTrigger asChild className="lg:hidden">
+                  <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsMobileMenuOpen(true)}>
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+              </Sheet>
               
               <Link to="/" className="flex items-center gap-2">
                 <img 
@@ -315,14 +318,122 @@ const AdminDashboard = () => {
                       <span className="hidden md:inline">Back to Home</span>
                     </Button>
                   </Link>
-                  <Button 
-                    variant="default" 
-                    className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
-                    onClick={() => setIsSettingsOpen(true)}
-                  >
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden md:inline">Settings</span>
-                  </Button>
+                  {/* Fixed Dialog to have proper trigger */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="default" 
+                        className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span className="hidden md:inline">Settings</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px] rounded-xl">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl">Settings</DialogTitle>
+                        <DialogDescription>
+                          Customize your dashboard experience and account preferences
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      <Tabs defaultValue="appearance">
+                        <TabsList className="grid grid-cols-3 w-full">
+                          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+                          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                          <TabsTrigger value="account">Account</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="appearance" className="space-y-4 py-4">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="dark-mode-2">Dark Mode</Label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Toggle between light and dark theme</p>
+                              </div>
+                              <Switch 
+                                id="dark-mode-2" 
+                                checked={theme === 'dark'}
+                                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                              />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="reduced-motion-2">Reduced Motion</Label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Minimize animations throughout the interface</p>
+                              </div>
+                              <Switch id="reduced-motion-2" />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="compact-view-2">Compact View</Label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Reduce spacing and size of UI elements</p>
+                              </div>
+                              <Switch id="compact-view-2" />
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="notifications" className="space-y-4 py-4">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="email-notifs-2">Email Notifications</Label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Receive system notifications via email</p>
+                              </div>
+                              <Switch id="email-notifs-2" defaultChecked />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <Label htmlFor="push-notifs-2">Push Notifications</Label>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Receive in-app notifications</p>
+                              </div>
+                              <Switch id="push-notifs-2" defaultChecked />
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="account" className="space-y-4 py-4">
+                          <div className="space-y-4">
+                            <div className="flex items-center space-x-4">
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src="https://ui.shadcn.com/avatars/03.png" />
+                                <AvatarFallback>MD</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">Dr. Maria Dawson</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Infectious Disease Specialist</p>
+                              </div>
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div>
+                              <Button variant="outline" className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30" onClick={handleLogout}>
+                                <LogOut className="h-4 w-4 mr-2" />
+                                Log out
+                              </Button>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                      
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
+                          Close
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
               
