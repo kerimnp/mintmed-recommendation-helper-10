@@ -3,12 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Activity, AlertCircle, TrendingDown, TrendingUp, Check } from "lucide-react";
-import { calculateGFR } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
+import { Activity, AlertCircle, TrendingDown, Kidney, Check } from "lucide-react";
+import { calculateGFR, getRenalAdjustmentMessage } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { Badge } from "./ui/badge";
 import { Alert, AlertDescription } from "./ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 interface RenalFunctionSectionProps {
   creatinine: string;
@@ -60,6 +61,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   
   const [gfr, setGfr] = useState<number | null>(null);
   const [renalStatus, setRenalStatus] = useState<string>("");
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
   
   // Calculate GFR and renal status immediately when creatinine changes or when component mounts
   useEffect(() => {
@@ -68,8 +70,18 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
 
   // Calculate renal function based on input values
   const calculateRenalFunction = () => {
-    if (creatinine) {
+    if (!creatinine || creatinine === "") {
+      setGfr(null);
+      setRenalStatus("");
+      return;
+    }
+    
+    setIsCalculating(true);
+    
+    // Short delay to show calculation animation
+    setTimeout(() => {
       const creatinineValue = parseFloat(creatinine);
+      
       // Default values if parameters are missing
       const ageValue = age ? parseFloat(age) : 50;
       const weightValue = weight ? parseFloat(weight) : 70;
@@ -99,14 +111,13 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
         setGfr(null);
         setRenalStatus("");
       }
-    } else {
-      setGfr(null);
-      setRenalStatus("");
-    }
+      
+      setIsCalculating(false);
+    }, 300);
   };
 
   const getRenalStatusIcon = () => {
-    if (!renalStatus) return null;
+    if (!renalStatus) return <Kidney className="h-5 w-5 text-gray-400" />;
     
     switch (renalStatus) {
       case "normal":
@@ -118,36 +129,66 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       case "severe":
         return <TrendingDown className="h-5 w-5 text-red-500" />;
       default:
-        return null;
+        return <Kidney className="h-5 w-5 text-gray-400" />;
     }
   };
 
+  const getAdjustmentMessage = () => {
+    if (!gfr) return null;
+    return getRenalAdjustmentMessage(gfr);
+  };
+
   const renderRenalStatus = () => {
-    if (creatinine === "") return null;
+    let color = "bg-gray-200 dark:bg-gray-700";
+    let text = "Enter creatinine value";
+    let textColor = "text-gray-600 dark:text-gray-300";
     
-    let color = "bg-green-500";
-    let text = translationWithDefaults.normal;
-    
-    if (renalStatus === "mild") {
-      color = "bg-yellow-500";
-      text = translationWithDefaults.mild;
-    } else if (renalStatus === "moderate") {
-      color = "bg-orange-500";
-      text = translationWithDefaults.moderate;
-    } else if (renalStatus === "severe") {
-      color = "bg-red-500";
-      text = translationWithDefaults.severe;
+    if (renalStatus) {
+      if (renalStatus === "normal") {
+        color = "bg-green-100 border-green-300 dark:bg-green-900/30";
+        textColor = "text-green-800 dark:text-green-300";
+        text = translationWithDefaults.normal;
+      } else if (renalStatus === "mild") {
+        color = "bg-yellow-100 border-yellow-300 dark:bg-yellow-900/30";
+        textColor = "text-yellow-800 dark:text-yellow-300";
+        text = translationWithDefaults.mild;
+      } else if (renalStatus === "moderate") {
+        color = "bg-orange-100 border-orange-300 dark:bg-orange-900/30";
+        textColor = "text-orange-800 dark:text-orange-300";
+        text = translationWithDefaults.moderate;
+      } else if (renalStatus === "severe") {
+        color = "bg-red-100 border-red-300 dark:bg-red-900/30";
+        textColor = "text-red-800 dark:text-red-300";
+        text = translationWithDefaults.severe;
+      }
     }
     
     return (
-      <div className="mt-4">
-        <Badge variant="outline" className={`text-white ${color} px-2 py-1 flex items-center gap-2`}>
-          {getRenalStatusIcon()}
-          {gfr ? `${text} - GFR: ${Math.round(gfr)} mL/min` : "Enter valid creatinine value"}
-        </Badge>
+      <div className="mt-4 space-y-3">
+        <div className={`rounded-lg ${color} border p-3 transition-all duration-300 animate-fade-in`}>
+          <div className="flex items-center gap-2">
+            {getRenalStatusIcon()}
+            <span className={`font-medium ${textColor}`}>
+              {isCalculating ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                  Calculating...
+                </span>
+              ) : (
+                gfr ? `${text} - GFR: ${Math.round(gfr)} mL/min` : text
+              )}
+            </span>
+          </div>
+          
+          {gfr && !isCalculating && (
+            <p className={`mt-2 text-sm ${textColor}`}>
+              {getAdjustmentMessage()}
+            </p>
+          )}
+        </div>
         
         {renalStatus === "severe" && (
-          <Alert variant="destructive" className="mt-2">
+          <Alert variant="destructive" className="animate-fade-in">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               {language === "en" 
@@ -172,23 +213,43 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       
       <div className="space-y-4">
         <div className="max-w-xs">
-          <Label 
-            htmlFor="creatinine"
-            className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 mb-2"
-          >
-            {translationWithDefaults.creatinineLabel}
-          </Label>
-          <Input
-            id="creatinine"
-            type="number"
-            step="0.1"
-            min="0.1"
-            max="20"
-            value={creatinine}
-            onChange={(e) => onCreatinineChange(e.target.value)}
-            className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors"
-            placeholder="e.g., 0.8"
-          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Label 
+                  htmlFor="creatinine"
+                  className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 mb-2 cursor-help"
+                >
+                  {translationWithDefaults.creatinineLabel}
+                  <Kidney className="h-4 w-4 text-gray-400" />
+                </Label>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm max-w-xs">
+                  {language === "en" 
+                    ? "Normal range: 0.7-1.3 mg/dL for men and 0.6-1.1 mg/dL for women"
+                    : "Normalni raspon: 0.7-1.3 mg/dL za muškarce i 0.6-1.1 mg/dL za žene"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          
+          <div className="relative">
+            <Input
+              id="creatinine"
+              type="number"
+              step="0.1"
+              min="0.1"
+              max="20"
+              value={creatinine}
+              onChange={(e) => onCreatinineChange(e.target.value)}
+              className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors pl-3 pr-10"
+              placeholder="e.g., 0.8"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <span className="text-gray-500 dark:text-gray-400 text-sm">mg/dL</span>
+            </div>
+          </div>
         </div>
         
         {renderRenalStatus()}
