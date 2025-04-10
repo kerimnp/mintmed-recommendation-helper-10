@@ -1,11 +1,11 @@
-
 import React from "react";
 import { 
   Shield, 
   PieChart, 
   Microscope, 
   MapPin, 
-  BookOpen 
+  BookOpen,
+  PillIcon 
 } from "lucide-react";
 
 interface DashboardTabsProps {
@@ -19,7 +19,8 @@ export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) =
     { id: "effectiveness", icon: PieChart, label: "Effectiveness" },
     { id: "resistance", icon: Microscope, label: "Resistance" },
     { id: "regional", icon: MapPin, label: "Regional" },
-    { id: "education", icon: BookOpen, label: "Education" }
+    { id: "education", icon: BookOpen, label: "Education" },
+    { id: "guidelines", icon: PillIcon, label: "Guidelines" }
   ];
 
   return (

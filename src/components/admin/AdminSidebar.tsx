@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -9,7 +8,8 @@ import {
   BookOpen, 
   Home,
   Settings,
-  Users
+  Users,
+  PillIcon
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
     { id: "resistance", label: "Resistance", icon: Microscope },
     { id: "regional", label: "Regional", icon: MapPin },
     { id: "education", label: "Education", icon: BookOpen },
+    { id: "guidelines", label: "Guidelines", icon: PillIcon },
   ];
 
   return (

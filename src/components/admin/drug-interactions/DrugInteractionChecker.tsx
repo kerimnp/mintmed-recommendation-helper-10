@@ -29,8 +29,29 @@ export const DrugInteractionChecker = () => {
   };
 
   const handleCheckInteractions = () => {
+    if (selectedDrugs.length < 2) {
+      toast({
+        title: "Not enough medications selected",
+        description: "Please select at least two medications to check for interactions.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const results = checkInteractions(selectedDrugs);
     setInteractionResults(results);
+    
+    if (results.length === 0) {
+      toast({
+        title: "No interactions found",
+        description: "No known interactions between the selected medications.",
+      });
+    } else {
+      toast({
+        title: `${results.length} interaction${results.length > 1 ? 's' : ''} found`,
+        description: "Review the results below for details.",
+      });
+    }
   };
 
   return (
