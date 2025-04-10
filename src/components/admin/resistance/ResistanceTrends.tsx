@@ -1,18 +1,23 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { resistanceTrendData } from "./data";
 import { regionalResistanceData } from "@/utils/antibioticRecommendations/data/regionalResistance";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import { useTheme } from "next-themes";
 
 interface ResistanceTrendsProps {
   selectedRegion?: string;
-  selectedResistance?: string; // Add the missing prop to fix the TypeScript error
+  selectedResistance?: string;
 }
 
 export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance = "mrsa" }: ResistanceTrendsProps) => {
+  const { theme } = useTheme();
+  
   // Generate region-specific trend data based on selected region
   const getRegionSpecificTrendData = () => {
     // Apply a regional modifier based on selected region
@@ -86,16 +91,113 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
   const regionObservations = getRegionObservations();
   
   const handleExportData = () => {
-    toast.success(`${selectedRegion} resistance data exported successfully`);
+    // Create a CSV file with the resistance data
+    const csvContent = [
+      // Header row
+      ["Year", "MRSA", "VRE", "ESBL", "CRE", "Pseudomonas"],
+      // Data rows
+      ...regionSpecificData.map(item => [
+        item.year,
+        item.mrsa,
+        item.vre,
+        item.esbl,
+        item.cre,
+        item.pseudomonas
+      ])
+    ]
+      .map(row => row.join(","))
+      .join("\n");
+
+    // Create a blob and download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${selectedRegion}_resistance_data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`${selectedRegion} resistance data exported as CSV`);
   };
   
   const handleDownloadGuidelines = () => {
-    toast.success(`${selectedRegion} regional guidelines downloaded successfully`);
+    // Create a PDF document with the regional guidelines
+    const doc = new jsPDF();
+    
+    // Add header and title
+    doc.setFontSize(18);
+    doc.setTextColor(0, 51, 102);
+    doc.text(`${selectedRegion} Regional Guidelines`, 20, 20);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Antimicrobial Resistance Surveillance Data", 20, 30);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 37);
+    
+    // Add resistance trends section
+    doc.setFontSize(14);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Regional Resistance Observations", 20, 50);
+    
+    // Add observations
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    regionObservations.forEach((observation, index) => {
+      doc.text(`• ${observation}`, 25, 60 + (index * 7));
+    });
+    
+    // Add data table
+    doc.setFontSize(14);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Resistance Data (2019-2024)", 20, 100);
+    
+    // Table headers
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const headers = ["Year", "MRSA", "VRE", "ESBL", "CRE", "Pseudomonas"];
+    headers.forEach((header, index) => {
+      doc.text(header, 20 + (index * 30), 110);
+    });
+    
+    // Table data
+    doc.setFontSize(9);
+    regionSpecificData.forEach((row, rowIndex) => {
+      doc.text(row.year.toString(), 20, 120 + (rowIndex * 7));
+      doc.text(row.mrsa.toString() + "%", 50, 120 + (rowIndex * 7));
+      doc.text(row.vre.toString() + "%", 80, 120 + (rowIndex * 7));
+      doc.text(row.esbl.toString() + "%", 110, 120 + (rowIndex * 7));
+      doc.text(row.cre.toString() + "%", 140, 120 + (rowIndex * 7));
+      doc.text(row.pseudomonas.toString() + "%", 170, 120 + (rowIndex * 7));
+    });
+    
+    // Add recommendations section
+    doc.setFontSize(14);
+    doc.setTextColor(0, 51, 102);
+    doc.text("Recommendations", 20, 160);
+    
+    // Add recommendation content
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("1. Monitor local resistance patterns closely and adjust protocols accordingly", 25, 170);
+    doc.text("2. Implement antimicrobial stewardship programs to reduce unnecessary prescriptions", 25, 177);
+    doc.text("3. Follow guidelines for appropriate empiric therapy based on regional data", 25, 184);
+    doc.text("4. Consider resistance patterns when selecting antibiotic regimens", 25, 191);
+    
+    // Add footer
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Report generated by Horalix Clinical Decision Support System", 60, 280);
+    
+    // Save the PDF
+    doc.save(`${selectedRegion}_guidelines.pdf`);
+    
+    toast.success(`${selectedRegion} regional guidelines downloaded as PDF`);
   };
   
   return (
-    <Card className="mb-8 shadow-lg border border-gray-100 dark:border-gray-800">
-      <CardHeader className="pb-2">
+    <Card className="mb-8 shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden backdrop-blur-sm">
+      <CardHeader className="pb-2 bg-gray-50/80 dark:bg-gray-900/50">
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
           <div>
             <CardTitle className="text-xl text-medical-primary">Resistance Trends (2019-2024) - {selectedRegion}</CardTitle>
@@ -103,14 +205,20 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
               Data based on European Antimicrobial Resistance Surveillance Network (EARS-Net)
             </CardDescription>
           </div>
-          <Button onClick={handleDownloadGuidelines} variant="outline" className="flex items-center gap-2 whitespace-nowrap">
-            <Download className="h-4 w-4" />
-            Download {selectedRegion} Guidelines
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleDownloadGuidelines} variant="outline" className="flex items-center gap-2 whitespace-nowrap rounded-full text-sm">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Download Guidelines</span>
+            </Button>
+            <Button onClick={handleExportData} variant="outline" className="flex items-center gap-2 whitespace-nowrap rounded-full text-sm">
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export Data</span>
+            </Button>
+          </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="h-[600px]"> {/* Increased height for better visibility */}
+      <CardContent className="p-6">
+        <div className="h-[500px]"> {/* Adjusted height for better visibility */}
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               width={500}
@@ -136,11 +244,12 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
               <Tooltip 
                 formatter={(value: number) => [`${value}%`, ""]} 
                 contentStyle={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                  borderRadius: '8px', 
-                  border: '1px solid #ccc', 
+                  backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)', 
+                  borderRadius: '12px', 
+                  border: theme === 'dark' ? '1px solid rgba(100, 116, 139, 0.5)' : '1px solid rgba(200, 214, 229, 0.5)', 
                   padding: '12px',
-                  fontSize: '13px'
+                  fontSize: '13px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}
               />
               <Legend wrapperStyle={{ paddingTop: "10px" }} formatter={(value) => value.toUpperCase()} />
@@ -152,6 +261,7 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
                 fill="#FF8042" 
                 fillOpacity={0.6}
                 strokeWidth={2}
+                activeDot={{ r: 6 }}
               />
               <Area 
                 type="monotone" 
@@ -161,6 +271,7 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
                 fill="#FFBB28" 
                 fillOpacity={0.6}
                 strokeWidth={2}
+                activeDot={{ r: 6 }}
               />
               <Area 
                 type="monotone" 
@@ -170,6 +281,7 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
                 fill="#0088FE" 
                 fillOpacity={0.6}
                 strokeWidth={2}
+                activeDot={{ r: 6 }}
               />
               <Area 
                 type="monotone" 
@@ -179,6 +291,7 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
                 fill="#8884d8" 
                 fillOpacity={0.6}
                 strokeWidth={2}
+                activeDot={{ r: 6 }}
               />
               <Area 
                 type="monotone" 
@@ -188,15 +301,16 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
                 fill="#00C49F" 
                 fillOpacity={0.6}
                 strokeWidth={2}
+                activeDot={{ r: 6 }}
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
         
         <div className="mt-8 flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg w-full md:w-3/4">
-            <h4 className="text-sm font-medium mb-2">Key Observations for {selectedRegion}</h4>
-            <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-300">
+          <div className="p-4 bg-gray-50 dark:bg-gray-900/30 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm w-full md:w-3/4">
+            <h4 className="text-sm font-medium mb-2 text-medical-primary">Key Observations for {selectedRegion}</h4>
+            <ul className="text-sm space-y-1.5 text-gray-700 dark:text-gray-300">
               {regionObservations.map((observation, index) => (
                 <li key={index} className="flex items-start gap-2">
                   <span className="text-medical-primary">•</span>
@@ -205,11 +319,6 @@ export const ResistanceTrends = ({ selectedRegion = "Balkan", selectedResistance
               ))}
             </ul>
           </div>
-
-          <Button className="flex items-center gap-2" onClick={handleExportData}>
-            <Download className="h-4 w-4" />
-            Export Data
-          </Button>
         </div>
       </CardContent>
     </Card>

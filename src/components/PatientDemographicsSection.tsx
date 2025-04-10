@@ -41,7 +41,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
   ];
 
   return (
-    <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800">
+    <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800 rounded-xl">
       <div className="space-y-2 mb-6">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <UserRound className="h-5 w-5 text-medical-primary" />
@@ -50,7 +50,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
         <div className="space-y-2">
           <Label 
             htmlFor="age" 
@@ -92,7 +92,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
               <SelectValue placeholder={t.gender} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg">
               <SelectItem value="male">{t.genderOptions.male}</SelectItem>
               <SelectItem value="female">{t.genderOptions.female}</SelectItem>
             </SelectContent>
@@ -172,7 +172,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
               <SelectValue placeholder={t.nationality} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg max-h-60">
               {balkanCountries.map((country) => (
                 <SelectItem key={country} value={country}>
                   {country}
@@ -195,7 +195,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
               <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
                 <SelectValue placeholder={t.pregnancy} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg">
                 <SelectItem value="not-pregnant">{t.pregnancyOptions.notPregnant}</SelectItem>
                 <SelectItem value="pregnant">{t.pregnancyOptions.pregnant}</SelectItem>
                 <SelectItem value="breastfeeding">{t.pregnancyOptions.breastfeeding}</SelectItem>
