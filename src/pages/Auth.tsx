@@ -1,18 +1,18 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Auth = () => {
   const { language } = useLanguage();
@@ -20,10 +20,22 @@ const Auth = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [error, setError] = useState<string | null>(null);
   const { signIn, signUp, signInWithGoogle } = useAuth();
+
+  useEffect(() => {
+    // Clear error when switching tabs
+    setError(null);
+    
+    // Clear form fields when switching tabs
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  }, [activeTab]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,20 +57,21 @@ const Auth = () => {
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     if (!email || !password) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: language === "en" ? "Please enter email and password" : "Molimo unesite email i lozinku",
-        variant: "destructive",
-      });
+      setError(language === "en" ? "Please enter email and password" : "Molimo unesite email i lozinku");
       return;
     }
 
     setIsLoading(true);
     try {
       await signIn(email, password);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign in error:", error);
+      setError(error.message || (language === "en" 
+        ? "Failed to sign in. Please check your credentials." 
+        : "Prijava nije uspjela. Molimo provjerite svoje podatke."));
     } finally {
       setIsLoading(false);
     }
@@ -66,20 +79,31 @@ const Auth = () => {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     if (!email || !password) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: language === "en" ? "Please enter email and password" : "Molimo unesite email i lozinku",
-        variant: "destructive",
-      });
+      setError(language === "en" ? "Please enter email and password" : "Molimo unesite email i lozinku");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError(language === "en" ? "Passwords do not match" : "Lozinke se ne podudaraju");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError(language === "en" ? "Password must be at least 6 characters long" : "Lozinka mora imati najmanje 6 znakova");
       return;
     }
 
     setIsLoading(true);
     try {
       await signUp(email, password);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign up error:", error);
+      setError(error.message || (language === "en" 
+        ? "Failed to create account. This email might already be in use." 
+        : "Neuspjelo stvaranje računa. Ovaj email možda već postoji."));
     } finally {
       setIsLoading(false);
     }
@@ -88,9 +112,15 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       await signInWithGoogle();
-    } catch (error) {
+      // Note: Success is handled by the auth state change listener
+    } catch (error: any) {
       console.error("Google sign in error:", error);
+      setError(error.message || (language === "en" 
+        ? "Failed to sign in with Google. Please try again." 
+        : "Prijava putem Googlea nije uspjela. Molimo pokušajte ponovno."));
+      setIsLoading(false);
     }
   };
 
@@ -113,7 +143,7 @@ const Auth = () => {
       >
         <Card className="ios-card-shadow bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-gray-100 dark:border-gray-800 rounded-2xl">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold text-medical-primary">
               {activeTab === "login" 
                 ? (language === "en" ? "Welcome Back" : "Dobrodošli Natrag") 
                 : (language === "en" ? "Create Account" : "Stvorite Račun")}
@@ -125,17 +155,24 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <Tabs 
               defaultValue="login" 
               value={activeTab} 
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid grid-cols-2 mb-6">
-                <TabsTrigger value="login">
+              <TabsList className="grid grid-cols-2 mb-6 w-full">
+                <TabsTrigger value="login" className="text-sm font-medium">
                   {language === "en" ? "Sign In" : "Prijava"}
                 </TabsTrigger>
-                <TabsTrigger value="register">
+                <TabsTrigger value="register" className="text-sm font-medium">
                   {language === "en" ? "Sign Up" : "Registracija"}
                 </TabsTrigger>
               </TabsList>
@@ -143,22 +180,23 @@ const Auth = () => {
               <TabsContent value="login">
                 <form onSubmit={handleEmailSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">{language === "en" ? "Email" : "Email"}</Label>
+                    <Label htmlFor="email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
                         id="email"
                         type="email"
                         placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 ios-input"
+                        className="pl-10 py-6 ios-input"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password">{language === "en" ? "Password" : "Lozinka"}</Label>
+                      <Label htmlFor="password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
                       <Button 
                         variant="link" 
                         className="px-0 h-auto font-normal text-xs text-medical-primary"
@@ -168,19 +206,21 @@ const Auth = () => {
                       </Button>
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 ios-input"
+                        className="pl-10 pr-10 py-6 ios-input"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                         onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
                       >
                         {showPassword ? (
                           <EyeOff className="h-5 w-5" />
@@ -192,7 +232,7 @@ const Auth = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full ios-button mt-2" 
+                    className="w-full ios-button mt-4 py-6" 
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -210,35 +250,38 @@ const Auth = () => {
               <TabsContent value="register">
                 <form onSubmit={handleEmailSignUp} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">{language === "en" ? "Email" : "Email"}</Label>
+                    <Label htmlFor="register-email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
                         id="register-email"
                         type="email"
                         placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 ios-input"
+                        className="pl-10 py-6 ios-input"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">{language === "en" ? "Password" : "Lozinka"}</Label>
+                    <Label htmlFor="register-password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
                         id="register-password"
                         type={showPassword ? "text" : "password"}
                         placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 ios-input"
+                        className="pl-10 pr-10 py-6 ios-input"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                         onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
                       >
                         {showPassword ? (
                           <EyeOff className="h-5 w-5" />
@@ -246,6 +289,23 @@ const Auth = () => {
                           <Eye className="h-5 w-5" />
                         )}
                       </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-medium">
+                      {language === "en" ? "Confirm Password" : "Potvrdite Lozinku"}
+                    </Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="confirm-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder={language === "en" ? "••••••••" : "••••••••"}
+                        className="pl-10 pr-10 py-6 ios-input"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                      />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       {language === "en" 
@@ -255,7 +315,7 @@ const Auth = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full ios-button mt-2" 
+                    className="w-full ios-button mt-4 py-6" 
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -285,8 +345,9 @@ const Auth = () => {
             <div className="flex justify-center">
               <Button
                 variant="outline"
-                className="ios-button-secondary flex items-center justify-center gap-2 w-full"
+                className="ios-button-secondary flex items-center justify-center gap-2 w-full py-6"
                 onClick={handleGoogleSignIn}
+                disabled={isLoading}
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -307,14 +368,30 @@ const Auth = () => {
                   />
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
-                <span>{language === "en" ? "Sign in with Google" : "Prijavi se s Google računom"}</span>
+                <span className="ml-2">{language === "en" ? "Sign in with Google" : "Prijavi se s Google računom"}</span>
               </Button>
             </div>
           </CardContent>
-          <CardFooter className="text-center text-xs text-gray-500 dark:text-gray-400">
-            {language === "en" 
-              ? "By continuing, you agree to our Terms of Service and Privacy Policy"
-              : "Nastavljanjem, pristajete na naše Uvjete korištenja i Politiku privatnosti"}
+          <CardFooter className="flex flex-col text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {language === "en" 
+                ? "By continuing, you agree to our Terms of Service and Privacy Policy"
+                : "Nastavljanjem, pristajete na naše Uvjete korištenja i Politiku privatnosti"}
+            </p>
+            <p className="text-xs text-medical-primary mt-2">
+              {activeTab === "login" 
+                ? (language === "en" ? "Don't have an account? " : "Nemate račun? ") 
+                : (language === "en" ? "Already have an account? " : "Već imate račun? ")}
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-xs font-medium" 
+                onClick={() => setActiveTab(activeTab === "login" ? "register" : "login")}
+              >
+                {activeTab === "login" 
+                  ? (language === "en" ? "Sign up" : "Registrirajte se") 
+                  : (language === "en" ? "Sign in" : "Prijavite se")}
+              </Button>
+            </p>
           </CardFooter>
         </Card>
       </motion.div>

@@ -14,7 +14,6 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
-  signInWithApple: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,8 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           toast({
             title: language === 'en' ? 'Signed in successfully!' : 'Uspješna prijava!',
             description: language === 'en' 
-              ? 'Welcome back to the application.'
-              : 'Dobrodošli natrag u aplikaciju.',
+              ? 'Welcome to Antibiotic Advisor.'
+              : 'Dobrodošli u Antibiotic Advisor.',
           });
           
           // Only navigate if on auth page to avoid unnecessary redirects
@@ -55,8 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           toast({
             title: language === 'en' ? 'Signed out' : 'Odjavljeni ste',
             description: language === 'en' 
-              ? 'You have been signed out of the application.'
-              : 'Odjavljeni ste iz aplikacije.',
+              ? 'You have been signed out successfully.'
+              : 'Uspješno ste odjavljeni.',
           });
         }
       }
@@ -93,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'destructive',
       });
       console.error('Sign in error:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -115,10 +115,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       toast({
-        title: language === 'en' ? 'Verification email sent' : 'Verifikacijski email poslan',
+        title: language === 'en' ? 'Account created successfully' : 'Račun uspješno kreiran',
         description: language === 'en'
-          ? 'Please check your email for a verification link.'
-          : 'Molimo provjerite svoj email za verifikacijski link.',
+          ? 'Please check your email for verification instructions.'
+          : 'Molimo provjerite svoj email za upute o verifikaciji.',
       });
     } catch (error: any) {
       toast({
@@ -129,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'destructive',
       });
       console.error('Sign up error:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -155,7 +156,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -174,32 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'destructive',
       });
       console.error('Google sign in error:', error);
-      setLoading(false);
-    }
-  };
-
-  const signInWithApple = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: `${window.location.origin}/auth`,
-        }
-      });
-      
-      if (error) throw error;
-      
-    } catch (error: any) {
-      toast({
-        title: language === 'en' ? 'Apple sign-in failed' : 'Apple prijava nije uspjela',
-        description: error.message || (language === 'en'
-          ? 'There was an error signing in with Apple.'
-          : 'Došlo je do pogreške prilikom prijave putem Applea.'),
-        variant: 'destructive',
-      });
-      console.error('Apple sign in error:', error);
-      setLoading(false);
+      throw error;
     }
   };
 
@@ -211,7 +186,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     loading,
     signInWithGoogle,
-    signInWithApple,
   };
 
   return (
