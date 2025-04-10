@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
-import { Activity } from "lucide-react";
+import { Activity, Kidney } from "lucide-react";
 import { calculateGFR } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
@@ -16,6 +16,7 @@ interface RenalFunctionSectionProps {
   age?: string;
   weight?: string;
   gender?: string;
+  height?: string;
 }
 
 interface RenalFunctionTranslation {
@@ -33,7 +34,8 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   onCreatinineChange,
   age = "",
   weight = "",
-  gender = ""
+  gender = "",
+  height = ""
 }) => {
   const { language } = useLanguage();
   const defaultTranslation: RenalFunctionTranslation = {
@@ -65,7 +67,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   // Calculate GFR and renal status immediately when creatinine changes or when component mounts
   useEffect(() => {
     calculateRenalFunction();
-  }, [creatinine, age, weight, gender]);
+  }, [creatinine, age, weight, gender, height]);
 
   // Calculate renal function based on input values
   const calculateRenalFunction = () => {
@@ -85,13 +87,15 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       const ageValue = age ? parseFloat(age) : 50;
       const weightValue = weight ? parseFloat(weight) : 70;
       const genderValue = gender || "male";
+      const heightValue = height || "";
       
       if (!isNaN(creatinineValue) && creatinineValue > 0) {
         const calculatedGFR = calculateGFR({
           age: ageValue.toString(),
           weight: weightValue.toString(),
           gender: genderValue,
-          creatinine: creatinineValue
+          creatinine: creatinineValue,
+          height: heightValue
         });
         
         setGfr(calculatedGFR);
@@ -112,7 +116,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800 rounded-xl">
       <div className="space-y-2 mb-4">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <Activity className="h-5 w-5 text-medical-primary" />
+          <Kidney className="h-5 w-5 text-medical-primary" />
           {translationWithDefaults.title}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">{translationWithDefaults.subtitle}</p>

@@ -1,9 +1,11 @@
 
 import React from "react";
-import { Activity, AlertCircle, TrendingDown, Heart, Check } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, Kidney, Check } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
 import { getGFRCategory, getGFRInterpretation } from "@/utils/antibioticRecommendations/renalAdjustments/renalReferenceRanges";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Badge } from "../ui/badge";
+import { Progress } from "../ui/progress";
 
 interface GFRDisplayProps {
   gfr: number | null;
@@ -19,7 +21,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
   const { language } = useLanguage();
 
   const getRenalStatusIcon = () => {
-    if (!renalStatus) return <Heart className="h-5 w-5 text-gray-400" />;
+    if (!renalStatus) return <Kidney className="h-5 w-5 text-gray-400" />;
     
     switch (renalStatus) {
       case "normal":
@@ -31,7 +33,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
       case "severe":
         return <TrendingDown className="h-5 w-5 text-red-500" />;
       default:
-        return <Heart className="h-5 w-5 text-gray-400" />;
+        return <Kidney className="h-5 w-5 text-gray-400" />;
     }
   };
 
@@ -57,6 +59,24 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
     return category.colorClass;
   };
 
+  const getProgressColor = () => {
+    if (!renalStatus) return "bg-gray-300";
+    
+    switch (renalStatus) {
+      case "normal": return "bg-green-500";
+      case "mild": return "bg-yellow-500";
+      case "moderate": return "bg-orange-500";
+      case "severe": return "bg-red-500";
+      default: return "bg-gray-300";
+    }
+  };
+
+  const getProgressValue = () => {
+    if (!gfr || gfr <= 15) return 15;
+    if (gfr >= 90) return 100;
+    return (gfr / 90) * 100;
+  };
+
   return (
     <div className="mt-4 space-y-3">
       <div className={`rounded-lg ${getStatusClass()} border p-3 transition-all duration-300 animate-fade-in`}>
@@ -69,15 +89,27 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
                 {language === "en" ? "Calculating..." : "Izračunavanje..."}
               </span>
             ) : (
-              gfr ? `${getStatusText()} - GFR: ${Math.round(gfr)} mL/min` : getStatusText()
+              gfr ? (
+                <div className="flex items-center gap-2">
+                  {getStatusText()}
+                  <Badge variant="outline" className="ml-2 font-mono">
+                    GFR: {Math.round(gfr)} mL/min
+                  </Badge>
+                </div>
+              ) : getStatusText()
             )}
           </span>
         </div>
         
         {gfr && !isCalculating && (
-          <p className="mt-2 text-sm">
-            {getGFRInterpretation(gfr)}
-          </p>
+          <>
+            <div className="mt-3 mb-2">
+              <Progress value={getProgressValue()} className={`h-2 ${getProgressColor()}`} />
+            </div>
+            <p className="mt-2 text-sm">
+              {getGFRInterpretation(gfr)}
+            </p>
+          </>
         )}
       </div>
       

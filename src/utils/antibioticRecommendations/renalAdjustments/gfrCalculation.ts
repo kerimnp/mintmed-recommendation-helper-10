@@ -4,13 +4,15 @@ interface GFRParams {
   weight: string;
   gender: string;
   creatinine?: number;
+  height?: string;
 }
 
 export const calculateGFR = ({
   age,
   weight,
   gender,
-  creatinine = 1.0
+  creatinine = 1.0,
+  height
 }: GFRParams): number => {
   const ageNum = parseFloat(age);
   const weightNum = parseFloat(weight);
@@ -19,11 +21,31 @@ export const calculateGFR = ({
     return 60; // Default to normal renal function if parameters are invalid
   }
 
-  // Cockcroft-Gault formula with correction factor for gender
-  const genderConstant = gender.toLowerCase() === 'male' ? 1.23 : 1.04;
-  const gfr = ((140 - ageNum) * weightNum * genderConstant) / creatinine;
+  // MDRD formula for adults - more accurate than Cockcroft-Gault
+  // GFR = 175 × (Scr)^-1.154 × (Age)^-0.203 × 0.742 [if female] × 1.212 [if Black]
+  // Simplified version for our purposes
+  if (ageNum >= 18) {
+    const genderFactor = gender.toLowerCase() === 'female' ? 0.742 : 1.0;
+    const gfr = 175 * Math.pow(creatinine, -1.154) * Math.pow(ageNum, -0.203) * genderFactor;
+    return Math.round(gfr);
+  } 
   
-  return Math.round(gfr);
+  // For children, use the Schwartz formula
+  // GFR = (k × Height) / Scr
+  // where k is a constant that depends on age and gender
+  else {
+    const heightCm = height ? parseFloat(height) : weightNum * 2; // Approximation if height is missing
+    let k = 0.45; // Default for infants
+    
+    if (ageNum > 1 && ageNum <= 12) {
+      k = 0.55;
+    } else if (ageNum > 12) {
+      k = gender.toLowerCase() === 'female' ? 0.55 : 0.7;
+    }
+    
+    const gfr = (k * heightCm) / creatinine;
+    return Math.round(gfr);
+  }
 };
 
 // Get appropriate renal dose adjustment message based on GFR

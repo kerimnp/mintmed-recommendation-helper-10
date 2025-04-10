@@ -10,6 +10,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "@/pages/Index";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Auth from "@/pages/Auth";
+import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -20,18 +21,20 @@ function App() {
       <BrowserRouter>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LanguageProvider>
-            <QueryClientProvider client={queryClient}>
-              <TooltipProvider>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="*" element={<Index />} />
-                </Routes>
-                <Toaster />
-                <Sonner />
-              </TooltipProvider>
-            </QueryClientProvider>
+            <AuthProvider>
+              <QueryClientProvider client={queryClient}>
+                <TooltipProvider>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="*" element={<Index />} />
+                  </Routes>
+                  <Toaster />
+                  <Sonner />
+                </TooltipProvider>
+              </QueryClientProvider>
+            </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
       </BrowserRouter>
