@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { findInteractions } from '../utils/interactionUtils';
+import { checkInteractions } from '../utils/interactionUtils';
 import { SeverityBadge } from './SeverityBadge';
 import { antibioticsList, commonMedications } from '../data/medicationsData';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -17,7 +18,7 @@ export const InteractionResults: React.FC<InteractionResultsProps> = ({ selected
     return drug ? drug.name : drugId;
   });
 
-  const interactions = findInteractions(selectedDrugs);
+  const interactions = checkInteractions(selectedDrugs);
   
   if (selectedDrugs.length < 2) {
     return (
@@ -45,7 +46,7 @@ export const InteractionResults: React.FC<InteractionResultsProps> = ({ selected
           <CardDescription>Potential interactions between selected medications</CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert variant="success">
+          <Alert variant="default" className="bg-green-50 text-green-800 dark:bg-green-950/20 dark:text-green-300 border-green-200 dark:border-green-800">
             <Check className="h-4 w-4" />
             <AlertTitle>No significant interactions found</AlertTitle>
             <AlertDescription>
@@ -68,7 +69,7 @@ export const InteractionResults: React.FC<InteractionResultsProps> = ({ selected
           <Alert key={index} className="mb-4">
             <ShieldAlert className="h-4 w-4" />
             <AlertTitle>
-              {interaction.drugA} and {interaction.drugB}
+              {interaction.drug1} and {interaction.drug2}
             </AlertTitle>
             <AlertDescription>
               {interaction.description}
