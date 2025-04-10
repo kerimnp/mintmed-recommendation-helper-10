@@ -19,6 +19,16 @@ interface RenalFunctionSectionProps {
   gender?: string;
 }
 
+interface RenalFunctionTranslation {
+  title: string;
+  subtitle: string;
+  creatinineLabel: string;
+  normal: string;
+  mild: string;
+  moderate: string;
+  severe: string;
+}
+
 export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   creatinine,
   onCreatinineChange,
@@ -27,7 +37,27 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   gender = ""
 }) => {
   const { language } = useLanguage();
-  const t = translations[language].renalFunction || { title: "Renal Function", subtitle: "Enter creatinine value if known", creatinineLabel: "Creatinine (mg/dL)", normal: "Normal", mild: "Mild Impairment", moderate: "Moderate Impairment", severe: "Severe Impairment" };
+  const defaultTranslation: RenalFunctionTranslation = {
+    title: "Renal Function",
+    subtitle: "Enter creatinine value if known",
+    creatinineLabel: "Creatinine (mg/dL)",
+    normal: "Normal",
+    mild: "Mild Impairment",
+    moderate: "Moderate Impairment",
+    severe: "Severe Impairment"
+  };
+  
+  // Ensure that we have all the required translation keys or use defaults
+  const t = translations[language].renalFunction || defaultTranslation;
+  const translationWithDefaults: RenalFunctionTranslation = {
+    title: t.title || defaultTranslation.title,
+    subtitle: t.subtitle || defaultTranslation.subtitle,
+    creatinineLabel: t.creatinineLabel || defaultTranslation.creatinineLabel,
+    normal: t.normal || defaultTranslation.normal,
+    mild: t.mild || defaultTranslation.mild,
+    moderate: t.moderate || defaultTranslation.moderate,
+    severe: t.severe || defaultTranslation.severe
+  };
   
   const [gfr, setGfr] = useState<number | null>(null);
   const [renalStatus, setRenalStatus] = useState<string>("");
@@ -69,17 +99,17 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     if (!gfr) return null;
     
     let color = "bg-green-500";
-    let text = t.normal;
+    let text = translationWithDefaults.normal;
     
     if (renalStatus === "mild") {
       color = "bg-yellow-500";
-      text = t.mild;
+      text = translationWithDefaults.mild;
     } else if (renalStatus === "moderate") {
       color = "bg-orange-500";
-      text = t.moderate;
+      text = translationWithDefaults.moderate;
     } else if (renalStatus === "severe") {
       color = "bg-red-500";
-      text = t.severe;
+      text = translationWithDefaults.severe;
     }
     
     return (
@@ -107,9 +137,9 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       <div className="space-y-2 mb-4">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Activity className="h-5 w-5 text-medical-primary" />
-          {t.title}
+          {translationWithDefaults.title}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{translationWithDefaults.subtitle}</p>
       </div>
       
       <div className="space-y-4">
@@ -118,7 +148,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
             htmlFor="creatinine"
             className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 mb-2"
           >
-            {t.creatinineLabel}
+            {translationWithDefaults.creatinineLabel}
           </Label>
           <Input
             id="creatinine"

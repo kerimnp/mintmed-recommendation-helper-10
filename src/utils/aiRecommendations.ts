@@ -89,8 +89,14 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
         reasons: []
       };
       
+      // Initialize regionConsiderations if it doesn't exist
+      if (!aiRecommendation.rationale.regionConsiderations) {
+        aiRecommendation.rationale.regionConsiderations = [];
+      }
+      
+      // Add our regional considerations
       aiRecommendation.rationale.regionConsiderations = [
-        ...(aiRecommendation.rationale.regionConsiderations || []),
+        ...aiRecommendation.rationale.regionConsiderations,
         ...regionalConsiderations
       ];
     }
@@ -103,8 +109,14 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
         reasons: []
       };
       
+      // Initialize doseAdjustments if it doesn't exist
+      if (!aiRecommendation.rationale.doseAdjustments) {
+        aiRecommendation.rationale.doseAdjustments = [];
+      }
+      
+      // Add our renal considerations
       aiRecommendation.rationale.doseAdjustments = [
-        ...(aiRecommendation.rationale.doseAdjustments || []),
+        ...aiRecommendation.rationale.doseAdjustments,
         ...renalConsiderations
       ];
     }
