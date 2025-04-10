@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -11,10 +12,11 @@ import { RenalFunctionSection } from "./RenalFunctionSection";
 import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
+import { LabResultsSection } from "./LabResultsSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { Card } from "./ui/card";
-import { Calculator, BarChart2 } from "lucide-react";
+import { Calculator, BarChart2, LogIn } from "lucide-react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
@@ -66,7 +68,8 @@ export const PatientForm = () => {
       esbl: false,
       cre: false,
       pseudomonas: false
-    }
+    },
+    labResults: null
   });
 
   const handleInputChange = (field: string, value: any) => {
@@ -198,6 +201,10 @@ export const PatientForm = () => {
     }
   };
 
+  const handleLabResultsChange = (results: any) => {
+    handleInputChange("labResults", results);
+  };
+
   const renderSectionHeader = (number: number, title: string, subtitle: string) => (
     <div className="flex items-center gap-2 mb-4">
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-primary/10 text-medical-primary font-semibold">
@@ -214,12 +221,20 @@ export const PatientForm = () => {
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-medical-text">{t.title}</h2>
-        <Link to="/admin">
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
-            <BarChart2 className="h-4 w-4" />
-            <span>Admin Dashboard</span>
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/auth">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <LogIn className="h-4 w-4" />
+              <span>{language === "en" ? "Sign In" : "Prijava"}</span>
+            </Button>
+          </Link>
+          <Link to="/admin">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <BarChart2 className="h-4 w-4" />
+              <span>Admin Dashboard</span>
+            </Button>
+          </Link>
+        </div>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -271,6 +286,7 @@ export const PatientForm = () => {
             age={formData.age}
             weight={formData.weight}
             gender={formData.gender}
+            height={formData.height}
           />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
@@ -291,6 +307,16 @@ export const PatientForm = () => {
               errors={showErrors ? errors : {}}
             />
           </div>
+          
+          <div className="h-px bg-gray-200 dark:bg-gray-700" />
+          
+          {renderSectionHeader(6, 
+            language === "en" ? "Laboratory Results" : "Laboratorijski Rezultati", 
+            language === "en" ? "Enter available lab results if applicable (optional)" : "Unesite dostupne laboratorijske rezultate ako su dostupni (opcionalno)"
+          )}
+          <LabResultsSection 
+            onLabResultsChange={handleLabResultsChange}
+          />
 
           <AIRecommendationSection
             isLoading={isLoadingAI}

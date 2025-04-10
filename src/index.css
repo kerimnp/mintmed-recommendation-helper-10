@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,6 +67,57 @@
   }
 }
 
+/* iOS Design Components */
+.ios-card-shadow {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.ios-blur-background {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.ios-input {
+  @apply rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/70 
+    px-4 py-3 focus:ring-1 focus:ring-medical-accent focus:border-medical-accent 
+    transition-all duration-200 ease-in-out placeholder:text-gray-400;
+}
+
+.ios-button {
+  @apply rounded-xl bg-medical-primary text-white font-medium px-5 py-3
+    hover:bg-medical-primary-hover active:scale-95 transition-all duration-200;
+}
+
+.ios-button-secondary {
+  @apply rounded-xl bg-white dark:bg-gray-800 text-medical-primary font-medium px-5 py-3
+    hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all duration-200
+    border border-gray-200 dark:border-gray-700;
+}
+
+.ios-segmented-control {
+  @apply flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl;
+}
+
+.ios-segmented-item {
+  @apply flex-1 py-2 px-4 text-center font-medium rounded-lg transition-all duration-200;
+}
+
+.ios-segmented-item.active {
+  @apply bg-white dark:bg-gray-700 text-medical-primary shadow-sm;
+}
+
+.ios-toggle {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full
+    transition-colors focus-visible:outline-none focus-visible:ring-2
+    focus-visible:ring-medical-primary focus-visible:ring-offset-2;
+}
+
+.ios-toggle-thumb {
+  @apply pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg
+    ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0;
+}
+
+/* Original Classes */
 .form-card {
   @apply bg-white/80 dark:bg-medical-bg-secondary/80 
     backdrop-blur-xl border border-black/5 dark:border-medical-text-secondary/10
@@ -109,5 +161,35 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
