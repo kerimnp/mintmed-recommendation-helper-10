@@ -4,31 +4,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClinicalGuidelines } from "@/components/admin/ClinicalGuidelines";
 import { DrugInteractionChecker } from "@/components/admin/drug-interactions/DrugInteractionChecker";
+import { BookOpen, Pill } from "lucide-react";
 
 export const GuidelinesTab = () => {
   const [activeTab, setActiveTab] = React.useState("guidelines");
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Clinical Guidelines & Decision Support</CardTitle>
+    <Card className="shadow-md">
+      <CardHeader className="bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 border-b">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-medical-primary" />
+          <CardTitle>Clinical Guidelines & Decision Support</CardTitle>
+        </div>
         <CardDescription>
-          Evidence-based treatment protocols and drug interaction information.
+          Evidence-based treatment protocols and medication interaction information
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="guidelines">Clinical Guidelines</TabsTrigger>
-            <TabsTrigger value="interactions">Drug Interactions</TabsTrigger>
-          </TabsList>
+      <CardContent className="p-0 pt-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="px-6">
+            <TabsList className="grid grid-cols-2 mb-6 w-full md:w-1/2">
+              <TabsTrigger value="guidelines" className="flex items-center gap-1.5">
+                <BookOpen className="h-4 w-4" />
+                Guidelines
+              </TabsTrigger>
+              <TabsTrigger value="interactions" className="flex items-center gap-1.5">
+                <Pill className="h-4 w-4" />
+                Drug Interactions
+              </TabsTrigger>
+            </TabsList>
+          </div>
           
           <TabsContent value="guidelines">
-            <ClinicalGuidelines />
+            <div className="px-6 pb-6">
+              <ClinicalGuidelines />
+            </div>
           </TabsContent>
           
-          <TabsContent value="interactions">
-            <DrugInteractionChecker />
+          <TabsContent value="interactions" className="m-0 p-0">
+            <div className="px-6 pb-6">
+              <DrugInteractionChecker />
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
