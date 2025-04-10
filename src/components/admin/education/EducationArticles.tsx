@@ -7,12 +7,17 @@ import { articles, categories } from './data';
 import { QuizComponent } from './QuizComponent';
 import { quizzes } from './data/quizData';
 import { toast } from '@/components/ui/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { Book, Brain, Trophy, BookText } from 'lucide-react';
 
 export const EducationArticles = () => {
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedQuiz, setSelectedQuiz] = useState<string | null>(null);
   const [showQuizzes, setShowQuizzes] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSelectArticle = (id: string) => {
     setSelectedArticle(id);
@@ -61,32 +66,35 @@ export const EducationArticles = () => {
       {selectedArticle === null && selectedQuiz === null ? (
         <div className="space-y-6">
           <Tabs defaultValue="all" className="w-full" onValueChange={setActiveCategory}>
-            <div className="flex justify-between items-center mb-4">
-              <TabsList className="bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto justify-start">
-                {categories.map(category => (
-                  <TabsTrigger 
-                    key={category.id} 
-                    value={category.id} 
-                    className="px-4 py-2 data-[state=active]:bg-medical-primary data-[state=active]:text-white"
-                  >
-                    {category.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+              <ScrollArea className="w-full sm:w-auto">
+                <TabsList className="bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto justify-start">
+                  {categories.map(category => (
+                    <TabsTrigger 
+                      key={category.id} 
+                      value={category.id} 
+                      className="px-4 py-2 data-[state=active]:bg-medical-primary data-[state=active]:text-white whitespace-nowrap"
+                    >
+                      {category.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </ScrollArea>
               
               <div className="flex items-center">
-                <button 
+                <Button 
                   onClick={() => setShowQuizzes(!showQuizzes)}
-                  className="text-sm font-medium px-4 py-2 rounded-lg bg-medical-primary/10 text-medical-primary hover:bg-medical-primary/20 transition-colors"
+                  className="text-sm font-medium px-4 py-2 rounded-lg bg-medical-primary/10 text-medical-primary hover:bg-medical-primary/20 transition-colors flex items-center gap-2"
                 >
-                  {showQuizzes ? "Show Articles" : "Show Quizzes"}
-                </button>
+                  {showQuizzes ? <BookText className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
+                  <span>{showQuizzes ? "Show Articles" : "Show Quizzes"}</span>
+                </Button>
               </div>
             </div>
 
             <TabsContent value={activeCategory} className="mt-0">
               {showQuizzes ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
                   {filteredQuizzes.length > 0 ? (
                     filteredQuizzes.map((quiz) => (
                       <div 
@@ -94,18 +102,18 @@ export const EducationArticles = () => {
                         className="group overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-lg transition-all duration-300 cursor-pointer"
                         onClick={() => handleSelectQuiz(quiz.id)}
                       >
-                        <div className="p-6">
+                        <div className="p-4 sm:p-6">
                           <div className="flex items-start space-x-4">
                             <div className="rounded-full bg-medical-primary/10 p-3 flex-shrink-0">
-                              <span className="font-bold text-medical-primary">Q</span>
+                              <Trophy className="h-5 w-5 text-medical-primary" />
                             </div>
                             <div className="flex-1">
-                              <h3 className="text-lg font-medium mb-1 group-hover:text-medical-accent transition-colors">
+                              <h3 className="text-lg font-medium mb-1 group-hover:text-medical-accent transition-colors line-clamp-1">
                                 {quiz.title}
                               </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">{quiz.description}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{quiz.description}</p>
                               
-                              <div className="flex items-center mt-4 space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="flex flex-wrap items-center mt-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
                                 <div className="flex items-center">
                                   <span className="px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800">
                                     {quiz.questions.length} questions
@@ -123,13 +131,13 @@ export const EducationArticles = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="col-span-2 p-6 text-center text-gray-500 dark:text-gray-400">
+                    <div className="col-span-full p-6 text-center text-gray-500 dark:text-gray-400">
                       No quizzes available for this category. Please select another category.
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
                   {filteredArticles.length > 0 ? (
                     filteredArticles.map((article) => (
                       <ArticleCard 
@@ -139,7 +147,7 @@ export const EducationArticles = () => {
                       />
                     ))
                   ) : (
-                    <div className="col-span-2 p-6 text-center text-gray-500 dark:text-gray-400">
+                    <div className="col-span-full p-6 text-center text-gray-500 dark:text-gray-400">
                       No articles available for this category. Please select another category.
                     </div>
                   )}

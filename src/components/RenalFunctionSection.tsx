@@ -7,6 +7,7 @@ import { translations } from "@/translations";
 import { CreatinineInput } from "./renal/CreatinineInput";
 import { GFRDisplay } from "./renal/GFRDisplay";
 import { calculateCreatinineClearance } from "@/utils/antibioticRecommendations/renalAdjustments/creatinineClearance";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface RenalFunctionSectionProps {
   creatinine: string;
@@ -30,6 +31,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   const [crCl, setCrCl] = useState<number | null>(null);
   const [renalStatus, setRenalStatus] = useState<"normal" | "mild" | "moderate" | "severe" | "">("");
   const [isCalculating, setIsCalculating] = useState(false);
+  const isMobile = useIsMobile();
   
   // Calculate creatinine clearance when inputs change
   useEffect(() => {
@@ -72,9 +74,9 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
   }, [creatinine, age, weight, gender]);
   
   return (
-    <Card className="p-6 bg-white dark:bg-gray-800 shadow-sm rounded-xl">
-      <div className="space-y-2 mb-6">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+    <Card className={`p-4 ${isMobile ? '' : 'p-6'} bg-white dark:bg-gray-800 shadow-sm rounded-xl`}>
+      <div className="space-y-2 mb-4 sm:mb-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <Activity className="h-5 w-5 text-medical-primary" />
           {language === "en" ? "Renal Function Assessment" : "Procjena Bubrežne Funkcije"}
         </h3>

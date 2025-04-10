@@ -6,6 +6,7 @@ import { getGFRCategory, getGFRInterpretation } from "@/utils/antibioticRecommen
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "../ui/badge";
 import { Progress } from "../ui/progress";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface GFRDisplayProps {
   gfr: number | null;
@@ -19,6 +20,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
   renalStatus
 }) => {
   const { language } = useLanguage();
+  const isMobile = useIsMobile();
 
   const getRenalStatusIcon = () => {
     if (!renalStatus) return <Activity className="h-5 w-5 text-gray-400" />;
@@ -110,7 +112,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
 
   return (
     <div className="mt-4 space-y-3">
-      <div className={`rounded-lg ${getStatusClass()} border p-4 transition-all duration-300 animate-fade-in`}>
+      <div className={`rounded-lg ${getStatusClass()} border p-3 sm:p-4 transition-all duration-300 animate-fade-in`}>
         <div className="flex items-center gap-2">
           {getRenalStatusIcon()}
           <span className={`font-medium ${getTextColor()}`}>
@@ -121,9 +123,9 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
               </span>
             ) : (
               gfr ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {getStatusText()}
-                  <Badge variant="outline" className="ml-2 font-mono">
+                  <Badge variant="outline" className="ml-1 sm:ml-2 font-mono">
                     {Math.round(gfr)} mL/min
                   </Badge>
                 </div>
@@ -141,13 +143,14 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
               {getGFRInterpretation(gfr)}
             </p>
             
-            <div className="grid grid-cols-4 gap-2 mt-4 text-center text-xs">
+            <div className={`grid ${isMobile ? 'grid-cols-2 gap-1 mt-2' : 'grid-cols-4 gap-2 mt-4'} text-center text-xs`}>
               <div className={`p-1 rounded ${renalStatus === "severe" ? "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
                 &lt; 30
               </div>
               <div className={`p-1 rounded ${renalStatus === "moderate" ? "bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
                 30-59
               </div>
+              {isMobile && <div className="col-span-2 h-1"></div>}
               <div className={`p-1 rounded ${renalStatus === "mild" ? "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 font-semibold" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
                 60-89
               </div>
