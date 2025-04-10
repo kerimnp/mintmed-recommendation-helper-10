@@ -8,6 +8,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "@/pages/Index";
+import AntibioticAdvisor from "@/pages/AntibioticAdvisor";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Auth from "@/pages/Auth";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -33,6 +34,7 @@ function App() {
                 <TooltipProvider>
                   <Routes>
                     <Route path="/" element={<Index />} />
+                    <Route path="/advisor" element={<AntibioticAdvisor />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="*" element={<Index />} />
