@@ -41,7 +41,7 @@ export const getCountryDataByRegion = (region: string): CountryResistanceData[] 
   if (region === "Balkan") return balkanDetailedData;
   
   // For other regions, simulate data by adjusting Balkan data
-  const regionMultipliers = {
+  const regionMultipliers: Record<string, number> = {
     "Southern Europe": 1.2,
     "Northern Europe": 0.6,
     "Eastern Europe": 1.1,
