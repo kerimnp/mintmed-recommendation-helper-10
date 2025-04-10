@@ -26,6 +26,7 @@ export interface EnhancedAntibioticRecommendation {
     infectionType: string;
     severity: string;
     reasons: string[];
+    regionConsiderations?: string[];
     allergyConsiderations?: string[];
     doseAdjustments?: string[];
   };
