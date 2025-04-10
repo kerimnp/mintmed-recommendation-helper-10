@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card } from "./ui/card";
 import { Label } from "./ui/label";
@@ -52,7 +53,7 @@ export const ComorbiditySection: React.FC<ComorbiditySectionProps> = ({
             { id: "kidneyDisease", label: t.kidneyDisease },
             { id: "liverDisease", label: t.liverDisease },
             { id: "diabetes", label: t.diabetes },
-            { id: "immunosuppressed", label: t.immunosuppressed }
+            { id: "immunosuppressed", label: language === "en" ? t.immunosuppressed : t.immunosupresija }
           ].map(({ id, label }) => (
             <div key={id} className="flex items-center space-x-3 p-3 rounded-lg 
               bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
@@ -96,4 +97,3 @@ export const ComorbiditySection: React.FC<ComorbiditySectionProps> = ({
     </Card>
   );
 };
-

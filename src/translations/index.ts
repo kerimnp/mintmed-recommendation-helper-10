@@ -1,3 +1,4 @@
+
 export const translations = {
   en: {
     title: "Antibiotic Recommendation System",
@@ -32,7 +33,8 @@ export const translations = {
       kidneyDisease: "Kidney Disease",
       liverDisease: "Liver Disease",
       diabetes: "Diabetes",
-      immunosuppressed: "Immunosuppressed"
+      immunosuppressed: "Immunosuppressed",
+      immunosupresija: "Immunosuppressed" // Adding this for consistency
     },
     infectionDetails: {
       title: "Infection Details",
@@ -141,6 +143,7 @@ export const translations = {
       kidneyDisease: "Bubrežna bolest",
       liverDisease: "Bolest jetre",
       diabetes: "Dijabetes",
+      immunosuppressed: "Imunosupresija", // Adding this for consistency
       immunosupresija: "Imunosupresija"
     },
     infectionDetails: {
