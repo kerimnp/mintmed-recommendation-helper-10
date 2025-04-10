@@ -6,7 +6,11 @@ import { ClinicalGuidelines } from "@/components/admin/ClinicalGuidelines";
 import { DrugInteractionChecker } from "@/components/admin/drug-interactions/DrugInteractionChecker";
 import { BookOpen, Pill } from "lucide-react";
 
-export const GuidelinesTab = () => {
+interface GuidelinesTabProps {
+  searchTerm?: string;
+}
+
+export const GuidelinesTab: React.FC<GuidelinesTabProps> = ({ searchTerm = "" }) => {
   const [activeTab, setActiveTab] = React.useState("guidelines");
   
   return (
@@ -37,13 +41,13 @@ export const GuidelinesTab = () => {
           
           <TabsContent value="guidelines">
             <div className="px-6 pb-6">
-              <ClinicalGuidelines />
+              <ClinicalGuidelines searchTerm={searchTerm} />
             </div>
           </TabsContent>
           
           <TabsContent value="interactions" className="m-0 p-0">
             <div className="px-6 pb-6">
-              <DrugInteractionChecker />
+              <DrugInteractionChecker searchTerm={searchTerm} />
             </div>
           </TabsContent>
         </Tabs>

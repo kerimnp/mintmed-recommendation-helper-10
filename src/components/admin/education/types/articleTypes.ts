@@ -20,3 +20,6 @@ export interface Article {
   authorCredentials: string;
   content: string;
 }
+
+// Export ArticleType as an alias to Article for backward compatibility
+export type ArticleType = Article;

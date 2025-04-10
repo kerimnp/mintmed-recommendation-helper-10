@@ -26,6 +26,11 @@ export const DrugSelectionPanel: React.FC<DrugSelectionPanelProps> = ({
     }
   }, [initialSearchTerm]);
   
+  const handleClearAll = () => {
+    // Remove all selected drugs
+    selectedDrugs.forEach(drugId => onRemoveDrug(drugId));
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -44,6 +49,7 @@ export const DrugSelectionPanel: React.FC<DrugSelectionPanelProps> = ({
         <SelectedDrugsList 
           selectedDrugs={selectedDrugs} 
           onRemoveDrug={onRemoveDrug} 
+          onClearAll={handleClearAll}
         />
       </CardContent>
     </Card>

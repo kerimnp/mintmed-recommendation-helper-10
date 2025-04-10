@@ -3,7 +3,11 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TreatmentEffectiveness } from "@/components/admin/TreatmentEffectiveness";
 
-export const EffectivenessTab = () => {
+interface EffectivenessTabProps {
+  searchTerm?: string;
+}
+
+export const EffectivenessTab: React.FC<EffectivenessTabProps> = ({ searchTerm = "" }) => {
   return (
     <div>
       <div className="flex items-center mb-4">

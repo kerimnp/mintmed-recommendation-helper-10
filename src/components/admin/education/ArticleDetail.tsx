@@ -9,11 +9,16 @@ import { useIsMobile } from '@/hooks/use-mobile';
 interface ArticleDetailProps {
   article: Article;
   onBack: () => void;
-  relatedArticles: Article[];
-  onSelectRelated: (id: string) => void;
+  relatedArticles?: Article[];
+  onSelectRelated?: (id: string) => void;
 }
 
-export const ArticleDetail = ({ article, onBack, relatedArticles, onSelectRelated }: ArticleDetailProps) => {
+export const ArticleDetail = ({ 
+  article, 
+  onBack, 
+  relatedArticles = [], 
+  onSelectRelated = () => {} 
+}: ArticleDetailProps) => {
   const isMobile = useIsMobile();
   
   return (

@@ -7,9 +7,23 @@ import { ResistanceTrends } from "@/components/admin/resistance/ResistanceTrends
 import { AntibioticEffectiveness } from "@/components/admin/resistance/AntibioticEffectiveness";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const ResistanceTab = () => {
+interface ResistanceTabProps {
+  searchTerm?: string;
+}
+
+export const ResistanceTab: React.FC<ResistanceTabProps> = ({ searchTerm = "" }) => {
   const [selectedResistance, setSelectedResistance] = useState("mrsa");
   const [selectedRegion, setSelectedRegion] = useState("Balkan");
+
+  // We could use searchTerm to filter content in the future
+  React.useEffect(() => {
+    // Example of how searchTerm could be used
+    if (searchTerm && searchTerm.toLowerCase().includes("mrsa")) {
+      setSelectedResistance("mrsa");
+    } else if (searchTerm && searchTerm.toLowerCase().includes("vre")) {
+      setSelectedResistance("vre");
+    }
+  }, [searchTerm]);
 
   return (
     <div className="space-y-6">

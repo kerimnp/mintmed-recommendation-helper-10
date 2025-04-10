@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArticleCard } from './ArticleCard';
 import { ArticleDetail } from './ArticleDetail';
-import { ArticleType } from './types/articleTypes';
+import { Article, ArticleType } from './types/articleTypes';
 import { categories } from './data/categories';
 import { articles } from './data/index';
 import { Badge } from '@/components/ui/badge';
@@ -56,8 +56,23 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   
   const selectedArticle = articles.find(article => article.id === selectedArticleId);
   
+  // Get related articles (simple implementation - same category, not the current article)
+  const getRelatedArticles = (article: Article) => {
+    return articles
+      .filter(a => a.category === article.category && a.id !== article.id)
+      .slice(0, 3);
+  };
+  
   if (selectedArticle) {
-    return <ArticleDetail article={selectedArticle} onBack={handleBackToArticles} />;
+    const relatedArticles = getRelatedArticles(selectedArticle);
+    return (
+      <ArticleDetail 
+        article={selectedArticle} 
+        onBack={handleBackToArticles}
+        relatedArticles={relatedArticles}
+        onSelectRelated={handleArticleSelect}
+      />
+    );
   }
   
   return (
@@ -103,7 +118,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
               className="cursor-pointer hover:bg-primary/90 transition-colors"
               onClick={() => setSelectedCategory(category.id)}
             >
-              {category.name}
+              {category.label}
             </Badge>
           ))}
         </div>
@@ -114,7 +129,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
           {filteredArticles.map(article => (
             <ArticleCard 
               key={article.id} 
-              article={article as ArticleType} 
+              article={article} 
               onSelect={handleArticleSelect} 
             />
           ))}
