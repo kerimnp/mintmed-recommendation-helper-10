@@ -1,32 +1,62 @@
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { PatientForm } from "@/components/PatientForm";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "next-themes";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
+  const { theme } = useTheme();
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-blue-100/50 to-blue-200/50 
-      dark:from-medical-bg dark:via-medical-bg-secondary dark:to-medical-bg-tertiary overflow-auto pt-20">
+    <div className="min-h-screen w-full bg-white dark:bg-gray-900 overflow-auto">
       <Helmet>
         <title>Horalix - Antibiotic Recommendation System</title>
         <meta name="description" content="Evidence-based antibiotic recommendations tailored to patient needs" />
       </Helmet>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <header className="fixed top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-gray-900/70 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-6">
+              <Link to="/">
+                <img 
+                  src={theme === 'dark' ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} 
+                  alt="Horalix Logo" 
+                  className="h-8 w-auto" 
+                />
+              </Link>
+              <div className="h-5 w-px bg-gray-300 dark:bg-gray-700 hidden sm:block"></div>
+              <h1 className="text-lg font-medium text-gray-900 dark:text-white hidden sm:block">
+                {language === "en" ? "Antibiotic Advisor" : "Savjetnik za Antibiotike"}
+              </h1>
+            </div>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                <ArrowLeft className="h-4 w-4" />
+                <span>{language === "en" ? "Back to Home" : "Natrag na Početnu"}</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-medical-text mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             {language === "en" ? "Antibiotic Recommendation System" : "Sustav Preporuke Antibiotika"}
-          </h1>
-          <p className="text-gray-600 dark:text-medical-text-secondary">
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300">
             {language === "en" 
               ? "Use the form below to get personalized, evidence-based antibiotic recommendations."
               : "Koristite obrazac ispod da biste dobili personalizirane preporuke za antibiotike temeljene na dokazima."}
@@ -37,7 +67,7 @@ const AntibioticAdvisor = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="form-card p-8 rounded-3xl ios-card-shadow"
+          className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-sm"
         >
           <PatientForm />
         </motion.div>

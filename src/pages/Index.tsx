@@ -169,10 +169,7 @@ const Index = () => {
                       alt="Horalix Dashboard" 
                       className="w-full h-auto object-cover" 
                     />
-                    <div className={`absolute inset-0 ${theme === 'dark' 
-                      ? 'bg-gradient-to-t from-gray-900/50 to-gray-800/20' 
-                      : 'bg-gradient-to-t from-gray-200/50 to-gray-100/20'}`}
-                    ></div>
+                    <div className="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
                   </div>
                 </motion.div>
               </div>
@@ -180,7 +177,7 @@ const Index = () => {
           </section>
 
           {/* Features Section */}
-          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50/50 dark:bg-gray-800/20 backdrop-blur-sm">
+          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white/50 dark:bg-gray-800/10">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -201,7 +198,7 @@ const Index = () => {
                     whileInView={{ opacity: 1, y: 0 }} 
                     viewport={{ once: true }} 
                     transition={{ duration: 0.5, delay: index * 0.1 }} 
-                    className="bg-white/90 dark:bg-gray-800/40 backdrop-blur-sm rounded-3xl p-8 shadow-md"
+                    className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm"
                   >
                     <div className="mb-6 flex items-center justify-center">
                       {feature.icon}
@@ -231,11 +228,7 @@ const Index = () => {
                   className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-16 items-center`}
                 >
                   <div className="md:w-1/2">
-                    <div className={`rounded-3xl p-12 flex items-center justify-center shadow-lg ${
-                      theme === 'dark' 
-                        ? 'bg-gradient-to-br from-gray-800/70 to-gray-900/70' 
-                        : 'bg-gradient-to-br from-gray-50/90 to-gray-100/90'
-                    }`}>
+                    <div className="rounded-3xl p-12 flex items-center justify-center shadow-lg bg-white dark:bg-gray-800">
                       {section.icon}
                     </div>
                   </div>
@@ -253,7 +246,7 @@ const Index = () => {
           </section>
 
           {/* CTA Section */}
-          <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-medical-primary/10 to-medical-accent/10 dark:from-medical-primary/5 dark:to-medical-accent/5 backdrop-blur-sm">
+          <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800/20">
             <div className="max-w-5xl mx-auto text-center">
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
@@ -288,7 +281,7 @@ const Index = () => {
           </section>
         </main>
         
-        <footer className="py-12 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+        <footer className="py-12 bg-white dark:bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="md:flex md:items-center md:justify-between">
               <div className="flex justify-center md:justify-start">
