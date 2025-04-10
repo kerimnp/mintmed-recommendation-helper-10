@@ -62,8 +62,12 @@ export const translations = {
     },
     renalFunction: {
       title: "Renal Function",
-      subtitle: "Creatinine levels",
-      creatinine: "Creatinine (mg/dL)"
+      subtitle: "Enter creatinine value if known",
+      creatinineLabel: "Creatinine (mg/dL)",
+      normal: "Normal",
+      mild: "Mild Impairment",
+      moderate: "Moderate Impairment",
+      severe: "Severe Impairment"
     },
     patientDemographics: {
       title: "Patient Demographics",
@@ -168,7 +172,11 @@ export const translations = {
     renalFunction: {
       title: "Bubrežna funkcija",
       subtitle: "Nivoi kreatinina",
-      creatinine: "Kreatinin (mg/dL)"
+      creatinineLabel: "Kreatinin (mg/dL)",
+      normal: "Normalna",
+      mild: "Blago oštećenje",
+      moderate: "Umjereno oštećenje",
+      severe: "Teško oštećenje"
     },
     patientDemographics: {
       title: "Demografski podaci",

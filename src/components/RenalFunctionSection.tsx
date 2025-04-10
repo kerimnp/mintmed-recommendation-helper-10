@@ -47,16 +47,16 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     severe: "Severe Impairment"
   };
   
-  // Ensure that we have all the required translation keys or use defaults
-  const t = translations[language].renalFunction || defaultTranslation;
+  // Cast the translation to ensure TypeScript knows all required fields exist
+  const translationData = translations[language].renalFunction || {};
   const translationWithDefaults: RenalFunctionTranslation = {
-    title: t.title || defaultTranslation.title,
-    subtitle: t.subtitle || defaultTranslation.subtitle,
-    creatinineLabel: t.creatinineLabel || defaultTranslation.creatinineLabel,
-    normal: t.normal || defaultTranslation.normal,
-    mild: t.mild || defaultTranslation.mild,
-    moderate: t.moderate || defaultTranslation.moderate,
-    severe: t.severe || defaultTranslation.severe
+    title: translationData.title || defaultTranslation.title,
+    subtitle: translationData.subtitle || defaultTranslation.subtitle,
+    creatinineLabel: translationData.creatinineLabel || defaultTranslation.creatinineLabel,
+    normal: translationData.normal || defaultTranslation.normal,
+    mild: translationData.mild || defaultTranslation.mild,
+    moderate: translationData.moderate || defaultTranslation.moderate,
+    severe: translationData.severe || defaultTranslation.severe
   };
   
   const [gfr, setGfr] = useState<number | null>(null);
