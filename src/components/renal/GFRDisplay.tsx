@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Activity, AlertCircle, TrendingDown, Kidney, Check } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, Check } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
 import { getGFRCategory, getGFRInterpretation } from "@/utils/antibioticRecommendations/renalAdjustments/renalReferenceRanges";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -21,7 +20,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
   const { language } = useLanguage();
 
   const getRenalStatusIcon = () => {
-    if (!renalStatus) return <Kidney className="h-5 w-5 text-gray-400" />;
+    if (!renalStatus) return <Activity className="h-5 w-5 text-gray-400" />;
     
     switch (renalStatus) {
       case "normal":
@@ -33,7 +32,7 @@ export const GFRDisplay: React.FC<GFRDisplayProps> = ({
       case "severe":
         return <TrendingDown className="h-5 w-5 text-red-500" />;
       default:
-        return <Kidney className="h-5 w-5 text-gray-400" />;
+        return <Activity className="h-5 w-5 text-gray-400" />;
     }
   };
 

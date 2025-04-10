@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Card } from "./ui/card";
-import { Activity, Kidney } from "lucide-react";
+import { Activity } from "lucide-react";
 import { calculateGFR } from "@/utils/antibioticRecommendations/renalAdjustments/gfrCalculation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
@@ -116,7 +116,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
     <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800 rounded-xl">
       <div className="space-y-2 mb-4">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <Kidney className="h-5 w-5 text-medical-primary" />
+          <Activity className="h-5 w-5 text-medical-primary" />
           {translationWithDefaults.title}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">{translationWithDefaults.subtitle}</p>

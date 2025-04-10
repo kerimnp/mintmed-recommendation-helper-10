@@ -2,7 +2,7 @@
 import React from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Kidney } from "lucide-react";
+import { Activity } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { creatinineReferenceRanges } from "@/utils/antibioticRecommendations/renalAdjustments/renalReferenceRanges";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -31,7 +31,7 @@ export const CreatinineInput: React.FC<CreatinineInputProps> = ({
               className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 mb-2 cursor-help"
             >
               {language === "en" ? "Creatinine (mg/dL)" : "Kreatinin (mg/dL)"}
-              <Kidney className="h-4 w-4 text-medical-primary" />
+              <Activity className="h-4 w-4 text-medical-primary" />
             </Label>
           </TooltipTrigger>
           <TooltipContent>
