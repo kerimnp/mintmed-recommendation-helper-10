@@ -123,7 +123,7 @@ const Index = () => {
               }} className="relative">
                   <div className="relative overflow-hidden rounded-3xl shadow-2xl">
                     <img src="/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png" alt="Horalix Dashboard" className="w-full h-auto object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t"></div>
+                    <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-gradient-to-t from-gray-900/40 to-gray-800/10' : 'bg-gradient-to-t from-gray-200/40 to-gray-100/10'}`}></div>
                   </div>
                 </motion.div>
               </div>
@@ -241,4 +241,5 @@ const Index = () => {
       </div>
     </>;
 };
+
 export default Index;
