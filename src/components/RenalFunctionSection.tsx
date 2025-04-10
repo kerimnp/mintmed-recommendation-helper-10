@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import { Kidney, Activity } from "lucide-react";
+import { Activity, KidneyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -47,7 +47,7 @@ export const RenalFunctionSection: React.FC<RenalFunctionSectionProps> = ({
       <div className="p-6 space-y-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
-            <Kidney className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">

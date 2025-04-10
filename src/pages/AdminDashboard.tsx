@@ -23,7 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
+import { toast as sonnerToast } from "sonner";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -231,7 +231,7 @@ const AdminDashboard = () => {
             {/* Right side actions */}
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" className="rounded-full" onClick={() => {
-                toast.success("No new notifications");
+                sonnerToast.success("No new notifications");
               }}>
                 <Bell className="h-5 w-5" />
               </Button>
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="cursor-pointer" onClick={() => {
-                    toast.success("Profile view will be implemented soon");
+                    sonnerToast.success("Profile view will be implemented soon");
                   }}>
                     Profile
                   </DropdownMenuItem>
