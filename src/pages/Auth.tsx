@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, Apple, Github } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Auth = () => {
   const { language } = useLanguage();
@@ -22,11 +23,10 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const [session, setSession] = useState(null);
+  const { signIn, signUp, signInWithGoogle } = useAuth();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
       if (session) {
         navigate("/");
       }
@@ -34,7 +34,6 @@ const Auth = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setSession(session);
         if (session) {
           navigate("/");
         }
@@ -56,25 +55,10 @@ const Auth = () => {
     }
 
     setIsLoading(true);
-
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: language === "en" ? "Success" : "Uspjeh",
-        description: language === "en" ? "Logged in successfully" : "Uspješno ste se prijavili",
-      });
-    } catch (error: any) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en" ? "Failed to log in" : "Prijava nije uspjela"),
-        variant: "destructive",
-      });
+      await signIn(email, password);
+    } catch (error) {
+      console.error("Sign in error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -92,27 +76,10 @@ const Auth = () => {
     }
 
     setIsLoading(true);
-
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: language === "en" ? "Success" : "Uspjeh",
-        description: language === "en" 
-          ? "Registration successful! Please check your email for confirmation." 
-          : "Registracija uspješna! Provjerite svoj email za potvrdu.",
-      });
-    } catch (error: any) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en" ? "Failed to sign up" : "Registracija nije uspjela"),
-        variant: "destructive",
-      });
+      await signUp(email, password);
+    } catch (error) {
+      console.error("Sign up error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -120,58 +87,10 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en" ? "Failed to sign in with Google" : "Prijava s Google računom nije uspjela"),
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en" ? "Failed to sign in with Apple" : "Prijava s Apple računom nije uspjela"),
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleGithubSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en" ? "Failed to sign in with GitHub" : "Prijava s GitHub računom nije uspjela"),
-        variant: "destructive",
-      });
+      setIsLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google sign in error:", error);
     }
   };
 
@@ -363,10 +282,10 @@ const Auth = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="flex justify-center">
               <Button
                 variant="outline"
-                className="ios-button-secondary flex items-center justify-center gap-2"
+                className="ios-button-secondary flex items-center justify-center gap-2 w-full"
                 onClick={handleGoogleSignIn}
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -388,20 +307,7 @@ const Auth = () => {
                   />
                   <path d="M1 1h22v22H1z" fill="none" />
                 </svg>
-              </Button>
-              <Button
-                variant="outline"
-                className="ios-button-secondary flex items-center justify-center"
-                onClick={handleAppleSignIn}
-              >
-                <Apple className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                className="ios-button-secondary flex items-center justify-center"
-                onClick={handleGithubSignIn}
-              >
-                <Github className="h-5 w-5" />
+                <span>{language === "en" ? "Sign in with Google" : "Prijavi se s Google računom"}</span>
               </Button>
             </div>
           </CardContent>
