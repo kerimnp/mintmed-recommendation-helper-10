@@ -29,6 +29,45 @@ serve(async (req) => {
       throw new Error('API service configuration is missing - please add OPENAI_API_KEY to your Supabase Edge Function Secrets');
     }
 
+    // Format our message with the importance of considering nationality/region
+    const systemMessage = `You are a medical AI assistant specializing in antibiotic recommendations. 
+    Given the patient data, provide a detailed recommendation in JSON format with the following structure:
+    {
+      "primaryRecommendation": {
+        "name": string,
+        "dose": string,
+        "route": string,
+        "duration": string
+      },
+      "reasoning": string,
+      "alternatives": [
+        {
+          "name": string,
+          "dose": string,
+          "route": string,
+          "duration": string,
+          "reason": string
+        }
+      ],
+      "precautions": [string],
+      "rationale": {
+        "infectionType": string,
+        "severity": string,
+        "reasons": [string],
+        "regionConsiderations": [string],
+        "allergyConsiderations": [string],
+        "doseAdjustments": [string]
+      }
+    }
+    
+    IMPORTANT CONSIDERATIONS:
+    1. Consider regional antibiotic resistance patterns for the patient's nationality/region (${patientData.nationality || "unknown"}).
+    2. If renal function is impaired (provided in additionalContext.renalConsiderations), adjust dosing accordingly.
+    3. Provide specific rationales for why each drug was chosen or avoided based on patient factors.
+    4. Use evidence-based guidelines (IDSA, WHO, etc.) to inform your recommendations.
+    
+    Return ONLY valid JSON with NO markdown formatting or additional text.`;
+
     console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -39,35 +78,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          {
-            role: 'system',
-            content: `You are a medical AI assistant specializing in antibiotic recommendations. 
-            Given the patient data, provide a detailed recommendation in JSON format with the following structure:
-            {
-              "primaryRecommendation": {
-                "name": string,
-                "dose": string,
-                "route": string,
-                "duration": string
-              },
-              "reasoning": string,
-              "alternatives": [
-                {
-                  "name": string,
-                  "dose": string,
-                  "route": string,
-                  "duration": string,
-                  "reason": string
-                }
-              ],
-              "precautions": [string]
-            }
-            Return ONLY valid JSON with NO markdown formatting or additional text.`
-          },
-          {
-            role: 'user',
-            content: JSON.stringify(patientData)
-          }
+          { role: 'system', content: systemMessage },
+          { role: 'user', content: JSON.stringify(patientData) }
         ],
         temperature: 0.2,
         max_tokens: 1000,
@@ -104,6 +116,29 @@ serve(async (req) => {
           !Array.isArray(parsedRecommendation.precautions)) {
         console.error('Invalid recommendation structure:', parsedRecommendation);
         throw new Error('Invalid recommendation format from AI');
+      }
+
+      // Add any additional regional or renal considerations from our calculations
+      if (patientData.additionalContext) {
+        parsedRecommendation.rationale = parsedRecommendation.rationale || {
+          infectionType: patientData.infectionSites[0] || "unknown",
+          severity: patientData.severity || "unknown",
+          reasons: []
+        };
+        
+        if (patientData.additionalContext.regionalConsiderations?.length) {
+          parsedRecommendation.rationale.regionConsiderations = [
+            ...(parsedRecommendation.rationale.regionConsiderations || []),
+            ...patientData.additionalContext.regionalConsiderations
+          ];
+        }
+        
+        if (patientData.additionalContext.renalConsiderations?.length) {
+          parsedRecommendation.rationale.doseAdjustments = [
+            ...(parsedRecommendation.rationale.doseAdjustments || []),
+            ...patientData.additionalContext.renalConsiderations
+          ];
+        }
       }
 
       return new Response(

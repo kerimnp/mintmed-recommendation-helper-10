@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -268,7 +267,10 @@ export const PatientForm = () => {
           {renderSectionHeader(3, t.renalFunction.title, t.renalFunction.subtitle)}
           <RenalFunctionSection 
             creatinine={formData.creatinine} 
-            onCreatinineChange={(value) => handleInputChange("creatinine", value)} 
+            onCreatinineChange={(value) => handleInputChange("creatinine", value)}
+            age={formData.age}
+            weight={formData.weight}
+            gender={formData.gender}
           />
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />

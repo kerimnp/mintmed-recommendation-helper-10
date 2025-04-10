@@ -30,14 +30,24 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
   const { language } = useLanguage();
   const t = translations[language].patientDemographics;
 
-  const balkanCountries = [
+  // Common regions for suggestions
+  const suggestedRegions = [
     "Serbia",
     "Bosnia and Herzegovina",
     "Croatia",
     "North Macedonia",
     "Montenegro",
     "Albania",
-    "Kosovo"
+    "Kosovo",
+    "United States",
+    "United Kingdom",
+    "Germany",
+    "France",
+    "Italy",
+    "Spain",
+    "China",
+    "Japan",
+    "India"
   ];
 
   return (
@@ -165,21 +175,20 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
             <Flag className="h-3.5 w-3.5" />
             {t.nationality}
           </Label>
-          <Select 
-            value={formData.nationality} 
-            onValueChange={(value) => onInputChange("nationality", value)}
-          >
-            <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
-              <SelectValue placeholder={t.nationality} />
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg max-h-60">
-              {balkanCountries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="nationality"
+            type="text"
+            value={formData.nationality}
+            onChange={(e) => onInputChange("nationality", e.target.value)}
+            className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors"
+            list="nationality-suggestions"
+            placeholder="Enter any nationality"
+          />
+          <datalist id="nationality-suggestions">
+            {suggestedRegions.map((region) => (
+              <option key={region} value={region} />
+            ))}
+          </datalist>
         </div>
 
         {formData.gender === "female" && (
