@@ -1,7 +1,6 @@
 
 import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
 import { getAIRecommendation } from "@/utils/aiRecommendations";
@@ -15,11 +14,10 @@ import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { LabResultsSection } from "./LabResultsSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import { Card } from "./ui/card";
-import { Calculator, BarChart2, LogIn } from "lucide-react";
-import { Alert, AlertDescription } from "./ui/alert";
-import { AlertCircle } from "lucide-react";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
+import { FormHeader } from "./PatientFormSections/FormHeader";
+import { SectionHeader } from "./PatientFormSections/SectionHeader";
+import { FormActions } from "./PatientFormSections/FormActions";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
@@ -183,7 +181,9 @@ export const PatientForm = () => {
 
     setIsLoadingAI(true);
     try {
+      console.log("Getting AI recommendation with data:", formData);
       const aiResponse = await getAIRecommendation(formData);
+      console.log("AI recommendation response:", aiResponse);
       setAiRecommendation(aiResponse);
       toast({
         title: "AI Recommendation Ready",
@@ -205,58 +205,14 @@ export const PatientForm = () => {
     handleInputChange("labResults", results);
   };
 
-  const renderSectionHeader = (number: number, title: string, subtitle: string) => (
-    <div className="flex items-center gap-2 mb-4">
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-medical-primary/10 text-medical-primary font-semibold">
-        {number}
-      </div>
-      <div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-medical-text">{title}</h3>
-        <p className="text-sm text-gray-500 dark:text-medical-text-secondary">{subtitle}</p>
-      </div>
-    </div>
-  );
-
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-medical-text">{t.title}</h2>
-        <div className="flex items-center gap-2">
-          <Link to="/auth">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
-              <LogIn className="h-4 w-4" />
-              <span>{language === "en" ? "Sign In" : "Prijava"}</span>
-            </Button>
-          </Link>
-          <Link to="/admin">
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
-              <BarChart2 className="h-4 w-4" />
-              <span>Admin Dashboard</span>
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <FormHeader errors={errors} showErrors={showErrors} />
       
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
-          {showErrors && Object.keys(errors).length > 0 && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {language === "en" 
-                  ? "Please correct the following errors:"
-                  : "Molimo ispravite sljedeće greške:"}
-                <ul className="list-disc list-inside mt-2">
-                  {Object.values(errors).map((error, index) => (
-                    <li key={index} className="text-sm">{error}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-          )}
-
           <div ref={sectionRefs.demographics}>
-            {renderSectionHeader(1, t.title, t.subtitle)}
+            <SectionHeader number={1} title={t.title} subtitle={t.subtitle} />
             <PatientDemographicsSection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -266,41 +222,47 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(2, t.allergies.title, t.allergies.subtitle)}
-          <AllergySection 
-            allergies={formData.allergies} 
-            onAllergyChange={(allergy, checked) => {
-              handleInputChange("allergies", {
-                ...formData.allergies,
-                [allergy]: checked
-              });
-            }}
-          />
+          <div>
+            <SectionHeader number={2} title={t.allergies.title} subtitle={t.allergies.subtitle} />
+            <AllergySection 
+              allergies={formData.allergies} 
+              onAllergyChange={(allergy, checked) => {
+                handleInputChange("allergies", {
+                  ...formData.allergies,
+                  [allergy]: checked
+                });
+              }}
+            />
+          </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(3, t.renalFunction.title, t.renalFunction.subtitle)}
-          <RenalFunctionSection 
-            creatinine={formData.creatinine} 
-            onCreatinineChange={(value) => handleInputChange("creatinine", value)}
-            age={formData.age}
-            weight={formData.weight}
-            gender={formData.gender}
-            height={formData.height}
-          />
+          <div>
+            <SectionHeader number={3} title={t.renalFunction.title} subtitle={t.renalFunction.subtitle} />
+            <RenalFunctionSection 
+              creatinine={formData.creatinine} 
+              onCreatinineChange={(value) => handleInputChange("creatinine", value)}
+              age={formData.age}
+              weight={formData.weight}
+              gender={formData.gender}
+              height={formData.height}
+            />
+          </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(4, t.comorbidities.title, t.comorbidities.subtitle)}
-          <ComorbiditySection 
-            formData={formData} 
-            onInputChange={handleInputChange}
-          />
+          <div>
+            <SectionHeader number={4} title={t.comorbidities.title} subtitle={t.comorbidities.subtitle} />
+            <ComorbiditySection 
+              formData={formData} 
+              onInputChange={handleInputChange}
+            />
+          </div>
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           <div ref={sectionRefs.infection}>
-            {renderSectionHeader(5, t.infectionDetails.title, t.infectionDetails.subtitle)}
+            <SectionHeader number={5} title={t.infectionDetails.title} subtitle={t.infectionDetails.subtitle} />
             <InfectionDetailsSection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -310,13 +272,16 @@ export const PatientForm = () => {
           
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
-          {renderSectionHeader(6, 
-            language === "en" ? "Laboratory Results" : "Laboratorijski Rezultati", 
-            language === "en" ? "Enter available lab results if applicable (optional)" : "Unesite dostupne laboratorijske rezultate ako su dostupni (opcionalno)"
-          )}
-          <LabResultsSection 
-            onLabResultsChange={handleLabResultsChange}
-          />
+          <div>
+            <SectionHeader 
+              number={6}
+              title={language === "en" ? "Laboratory Results" : "Laboratorijski Rezultati"}
+              subtitle={language === "en" ? "Enter available lab results if applicable (optional)" : "Unesite dostupne laboratorijske rezultate ako su dostupni (opcionalno)"}
+            />
+            <LabResultsSection 
+              onLabResultsChange={handleLabResultsChange}
+            />
+          </div>
 
           <AIRecommendationSection
             isLoading={isLoadingAI}
@@ -324,19 +289,7 @@ export const PatientForm = () => {
             onGetRecommendation={handleGetAIRecommendation}
           />
 
-          <div className="flex gap-4">
-            <Button 
-              type="submit"
-              className="premium-button flex-1 flex items-center justify-center gap-2"
-              disabled={isSubmitting}
-            >
-              <Calculator className="h-4 w-4" />
-              {isSubmitting 
-                ? (language === "en" ? "Generating..." : "Generisanje...") 
-                : t.buttons.generate
-              }
-            </Button>
-          </div>
+          <FormActions isSubmitting={isSubmitting} />
         </Card>
       </form>
 

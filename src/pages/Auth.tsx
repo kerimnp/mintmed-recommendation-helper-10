@@ -123,10 +123,14 @@ const Auth = () => {
       setIsLoading(true);
       setError(null);
       
+      // Fix: use the current origin instead of hardcoded localhost
+      const currentOrigin = window.location.origin;
+      console.log("Current origin for redirect:", currentOrigin);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/advisor'
+          redirectTo: `${currentOrigin}/auth`
         }
       });
       

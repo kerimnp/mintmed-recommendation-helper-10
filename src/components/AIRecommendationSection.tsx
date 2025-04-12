@@ -2,7 +2,7 @@
 import React from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Loader2, Bot, AlertCircle } from "lucide-react";
+import { Loader2, Bot, AlertCircle, CheckCircle } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
 import { Alert, AlertDescription } from "./ui/alert";
@@ -25,8 +25,9 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="mb-6"
     >
-      <Card className="p-4 sm:p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-4 rounded-xl">
+      <Card className="p-4 sm:p-6 bg-white/90 dark:bg-gray-900/90 shadow-lg space-y-4 rounded-xl border-medical-primary/30">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2">
             <Bot className="h-6 w-6 text-medical-primary" />
@@ -43,6 +44,11 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyzing Patient Data...
+              </>
+            ) : recommendation ? (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Refresh AI Analysis
               </>
             ) : (
               <>
@@ -74,9 +80,21 @@ export const AIRecommendationSection: React.FC<AIRecommendationSectionProps> = (
         )}
 
         {!isLoading && recommendation && (
-          <div className="mt-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.4 }}
+            className="mt-4 bg-green-50 dark:bg-green-900/10 p-4 rounded-lg border border-green-200 dark:border-green-800"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <h3 className="font-medium text-green-700 dark:text-green-300">AI Recommendation Generated</h3>
+            </div>
+            <p className="text-sm text-green-600 dark:text-green-400 mb-4">
+              The AI has analyzed your patient data and provided a personalized antibiotic recommendation.
+            </p>
             <AntibioticRecommendation recommendation={recommendation} />
-          </div>
+          </motion.div>
         )}
       </Card>
     </motion.div>

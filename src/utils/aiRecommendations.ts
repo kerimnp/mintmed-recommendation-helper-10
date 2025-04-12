@@ -49,89 +49,133 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
       }
     };
 
-    // Call the Supabase Edge Function
-    console.log('Calling Edge Function with data:', JSON.stringify(enhancedData, null, 2));
-    
-    const { data: response, error } = await supabase.functions.invoke('get-ai-recommendation', {
-      body: { patientData: enhancedData }
-    });
+    // Call the Supabase Edge Function with exponential backoff retry
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError = null;
 
-    if (error) {
-      console.error('Error from Edge Function:', error);
-      if (error.message && error.message.includes('API service configuration is missing')) {
-        throw new Error('API key missing: Add OPENAI_API_KEY to Supabase Edge Function Secrets');
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`Attempt ${retryCount + 1}: Calling Edge Function with data:`, JSON.stringify(enhancedData, null, 2));
+        
+        const { data: response, error } = await supabase.functions.invoke('get-ai-recommendation', {
+          body: { patientData: enhancedData }
+        });
+
+        if (error) {
+          console.error(`Attempt ${retryCount + 1} failed:`, error);
+          lastError = error;
+          retryCount++;
+          
+          if (error.message && error.message.includes('API service configuration is missing')) {
+            throw new Error('API key missing: Add OPENAI_API_KEY to Supabase Edge Function Secrets');
+          }
+          
+          // Wait before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+          continue;
+        }
+
+        console.log('Raw response received:', response);
+
+        if (!response) {
+          console.error('Empty response received');
+          lastError = new Error('Empty response from AI recommendation service');
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+          continue;
+        }
+
+        if (response.status === 'error') {
+          console.error('Error response:', response);
+          lastError = new Error(response.error || 'Error in AI recommendation service');
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+          continue;
+        }
+
+        if (!response.recommendation) {
+          console.error('Invalid response format:', response);
+          lastError = new Error('Invalid response format from AI recommendation service');
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+          continue;
+        }
+
+        console.log('Processing AI recommendation:', response.recommendation);
+        
+        // Enhance the recommendation with our calculated considerations
+        const aiRecommendation = response.recommendation as EnhancedAntibioticRecommendation;
+        
+        // Ensure we have a valid rationale object
+        aiRecommendation.rationale = aiRecommendation.rationale || {
+          infectionType: data.infectionSites[0] || "unknown",
+          severity: data.severity || "unknown",
+          reasons: []
+        };
+        
+        // Add regional considerations if they don't already exist
+        if (regionalConsiderations.length > 0) {
+          // Initialize regionConsiderations if it doesn't exist
+          if (!aiRecommendation.rationale.regionConsiderations) {
+            aiRecommendation.rationale.regionConsiderations = [];
+          }
+          
+          // Add our regional considerations
+          aiRecommendation.rationale.regionConsiderations = [
+            ...aiRecommendation.rationale.regionConsiderations,
+            ...regionalConsiderations.filter(item => 
+              !aiRecommendation.rationale.regionConsiderations?.includes(item)
+            )
+          ];
+        }
+        
+        // Add renal considerations
+        if (renalConsiderations.length > 0) {
+          // Initialize doseAdjustments if it doesn't exist
+          if (!aiRecommendation.rationale.doseAdjustments) {
+            aiRecommendation.rationale.doseAdjustments = [];
+          }
+          
+          // Add our renal considerations
+          aiRecommendation.rationale.doseAdjustments = [
+            ...aiRecommendation.rationale.doseAdjustments,
+            ...renalConsiderations.filter(item => 
+              !aiRecommendation.rationale.doseAdjustments?.includes(item)
+            )
+          ];
+        }
+        
+        // Ensure we have other required fields
+        if (!aiRecommendation.alternatives) {
+          aiRecommendation.alternatives = [];
+        }
+        
+        if (!aiRecommendation.precautions) {
+          aiRecommendation.precautions = [];
+        }
+        
+        console.log('Final enhanced recommendation:', aiRecommendation);
+        return aiRecommendation;
+      } catch (e) {
+        console.error(`Attempt ${retryCount + 1} threw an exception:`, e);
+        lastError = e instanceof Error ? e : new Error(String(e));
+        retryCount++;
+        
+        // For some errors, we don't want to retry
+        if (e instanceof Error && e.message.includes('API key missing')) {
+          throw e;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
+        }
       }
-      throw new Error(`AI service error: ${error.message}`);
     }
 
-    console.log('Raw response received:', response);
-
-    if (!response) {
-      console.error('Empty response received');
-      throw new Error('Empty response from AI recommendation service');
-    }
-
-    if (response.status === 'error') {
-      console.error('Error response:', response);
-      throw new Error(response.error || 'Error in AI recommendation service');
-    }
-
-    if (!response.recommendation) {
-      console.error('Invalid response format:', response);
-      throw new Error('Invalid response format from AI recommendation service');
-    }
-
-    console.log('Processing AI recommendation:', response.recommendation);
-    
-    // Enhance the recommendation with our calculated considerations
-    const aiRecommendation = response.recommendation as EnhancedAntibioticRecommendation;
-    
-    // Ensure we have a valid rationale object
-    aiRecommendation.rationale = aiRecommendation.rationale || {
-      infectionType: data.infectionSites[0] || "unknown",
-      severity: data.severity || "unknown",
-      reasons: []
-    };
-    
-    // Add regional considerations if they don't already exist
-    if (regionalConsiderations.length > 0) {
-      // Initialize regionConsiderations if it doesn't exist
-      if (!aiRecommendation.rationale.regionConsiderations) {
-        aiRecommendation.rationale.regionConsiderations = [];
-      }
-      
-      // Add our regional considerations
-      aiRecommendation.rationale.regionConsiderations = [
-        ...aiRecommendation.rationale.regionConsiderations,
-        ...regionalConsiderations
-      ];
-    }
-    
-    // Add renal considerations
-    if (renalConsiderations.length > 0) {
-      // Initialize doseAdjustments if it doesn't exist
-      if (!aiRecommendation.rationale.doseAdjustments) {
-        aiRecommendation.rationale.doseAdjustments = [];
-      }
-      
-      // Add our renal considerations
-      aiRecommendation.rationale.doseAdjustments = [
-        ...aiRecommendation.rationale.doseAdjustments,
-        ...renalConsiderations
-      ];
-    }
-    
-    // Ensure we have other required fields
-    if (!aiRecommendation.alternatives) {
-      aiRecommendation.alternatives = [];
-    }
-    
-    if (!aiRecommendation.precautions) {
-      aiRecommendation.precautions = [];
-    }
-    
-    console.log('Final enhanced recommendation:', aiRecommendation);
-    return aiRecommendation;
+    // If we got here, all retries failed
+    throw lastError || new Error('Failed to get AI recommendation after multiple attempts');
   } catch (error) {
     console.error('Error getting AI recommendation:', error);
     throw error instanceof Error 
