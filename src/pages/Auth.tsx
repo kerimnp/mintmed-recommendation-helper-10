@@ -38,12 +38,14 @@ const Auth = () => {
   }, [activeTab]);
 
   useEffect(() => {
+    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/");
       }
     });
 
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session) {
@@ -67,6 +69,7 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await signIn(email, password);
+      // Successful login is handled by the auth state change listener
     } catch (error: any) {
       console.error("Sign in error:", error);
       setError(error.message || (language === "en" 
@@ -99,6 +102,12 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await signUp(email, password);
+      toast({
+        title: language === "en" ? "Account created" : "Račun stvoren",
+        description: language === "en" 
+          ? "Please check your email to confirm your account" 
+          : "Molimo provjerite svoj email za potvrdu računa",
+      });
     } catch (error: any) {
       console.error("Sign up error:", error);
       setError(error.message || (language === "en" 
@@ -113,8 +122,17 @@ const Auth = () => {
     try {
       setIsLoading(true);
       setError(null);
-      await signInWithGoogle();
-      // Note: Success is handled by the auth state change listener
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/advisor'
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Success is handled by the auth state change listener
     } catch (error: any) {
       console.error("Google sign in error:", error);
       setError(error.message || (language === "en" 
@@ -126,9 +144,9 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-medical-bg dark:to-medical-bg-secondary p-4">
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-4 left-4 z-10">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="flex items-center gap-2 rounded-full">
             <ChevronLeft className="h-4 w-4" />
             <span>{language === "en" ? "Back to Home" : "Natrag na Početnu"}</span>
           </Button>
@@ -141,8 +159,8 @@ const Auth = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="ios-card-shadow bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-gray-100 dark:border-gray-800 rounded-2xl">
-          <CardHeader className="text-center">
+        <Card className="ios-card-shadow bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
+          <CardHeader className="text-center pb-4">
             <CardTitle className="text-2xl font-bold text-medical-primary">
               {activeTab === "login" 
                 ? (language === "en" ? "Welcome Back" : "Dobrodošli Natrag") 
@@ -156,7 +174,7 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert variant="destructive" className="mb-4">
+              <Alert variant="destructive" className="mb-4 rounded-xl">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -168,11 +186,11 @@ const Auth = () => {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid grid-cols-2 mb-6 w-full">
-                <TabsTrigger value="login" className="text-sm font-medium">
+              <TabsList className="grid grid-cols-2 mb-6 w-full rounded-full p-1 bg-gray-100 dark:bg-gray-800">
+                <TabsTrigger value="login" className="text-sm font-medium rounded-full px-0 py-2.5">
                   {language === "en" ? "Sign In" : "Prijava"}
                 </TabsTrigger>
-                <TabsTrigger value="register" className="text-sm font-medium">
+                <TabsTrigger value="register" className="text-sm font-medium rounded-full px-0 py-2.5">
                   {language === "en" ? "Sign Up" : "Registracija"}
                 </TabsTrigger>
               </TabsList>
@@ -187,7 +205,7 @@ const Auth = () => {
                         id="email"
                         type="email"
                         placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 py-6 ios-input"
+                        className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isLoading}
@@ -211,7 +229,7 @@ const Auth = () => {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 ios-input"
+                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isLoading}
@@ -232,7 +250,7 @@ const Auth = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full ios-button mt-4 py-6" 
+                    className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -257,7 +275,7 @@ const Auth = () => {
                         id="register-email"
                         type="email"
                         placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 py-6 ios-input"
+                        className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isLoading}
@@ -272,7 +290,7 @@ const Auth = () => {
                         id="register-password"
                         type={showPassword ? "text" : "password"}
                         placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 ios-input"
+                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isLoading}
@@ -301,7 +319,7 @@ const Auth = () => {
                         id="confirm-password"
                         type={showPassword ? "text" : "password"}
                         placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 ios-input"
+                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         disabled={isLoading}
@@ -315,7 +333,7 @@ const Auth = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full ios-button mt-4 py-6" 
+                    className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -345,7 +363,7 @@ const Auth = () => {
             <div className="flex justify-center">
               <Button
                 variant="outline"
-                className="ios-button-secondary flex items-center justify-center gap-2 w-full py-6"
+                className="flex items-center justify-center gap-2 w-full py-6 rounded-xl h-12 border-gray-200 dark:border-gray-700"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >

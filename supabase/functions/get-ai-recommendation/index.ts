@@ -141,6 +141,7 @@ serve(async (req) => {
         }
       }
 
+      console.log('Successfully processed recommendation');
       return new Response(
         JSON.stringify({ 
           recommendation: parsedRecommendation,
@@ -150,6 +151,7 @@ serve(async (req) => {
       );
     } catch (error) {
       console.error('Error parsing AI response:', error);
+      console.error('Raw content:', result.choices[0].message.content);
       throw new Error('Failed to parse AI recommendation: ' + error.message);
     }
   } catch (error) {

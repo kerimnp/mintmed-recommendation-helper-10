@@ -16,7 +16,7 @@ const AntibioticAdvisor = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-gray-900 overflow-auto">
+    <div className="min-h-screen w-full bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 overflow-auto pb-20">
       <Helmet>
         <title>Horalix - Antibiotic Recommendation System</title>
         <meta name="description" content="Evidence-based antibiotic recommendations tailored to patient needs" />
@@ -40,7 +40,7 @@ const AntibioticAdvisor = () => {
               </h1>
             </div>
             <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
                 <ArrowLeft className="h-4 w-4" />
                 <span className={isMobile ? "sr-only" : ""}>
                   {language === "en" ? "Back to Home" : "Natrag na Početnu"}
@@ -51,7 +51,7 @@ const AntibioticAdvisor = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 pt-28">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

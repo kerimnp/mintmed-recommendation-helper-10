@@ -49,20 +49,25 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
       }
     };
 
+    // Call the Supabase Edge Function
+    console.log('Calling Edge Function with data:', JSON.stringify(enhancedData, null, 2));
+    
     const { data: response, error } = await supabase.functions.invoke('get-ai-recommendation', {
       body: { patientData: enhancedData }
     });
 
     if (error) {
       console.error('Error from Edge Function:', error);
-      if (error.message.includes('API service configuration is missing')) {
+      if (error.message && error.message.includes('API service configuration is missing')) {
         throw new Error('API key missing: Add OPENAI_API_KEY to Supabase Edge Function Secrets');
       }
       throw new Error(`AI service error: ${error.message}`);
     }
 
+    console.log('Raw response received:', response);
+
     if (!response) {
-      console.error('Empty response received:', response);
+      console.error('Empty response received');
       throw new Error('Empty response from AI recommendation service');
     }
 
@@ -76,19 +81,20 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
       throw new Error('Invalid response format from AI recommendation service');
     }
 
-    console.log('AI recommendation received:', response.recommendation);
+    console.log('Processing AI recommendation:', response.recommendation);
     
     // Enhance the recommendation with our calculated considerations
     const aiRecommendation = response.recommendation as EnhancedAntibioticRecommendation;
     
+    // Ensure we have a valid rationale object
+    aiRecommendation.rationale = aiRecommendation.rationale || {
+      infectionType: data.infectionSites[0] || "unknown",
+      severity: data.severity || "unknown",
+      reasons: []
+    };
+    
     // Add regional considerations if they don't already exist
     if (regionalConsiderations.length > 0) {
-      aiRecommendation.rationale = aiRecommendation.rationale || {
-        infectionType: data.infectionSites[0] || "unknown",
-        severity: data.severity || "unknown",
-        reasons: []
-      };
-      
       // Initialize regionConsiderations if it doesn't exist
       if (!aiRecommendation.rationale.regionConsiderations) {
         aiRecommendation.rationale.regionConsiderations = [];
@@ -103,12 +109,6 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
     
     // Add renal considerations
     if (renalConsiderations.length > 0) {
-      aiRecommendation.rationale = aiRecommendation.rationale || {
-        infectionType: data.infectionSites[0] || "unknown",
-        severity: data.severity || "unknown",
-        reasons: []
-      };
-      
       // Initialize doseAdjustments if it doesn't exist
       if (!aiRecommendation.rationale.doseAdjustments) {
         aiRecommendation.rationale.doseAdjustments = [];
@@ -121,6 +121,16 @@ export const getAIRecommendation = async (data: PatientData): Promise<EnhancedAn
       ];
     }
     
+    // Ensure we have other required fields
+    if (!aiRecommendation.alternatives) {
+      aiRecommendation.alternatives = [];
+    }
+    
+    if (!aiRecommendation.precautions) {
+      aiRecommendation.precautions = [];
+    }
+    
+    console.log('Final enhanced recommendation:', aiRecommendation);
     return aiRecommendation;
   } catch (error) {
     console.error('Error getting AI recommendation:', error);
