@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 interface FormValidationProps {
   validateForm: () => boolean;

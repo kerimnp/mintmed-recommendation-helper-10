@@ -47,8 +47,8 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
 
   // Determine which antibiotic data to show based on the active tab
   const currentAntibiotic = activeTab === "primary" 
-    ? recommendation.primaryRecommendation
-    : recommendation.alternatives[activeAntibioticIndex] || recommendation.primaryRecommendation;
+    ? { ...recommendation.primaryRecommendation, reason: recommendation.reasoning }
+    : recommendation.alternatives[activeAntibioticIndex] || { ...recommendation.primaryRecommendation, reason: recommendation.reasoning };
 
   // Extract just the main antibiotic name for product lookup
   const currentAntibioticName = currentAntibiotic.name?.split('+')[0]?.trim() || "";
@@ -66,7 +66,10 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
         <TabsContent value="primary" className="mt-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PrimaryRecommendation 
-              recommendation={recommendation.primaryRecommendation} 
+              recommendation={{ 
+                ...recommendation.primaryRecommendation, 
+                reason: recommendation.reasoning 
+              }} 
               selectedProduct={activeTab === "primary" ? selectedProduct : undefined}
               isActive={activeTab === "primary"}
             />
