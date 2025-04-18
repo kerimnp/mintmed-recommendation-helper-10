@@ -83,7 +83,10 @@ const Index = () => {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <img 
-                  src={theme === 'dark' ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} 
+                  src={theme === 'dark' 
+                    ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png"
+                    : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"
+                  } 
                   alt="Horalix Logo" 
                   className="h-8 w-auto" 
                 />
