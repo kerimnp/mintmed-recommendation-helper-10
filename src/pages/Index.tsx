@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -169,7 +168,7 @@ const Index = () => {
                       alt="Horalix Dashboard" 
                       className="w-full h-auto object-cover" 
                     />
-                    <div className="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
+                    <div className="absolute inset-0 bg-black/10 dark:bg-white/10"></div>
                   </div>
                 </motion.div>
               </div>
