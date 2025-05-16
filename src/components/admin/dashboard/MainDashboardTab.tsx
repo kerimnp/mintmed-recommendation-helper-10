@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus } from "lucide-react";
+import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon } from "lucide-react"; // Added Moon here
 import { motion } from "framer-motion";
 
 interface MainDashboardTabProps {
@@ -12,9 +11,8 @@ const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return { message: "Good Morning", icon: <Sun className="h-7 w-7 text-yellow-500" /> };
   if (hour < 18) return { message: "Good Afternoon", icon: <Cloud className="h-7 w-7 text-blue-400" /> };
-  return { message: "Good Evening", icon: <Moon className="h-7 w-7 text-indigo-400" /> }; // Assuming Moon is imported, if not use a placeholder
+  return { message: "Good Evening", icon: <Moon className="h-7 w-7 text-indigo-400" /> };
 };
-
 
 export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }) => {
   const { message: greetingMessage, icon: greetingIcon } = getGreeting();
