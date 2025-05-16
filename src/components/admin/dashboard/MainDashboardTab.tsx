@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon } from "lucide-react"; // Added Moon here
+import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react"; // Added Moon, CalendarDays, FilePenLine, Thermometer
 import { motion } from "framer-motion";
 
 interface MainDashboardTabProps {
@@ -36,6 +36,27 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
     { id: "A002", message: "Patient P003 (Robert Johnson) has a potential drug interaction.", severity: "Medium", patientId: "P003" },
     { id: "A003", message: "New severe allergy reported for patient P00Y.", severity: "High", patientId: "P00Y" },
   ];
+
+  const nextPatients = [
+    { id: "NP001", name: "Alice Wonderland", time: "14:00", reason: "Follow-up", priority: "medium" },
+    { id: "NP002", name: "Bob The Builder", time: "14:30", reason: "New Consultation", priority: "high" },
+    { id: "NP003", name: "Charlie Brown", time: "15:00", reason: "Routine Checkup", priority: "low" },
+  ];
+
+  const mockPrescriptions = [
+    { id: "RX001", patientName: "John Doe", drug: "Amoxicillin 250mg", timestamp: "2 mins ago", status: "Pending" },
+    { id: "RX002", name: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" },
+    { id: "RX003", name: "Robert Johnson", drug: "Azithromycin 500mg", timestamp: "35 mins ago", status: "Sent" },
+  ];
+
+  const heatmapData = [
+    { id: "region1", name: "North Sector", resistance: 80, color: "bg-red-600 hover:bg-red-700" },
+    { id: "region2", name: "East District", resistance: 45, color: "bg-yellow-500 hover:bg-yellow-600" },
+    { id: "region3", name: "West Ward", resistance: 20, color: "bg-green-500 hover:bg-green-600" },
+    { id: "region4", name: "South Area", resistance: 65, color: "bg-orange-500 hover:bg-orange-600" },
+    { id: "region5", name: "Central Zone", resistance: 30, color: "bg-lime-500 hover:bg-lime-600" },
+    { id: "region6", name: "Metro Hub", resistance: 90, color: "bg-red-700 hover:bg-red-800" },
+  ];
   
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -47,7 +68,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
-
 
   return (
     <div className="space-y-8 p-1">
@@ -102,17 +122,28 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
               <CardTitle className="text-xl text-gray-800 dark:text-white flex items-center">
-                <MapPin className="h-6 w-6 mr-3 text-medical-accent" />
+                <Thermometer className="h-6 w-6 mr-3 text-medical-accent" />
                 Geographic Resistance Heatmap
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <MapPin className="h-20 w-20 text-yellow-500 mb-4 opacity-70" />
-              <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                Interactive Heatmap Coming Soon!
+            <CardContent className="py-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Resistance levels across observed regions (simulated data):
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Visualizing local resistance patterns to enhance decision-making.
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {heatmapData.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    className={`${item.color} p-3 rounded-lg text-white shadow-md transition-all duration-300 ease-in-out`}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                  >
+                    <p className="font-semibold text-sm truncate">{item.name}</p>
+                    <p className="text-xs opacity-90">Resistance: {item.resistance}%</p>
+                  </motion.div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                Note: This is a pseudo-heatmap. Full interactive map coming soon.
               </p>
             </CardContent>
           </Card>
@@ -150,6 +181,102 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
               {criticalAlerts.length > 3 && (
                   <button className="text-sm text-medical-primary hover:underline mt-3 font-medium">View all alerts</button>
               )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      <motion.div className="grid gap-6 lg:grid-cols-2" initial="hidden" animate="visible" variants={sectionVariants}>
+        {/* Next Patients Section */}
+        <motion.div variants={cardVariants} whileHover="hover">
+          <Card className="shadow-lg lg:col-span-1 h-full">
+            <CardHeader>
+              <CardTitle className="text-xl text-gray-800 dark:text-white flex items-center">
+                <CalendarDays className="h-6 w-6 mr-3 text-medical-primary" />
+                Upcoming Appointments
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-4">
+              {nextPatients.length > 0 ? (
+                nextPatients.map(patient => (
+                  <motion.div 
+                    key={patient.id} 
+                    className={`p-3 rounded-lg border ${
+                      patient.priority === 'high' ? 'border-red-300 bg-red-50/70 dark:border-red-700 dark:bg-red-900/30' :
+                      patient.priority === 'medium' ? 'border-yellow-300 bg-yellow-50/70 dark:border-yellow-700 dark:bg-yellow-900/30' :
+                      'border-gray-200 bg-gray-50/70 dark:border-gray-700 dark:bg-gray-800/30'
+                    } hover:shadow-md transition-shadow`}
+                    whileHover={{ y: -2 }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{patient.name}</p>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        patient.priority === 'high' ? 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-red-200' :
+                        patient.priority === 'medium' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200' :
+                        'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
+                      }`}>
+                        {patient.time}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{patient.reason}</p>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <SmilePlus className="h-16 w-16 text-green-500 mb-4 opacity-80" />
+                  <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">No Upcoming Appointments</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Your schedule is clear for now.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Recent Prescription Activity Section */}
+        <motion.div variants={cardVariants} whileHover="hover">
+          <Card className="shadow-lg lg:col-span-1 h-full">
+            <CardHeader>
+              <CardTitle className="text-xl text-gray-800 dark:text-white flex items-center">
+                <FilePenLine className="h-6 w-6 mr-3 text-purple-500" />
+                Recent Prescription Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-4">
+              {mockPrescriptions.length > 0 ? (
+                mockPrescriptions.slice(0,3).map(rx => (
+                  <motion.div 
+                    key={rx.id} 
+                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:shadow-md transition-shadow"
+                    whileHover={{ y: -2 }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName || rx.name}</p> {/* Support both patientName and name */}
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{rx.drug}</p>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        rx.status === 'Pending' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200' :
+                        'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-200'
+                      }`}>
+                        {rx.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1 text-right">{rx.timestamp}</p>
+                  </motion.div>
+                ))
+              ) : (
+                 <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <Zap className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4 opacity-70" />
+                  <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">No Recent Prescriptions</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prescription activity will appear here.</p>
+                </div>
+              )}
+              {mockPrescriptions.length > 3 && (
+                <button className="text-sm text-medical-primary hover:underline mt-3 font-medium w-full text-left">View all prescription activity</button>
+              )}
+               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                Live updates for prescriptions will be shown here. Full real-time integration is in development.
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -215,6 +342,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           </CardContent>
         </Card>
       </motion.div>
+
 
       {searchTerm && (
         <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
