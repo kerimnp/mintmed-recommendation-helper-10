@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { construction } from "lucide-react"; // Using a placeholder icon
+import { Construction } from "lucide-react"; // Changed 'construction' to 'Construction'
 
 interface MainDashboardTabProps {
   searchTerm?: string;
@@ -43,7 +43,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           <CardTitle className="text-xl text-medical-primary">Dashboard Content Area</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <construction className="h-16 w-16 text-yellow-500 mb-4" />
+          <Construction className="h-16 w-16 text-yellow-500 mb-4" /> {/* Changed 'construction' to 'Construction' */}
           <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
             Dashboard Features Under Construction
           </p>
@@ -60,3 +60,4 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
     </div>
   );
 };
+

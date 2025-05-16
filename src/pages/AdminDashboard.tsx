@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"; // Removed DialogTrigger as it's not directly used here for settings button
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast as sonnerToast } from "sonner";
 
 const AdminDashboard = () => {
+  // ... keep existing code (hooks and state variables)
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("dashboard"); // Changed default to "dashboard"
@@ -228,6 +229,7 @@ const AdminDashboard = () => {
       <main className="flex-1 overflow-hidden w-full flex flex-col h-screen">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
+          {/* ... keep existing code (header content: logo, search, actions) */}
           <div className="flex items-center justify-between h-16 px-4 md:px-6">
             <div className="flex items-center gap-4">
               <Sheet>
@@ -366,22 +368,22 @@ const AdminDashboard = () => {
                     </Button>
                   </Link>
                   
-                  <DialogTrigger asChild>
-                     <Button 
-                        variant="default" 
-                        className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
-                        onClick={() => setIsSettingsOpen(true)} // Trigger settings dialog
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden md:inline">Settings</span>
-                      </Button>
-                  </DialogTrigger>
+                  {/* Removed DialogTrigger, Button directly controls Dialog state */}
+                   <Button 
+                      variant="default" 
+                      className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
+                      onClick={() => setIsSettingsOpen(true)} // Trigger settings dialog
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden md:inline">Settings</span>
+                    </Button>
                 </div>
               </div>
               
               <DashboardContent activeTab={activeTab} searchTerm={searchTerm} />
             </motion.div>
             
+            {/* ... keep existing code (footer) */}
             <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 mt-8">
               <p>© 2025 Horalix Clinical Decision Support System</p>
               <p className="mt-1">Version 1.0.0 | Last updated: May 16, 2025</p>
