@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, Bell, Sun, Moon, Settings, Search, Menu, LogOut } from "lucide-react";
+import { Home, Bell, Sun, Moon, Settings, Search, Menu, LogOut, LayoutDashboard } from "lucide-react"; // Added LayoutDashboard
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
@@ -28,7 +27,7 @@ import { toast as sonnerToast } from "sonner";
 const AdminDashboard = () => {
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState("resistance");
+  const [activeTab, setActiveTab] = useState("dashboard"); // Changed default to "dashboard"
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -46,8 +45,17 @@ const AdminDashboard = () => {
     const tabParam = urlParams.get('tab');
     if (tabParam) {
       setActiveTab(tabParam);
+    } else {
+      // If no tab param, ensure URL reflects default activeTab
+      navigate(`/admin?tab=${activeTab}`, { replace: true });
     }
-  }, []);
+  }, []); // Removed activeTab from dependency array to avoid loop on initial load
+
+  // Update URL when activeTab changes
+  useEffect(() => {
+    navigate(`/admin?tab=${activeTab}`, { replace: true });
+  }, [activeTab, navigate]);
+
 
   const handleLogout = () => {
     // In a real app, this would call an auth logout function
@@ -72,7 +80,9 @@ const AdminDashboard = () => {
       // Determine which tab to navigate to based on search term
       const lowerSearchTerm = searchTerm.toLowerCase();
       
-      if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) {
+      if (lowerSearchTerm.includes("dashboard")) {
+        setActiveTab("dashboard");
+      } else if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) {
         setActiveTab("antibiotics");
       } else if (lowerSearchTerm.includes("resist") || lowerSearchTerm.includes("pattern")) {
         setActiveTab("resistance");
@@ -186,12 +196,12 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src="https://ui.shadcn.com/avatars/03.png" />
-                    <AvatarFallback>MD</AvatarFallback>
+                    <AvatarImage src="/lovable.svg" /> {/* Placeholder - update if a specific image is desired */}
+                    <AvatarFallback>KS</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">Dr. Maria Dawson</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Infectious Disease Specialist</p>
+                    <p className="font-medium">Dr. Kerim Sabic</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Head of Clinical Informatics</p>
                   </div>
                 </div>
                 
@@ -220,13 +230,13 @@ const AdminDashboard = () => {
         <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4 md:px-6">
             <div className="flex items-center gap-4">
-              {/* Fixed SheetTrigger to be wrapped in SheetRoot */}
               <Sheet>
                 <SheetTrigger asChild className="lg:hidden">
                   <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsMobileMenuOpen(true)}>
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
+                {/* SheetContent is part of AdminSidebar mobile setup */}
               </Sheet>
               
               <Link to="/" className="flex items-center gap-2">
@@ -247,7 +257,7 @@ const AdminDashboard = () => {
               <div className="relative w-full">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Search guidelines, drugs, or resistance data..."
+                  placeholder="Search dashboard, guidelines, drugs..."
                   className="pl-9 border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/50 h-9 rounded-full w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -280,20 +290,20 @@ const AdminDashboard = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="rounded-full h-8 w-8 p-0">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://ui.shadcn.com/avatars/03.png" />
-                      <AvatarFallback>MD</AvatarFallback>
+                      <AvatarImage src="/lovable.svg" /> {/* Placeholder - update if specific image desired */}
+                      <AvatarFallback>KS</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 p-2">
                   <div className="flex items-center p-2 gap-2">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="https://ui.shadcn.com/avatars/03.png" />
-                      <AvatarFallback>MD</AvatarFallback>
+                      <AvatarImage src="/lovable.svg" /> {/* Placeholder - update if specific image desired */}
+                      <AvatarFallback>KS</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium">Dr. Maria Dawson</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">maria@hospital.org</p>
+                      <p className="text-sm font-medium">Dr. Kerim Sabic</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">kerim.sabic@horalix.com</p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -317,7 +327,7 @@ const AdminDashboard = () => {
         
         {/* Main content area */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto p-4 md:p-6 pt-6">
+          <div className="max-w-full mx-auto p-4 md:p-6 pt-6"> {/* Changed max-w-7xl to max-w-full */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -327,11 +337,11 @@ const AdminDashboard = () => {
               {/* Page heading */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                    Admin Dashboard
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white capitalize">
+                    {activeTab.replace('-', ' ')} Overview
                   </h1>
                   <p className="text-gray-500 dark:text-gray-400 mt-1">
-                    Monitor resistance patterns and antibiotic effectiveness
+                    Monitor key metrics and manage clinical data
                   </p>
                 </div>
                 
@@ -356,122 +366,16 @@ const AdminDashboard = () => {
                     </Button>
                   </Link>
                   
-                  {/* Fixed Dialog to have proper trigger */}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button 
+                  <DialogTrigger asChild>
+                     <Button 
                         variant="default" 
                         className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
+                        onClick={() => setIsSettingsOpen(true)} // Trigger settings dialog
                       >
                         <Settings className="h-4 w-4" />
                         <span className="hidden md:inline">Settings</span>
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px] rounded-xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-xl">Settings</DialogTitle>
-                        <DialogDescription>
-                          Customize your dashboard experience and account preferences
-                        </DialogDescription>
-                      </DialogHeader>
-                      
-                      <Tabs defaultValue="appearance">
-                        <TabsList className="grid grid-cols-3 w-full">
-                          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-                          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                          <TabsTrigger value="account">Account</TabsTrigger>
-                        </TabsList>
-                        
-                        <TabsContent value="appearance" className="space-y-4 py-4">
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Label htmlFor="dark-mode-2">Dark Mode</Label>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Toggle between light and dark theme</p>
-                              </div>
-                              <Switch 
-                                id="dark-mode-2" 
-                                checked={theme === 'dark'}
-                                onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                              />
-                            </div>
-                            
-                            <Separator />
-                            
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Label htmlFor="reduced-motion-2">Reduced Motion</Label>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Minimize animations throughout the interface</p>
-                              </div>
-                              <Switch id="reduced-motion-2" />
-                            </div>
-                            
-                            <Separator />
-                            
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Label htmlFor="compact-view-2">Compact View</Label>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Reduce spacing and size of UI elements</p>
-                              </div>
-                              <Switch id="compact-view-2" />
-                            </div>
-                          </div>
-                        </TabsContent>
-                        
-                        <TabsContent value="notifications" className="space-y-4 py-4">
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Label htmlFor="email-notifs-2">Email Notifications</Label>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Receive system notifications via email</p>
-                              </div>
-                              <Switch id="email-notifs-2" defaultChecked />
-                            </div>
-                            
-                            <Separator />
-                            
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Label htmlFor="push-notifs-2">Push Notifications</Label>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Receive in-app notifications</p>
-                              </div>
-                              <Switch id="push-notifs-2" defaultChecked />
-                            </div>
-                          </div>
-                        </TabsContent>
-                        
-                        <TabsContent value="account" className="space-y-4 py-4">
-                          <div className="space-y-4">
-                            <div className="flex items-center space-x-4">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src="https://ui.shadcn.com/avatars/03.png" />
-                                <AvatarFallback>MD</AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-medium">Dr. Maria Dawson</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Infectious Disease Specialist</p>
-                              </div>
-                            </div>
-                            
-                            <Separator />
-                            
-                            <div>
-                              <Button variant="outline" className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30" onClick={handleLogout}>
-                                <LogOut className="h-4 w-4 mr-2" />
-                                Log out
-                              </Button>
-                            </div>
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-                      
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsSettingsOpen(false)}>
-                          Close
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  </DialogTrigger>
                 </div>
               </div>
               
@@ -480,7 +384,7 @@ const AdminDashboard = () => {
             
             <footer className="text-center text-sm text-gray-500 dark:text-gray-400 py-6 mt-8">
               <p>© 2025 Horalix Clinical Decision Support System</p>
-              <p className="mt-1">Version 1.0.0 | Last updated: April 10, 2025</p>
+              <p className="mt-1">Version 1.0.0 | Last updated: May 16, 2025</p>
             </footer>
           </div>
         </div>

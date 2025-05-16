@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -11,13 +10,15 @@ import {
   Settings,
   Users,
   PillIcon,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
+// import { useAuth } from "@/contexts/AuthContext"; // Import if needed for dynamic user info
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -26,8 +27,10 @@ interface AdminSidebarProps {
 
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
   const { theme } = useTheme();
-  
+  // const { signOut } = useAuth(); // Uncomment if using context signOut
+
   const navItems = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
     { id: "antibiotics", label: "Antibiotics", icon: Shield, description: "Antibiotic guidelines and usage" },
     { id: "effectiveness", label: "Effectiveness", icon: PieChart, description: "Treatment effectiveness data" },
     { id: "resistance", label: "Resistance", icon: Microscope, description: "Resistance pattern mapping" },
@@ -36,13 +39,14 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
     { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // await signOut(); // Use this if integrating with AuthContext signOut
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account.",
     });
     // Navigate to home page
-    setTimeout(() => window.location.href = "/", 500);
+    setTimeout(() => window.location.href = "/", 500); // Consider using useNavigate from react-router-dom
   };
 
   return (
@@ -125,19 +129,20 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           </div>
         </div>
         
-        <div className="lg:hidden flex justify-between">
+        <div className="lg:hidden flex justify-around overflow-x-auto no-scrollbar py-2">
           {navItems.map((item) => (
             <Button 
               key={item.id}
               variant="ghost"
-              size="sm"
+              size="icon"
               className={cn(
-                "px-3 py-2",
-                activeTab === item.id ? "bg-medical-primary/10 text-medical-primary" : ""
+                "flex flex-col items-center h-auto p-2 rounded-lg",
+                activeTab === item.id ? "bg-medical-primary/10 text-medical-primary" : "text-gray-600 dark:text-gray-400"
               )}
               onClick={() => setActiveTab(item.id)}
+              title={item.label}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-5 w-5" />
             </Button>
           ))}
         </div>
