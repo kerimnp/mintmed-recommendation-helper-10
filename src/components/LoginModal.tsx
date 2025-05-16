@@ -7,8 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert"; // Ensure this path is correct
-import { supabase } from '@/integrations/supabase/client'; // For Google Sign-In
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -17,7 +16,7 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onOpenChange }) => {
   const { language } = useLanguage();
-  const { signIn, signInWithGoogle } = useAuth(); // Added signInWithGoogle from context
+  const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('kerim.sabic@gmail.com');
   const [password, setPassword] = useState('Nadin123');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,11 +42,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onOpenChange }) => {
     setIsLoading(true);
     try {
       await signInWithGoogle();
-      // onOpenChange(false); // Assuming onAuthStateChange will handle navigation/closing
+      // onOpenChange(false); // Modal will close automatically after redirect
     } catch (err: any) {
       setError(err.message || (language === 'en' ? 'Google sign-in failed.' : 'Google prijava nije uspjela.'));
     } finally {
-      setIsLoading(false); // Might need to keep modal open until redirect
+      setIsLoading(false);
     }
   };
 
@@ -121,7 +120,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onOpenChange }) => {
           </DialogFooter>
         </form>
         <div className="text-center text-sm mt-4">
-          {/* Placeholder for Sign Up link - This could open another modal or redirect */}
           <p>
             {language === 'en' ? "Don't have an account? " : "Nemate račun? "}
             <Button variant="link" className="p-0 h-auto" onClick={() => alert('Sign up functionality to be implemented here. This could open a sign-up modal or navigate to a registration page.')}>

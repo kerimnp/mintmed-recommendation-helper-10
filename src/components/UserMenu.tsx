@@ -43,7 +43,12 @@ const UserMenu: React.FC = () => {
   if (!user && !loading) {
     return (
       <>
-        <Button variant="ghost" onClick={() => setIsLoginModalOpen(true)} className="p-0 rounded-full">
+        <Button 
+          variant="ghost" 
+          onClick={() => setIsLoginModalOpen(true)} 
+          className="p-0 rounded-full"
+          aria-label={language === 'en' ? 'Sign In' : 'Prijavi se'}
+        >
           <Avatar>
             <AvatarFallback>{avatarFallbackText}</AvatarFallback>
           </Avatar>

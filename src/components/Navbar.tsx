@@ -2,8 +2,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import UserMenu from './UserMenu';
-import { Stethoscope } from 'lucide-react'; // Medical icon for branding
-import { LanguageToggle } from './LanguageToggle'; // Changed to named import
+import { Stethoscope } from 'lucide-react';
+import { LanguageToggle } from '@/components/LanguageToggle'; // Using named import
 
 const Navbar: React.FC = () => {
   return (
