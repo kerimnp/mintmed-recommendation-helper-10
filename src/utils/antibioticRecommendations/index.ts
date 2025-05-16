@@ -1,4 +1,3 @@
-
 import { PatientData } from "../types/patientTypes";
 import { calculateBMI, getBMICategory } from "./bmiCalculations";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
@@ -106,36 +105,50 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
     default:
       recommendation = {
         primaryRecommendation: {
-          name: "Specialist Consultation Required",
+          name: "Further Information Needed",
           dose: "N/A",
           route: "N/A",
           duration: "N/A"
         },
-        reasoning: `Infection site "${site}" requires specialist evaluation`,
+        reasoning: `The infection site "${site}" is not specifically covered by current guidelines or requires more specific information. Please specify the infection type (e.g., specific organ, cellulitis vs. abscess for skin) or consult relevant clinical resources.`,
         alternatives: [],
-        precautions: [],
+        precautions: ["This is not a treatment recommendation. Provide more details for a potential AI-guided suggestion or consult a specialist."],
         rationale: {
-          infectionType: "unknown",
-          severity: "unknown",
-          reasons: ["Infection type requires specialist consultation"]
+          infectionType: site,
+          severity: data.severity,
+          reasons: [`Unrecognized or too general infection site: "${site}". More specific information is needed.`]
         }
       };
   }
 
   // Add additional checks and adjustments
-  if (data.allergies.penicillin && !recommendation.rationale.allergyConsiderations) {
-    recommendation.rationale.allergyConsiderations = ["Patient has penicillin allergy - avoiding beta-lactams"];
-  }
+  if (recommendation.primaryRecommendation.name && recommendation.primaryRecommendation.name !== "Further Information Needed" && recommendation.primaryRecommendation.name !== "Incomplete Information") {
+    if (data.allergies.penicillin && (!recommendation.rationale.allergyConsiderations || recommendation.rationale.allergyConsiderations.length === 0)) {
+        recommendation.rationale.allergyConsiderations = [...(recommendation.rationale.allergyConsiderations || []), "Patient has penicillin allergy - chosen regimen avoids penicillin or considers cross-reactivity."];
+    }
 
-  if (gfr < 60 && !recommendation.rationale.doseAdjustments) {
-    recommendation.rationale.doseAdjustments = [`Dose adjusted for reduced renal function (GFR: ${Math.round(gfr)} mL/min)`];
-  }
+    if (gfr < 60 && (!recommendation.rationale.doseAdjustments || !recommendation.rationale.doseAdjustments.some(adj => adj.includes("GFR")))) {
+        recommendation.rationale.doseAdjustments = [
+        ...(recommendation.rationale.doseAdjustments || []),
+        `Dose adjustment and/or cautious use recommended for reduced renal function (GFR: ${Math.round(gfr)} mL/min).`
+        ];
+    }
+    
+    if (bmi >= 30 && (!recommendation.rationale.doseAdjustments || !recommendation.rationale.doseAdjustments.some(adj => adj.includes("BMI")))) {
+        recommendation.rationale.doseAdjustments = [
+        ...(recommendation.rationale.doseAdjustments || []),
+        `Consider dose adjustments for ${bmiCategory} (BMI: ${bmi.toFixed(1)}).`
+        ];
+    }
 
-  if (bmi >= 30) {
-    recommendation.rationale.doseAdjustments = [
-      ...(recommendation.rationale.doseAdjustments || []),
-      `Dose considerations for ${bmiCategory} (BMI: ${bmi.toFixed(1)})`
-    ];
+    // Ensure duration is always present if a drug is named
+    if (recommendation.primaryRecommendation.name && !recommendation.primaryRecommendation.duration) {
+        // General fallback duration - specific modules should ideally set this
+        recommendation.primaryRecommendation.duration = "7-10 days"; 
+         if (data.severity === "severe") {
+            recommendation.primaryRecommendation.duration = "10-14 days";
+        }
+    }
   }
 
   return recommendation;
