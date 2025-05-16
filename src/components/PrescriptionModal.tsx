@@ -1,12 +1,15 @@
+
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
+import { Printer, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
+import { ReferralModal } from "./ReferralModal";
 
 interface PrescriptionModalProps {
   open: boolean;
@@ -21,6 +24,7 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
   const [patientSurname, setPatientSurname] = useState("");
   const [doctorName, setDoctorName] = useState("");
   const [doctorSurname, setDoctorSurname] = useState("");
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
   const generatePrescription = () => {
     if (!patientName || !patientSurname || !doctorName || !doctorSurname) {
@@ -110,59 +114,94 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
     onClose();
   };
 
+  const handleOpenReferral = () => {
+    setIsReferralModalOpen(true);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Generate Prescription</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="patientName">Patient Name</Label>
-              <Input
-                id="patientName"
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-                placeholder="First name"
-              />
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Printer className="h-5 w-5" />
+              Generate Prescription
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="patientName">Patient Name</Label>
+                <Input
+                  id="patientName"
+                  value={patientName}
+                  onChange={(e) => setPatientName(e.target.value)}
+                  placeholder="First name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="patientSurname">Patient Surname</Label>
+                <Input
+                  id="patientSurname"
+                  value={patientSurname}
+                  onChange={(e) => setPatientSurname(e.target.value)}
+                  placeholder="Last name"
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="patientSurname">Patient Surname</Label>
-              <Input
-                id="patientSurname"
-                value={patientSurname}
-                onChange={(e) => setPatientSurname(e.target.value)}
-                placeholder="Last name"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="doctorName">Doctor Name</Label>
+                <Input
+                  id="doctorName"
+                  value={doctorName}
+                  onChange={(e) => setDoctorName(e.target.value)}
+                  placeholder="First name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="doctorSurname">Doctor Surname</Label>
+                <Input
+                  id="doctorSurname"
+                  value={doctorSurname}
+                  onChange={(e) => setDoctorSurname(e.target.value)}
+                  placeholder="Last name"
+                />
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="doctorName">Doctor Name</Label>
-              <Input
-                id="doctorName"
-                value={doctorName}
-                onChange={(e) => setDoctorName(e.target.value)}
-                placeholder="First name"
-              />
+          <DialogFooter className="flex-col space-y-2">
+            <div className="flex w-full justify-end space-x-2">
+              <Button variant="outline" onClick={onClose}>Cancel</Button>
+              <Button onClick={generatePrescription}>Generate Prescription</Button>
             </div>
-            <div>
-              <Label htmlFor="doctorSurname">Doctor Surname</Label>
-              <Input
-                id="doctorSurname"
-                value={doctorSurname}
-                onChange={(e) => setDoctorSurname(e.target.value)}
-                placeholder="Last name"
-              />
+            <div className="flex w-full justify-center pt-4 border-t">
+              <Button 
+                variant="secondary" 
+                className="flex items-center gap-2"
+                onClick={handleOpenReferral}
+              >
+                <FileText className="h-4 w-4" />
+                Create Referral Letter
+              </Button>
             </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={generatePrescription}>Generate PDF</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {isReferralModalOpen && (
+        <ReferralModal
+          open={isReferralModalOpen}
+          onClose={() => setIsReferralModalOpen(false)}
+          recommendationData={recommendationData}
+          patientData={{
+            name: patientName,
+            surname: patientSurname,
+            gender: "",
+            age: ""
+          }}
+        />
+      )}
+    </>
   );
 };

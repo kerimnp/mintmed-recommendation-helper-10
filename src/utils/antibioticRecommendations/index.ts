@@ -1,3 +1,4 @@
+
 import { PatientData } from "../types/patientTypes";
 import { calculateBMI, getBMICategory } from "./bmiCalculations";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
@@ -105,24 +106,24 @@ export const generateAntibioticRecommendation = (data: PatientData): EnhancedAnt
     default:
       recommendation = {
         primaryRecommendation: {
-          name: "Further Information Needed",
+          name: "Additional Information Needed",
           dose: "N/A",
           route: "N/A",
           duration: "N/A"
         },
-        reasoning: `The infection site "${site}" is not specifically covered by current guidelines or requires more specific information. Please specify the infection type (e.g., specific organ, cellulitis vs. abscess for skin) or consult relevant clinical resources.`,
+        reasoning: `The infection site "${site}" requires more specific information. Please specify the infection type (e.g., specific organ, infection characteristics) for a tailored antibiotic recommendation.`,
         alternatives: [],
-        precautions: ["This is not a treatment recommendation. Provide more details for a potential AI-guided suggestion or consult a specialist."],
+        precautions: ["Based on the limited information provided, specific antibiotic recommendations cannot be made with confidence.", "Please provide additional clinical details or consider standard empiric therapy based on local guidelines."],
         rationale: {
           infectionType: site,
           severity: data.severity,
-          reasons: [`Unrecognized or too general infection site: "${site}". More specific information is needed.`]
+          reasons: [`More specific information needed about "${site}" infection to provide evidence-based recommendations.`]
         }
       };
   }
 
   // Add additional checks and adjustments
-  if (recommendation.primaryRecommendation.name && recommendation.primaryRecommendation.name !== "Further Information Needed" && recommendation.primaryRecommendation.name !== "Incomplete Information") {
+  if (recommendation.primaryRecommendation.name && recommendation.primaryRecommendation.name !== "Additional Information Needed" && recommendation.primaryRecommendation.name !== "Incomplete Information") {
     if (data.allergies.penicillin && (!recommendation.rationale.allergyConsiderations || recommendation.rationale.allergyConsiderations.length === 0)) {
         recommendation.rationale.allergyConsiderations = [...(recommendation.rationale.allergyConsiderations || []), "Patient has penicillin allergy - chosen regimen avoids penicillin or considers cross-reactivity."];
     }

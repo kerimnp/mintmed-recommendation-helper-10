@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
 import { availableDrugs } from "@/utils/availableDrugsDatabase";
 import { PrescriptionModal } from "./PrescriptionModal";
+import { ReferralModal } from "./ReferralModal";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { AvailableDrugs } from "./AvailableDrugs";
@@ -13,6 +14,7 @@ import { AlternativesList } from "./AntibioticRecommendationSections/Alternative
 import { ClinicalRationale } from "./AntibioticRecommendationSections/ClinicalRationale";
 import { Precautions } from "./AntibioticRecommendationSections/Precautions";
 import { DoseCalculations } from "./AntibioticRecommendationSections/DoseCalculations";
+import { FileText, Printer } from "lucide-react";
 
 interface RecommendationProps {
   recommendation: EnhancedAntibioticRecommendation;
@@ -21,6 +23,7 @@ interface RecommendationProps {
 export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recommendation }) => {
   const [selectedProduct, setSelectedProduct] = useState<DrugProduct>();
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [activeAntibioticIndex, setActiveAntibioticIndex] = useState<number>(-1);
   const [activeTab, setActiveTab] = useState("primary");
 
@@ -123,11 +126,20 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
         <DoseCalculations calculations={recommendation.calculations} />
       )}
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end mt-6 gap-3">
         <Button 
-          className="premium-button"
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => setIsReferralModalOpen(true)}
+        >
+          <FileText className="h-4 w-4" />
+          Create Referral
+        </Button>
+        <Button 
+          className="premium-button flex items-center gap-2"
           onClick={() => setIsPrescriptionModalOpen(true)}
         >
+          <Printer className="h-4 w-4" />
           Print Prescription
         </Button>
       </div>
@@ -144,6 +156,19 @@ export const AntibioticRecommendation: React.FC<RecommendationProps> = ({ recomm
               }
         }
         selectedProduct={selectedProduct}
+      />
+
+      <ReferralModal
+        open={isReferralModalOpen}
+        onClose={() => setIsReferralModalOpen(false)}
+        recommendationData={
+          activeTab === "primary" 
+            ? recommendation 
+            : {
+                ...recommendation,
+                primaryRecommendation: recommendation.alternatives[activeAntibioticIndex]
+              }
+        }
       />
     </div>
   );
