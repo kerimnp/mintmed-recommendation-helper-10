@@ -47,7 +47,6 @@ export const generateAbdominalRecommendation = (
         "Appropriate for mild, community-acquired infections"
       ];
       
-      // Add alternative
       if (!hasCephalosporinAllergy) {
         recommendation.alternatives.push({
           name: "Cefuroxime + Metronidazole",
@@ -68,12 +67,13 @@ export const generateAbdominalRecommendation = (
         route: "PO",
         duration: "7-10 days"
       };
-      recommendation.reasoning = "Alternative coverage for mild intra-abdominal infections";
+      recommendation.reasoning = "Alternative coverage for mild intra-abdominal infections with fluoroquinolone allergy";
       recommendation.rationale.reasons = [
         "Provides aerobic and anaerobic coverage",
         "Appropriate for fluoroquinolone-allergic patients"
       ];
-    } else {
+      recommendation.rationale.allergyConsiderations = ["Selected due to fluoroquinolone allergy."];
+    } else if (!hasPenicillinAllergy) { // Assuming Amox-Clav can be used if no penicillin allergy
       recommendation.primaryRecommendation = {
         name: "Amoxicillin-Clavulanate",
         dose: isPediatric
@@ -82,17 +82,28 @@ export const generateAbdominalRecommendation = (
         route: "PO",
         duration: "7-10 days"
       };
-      recommendation.reasoning = "Alternative for multiple allergies in mild intra-abdominal infections";
+      recommendation.reasoning = "Alternative for multiple allergies (fluoroquinolone, cephalosporin) in mild intra-abdominal infections";
       recommendation.rationale.reasons = [
         "Broad-spectrum coverage",
-        "Appropriate for patients with multiple antibiotic allergies"
+        "Appropriate for patients with fluoroquinolone and cephalosporin allergies"
       ];
+      recommendation.rationale.allergyConsiderations = ["Selected due to fluoroquinolone and cephalosporin allergies."];
+    } else {
+        recommendation.primaryRecommendation = {
+            name: "Complex Case: Consult Specialist",
+            dose: "N/A",
+            route: "N/A",
+            duration: "N/A"
+        };
+        recommendation.reasoning = "Standard oral options exhausted due to multiple allergies for mild infection. Specialist consultation advised.";
+        recommendation.rationale.reasons.push("Multiple allergies limit standard oral choices.");
+        recommendation.rationale.allergyConsiderations = ["Fluoroquinolone, cephalosporin, and penicillin allergies indicated or assumed."];
     }
   } else if (data.severity === "moderate") {
     if (!hasPenicillinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Piperacillin-Tazobactam",
-        dose: isPediatric ? "100mg/kg q6h" : "3.375g q6h",
+        dose: isPediatric ? "100mg/kg q6h" : "3.375g q6h", // Standard dose for Pip-Taz is often 4.5g q6h or 3.375g q6h
         route: "IV",
         duration: "7-14 days"
       };
@@ -116,6 +127,16 @@ export const generateAbdominalRecommendation = (
         "Appropriate alternative for penicillin-allergic patients"
       ];
       recommendation.rationale.allergyConsiderations = ["Avoids penicillins due to allergy"];
+    } else { // Fallback for moderate if both penicillin and cephalosporin allergy
+        recommendation.primaryRecommendation = {
+            name: "Meropenem (or consult specialist)", // Carbapenem if allergies allow, or consult
+            dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
+            route: "IV",
+            duration: "7-14 days"
+        };
+        recommendation.reasoning = "Broad-spectrum coverage for penicillin and cephalosporin allergic patients. Confirm no carbapenem allergy. Specialist consultation advised.";
+        recommendation.rationale.reasons.push("Multiple beta-lactam allergies limit choices.");
+        recommendation.rationale.allergyConsiderations = ["Penicillin and cephalosporin allergy. Check for carbapenem cross-reactivity."];
     }
   } else if (data.severity === "severe") {
     if (data.resistances.pseudomonas || isHospitalAcquired) {
@@ -125,25 +146,22 @@ export const generateAbdominalRecommendation = (
         route: "IV",
         duration: "10-14 days"
       };
-      recommendation.reasoning = "Broad-spectrum coverage for severe intra-abdominal infections";
+      recommendation.reasoning = "Broad-spectrum coverage for severe intra-abdominal infections with resistance factors";
       recommendation.rationale.reasons = [
         "Carbapenem coverage for possible resistant organisms",
         "Appropriate for severe or hospital-acquired infections"
       ];
       
       if (data.resistances.mrsa) {
-        recommendation.alternatives.push({
-          name: "Vancomycin",
-          dose: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
-          route: "IV",
-          duration: "10-14 days",
-          reason: "Added for MRSA coverage"
-        });
+        // MRSA is less common in typical IAI but if present, needs coverage
+        recommendation.primaryRecommendation.name += " + Vancomycin";
+        recommendation.primaryRecommendation.dose += isPediatric ? " + 15mg/kg q6h" : " + 15-20mg/kg q8-12h";
+        recommendation.rationale.reasons.push("Vancomycin added for MRSA coverage.");
       }
-    } else {
+    } else { // Severe, community-acquired, no major resistance flags
       recommendation.primaryRecommendation = {
         name: "Piperacillin-Tazobactam",
-        dose: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
+        dose: isPediatric ? "100mg/kg q6h (max 4g/dose)" : "4.5g q6h",
         route: "IV",
         duration: "10-14 days"
       };
@@ -152,6 +170,23 @@ export const generateAbdominalRecommendation = (
         "Broad-spectrum coverage including anaerobes",
         "Appropriate for severe community-acquired infections"
       ];
+       if (hasPenicillinAllergy) { // If penicillin allergy, and severe case
+            recommendation.primaryRecommendation = {
+                name: "Ceftriaxone + Metronidazole (if no ceph allergy) or Meropenem",
+                dose: "Refer to specific dosing based on choice", // Placeholder
+                route: "IV",
+                duration: "10-14 days"
+            };
+            recommendation.reasoning = "Alternative for severe community-acquired IAI with penicillin allergy. Choice depends on cephalosporin allergy status. Specialist consultation may be needed.";
+            recommendation.rationale.allergyConsiderations = ["Penicillin allergy, consider cephalosporin or carbapenem."];
+            if (!hasCephalosporinAllergy) {
+                 recommendation.primaryRecommendation.name = "Ceftriaxone + Metronidazole";
+                 recommendation.primaryRecommendation.dose = isPediatric ? "50-75mg/kg/day + 30mg/kg/day divided q8h" : "2g daily + 500mg q8h";
+            } else {
+                 recommendation.primaryRecommendation.name = "Meropenem";
+                 recommendation.primaryRecommendation.dose = isPediatric ? "20mg/kg q8h" : "1g q8h";
+            }
+       }
     }
   }
 
@@ -162,6 +197,10 @@ export const generateAbdominalRecommendation = (
       "Adjust doses based on renal function",
       "Monitor renal function closely"
     ];
+    recommendation.calculations = {
+        ...recommendation.calculations,
+        renalAdjustment: `GFR ${Math.round(gfr)} mL/min - dose adjustment may be required`
+    };
   }
 
   if (isImmunosuppressed) {
