@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -21,41 +22,42 @@ export default {
       colors: {
         // Medical theme colors
         "medical-bg": {
-          DEFAULT: "#121212",
-          secondary: "#1E1E2E",
-          tertiary: "#101820",
+          DEFAULT: "#FFFFFF", // Changed to white for light theme base
+          secondary: "#F0F4F8", // Light grayish blue
+          tertiary: "#E2E8F0",   // Lighter gray
         },
-        "medical-primary": {
-          DEFAULT: "#00BFA6",
-          hover: "#03DAC5",
+        "medical-primary": { // Horalix Primary Blue
+          DEFAULT: "#2A7FFF", 
+          hover: "#1A6FFF", // Darker shade for hover
         },
-        "medical-accent": {
-          DEFAULT: "#4DA8DA",
+        "medical-accent": { // A complementary accent, can adjust
+          DEFAULT: "#4DA8DA", // Existing accent
           secondary: "#008CFF",
           tertiary: "#00AEEF",
+        },
+        "medical-text": { // Dark slate for text
+          DEFAULT: "#334155", 
+          secondary: "#475569", // Lighter slate
+          tertiary: "#64748B",  // Even lighter slate
         },
         "medical-success": "#28C76F",
         "medical-error": "#FF4C4C",
         "medical-warning": "#FFB74D",
         "medical-info": "#2196F3",
-        "medical-text": {
-          DEFAULT: "#E0E0E0",
-          secondary: "#B0B0B0",
-          tertiary: "#A8C4E4",
-        },
-        // System colors
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+
+        // System colors (ensure these align with light mode first)
+        border: "hsl(var(--border))", // Should be light gray for light mode
+        input: "hsl(var(--input))",   // Light gray
+        ring: "hsl(var(--ring))",     // Primary blue: #2A7FFF
+        background: "hsl(var(--background))", // White: #FFFFFF
+        foreground: "hsl(var(--foreground))", // Dark Slate: #334155
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "hsl(var(--primary))", // Dark Slate
+          foreground: "hsl(var(--primary-foreground))", // White
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--secondary))", // Light gray
+          foreground: "hsl(var(--secondary-foreground))", // Dark Slate
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -74,9 +76,12 @@ export default {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "hsl(var(--card))", // White
+          foreground: "hsl(var(--card-foreground))", // Dark Slate
         },
+      },
+      fontFamily: { // Added Inter font as primary
+        sans: ['Inter', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -92,13 +97,18 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-slow": { // Added slow pulse for alerts
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-slow": "pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite", // Added slow pulse
       },
       backgroundImage: {
-        'gradient-medical': 'linear-gradient(135deg, #003973, #00AEEF)',
+        'gradient-medical': 'linear-gradient(135deg, #2A7FFF, #4DA8DA)', // Updated with primary blue
         'gradient-teal': 'linear-gradient(135deg, #00BFA6, #008CFF)',
         'gradient-dark': 'linear-gradient(135deg, #1E1E2E, #3A3A5E)',
       },
