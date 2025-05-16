@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetTrigger } from '@/components/ui/sheet'; // SheetTrigger is used here
 import { Menu, Search, Bell, Sun, Moon } from 'lucide-react';
 import { toast as sonnerToast } from "sonner";
 
@@ -40,12 +38,15 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
         <div className="flex items-center gap-4">
-          {/* SheetTrigger for mobile menu, Sheet and SheetContent are in AdminDashboard */}
-          <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
+          {/* Removed SheetTrigger wrapper. Button now directly handles click and visibility. */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="lg:hidden rounded-full" // Added lg:hidden from SheetTrigger
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           
           <Link to="/" className="flex items-center gap-2">
             <img 
@@ -132,4 +133,3 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     </header>
   );
 };
-
