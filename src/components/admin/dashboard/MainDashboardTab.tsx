@@ -1,22 +1,24 @@
-import React, { useState } from "react"; // Added useState
+import React, { useState, useEffect } from "react"; // Added useEffect
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react";
+import { Users, BellRing, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react"; // MapPin removed as it's unused
 import { motion } from "framer-motion";
-import { PatientDetailModal, DetailedPatientInfo, MockPatientSubDetails } from "./PatientDetailModal"; // Import new modal and types
+import { PatientDetailModal, DetailedPatientInfo, MockPatientSubDetails } from "./PatientDetailModal";
+import { usePrescriptions, Prescription } from "@/contexts/PrescriptionContext"; // Import prescription context
+import { formatDistanceToNow } from 'date-fns';
+
 
 interface MainDashboardTabProps {
   searchTerm?: string;
 }
 
 const getGreeting = () => {
-  // ... keep existing code (getGreeting function)
   const hour = new Date().getHours();
   if (hour < 12) return { message: "Good Morning", icon: <Sun className="h-7 w-7 text-yellow-500" /> };
   if (hour < 18) return { message: "Good Afternoon", icon: <Cloud className="h-7 w-7 text-blue-400" /> };
   return { message: "Good Evening", icon: <Moon className="h-7 w-7 text-indigo-400" /> };
 };
 
-// Helper to generate mock details
+// Helper to generate mock details (can be phased out or used as fallback)
 const generateMockPatientSubDetails = (name: string, baseInfo?: Partial<DetailedPatientInfo>): MockPatientSubDetails => {
   const randomAge = Math.floor(Math.random() * 60) + 20; // Age between 20 and 80
   const genders: Array<'Male' | 'Female' | 'Other'> = ['Male', 'Female'];
@@ -49,11 +51,14 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
   const [selectedPatient, setSelectedPatient] = useState<DetailedPatientInfo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { prescriptions: livePrescriptions, isLoading: isLoadingPrescriptions } = usePrescriptions(); // Use context
 
-  const handleOpenPatientModal = (patientData: Omit<DetailedPatientInfo, 'mockDetails'>) => {
+  const handleOpenPatientModal = (patientData: Omit<DetailedPatientInfo, 'mockDetails' | 'patientName'> & { patientName?: string}) => {
     const fullDetails: DetailedPatientInfo = {
       ...patientData,
-      mockDetails: generateMockPatientSubDetails(patientData.name, patientData)
+      name: patientData.patientName || patientData.name, // Ensure name is set correctly
+      patientName: patientData.patientName, // Keep patientName if provided
+      mockDetails: generateMockPatientSubDetails(patientData.patientName || patientData.name, patientData)
     };
     setSelectedPatient(fullDetails);
     setIsModalOpen(true);
@@ -84,11 +89,8 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
     { id: "NP003", name: "Charlie Brown", time: "15:00", reason: "Routine Checkup", priority: "low" },
   ];
 
-  const mockPrescriptions = [
-    { id: "RX001", patientName: "John Doe", drug: "Amoxicillin 250mg", timestamp: "2 mins ago", status: "Pending" },
-    { id: "RX002", patientName: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" }, // Corrected 'name' to 'patientName' for consistency
-    { id: "RX003", patientName: "Robert Johnson", drug: "Azithromycin 500mg", timestamp: "35 mins ago", status: "Sent" },
-  ];
+  // Mock prescriptions are now replaced by livePrescriptions from context
+  // const mockPrescriptions = [ ... ];
 
   const heatmapData = [
     { id: "region1", name: "North Sector", resistance: 80, color: "bg-red-600 hover:bg-red-700" },
@@ -252,7 +254,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                     whileHover={{ y: -2 }}
                     onClick={() => handleOpenPatientModal({
                       id: patient.id,
-                      name: patient.name,
+                      name: patient.name, // This is correct for upcoming patients
                       source: 'upcoming',
                       time: patient.time,
                       reason: patient.reason,
@@ -283,7 +285,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           </Card>
         </motion.div>
 
-        {/* Recent Prescription Activity Section */}
+        {/* Recent Prescription Activity Section - Updated to use live data */}
         <motion.div variants={cardVariants} whileHover="hover">
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
@@ -293,49 +295,52 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 pt-4">
-              {mockPrescriptions.length > 0 ? (
-                mockPrescriptions.slice(0,3).map(rx => (
-                  <motion.div 
-                    key={rx.id} 
-                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:shadow-md transition-shadow cursor-pointer"
-                    whileHover={{ y: -2 }}
-                    onClick={() => handleOpenPatientModal({
-                      id: rx.id,
-                      name: rx.patientName,
-                      source: 'prescription',
-                      drug: rx.drug,
-                      status: rx.status,
-                      timestamp: rx.timestamp,
-                    })}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName || rx.name}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{rx.drug}</p>
-                      </div>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                        rx.status === 'Pending' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200' :
-                        'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-200'
-                      }`}>
-                        {rx.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1 text-right">{rx.timestamp}</p>
-                  </motion.div>
-                ))
-              ) : (
+              {isLoadingPrescriptions && <p className="text-sm text-gray-500 dark:text-gray-400">Loading prescriptions...</p>}
+              {!isLoadingPrescriptions && livePrescriptions.length === 0 && (
                  <div className="flex flex-col items-center justify-center py-10 text-center">
                   <Zap className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4 opacity-70" />
                   <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">No Recent Prescriptions</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prescription activity will appear here.</p>
                 </div>
               )}
-               {mockPrescriptions.length > 3 && (
+              {!isLoadingPrescriptions && livePrescriptions.length > 0 && (
+                livePrescriptions.slice(0,5).map(rx => ( // Show up to 5 recent
+                  <motion.div 
+                    key={rx.id} 
+                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:shadow-md transition-shadow cursor-pointer"
+                    whileHover={{ y: -2 }}
+                    onClick={() => handleOpenPatientModal({
+                      id: rx.id,
+                      name: `${rx.patient_name} ${rx.patient_surname}`, // Construct name for modal
+                      patientName: `${rx.patient_name} ${rx.patient_surname}`, // Explicit patientName
+                      source: 'prescription',
+                      drug: rx.medication_name,
+                      status: rx.status || 'N/A',
+                      timestamp: formatDistanceToNow(new Date(rx.created_at), { addSuffix: true }),
+                    })}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patient_name} {rx.patient_surname}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{rx.medication_name}</p>
+                      </div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        rx.status === 'Pending' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-200' :
+                        rx.status === 'Sent' ? 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-200' :
+                        'bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200' // Default
+                      }`}>
+                        {rx.status || 'N/A'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1 text-right">
+                      {formatDistanceToNow(new Date(rx.created_at), { addSuffix: true })}
+                    </p>
+                  </motion.div>
+                ))
+              )}
+               {!isLoadingPrescriptions && livePrescriptions.length > 5 && (
                 <button className="text-sm text-medical-primary hover:underline mt-3 font-medium w-full text-left">View all prescription activity</button>
               )}
-               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
-                Live updates for prescriptions will be shown here. Full real-time integration is in development.
-              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -373,7 +378,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                             'hover:bg-gray-50 dark:hover:bg-slate-800/60'}`}
                         onClick={() => handleOpenPatientModal({
                           id: patient.id,
-                          name: patient.name,
+                          name: patient.name, // Correct for tracked patients
                           source: 'active',
                           condition: patient.condition,
                           status: patient.status,
