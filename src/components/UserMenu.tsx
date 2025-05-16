@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import LoginModal from './LoginModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, UserCircle, Settings, LayoutDashboard } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Removed Link as navigate is used
 
 const UserMenu: React.FC = () => {
   const { user, signOut, loading } = useAuth();
@@ -49,7 +48,7 @@ const UserMenu: React.FC = () => {
           className="p-0 rounded-full"
           aria-label={language === 'en' ? 'Sign In' : 'Prijavi se'}
         >
-          <Avatar>
+          <Avatar className="h-10 w-10"> {/* Ensure avatar size if needed */}
             <AvatarFallback>{avatarFallbackText}</AvatarFallback>
           </Avatar>
         </Button>
@@ -73,32 +72,33 @@ const UserMenu: React.FC = () => {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Dr. {user.email?.split('@')[0] || 'User'}</p>
+                <p className="text-sm font-medium leading-none text-slate-700">Dr. {user.email?.split('@')[0] || 'User'}</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {user.email}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/doctor-dashboard')}>
+            <DropdownMenuItem onClick={() => navigate('/doctor-dashboard')} className="text-slate-700 hover:bg-slate-100">
               <LayoutDashboard className="mr-2 h-4 w-4" />
               <span>{language === 'en' ? 'Dashboard' : 'Nadzorna ploča'}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => alert('Profile page to be implemented')}>
+            <DropdownMenuItem onClick={() => navigate('/doctor-dashboard/profile')} className="text-slate-700 hover:bg-slate-100"> {/* Assuming a profile sub-route or dedicated page */}
               <UserCircle className="mr-2 h-4 w-4" />
               <span>{language === 'en' ? 'Profile' : 'Profil'}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => alert('Settings page to be implemented')}>
+            <DropdownMenuItem onClick={() => navigate('/doctor-dashboard/settings')} className="text-slate-700 hover:bg-slate-100"> {/* Assuming a settings sub-route or dedicated page */}
               <Settings className="mr-2 h-4 w-4" />
               <span>{language === 'en' ? 'Settings' : 'Postavke'}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
+            <DropdownMenuItem onClick={handleSignOut} className="text-slate-700 hover:bg-slate-100">
               <LogOut className="mr-2 h-4 w-4" />
               <span>{language === 'en' ? 'Sign Out' : 'Odjava'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {/* LoginModal might not be needed here if user is already logged in, but keeping for consistency if modal can be opened other ways */}
         <LoginModal isOpen={isLoginModalOpen} onOpenChange={setIsLoginModalOpen} />
       </>
     );
@@ -107,7 +107,7 @@ const UserMenu: React.FC = () => {
   // Fallback for loading state or if user becomes null unexpectedly during loading
   return (
     <Button variant="ghost" disabled className="p-0 rounded-full">
-      <Avatar>
+      <Avatar className="h-10 w-10">
         <AvatarFallback>...</AvatarFallback>
       </Avatar>
     </Button>
