@@ -1,22 +1,63 @@
-import React from "react";
+import React, { useState } from "react"; // Added useState
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react"; // Added Moon, CalendarDays, FilePenLine, Thermometer
+import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react";
 import { motion } from "framer-motion";
+import { PatientDetailModal, DetailedPatientInfo, MockPatientSubDetails } from "./PatientDetailModal"; // Import new modal and types
 
 interface MainDashboardTabProps {
   searchTerm?: string;
 }
 
 const getGreeting = () => {
+  // ... keep existing code (getGreeting function)
   const hour = new Date().getHours();
   if (hour < 12) return { message: "Good Morning", icon: <Sun className="h-7 w-7 text-yellow-500" /> };
   if (hour < 18) return { message: "Good Afternoon", icon: <Cloud className="h-7 w-7 text-blue-400" /> };
   return { message: "Good Evening", icon: <Moon className="h-7 w-7 text-indigo-400" /> };
 };
 
+// Helper to generate mock details
+const generateMockPatientSubDetails = (name: string, baseInfo?: Partial<DetailedPatientInfo>): MockPatientSubDetails => {
+  const randomAge = Math.floor(Math.random() * 60) + 20; // Age between 20 and 80
+  const genders: Array<'Male' | 'Female' | 'Other'> = ['Male', 'Female'];
+  const randomGender = genders[Math.floor(Math.random() * genders.length)];
+  
+  let primaryConcern = "Routine check-up";
+  if (baseInfo?.condition) primaryConcern = `Follow-up for ${baseInfo.condition}`;
+  if (baseInfo?.reason) primaryConcern = baseInfo.reason;
+  if (baseInfo?.drug) primaryConcern = `Regarding prescription for ${baseInfo.drug}`;
+
+  return {
+    age: randomAge,
+    gender: randomGender,
+    primaryConcern: primaryConcern,
+    pastMedicalHistory: ["Hypertension (controlled)", "Seasonal allergies"].slice(0, Math.floor(Math.random() * 3)),
+    currentMedications: ["Lisinopril 10mg daily", "Vitamin D3 2000 IU daily"].slice(0, Math.floor(Math.random() * 3)),
+    allergies: Math.random() > 0.7 ? ["Penicillin (rash)"] : ["NKA"],
+    recentLabResults: [
+      { test: "CBC", value: "WNL", notes: "All values within normal limits.", date: "2025-05-10" },
+      { test: "BMP", value: "Creatinine 1.0 mg/dL", notes: "eGFR >60", date: "2025-05-10" },
+    ].slice(0, Math.floor(Math.random() * 2) + 1),
+    treatmentPlan: `Continue current medications. Follow up in 3 months. ${name} was advised to monitor blood pressure daily. If symptoms of ${baseInfo?.condition || 'their condition'} worsen, contact clinic immediately.`
+  };
+};
+
+
 export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }) => {
   const { message: greetingMessage, icon: greetingIcon } = getGreeting();
-  const userName = "Dr. Sabic"; // Placeholder for actual user name
+  const userName = "Dr. Sabic";
+
+  const [selectedPatient, setSelectedPatient] = useState<DetailedPatientInfo | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenPatientModal = (patientData: Omit<DetailedPatientInfo, 'mockDetails'>) => {
+    const fullDetails: DetailedPatientInfo = {
+      ...patientData,
+      mockDetails: generateMockPatientSubDetails(patientData.name, patientData)
+    };
+    setSelectedPatient(fullDetails);
+    setIsModalOpen(true);
+  };
 
   const metrics = [
     { title: "Patient Engagement", value: "76%", subtext: "monthly goal", icon: Users, trend: "up", iconColor: "text-medical-primary", specialClass: "bg-medical-primary/10 dark:bg-medical-primary/20" },
@@ -45,8 +86,8 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
   const mockPrescriptions = [
     { id: "RX001", patientName: "John Doe", drug: "Amoxicillin 250mg", timestamp: "2 mins ago", status: "Pending" },
-    { id: "RX002", name: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" },
-    { id: "RX003", name: "Robert Johnson", drug: "Azithromycin 500mg", timestamp: "35 mins ago", status: "Sent" },
+    { id: "RX002", patientName: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" }, // Corrected 'name' to 'patientName' for consistency
+    { id: "RX003", patientName: "Robert Johnson", drug: "Azithromycin 500mg", timestamp: "35 mins ago", status: "Sent" },
   ];
 
   const heatmapData = [
@@ -90,7 +131,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
       </motion.div>
 
       {/* Metrics Section */}
-      <motion.div 
+       <motion.div 
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
         initial="hidden"
         animate="visible"
@@ -116,6 +157,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         ))}
       </motion.div>
 
+      {/* Heatmap and Critical Alerts Section */}
       <motion.div className="grid gap-6 lg:grid-cols-2" initial="hidden" animate="visible" variants={sectionVariants}>
         {/* Geographic Resistance Heatmap Section */}
         <motion.div variants={cardVariants} whileHover="hover">
@@ -186,6 +228,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </motion.div>
       </motion.div>
 
+
       <motion.div className="grid gap-6 lg:grid-cols-2" initial="hidden" animate="visible" variants={sectionVariants}>
         {/* Next Patients Section */}
         <motion.div variants={cardVariants} whileHover="hover">
@@ -205,8 +248,16 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                       patient.priority === 'high' ? 'border-red-300 bg-red-50/70 dark:border-red-700 dark:bg-red-900/30' :
                       patient.priority === 'medium' ? 'border-yellow-300 bg-yellow-50/70 dark:border-yellow-700 dark:bg-yellow-900/30' :
                       'border-gray-200 bg-gray-50/70 dark:border-gray-700 dark:bg-gray-800/30'
-                    } hover:shadow-md transition-shadow`}
+                    } hover:shadow-md transition-shadow cursor-pointer`}
                     whileHover={{ y: -2 }}
+                    onClick={() => handleOpenPatientModal({
+                      id: patient.id,
+                      name: patient.name,
+                      source: 'upcoming',
+                      time: patient.time,
+                      reason: patient.reason,
+                      priority: patient.priority as 'low' | 'medium' | 'high' | undefined,
+                    })}
                   >
                     <div className="flex justify-between items-center">
                       <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{patient.name}</p>
@@ -246,12 +297,20 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                 mockPrescriptions.slice(0,3).map(rx => (
                   <motion.div 
                     key={rx.id} 
-                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:shadow-md transition-shadow"
+                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:shadow-md transition-shadow cursor-pointer"
                     whileHover={{ y: -2 }}
+                    onClick={() => handleOpenPatientModal({
+                      id: rx.id,
+                      name: rx.patientName,
+                      source: 'prescription',
+                      drug: rx.drug,
+                      status: rx.status,
+                      timestamp: rx.timestamp,
+                    })}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName || rx.name}</p> {/* Support both patientName and name */}
+                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName || rx.name}</p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">{rx.drug}</p>
                       </div>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -271,7 +330,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prescription activity will appear here.</p>
                 </div>
               )}
-              {mockPrescriptions.length > 3 && (
+               {mockPrescriptions.length > 3 && (
                 <button className="text-sm text-medical-primary hover:underline mt-3 font-medium w-full text-left">View all prescription activity</button>
               )}
                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -306,9 +365,22 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                   </thead>
                   <tbody className="bg-white dark:bg-slate-900/70 divide-y divide-gray-200 dark:divide-gray-700">
                     {trackedPatients.map(patient => (
-                      <tr key={patient.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors duration-150 
-                        ${patient.risk === 'high' ? 'bg-red-50/50 dark:bg-red-900/20' : 
-                          patient.risk === 'medium' ? 'bg-yellow-50/50 dark:bg-yellow-900/20' : ''}`}>
+                      <tr 
+                        key={patient.id} 
+                        className={`hover:bg-gray-100 dark:hover:bg-slate-800/60 transition-colors duration-150 cursor-pointer
+                          ${patient.risk === 'high' ? 'bg-red-50/50 dark:bg-red-900/20 hover:bg-red-100/70 dark:hover:bg-red-800/40' : 
+                            patient.risk === 'medium' ? 'bg-yellow-50/50 dark:bg-yellow-900/20 hover:bg-yellow-100/70 dark:hover:bg-yellow-800/40' : 
+                            'hover:bg-gray-50 dark:hover:bg-slate-800/60'}`}
+                        onClick={() => handleOpenPatientModal({
+                          id: patient.id,
+                          name: patient.name,
+                          source: 'active',
+                          condition: patient.condition,
+                          status: patient.status,
+                          lastUpdate: patient.lastUpdate,
+                          risk: patient.risk as 'low' | 'medium' | 'high' | undefined,
+                        })}
+                      >
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{patient.id}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{patient.name}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{patient.condition}</td>
@@ -343,12 +415,18 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </Card>
       </motion.div>
 
-
-      {searchTerm && (
+      {/* Search Term display */}
+       {searchTerm && (
         <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
           Search term active: <span className="font-semibold">{searchTerm}</span>. Results are filtered.
         </p>
       )}
+
+      <PatientDetailModal 
+        patient={selectedPatient} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };
