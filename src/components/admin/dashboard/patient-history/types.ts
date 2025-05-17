@@ -8,10 +8,12 @@ export interface PatientSummary {
   gender: 'Male' | 'Female' | 'Other';
   dob: string; // Date of Birth
   bloodType?: string; // Optional
-  // Add other summary fields if needed e.g. contact info
   phone?: string;
   email?: string;
   address?: string;
+  riskLevel?: 'low' | 'medium' | 'high'; // Added for dashboard patients
+  currentCondition?: string; // Added for dashboard patients
+  status?: string; // Added for dashboard patients, e.g., "Stable", "Improving"
 }
 
 export interface BaseHistoryEvent {

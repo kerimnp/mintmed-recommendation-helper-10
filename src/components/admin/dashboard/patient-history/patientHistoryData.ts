@@ -1,597 +1,230 @@
 
-import { PatientSummary, HistoryEvent } from './types';
-import { FileText, Pill, Stethoscope, TestTube2, Activity, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { User, CalendarDays, Activity, Pill, TestTube2, ShieldAlert, FileText, Users, HeartPulse, Stethoscope } from 'lucide-react';
+import { HistoryEvent, PatientSummary, PrescriptionEvent, LabResultEvent, VitalSignEvent, ConsultationEvent, DiagnosisEvent, NoteEvent } from './types';
 
-export const allMockPatients: PatientSummary[] = [
-  {
-    id: 'P001',
-    name: 'Eleanor Vance',
-    age: 45,
-    gender: 'Female',
-    dob: '1979-03-15',
-    bloodType: 'O+',
-    phone: '555-0101',
-    email: 'eleanor.vance@example.com',
-    address: '123 Oak Street, Springfield, IL',
-  },
-  {
-    id: 'P002',
-    name: 'Marcus Chen',
-    age: 62,
-    gender: 'Male',
-    dob: '1962-07-22',
-    bloodType: 'A-',
-    phone: '555-0102',
-    email: 'marcus.chen@example.com',
-    address: '456 Pine Avenue, Springfield, IL',
-  },
-  {
-    id: 'P003',
-    name: 'Aisha Khan',
-    age: 30,
-    gender: 'Female',
-    dob: '1994-11-05',
-    bloodType: 'B+',
-    phone: '555-0103',
-    email: 'aisha.khan@example.com',
-    address: '789 Maple Drive, Springfield, IL',
-  },
-  {
-    id: 'P004',
-    name: 'David Miller',
-    age: 55,
-    gender: 'Male',
-    dob: '1969-01-30',
-    bloodType: 'AB+',
-    phone: '555-0104',
-    email: 'david.miller@example.com',
-    address: '321 Birch Lane, Springfield, IL', // Added address
-  },
-  {
-    id: 'P005',
-    name: 'Sophia Ramirez',
-    age: 28,
-    gender: 'Female',
-    dob: '1996-09-12',
-    bloodType: 'O-',
-    phone: '555-0105', // Added contact
-    email: 'sophia.ramirez@example.com', // Added contact
-    address: '654 Willow Creek, Springfield, IL', // Added address
-  },
+// --- Data from MainDashboardTab (for integration) ---
+const trackedPatientsData = [
+  { id: "P001", name: "Johnathan Doe", condition: "Pneumonia", status: "Stable", lastUpdate: "2h ago", risk: "low" as const },
+  { id: "P002", name: "Janet Smithson", condition: "UTI", status: "Improving", lastUpdate: "5h ago", risk: "medium" as const },
+  { id: "P003", name: "Robert P. Johnson", condition: "Cellulitis", status: "Needs Review", lastUpdate: "1d ago", risk: "high" as const },
+  { id: "P004", name: "Emily White", condition: "Bronchitis", status: "Stable", lastUpdate: "3h ago", risk: "low" as const },
 ];
 
-export const allMockHistoryEvents: Record<string, HistoryEvent[]> = {
-  P001: [
-    {
-      id: 'E001',
-      date: '2024-05-10',
-      title: 'Initial Consultation',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Smith',
-      details: {
-        specialty: 'Cardiology',
-        reason: 'Chest pain and shortness of breath',
-        findings: 'Mild tachycardia, ECG shows sinus rhythm. Echocardiogram ordered.',
-        recommendations: 'Follow up after echocardiogram. Advised lifestyle changes.',
-      },
-      notes: 'Patient seemed anxious but cooperative.'
-    },
-    {
-      id: 'E002',
-      date: '2024-05-11',
-      title: 'Lab Results: Cardiac Enzymes',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'Springfield General Lab',
-      details: [
-        { testName: 'Troponin I', value: '0.02', unit: 'ng/mL', referenceRange: '< 0.04 ng/mL', interpretation: 'Normal' },
-        { testName: 'CK-MB', value: '2.1', unit: 'ng/mL', referenceRange: '0.6-6.3 ng/mL', interpretation: 'Normal' },
-      ],
-      notes: 'Cardiac enzymes within normal limits.'
-    },
-    {
-      id: 'E003',
-      date: '2024-05-12',
-      title: 'Diagnosis: Anxiety Disorder',
-      type: 'Diagnosis',
-      icon: FileText,
-      physician: 'Dr. Smith',
-      details: {
-        condition: 'Generalized Anxiety Disorder',
-        severity: 'Moderate',
-        assessment: 'Patient reports persistent worry and physical symptoms like palpitations, consistent with GAD. Cardiac causes largely ruled out.',
-      },
-    },
-    {
-      id: 'E004',
-      date: '2024-05-12',
-      title: 'Prescription: Sertraline',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Smith',
-      details: {
-        drugName: 'Sertraline',
-        dosage: '50 mg',
-        route: 'Oral',
-        frequency: 'Once daily',
-        duration: '3 months',
-        reason: 'Treatment for GAD',
-        instructions: 'Take in the morning with food. Report any side effects.',
-      },
-    },
-    {
-        id: 'E005',
-        date: '2024-04-20', // Older date for vital signs
-        title: 'Vital Signs Check',
-        type: 'Vital Sign',
-        icon: Activity,
-        physician: 'Nurse Johnson',
-        details: {
-          bloodPressure: "122/78 mmHg",
-          heartRate: "75 bpm",
-          temperature: "36.8 °C",
-          respiratoryRate: "16 breaths/min",
-          oxygenSaturation: "99%",
-        },
-        notes: 'Routine check during follow-up.',
-      },
-      {
-        id: 'E006',
-        date: '2023-11-15', // Older date for allergy
-        title: 'Allergy Reported: Penicillin',
-        type: 'Allergy',
-        icon: AlertTriangle,
-        physician: 'Dr. Smith', // Or patient reported
-        details: {
-            allergen: 'Penicillin',
-            reaction: 'Hives and mild rash',
-            severity: 'Moderate',
-            onsetDate: 'Childhood'
-        },
-        notes: 'Patient has a known allergy to Penicillin. Documented for future reference.'
-      },
-      {
-        id: 'E007',
-        date: '2024-07-15',
-        title: 'Follow-up Consultation',
-        type: 'Consultation',
-        icon: Stethoscope,
-        physician: 'Dr. Smith',
-        details: {
-          specialty: 'Cardiology/Psychiatry Liaison',
-          reason: 'Check-in on Sertraline effectiveness and anxiety symptoms.',
-          findings: 'Patient reports improvement in anxiety. Side effects minimal. BP normal.',
-          recommendations: 'Continue Sertraline 50mg. Follow up in 3 months or PRN.',
-        },
-        notes: 'Patient appears more relaxed.'
-    }
+const criticalAlertsData = [
+  { id: "A001", message: "High resistance detected for Amoxicillin in Ward A.", severity: "High", patientId: "P00X" }, // Generic patient ID
+  { id: "A002", message: "Patient P003 (Robert P. Johnson) has a potential drug interaction with newly prescribed medication.", severity: "Medium", patientId: "P003" },
+  { id: "A003", message: "New severe allergy to Sulfa drugs reported for patient P00Y.", severity: "High", patientId: "P00Y" }, // Generic patient ID
+];
+
+const nextPatientsData = [
+  { id: "NP001", name: "Alice Wonderland", time: "14:00", reason: "Follow-up for Asthma", priority: "medium" as const },
+  { id: "NP002", name: "Bob The Builder", time: "14:30", reason: "New Consultation - Persistent Cough", priority: "high" as const },
+  { id: "NP003", name: "Charles Brown", time: "15:00", reason: "Routine Checkup", priority: "low" as const },
+  { id: "NP004", name: "Diana Prince", time: "15:30", reason: "Post-operative review", priority: "medium" as const },
+];
+// --- End of Data from MainDashboardTab ---
+
+
+// Helper to generate random DOB and calculate age
+const generatePatientDetails = (baseYear = 1980, yearRange = 40) => {
+  const year = baseYear + Math.floor(Math.random() * yearRange);
+  const month = Math.floor(Math.random() * 12) + 1;
+  const day = Math.floor(Math.random() * 28) + 1; // Simplified to 28 days
+  const dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const age = new Date().getFullYear() - year;
+  const genders: Array<'Male' | 'Female' | 'Other'> = ['Male', 'Female'];
+  const gender = genders[Math.floor(Math.random() * genders.length)];
+  const bloodTypes = ['A+', 'O-', 'B+', 'AB+', 'A-', 'O+', 'B-', 'AB-'];
+  const bloodType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
+  return { dob, age, gender, bloodType };
+};
+
+const generateRandomDate = (startYear = 2023, endYear = 2025): string => {
+  const year = startYear + Math.floor(Math.random() * (endYear - startYear + 1));
+  const month = Math.floor(Math.random() * 12) + 1;
+  const day = Math.floor(Math.random() * 28) + 1;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(Math.floor(Math.random()*24)).padStart(2,'0')}:${String(Math.floor(Math.random()*60)).padStart(2,'0')}:00Z`;
+};
+
+
+const baseMockPatients: PatientSummary[] = [
+  { id: 'pat1', name: 'Eleanor Vance', age: 34, gender: 'Female', dob: '1990-07-22', bloodType: 'O+', phone: '555-0101', email: 'eleanor.vance@example.com', address: '123 Health St, Medicity, MC 54321' },
+  { id: 'pat2', name: 'Arthur Pendelton', age: 52, gender: 'Male', dob: '1972-03-15', bloodType: 'A-', phone: '555-0102', email: 'art.pendelton@example.com', address: '456 Wellness Ave, Townsville, TS 67890' },
+  { id: 'pat3', name: 'Isabelle Moreau', age: 28, gender: 'Female', dob: '1996-11-02', bloodType: 'B+', phone: '555-0103', email: 'isabelle.m@example.com', address: '789 Cure Blvd, Healburg, HB 10112' },
+  { id: 'pat4', name: 'Kenji Tanaka', age: 45, gender: 'Male', dob: '1979-06-10', bloodType: 'AB-', phone: '555-0104', email: 'kenji.t@example.com', address: '101 Vitality Rd, Lifesville, LV 13141' },
+];
+
+const baseMockHistoryEvents: Record<string, HistoryEvent[]> = {
+  pat1: [
+    { id: 'evt1a', date: '2024-05-10T09:15:00Z', title: 'Annual Checkup', type: 'Consultation', icon: Stethoscope, physician: 'Dr. Emily Carter', details: { specialty: 'General Practice', reason: 'Routine annual physical examination.', findings: 'Overall health good. Recommended regular exercise and balanced diet. Blood pressure slightly elevated.', recommendations: 'Monitor BP, follow up in 3 months if still high.' } },
+    { id: 'evt1b', date: '2024-05-10T09:45:00Z', title: 'Basic Metabolic Panel', type: 'Lab Result', icon: TestTube2, physician: 'Dr. Emily Carter', labName: 'Metro Health Labs', details: [{ testName: 'Glucose', value: '98', unit: 'mg/dL', referenceRange: '70-100', interpretation: 'Normal' }, { testName: 'Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.6-1.2', interpretation: 'Normal' }] },
+    { id: 'evt1c', date: '2024-01-20T14:30:00Z', title: 'Flu Vaccination', type: 'Prescription', icon: Pill, physician: 'Dr. Emily Carter', details: { drugName: 'Influenza Vaccine', dosage: '1 dose', route: 'IM', frequency: 'Once', duration: 'N/A', reason: 'Seasonal flu prevention', instructions: 'Observe for 15 mins post-injection.' } },
+    { id: 'evt1d', date: '2023-11-05T11:00:00Z', title: 'Vital Signs Check', type: 'Vital Sign', icon: HeartPulse, physician: 'Nurse R. Davis', details: { bloodPressure: '135/85 mmHg', heartRate: '72 bpm', temperature: '36.8 °C', oxygenSaturation: '98%' } },
   ],
-  P002: [ // Marcus Chen, 62, M
-    {
-      id: 'E101',
-      date: '2024-04-15',
-      title: 'Annual Physical Exam',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Lee',
-      details: {
-        specialty: 'General Practice',
-        reason: 'Routine check-up',
-        findings: 'Overall good health. BP slightly elevated at 142/88 mmHg. Cholesterol borderline high.',
-        recommendations: 'Monitor BP, diet and exercise. Recheck labs in 3 months.',
-      },
-    },
-    {
-      id: 'E102',
-      date: '2024-04-15',
-      title: 'Lab Panel (Annual)',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'Downtown Clinic Labs',
-      details: [
-        { testName: 'Cholesterol, Total', value: '210', unit: 'mg/dL', referenceRange: '< 200 mg/dL', interpretation: 'High', flag: 'H' },
-        { testName: 'LDL Cholesterol', value: '135', unit: 'mg/dL', referenceRange: '< 100 mg/dL', interpretation: 'High', flag: 'H' },
-        { testName: 'HDL Cholesterol', value: '45', unit: 'mg/dL', referenceRange: '> 40 mg/dL', interpretation: 'Normal' },
-        { testName: 'Triglycerides', value: '160', unit: 'mg/dL', referenceRange: '< 150 mg/dL', interpretation: 'High', flag: 'H' },
-        { testName: 'Glucose', value: '95', unit: 'mg/dL', referenceRange: '70-99 mg/dL', interpretation: 'Normal' },
-      ],
-    },
-    {
-      id: 'E103',
-      date: '2024-04-15',
-      title: 'Vital Signs (Annual)',
-      type: 'Vital Sign',
-      icon: Activity,
-      physician: 'Nurse Davis',
-      details: {
-        bloodPressure: "142/88 mmHg",
-        heartRate: "68 bpm",
-        temperature: "37.0 °C",
-        respiratoryRate: "15 breaths/min",
-        oxygenSaturation: "98%",
-      },
-      notes: 'BP slightly elevated. Patient advised on monitoring.',
-    },
-    {
-      id: 'E104',
-      date: '2024-07-20',
-      title: 'Follow-up: BP & Lipids',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Lee',
-      details: {
-        specialty: 'General Practice',
-        reason: 'Recheck BP and lipids after lifestyle modification attempts.',
-        findings: 'BP still elevated at 140/85 mmHg. Lipids show minimal improvement. Patient reports difficulty with strict diet.',
-        recommendations: 'Start Atorvastatin 20mg daily. Continue lifestyle modifications. Recheck BP in 1 month.',
-      },
-    },
-    {
-      id: 'E105',
-      date: '2024-07-20',
-      title: 'Prescription: Atorvastatin',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Lee',
-      details: {
-        drugName: 'Atorvastatin',
-        dosage: '20 mg',
-        route: 'Oral',
-        frequency: 'Once daily at bedtime',
-        duration: 'Ongoing',
-        reason: 'Hyperlipidemia',
-        instructions: 'Report any muscle pain. Avoid grapefruit.',
-      },
-    },
-    {
-        id: 'E106',
-        date: '2024-08-20',
-        title: 'BP Check',
-        type: 'Vital Sign',
-        icon: Activity,
-        physician: 'Nurse Davis',
-        details: {
-          bloodPressure: "135/82 mmHg",
-          heartRate: "70 bpm",
-        },
-        notes: 'BP showing improvement after starting Atorvastatin and continued lifestyle focus.',
-    }
+  pat2: [
+    { id: 'evt2a', date: '2024-04-15T10:00:00Z', title: 'Knee Pain Consultation', type: 'Consultation', icon: Stethoscope, physician: 'Dr. Robert Miller', details: { specialty: 'Orthopedics', reason: 'Persistent right knee pain, aggravated by activity.', findings: 'Suspected osteoarthritis. Mild swelling observed.', recommendations: 'X-ray ordered. Prescribed NSAIDs for pain relief. Advised low-impact exercises.' } },
+    { id: 'evt2b', date: '2024-04-15T10:30:00Z', title: 'Ibuprofen 400mg', type: 'Prescription', icon: Pill, physician: 'Dr. Robert Miller', details: { drugName: 'Ibuprofen', dosage: '400mg', route: 'Oral', frequency: 'TID PRN', duration: '7 days', reason: 'Knee pain management', instructions: 'Take with food.' } },
+    { id: 'evt2c', date: '2024-04-20T13:00:00Z', title: 'Right Knee X-Ray', type: 'Lab Result', icon: TestTube2, physician: 'Dr. Robert Miller', labName: 'City Imaging Center', details: [{ testName: 'Right Knee X-Ray', value: 'Mild degenerative changes noted.', unit: '', referenceRange: '', interpretation: 'Abnormal' }] },
   ],
-  P003: [ // Aisha Khan, 30, F
-     {
-      id: 'E200',
-      date: '2023-12-01',
-      title: 'Initial Diabetes Consultation',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Green',
-      details: {
-        specialty: 'Endocrinology',
-        reason: 'Newly diagnosed Type 2 Diabetes based on symptoms and lab work from PCP.',
-        findings: 'Reports increased thirst, frequent urination. A1c 7.8%. Weight 70kg, Height 165cm.',
-        recommendations: 'Start Metformin 500mg BID. Refer to dietitian. Lifestyle counseling.',
-      },
-    },
-    {
-      id: 'E201',
-      date: '2024-03-01', // Kept existing, makes sense as a follow-up
-      title: 'Progress Note: Diabetes Management',
-      type: 'Note',
-      icon: FileText,
-      physician: 'Dr. Green',
-      details: "Patient presents for follow-up on managing type 2 diabetes. Reports good adherence to Metformin (now 1000mg BID) and dietary changes. A1c has improved from 7.8% to 7.1%. Encouraged to continue current regimen and increase physical activity. Next follow-up in 3 months.",
-      notes: "Patient motivated and engaged in care."
-    },
-    {
-      id: 'E202',
-      date: '2023-12-01', // Date of initial prescription
-      title: 'Prescription: Metformin (Initial)',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Green',
-      details: {
-        drugName: 'Metformin',
-        dosage: '500 mg', // Initial dosage
-        route: 'Oral',
-        frequency: 'Twice daily',
-        duration: 'Ongoing',
-        reason: 'Type 2 Diabetes',
-        instructions: 'Take with meals to reduce GI upset.',
-      },
-    },
-    {
-      id: 'E203',
-      date: '2024-03-01', // Date of dosage increase
-      title: 'Prescription: Metformin (Dose Adjustment)',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Green',
-      details: {
-        drugName: 'Metformin',
-        dosage: '1000 mg', // Increased dosage
-        route: 'Oral',
-        frequency: 'Twice daily',
-        duration: 'Ongoing',
-        reason: 'Type 2 Diabetes',
-        instructions: 'Continue taking with meals.',
-      },
-    },
-    {
-      id: 'E204',
-      date: '2024-03-01',
-      title: 'Lab Results: A1c',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'Endo Clinic Labs',
-      details: [
-        { testName: 'Hemoglobin A1c', value: '7.1', unit: '%', referenceRange: '4.0-5.6%', interpretation: 'High', flag: 'H' },
-      ],
-      notes: 'A1c improved from 7.8% at diagnosis.'
-    },
-    {
-      id: 'E205',
-      date: '2024-03-01',
-      title: 'Vital Signs (Follow-up)',
-      type: 'Vital Sign',
-      icon: Activity,
-      physician: 'Nurse Miller',
-      details: {
-        bloodPressure: "120/75 mmHg",
-        heartRate: "72 bpm",
-        temperature: "36.9 °C",
-        respiratoryRate: "16 breaths/min",
-        weight: "68 kg" // Shows some weight loss
-      },
-    },
-    {
-      id: 'E206',
-      date: '2022-05-10',
-      title: 'Allergy Reported: Sulfa Drugs',
-      type: 'Allergy',
-      icon: AlertTriangle,
-      physician: 'Self-Reported to Dr. Green',
-      details: {
-          allergen: 'Sulfonamides (Sulfa Drugs)',
-          reaction: 'Severe rash and itching',
-          severity: 'Severe',
-          onsetDate: 'Teenager'
-      },
-      notes: 'Patient reports a known severe allergy to Sulfa drugs. Avoid prescribing.'
-    }
+  pat3: [
+    { id: 'evt3a', date: '2024-06-01T16:00:00Z', title: 'Allergy Consultation', type: 'Consultation', icon: Stethoscope, physician: 'Dr. Sarah Jenkins', details: { specialty: 'Allergy & Immunology', reason: 'Seasonal allergies, persistent rhinitis.', findings: 'Positive skin prick test for pollen.', recommendations: 'Prescribed antihistamines. Discussed allergen avoidance strategies.' } },
+    { id: 'evt3b', date: '2024-06-01T16:30:00Z', title: 'Loratadine 10mg', type: 'Prescription', icon: Pill, physician: 'Dr. Sarah Jenkins', details: { drugName: 'Loratadine', dosage: '10mg', route: 'Oral', frequency: 'Once daily', duration: '30 days', reason: 'Allergic rhinitis', instructions: 'May cause drowsiness initially.' } },
   ],
-  P004: [ // David Miller, 55, M
-    {
-      id: 'E301',
-      date: '2024-01-10',
-      title: 'New Patient Visit - Hypertension Concern',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Eva Foster',
-      details: {
-        specialty: 'Internal Medicine',
-        reason: 'Establishing care, concerns about high blood pressure readings at home.',
-        findings: 'BP 150/92 mmHg in office. Otherwise, exam unremarkable. Family history of HTN.',
-        recommendations: 'Start Lisinopril 10mg daily. Lifestyle modifications (diet, exercise, stress reduction). Follow-up in 1 month.',
-      },
-      notes: 'Patient is motivated to manage his blood pressure.'
-    },
-    {
-      id: 'E302',
-      date: '2024-01-10',
-      title: 'Diagnosis: Hypertension, Stage 1',
-      type: 'Diagnosis',
-      icon: FileText,
-      physician: 'Dr. Eva Foster',
-      details: {
-        condition: 'Hypertension, Stage 1',
-        severity: 'Moderate',
-        assessment: 'Consistent elevated BP readings in office and reported at home. Family history significant.',
-      },
-    },
-    {
-      id: 'E303',
-      date: '2024-01-10',
-      title: 'Prescription: Lisinopril',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Eva Foster',
-      details: {
-        drugName: 'Lisinopril',
-        dosage: '10 mg',
-        route: 'Oral',
-        frequency: 'Once daily',
-        duration: 'Ongoing',
-        reason: 'Hypertension',
-        instructions: 'Monitor for cough. Take consistently.',
-      },
-    },
-    {
-      id: 'E304',
-      date: '2024-01-10',
-      title: 'Baseline Vital Signs',
-      type: 'Vital Sign',
-      icon: Activity,
-      physician: 'Nurse Allen',
-      details: {
-        bloodPressure: "150/92 mmHg",
-        heartRate: "78 bpm",
-        temperature: "37.1 °C",
-        respiratoryRate: "18 breaths/min",
-        oxygenSaturation: "97%",
-      },
-    },
-    {
-      id: 'E305',
-      date: '2024-01-10',
-      title: 'Baseline Labs: Basic Metabolic Panel',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'City Central Labs',
-      details: [
-        { testName: 'Sodium', value: '140', unit: 'mEq/L', referenceRange: '135-145 mEq/L', interpretation: 'Normal' },
-        { testName: 'Potassium', value: '4.2', unit: 'mEq/L', referenceRange: '3.5-5.0 mEq/L', interpretation: 'Normal' },
-        { testName: 'Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7-1.3 mg/dL', interpretation: 'Normal' },
-        { testName: 'Glucose', value: '105', unit: 'mg/dL', referenceRange: '70-99 mg/dL', interpretation: 'High', flag: 'H' }, // Slightly elevated
-      ],
-      notes: 'Glucose slightly elevated, advise on diet.'
-    },
-    {
-      id: 'E306',
-      date: '2024-02-15',
-      title: 'Follow-up: Hypertension Management',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Eva Foster',
-      details: {
-        specialty: 'Internal Medicine',
-        reason: 'Check BP response to Lisinopril and lifestyle changes.',
-        findings: 'BP 138/86 mmHg. Patient reports adherence to medication and some dietary changes. No side effects from Lisinopril.',
-        recommendations: 'Continue Lisinopril 10mg. Reinforce lifestyle modifications. Recheck BP in 2 months.',
-      },
-    },
-    {
-      id: 'E307',
-      date: '2024-05-05',
-      title: 'Acute Visit: Cough and Sore Throat',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Eva Foster',
-      details: {
-        specialty: 'Internal Medicine',
-        reason: 'Patient c/o cough, sore throat, and mild fatigue for 3 days.',
-        findings: 'Mildly erythematous pharynx. Lungs clear. Temp 37.5°C. Likely viral URI.',
-        recommendations: 'Supportive care: rest, fluids, lozenges. Advised to return if symptoms worsen or fever develops.',
-      },
-      notes: 'No antibiotics prescribed at this time.'
-    },
-    {
-      id: 'E308',
-      date: '2024-05-05',
-      title: 'Diagnosis: Viral Upper Respiratory Infection',
-      type: 'Diagnosis',
-      icon: FileText,
-      physician: 'Dr. Eva Foster',
-      details: {
-        condition: 'Viral Upper Respiratory Infection (URI)',
-        severity: 'Mild',
-        assessment: 'Symptoms and findings consistent with common cold.',
-      },
-    }
-  ],
-  P005: [ // Sophia Ramirez, 28, F
-    {
-      id: 'E401',
-      date: '2024-03-20',
-      title: 'Consultation: Fatigue and Weakness',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Anya Sharma',
-      details: {
-        specialty: 'Family Medicine',
-        reason: 'Patient reports persistent fatigue, weakness, and occasional dizziness for several weeks.',
-        findings: 'Pale conjunctiva noted. Otherwise, physical exam unremarkable. Menstrual history: regular, heavy periods.',
-        recommendations: 'Order CBC, Ferritin, TSH. Advised dietary review for iron intake.',
-      },
-      notes: 'Suspect iron-deficiency anemia given symptoms and menstrual history.'
-    },
-    {
-      id: 'E402',
-      date: '2024-03-20',
-      title: 'Initial Vital Signs',
-      type: 'Vital Sign',
-      icon: Activity,
-      physician: 'Nurse Chen',
-      details: {
-        bloodPressure: "110/70 mmHg",
-        heartRate: "85 bpm", // Can be slightly elevated in anemia
-        temperature: "36.7 °C",
-        respiratoryRate: "16 breaths/min",
-        oxygenSaturation: "98%",
-      },
-    },
-    {
-      id: 'E403',
-      date: '2024-03-22',
-      title: 'Lab Results: Blood Panel',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'Community Health Labs',
-      details: [
-        { testName: 'Hemoglobin (Hgb)', value: '9.5', unit: 'g/dL', referenceRange: '12.0-15.5 g/dL', interpretation: 'Low', flag: 'L' },
-        { testName: 'Hematocrit (Hct)', value: '30', unit: '%', referenceRange: '36-46%', interpretation: 'Low', flag: 'L' },
-        { testName: 'MCV', value: '75', unit: 'fL', referenceRange: '80-100 fL', interpretation: 'Low', flag: 'L' },
-        { testName: 'Ferritin', value: '10', unit: 'ng/mL', referenceRange: '15-150 ng/mL', interpretation: 'Low', flag: 'L' },
-        { testName: 'TSH', value: '2.1', unit: 'mIU/L', referenceRange: '0.4-4.0 mIU/L', interpretation: 'Normal' },
-      ],
-      notes: 'Labs confirm microcytic anemia with low ferritin, consistent with iron deficiency.'
-    },
-    {
-      id: 'E404',
-      date: '2024-03-25',
-      title: 'Diagnosis: Iron-Deficiency Anemia',
-      type: 'Diagnosis',
-      icon: FileText,
-      physician: 'Dr. Anya Sharma',
-      details: {
-        condition: 'Iron-Deficiency Anemia',
-        severity: 'Moderate',
-        assessment: 'Clinical symptoms and lab findings (low Hgb, Hct, MCV, Ferritin) confirm IDA, likely secondary to menorrhagia.',
-      },
-    },
-    {
-      id: 'E405',
-      date: '2024-03-25',
-      title: 'Prescription: Ferrous Sulfate',
-      type: 'Prescription',
-      icon: Pill,
-      physician: 'Dr. Anya Sharma',
-      details: {
-        drugName: 'Ferrous Sulfate',
-        dosage: '325 mg (65 mg elemental iron)',
-        route: 'Oral',
-        frequency: 'Once daily',
-        duration: '3 months, then re-evaluate',
-        reason: 'Iron-Deficiency Anemia',
-        instructions: 'Take with Vitamin C (e.g., orange juice) to improve absorption. May cause constipation or dark stools. Take between meals if tolerated.',
-      },
-    },
-    {
-      id: 'E406',
-      date: '2024-06-25',
-      title: 'Follow-up: Anemia Treatment',
-      type: 'Consultation',
-      icon: Stethoscope,
-      physician: 'Dr. Anya Sharma',
-      details: {
-        specialty: 'Family Medicine',
-        reason: '3-month follow-up on iron supplementation.',
-        findings: 'Patient reports significant improvement in energy levels. Less dizziness. Tolerating iron well with dietary adjustments for constipation.',
-        recommendations: 'Recheck CBC and Ferritin. Continue iron supplementation based on results.',
-      },
-    },
-    {
-      id: 'E407',
-      date: '2024-06-27',
-      title: 'Lab Results: Follow-up Blood Panel',
-      type: 'Lab Result',
-      icon: TestTube2,
-      labName: 'Community Health Labs',
-      details: [
-        { testName: 'Hemoglobin (Hgb)', value: '11.8', unit: 'g/dL', referenceRange: '12.0-15.5 g/dL', interpretation: 'Low', flag: 'L' }, // Improved but still slightly low
-        { testName: 'Ferritin', value: '45', unit: 'ng/mL', referenceRange: '15-150 ng/mL', interpretation: 'Normal' },
-      ],
-      notes: 'Significant improvement in Hgb and Ferritin. Continue iron for another 3 months to fully replenish stores.'
-    },
-    {
-        id: 'E408',
-        date: '2024-07-01',
-        title: 'Note: Dietary Counseling',
-        type: 'Note',
-        icon: FileText,
-        physician: 'Dr. Anya Sharma / Dietitian referral',
-        details: "Patient received counseling on iron-rich foods (red meat, spinach, lentils, fortified cereals) and strategies to manage constipation associated with iron supplements (increased fiber, fluids). Also discussed management of heavy menstrual bleeding with GYN if it's a persistent underlying cause.",
-    }
+  pat4: [
+    { id: 'evt4a', date: '2024-03-10T08:30:00Z', title: 'Follow-up: Hypertension', type: 'Consultation', icon: Stethoscope, physician: 'Dr. Emily Carter', details: { specialty: 'General Practice', reason: 'Routine follow-up for hypertension management.', findings: 'Blood pressure well-controlled on current medication.', recommendations: 'Continue Lisinopril. Monitor BP weekly. Follow up in 6 months.' } },
+    { id: 'evt4b', date: '2024-03-10T08:45:00Z', title: 'Lisinopril 10mg', type: 'Prescription', icon: Pill, physician: 'Dr. Emily Carter', details: { drugName: 'Lisinopril', dosage: '10mg', route: 'Oral', frequency: 'Once daily', duration: 'Ongoing', reason: 'Hypertension', instructions: 'Take in the morning.' } },
+    { id: 'evt4c', date: '2024-03-10T08:40:00Z', title: 'Vital Signs', type: 'Vital Sign', icon: HeartPulse, physician: 'Nurse J. Lee', details: { bloodPressure: '125/80 mmHg', heartRate: '68 bpm', temperature: '37.0 °C', oxygenSaturation: '99%' } },
   ],
 };
+
+// --- Processing data from MainDashboardTab ---
+const newPatients: PatientSummary[] = [];
+const newHistoryEvents: Record<string, HistoryEvent[]> = {};
+
+// Process Tracked Patients
+trackedPatientsData.forEach(tp => {
+  const { dob, age, gender, bloodType } = generatePatientDetails(1970, 50);
+  newPatients.push({
+    id: tp.id,
+    name: tp.name,
+    age,
+    gender,
+    dob,
+    bloodType,
+    currentCondition: tp.condition,
+    status: tp.status,
+    riskLevel: tp.risk,
+    phone: `555-0${Math.floor(Math.random() * 899) + 100}`, // Random phone
+    email: `${tp.name.split(' ')[0].toLowerCase()}@example.com`,
+    address: `${Math.floor(Math.random()*900)+100} Dashboard St, Suite ${Math.floor(Math.random()*90)+10}`,
+  });
+  newHistoryEvents[tp.id] = [
+    { id: `${tp.id}-diag1`, date: generateRandomDate(2024,2024), title: `Diagnosis: ${tp.condition}`, type: 'Diagnosis', icon: ShieldAlert, physician: 'Dr. System Overview', details: { condition: tp.condition, severity: tp.risk === 'high' ? 'Severe' : tp.risk === 'medium' ? 'Moderate' : 'Mild', assessment: `Patient status: ${tp.status}. Last update: ${tp.lastUpdate}.` } },
+    { id: `${tp.id}-consult1`, date: generateRandomDate(2024,2024), title: 'Initial Review', type: 'Consultation', icon: Stethoscope, physician: 'Dr. A. Manager', details: { specialty: 'Internal Medicine', reason: `Monitoring for ${tp.condition}`, findings: `Patient is ${tp.status}.`, recommendations: 'Continue observation.' } },
+    { id: `${tp.id}-rx1`, date: generateRandomDate(2024,2024), title: 'Generic Prophylactic', type: 'Prescription', icon: Pill, physician: 'Dr. A. Manager', details: { drugName: 'Multivitamin', dosage: '1 tablet', route: 'Oral', frequency: 'Once daily', duration: '30 days', reason: 'General Health', instructions: 'Take with meal.' } },
+    { id: `${tp.id}-lab1`, date: generateRandomDate(2024,2024), title: 'Baseline CBC', type: 'Lab Result', icon: TestTube2, physician: 'Dr. A. Manager', labName: 'Clinic Labs', details: [{testName: 'WBC', value: (Math.random()*6+4).toFixed(1), unit: 'x10^9/L', referenceRange: '4.0-10.0', interpretation: 'Normal'}]} ],
+    { id: `${tp.id}-vital1`, date: generateRandomDate(2024,2024), title: 'Routine Vitals', type: 'Vital Sign', icon: HeartPulse, physician: 'Nurse B. Keeper', details: { bloodPressure: '120/80 mmHg', heartRate: '75 bpm', temperature: '37.0 C', oxygenSaturation: '98%', weight: `${(Math.random()*30+50).toFixed(1)} kg` } },
+  ];
+});
+
+// Process Critical Alerts
+criticalAlertsData.forEach(alert => {
+  let patientId = alert.patientId;
+  let patientName = `Patient ${alert.patientId}`; // Default for generic IDs
+
+  // If patient P003 exists from trackedPatientsData, use their name.
+  const existingPatient = newPatients.find(p => p.id === alert.patientId) || baseMockPatients.find(p => p.id === alert.patientId);
+  if (existingPatient) {
+    patientName = existingPatient.name;
+  } else if (alert.patientId === "P00X" || alert.patientId === "P00Y") { // Create new placeholder patient
+    const { dob, age, gender, bloodType } = generatePatientDetails(1980, 30);
+    if (!newPatients.find(p => p.id === alert.patientId) && !baseMockPatients.find(p => p.id === alert.patientId)) {
+        newPatients.push({
+            id: alert.patientId, name: patientName, age, gender, dob, bloodType,
+            phone: `555-ALERT${Math.floor(Math.random() * 99)}`,
+            email: `alert.patient.${alert.patientId.toLowerCase()}@example.com`,
+            address: `1 Alert Plaza, System City`
+        });
+    }
+  }
+
+  if (!newHistoryEvents[patientId]) {
+    newHistoryEvents[patientId] = [];
+  }
+  newHistoryEvents[patientId].push({
+    id: alert.id,
+    date: generateRandomDate(2025,2025), // Alerts are recent
+    title: 'Critical Alert Recorded',
+    type: 'Note',
+    icon: ShieldAlert,
+    physician: 'System Alert',
+    notes: `Severity: ${alert.severity}. Message: ${alert.message}`,
+    details: `Critical Alert for ${patientName}. Severity: ${alert.severity}. Details: ${alert.message}`
+  });
+});
+
+
+// Process Next Patients (Upcoming Appointments)
+nextPatientsData.forEach(np => {
+  const { dob, age, gender, bloodType } = generatePatientDetails(1960, 60);
+  if (!newPatients.find(p => p.id === np.id) && !baseMockPatients.find(p => p.id === np.id)) {
+      newPatients.push({
+        id: np.id,
+        name: np.name,
+        age,
+        gender,
+        dob,
+        bloodType,
+        phone: `555-NEXT${Math.floor(Math.random() * 99)}`,
+        email: `${np.name.split(' ')[0].toLowerCase()}.upcoming@example.com`,
+        address: `${Math.floor(Math.random()*900)+100} Appointment Ave`,
+      });
+  }
+
+  if (!newHistoryEvents[np.id]) {
+    newHistoryEvents[np.id] = [];
+  }
+  const appointmentDate = new Date();
+  appointmentDate.setDate(appointmentDate.getDate() + Math.floor(Math.random()*7)+1); // Appointment in next 1-7 days
+  const appointmentTime = np.time.split(':');
+  appointmentDate.setHours(parseInt(appointmentTime[0]), parseInt(appointmentTime[1]),0,0);
+  
+  newHistoryEvents[np.id].push(
+    { 
+      id: `${np.id}-upcomingConsult`, 
+      date: appointmentDate.toISOString(), 
+      title: `Upcoming: ${np.reason}`, 
+      type: 'Consultation', 
+      icon: CalendarDays, 
+      physician: 'Dr. Scheduler', 
+      details: { specialty: 'Scheduled Visit', reason: np.reason, findings: `Priority: ${np.priority}. Scheduled for ${np.time}.`, recommendations: 'Prepare for consultation.'} 
+    },
+    // Add some past mock data for these upcoming patients too
+    { id: `${np.id}-pastConsult1`, date: generateRandomDate(2023,2024), title: 'Past Checkup', type: 'Consultation', icon: Stethoscope, physician: 'Dr. Previous Care', details: { specialty: 'General Practice', reason: 'Routine check', findings: 'All clear.', recommendations: 'Continue healthy lifestyle.' } },
+    { id: `${np.id}-pastRx1`, date: generateRandomDate(2023,2024), title: 'Amoxicillin Course', type: 'Prescription', icon: Pill, physician: 'Dr. Previous Care', details: { drugName: 'Amoxicillin', dosage: '250mg', route: 'Oral', frequency: 'TID', duration: '7 days', reason: 'Minor infection', instructions: 'Complete full course.' } }
+  );
+});
+
+// Combine base and new patient data
+export const allMockPatients: PatientSummary[] = [...baseMockPatients];
+const existingPatientIds = new Set(baseMockPatients.map(p => p.id));
+
+newPatients.forEach(np => {
+  if (!existingPatientIds.has(np.id)) {
+    allMockPatients.push(np);
+    existingPatientIds.add(np.id);
+  }
+});
+
+export const allMockHistoryEvents: Record<string, HistoryEvent[]> = {...baseMockHistoryEvents};
+
+Object.keys(newHistoryEvents).forEach(patientId => {
+  if (!allMockHistoryEvents[patientId]) {
+    allMockHistoryEvents[patientId] = [];
+  }
+  // Add new events, ensuring no ID collision for events themselves (though unlikely with current generation)
+  newHistoryEvents[patientId].forEach(newEvent => {
+      if(!allMockHistoryEvents[patientId].find(e => e.id === newEvent.id)) {
+          allMockHistoryEvents[patientId].push(newEvent);
+      }
+  });
+   // Sort events by date after adding
+  allMockHistoryEvents[patientId].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
+
+// Adding more variety for existing patients to make their timelines fuller
+if (allMockHistoryEvents['pat1']) {
+    allMockHistoryEvents['pat1'].push(
+        { id: 'pat1-diagExtra', date: '2023-08-15T10:30:00Z', title: 'Diagnosed: Mild Anemia', type: 'Diagnosis', icon: ShieldAlert, physician: 'Dr. Emily Carter', details: { condition: 'Iron-deficiency Anemia', severity: 'Mild', assessment: 'Low hemoglobin levels noted in routine blood work.', differentialDiagnosis: ['Vitamin B12 deficiency'] } },
+        { id: 'pat1-noteExtra', date: '2023-08-16T11:00:00Z', title: 'Follow-up Discussion', type: 'Note', icon: FileText, physician: 'Dr. Emily Carter', details: 'Discussed dietary changes and iron supplementation for anemia. Patient receptive to plan.', notes: 'Scheduled follow-up labs in 3 months.'}
+    );
+    allMockHistoryEvents['pat1'].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+if (allMockHistoryEvents['pat2']) {
+    allMockHistoryEvents['pat2'].push(
+        { id: 'pat2-vitalExtra', date: '2024-04-15T09:55:00Z', title: 'Pre-Consultation Vitals', type: 'Vital Sign', icon: HeartPulse, physician: 'Nurse T. Ortho', details: { bloodPressure: '130/85 mmHg', heartRate: '78 bpm', painLevel: '6/10 (right knee)', weight: '85 kg' } },
+        { id: 'pat2-consultExtra', date: '2023-10-10T14:00:00Z', title: 'Physical Therapy Initial Assessment', type: 'Consultation', icon: Users, physician: 'John Smith, PT', details: { specialty: 'Physiotherapy', reason: 'Post-injury rehabilitation', findings: 'Limited range of motion in left shoulder.', recommendations: 'Begin targeted exercise program.' } }
+    );
+    allMockHistoryEvents['pat2'].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
 
