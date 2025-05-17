@@ -69,6 +69,7 @@ export interface VitalSignEvent extends BaseHistoryEvent {
     respiratoryRate?: string; // e.g., "16 breaths/min"
     oxygenSaturation?: string; // e.g., "98%"
     painLevel?: string; // e.g., "3/10"
+    weight?: string; // e.g., "70 kg" -- ADDED THIS LINE
   };
 }
 
