@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
@@ -180,19 +179,32 @@ export const PatientForm = () => {
     }
 
     setIsLoadingAI(true);
+    setAiRecommendation(null); // Clear previous recommendation
     try {
       console.log("Getting AI recommendation with data:", formData);
       const aiResponse = await getAIRecommendation(formData);
       console.log("AI recommendation response:", aiResponse);
-      setAiRecommendation(aiResponse);
-      toast({
-        title: "AI Recommendation Ready",
-        description: "The AI has analyzed the patient data and provided recommendations.",
-      });
+
+      if (aiResponse && aiResponse.primaryRecommendation && aiResponse.primaryRecommendation.name && aiResponse.primaryRecommendation.name.trim() !== "") {
+        setAiRecommendation(aiResponse);
+        toast({
+          title: "AI Recommendation Ready",
+          description: "The AI has analyzed the patient data and provided recommendations.",
+        });
+      } else {
+        // This case handles when aiResponse is technically not an error, but lacks meaningful content.
+        setAiRecommendation(null); 
+        toast({
+          title: "AI Analysis Incomplete",
+          description: "The AI analysis was generated but appears to be missing key details. Please check your input data or try again. If the problem persists, ensure the AI service is properly configured.",
+          variant: "default", 
+        });
+      }
     } catch (error) {
       console.error('AI Recommendation error:', error);
+      setAiRecommendation(null);
       toast({
-        title: "Error",
+        title: "Error Getting AI Recommendation",
         description: error instanceof Error ? error.message : "Failed to get AI recommendation. Please try again.",
         variant: "destructive"
       });

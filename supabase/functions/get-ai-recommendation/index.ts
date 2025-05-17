@@ -109,13 +109,14 @@ serve(async (req) => {
       console.log('Cleaned JSON');
       const parsedRecommendation = JSON.parse(cleanJson);
 
-      // Validate the response structure
-      if (!parsedRecommendation.primaryRecommendation?.name ||
+      // Validate the response structure - Added check for non-empty name
+      if (!parsedRecommendation.primaryRecommendation?.name || 
+          parsedRecommendation.primaryRecommendation.name.trim() === '' ||
           !parsedRecommendation.reasoning ||
           !Array.isArray(parsedRecommendation.alternatives) ||
           !Array.isArray(parsedRecommendation.precautions)) {
-        console.error('Invalid recommendation structure:', parsedRecommendation);
-        throw new Error('Invalid recommendation format from AI');
+        console.error('Invalid recommendation structure or empty primary recommendation name:', parsedRecommendation);
+        throw new Error('Invalid or incomplete recommendation format from AI');
       }
 
       // Add any additional regional or renal considerations from our calculations
@@ -169,3 +170,4 @@ serve(async (req) => {
     );
   }
 });
+
