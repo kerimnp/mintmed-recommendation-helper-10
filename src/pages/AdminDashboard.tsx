@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
@@ -69,7 +68,7 @@ const AdminDashboard = () => {
       else if (lowerSearchTerm.includes("guide") || lowerSearchTerm.includes("protocol")) setActiveTab("guidelines");
       else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) setActiveTab("effectiveness");
       else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) setActiveTab("education");
-      else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) setActiveTab("history"); // Added history search
+      else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) setActiveTab("history");
     }
   };
 
@@ -77,20 +76,18 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 overflow-hidden">
-      {activeTab !== 'history' && (
-        <div className="hidden lg:block">
-          <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        </div>
-      )}
+      {/* AdminSidebar is now always visible */}
+      <div className="hidden lg:block">
+        <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
       
-      {activeTab !== 'history' && (
-        <MobileMenuSheet
-          isOpen={isMobileMenuOpen}
-          onOpenChange={setIsMobileMenuOpen}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-      )}
+      {/* MobileMenuSheet is now always available */}
+      <MobileMenuSheet
+        isOpen={isMobileMenuOpen}
+        onOpenChange={setIsMobileMenuOpen}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
       <SettingsDialog
         isOpen={isSettingsOpen}
@@ -101,7 +98,6 @@ const AdminDashboard = () => {
       />
 
       <main className="flex-1 overflow-hidden w-full flex flex-col h-screen">
-        {/* AdminHeader is always present, PatientHistoryTab calculates height based on it */}
         <AdminHeader
           theme={theme}
           setTheme={setTheme}
@@ -111,24 +107,16 @@ const AdminDashboard = () => {
           setIsMobileMenuOpen={setIsMobileMenuOpen}
           setIsSettingsOpen={setIsSettingsOpen}
           handleLogout={handleLogout}
-          // For mobile, if history tab is active, we might want to hide the hamburger menu icon in AdminHeader
-          // This would require AdminHeader to know about activeTab or a prop to hide menu toggle.
-          // For now, menu button in header will still show.
         />
         
         <div className="flex-1 overflow-auto">
-          {/*
-            When activeTab is 'history', PageHeaderSection might not be relevant or desired.
-            For simplicity, it's still rendered but DashboardContent will render PatientHistoryTab
-            which takes up the full content area below AdminHeader.
-          */}
           <div className={`max-w-full mx-auto ${activeTab === 'history' ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
             <motion.div 
-              key={activeTab} // Add key here to re-trigger animation on tab change
+              key={activeTab} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className={activeTab === 'history' ? '' : 'space-y-6'} // No extra spacing for history tab itself
+              className={activeTab === 'history' ? '' : 'space-y-6'}
             >
               {activeTab !== 'history' && (
                 <PageHeaderSection
@@ -151,4 +139,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
