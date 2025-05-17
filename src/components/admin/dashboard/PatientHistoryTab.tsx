@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area"; // Still needed for patient list if very long, but not for events
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Stethoscope, Pill, FileText, Activity, User as UserIconLucide, ShieldAlert, TestTube2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, Stethoscope, Pill, FileText, Activity, User as UserIconLucide, ShieldAlert, TestTube2, ChevronLeft, ChevronRight, ArrowLeft, Users, Search as SearchIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"; // Import Button
+import { Button } from "@/components/ui/button";
 import { HistoryEventCard } from './HistoryEventCard';
 
 // --- Enhanced Data Interfaces ---
@@ -190,7 +190,6 @@ const allMockHistoryEvents: Record<string, HistoryEvent[]> = {
       icon: FileText, physician: 'Dr. Emily White'
     }
   ],
-  // ... (similarly detailed histories for P004 to P009)
   "P004": [ 
     { id: 'evt1-P004', date: '2025-03-10', type: 'Consultation', title: 'Cardiology Follow-up', details: { specialty: 'Cardiology', reason: 'Post-stent placement review', findings: 'Patient reports good recovery. Echo normal. No angina.', recommendations: 'Continue DAPT. Cardiac rehab progressing well.'}, icon: UserIconLucide, physician: 'Dr. Heartwell' },
     { id: 'evt2-P004', date: '2025-03-10', type: 'Prescription', title: 'Aspirin & Clopidogrel', details: { drugName: 'Aspirin', dosage: '81mg', route: 'Oral', frequency: 'OD', duration: 'Ongoing', reason: 'Secondary PCI prevention' }, icon: Pill, physician: 'Dr. Heartwell' },
@@ -205,7 +204,7 @@ const allMockHistoryEvents: Record<string, HistoryEvent[]> = {
     { id: 'evt1-P006', date: '2025-02-01', type: 'Diagnosis', title: 'Minor Ankle Sprain', details: { condition: 'Ankle Sprain, Grade I', severity: 'Mild', assessment: 'Injury during weekend sport. Mild swelling and tenderness over ATFL. RICE advised.'}, icon: Stethoscope, physician: 'Dr. Swift' },
     { id: 'evt2-P006', date: '2025-02-01', type: 'Prescription', title: 'Ibuprofen', details: { drugName: 'Ibuprofen', dosage: '400mg', route: 'Oral', frequency: 'PRN q6h', duration: '3-5 days', reason: 'Pain and inflammation from sprain'}, icon: Pill, physician: 'Dr. Swift' },
   ],
-  "P007": [], // Charlie Brown - No history events
+  "P007": [], 
   "P008": [
     { id: 'evt1-P008', date: '2025-04-01', type: 'Diagnosis', title: 'Iron Deficiency Anemia', details: { condition: 'Iron Deficiency Anemia', severity: 'Moderate', assessment: 'Patient reports fatigue and pallor. Labs confirm low ferritin and hemoglobin.'}, icon: Stethoscope, physician: 'Dr. Helen Cho' },
     { id: 'evt2-P008', date: '2025-04-01', type: 'Prescription', title: 'Ferrous Sulfate', details: { drugName: 'Ferrous Sulfate', dosage: '325mg', route: 'Oral', frequency: 'OD', duration: '3 months', reason: 'Iron supplementation'}, icon: Pill, physician: 'Dr. Helen Cho', notes: 'Take with Vitamin C source to aid absorption. Recheck Hb in 6 weeks.' },
@@ -246,33 +245,37 @@ interface PatientHistoryTabProps {
 
 export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm: initialSearchTerm, patientId: initialPatientId }) => {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-  const [currentSearch, setCurrentSearch] = useState(initialSearchTerm || "");
+  const [currentSearch, setCurrentSearch] = useState(""); // Search for events within a patient's history
+  const [patientListSearch, setPatientListSearch] = useState(""); // Search for patients in the list view
   const [currentPatientIndex, setCurrentPatientIndex] = useState<number>(-1);
 
   useEffect(() => {
-    let patientToSelectId: string | null = null;
-
     if (initialPatientId && allMockPatients.some(p => p.id === initialPatientId)) {
-      patientToSelectId = initialPatientId;
-    } else if (allMockPatients.length > 0 && (!selectedPatientId || !allMockPatients.some(p => p.id === selectedPatientId))) {
-      patientToSelectId = allMockPatients[0].id;
-    } else if (selectedPatientId) {
-      patientToSelectId = selectedPatientId; // Keep current selection if valid
-    }
-
-    if (patientToSelectId) {
-      setSelectedPatientId(patientToSelectId);
-      const patientIndex = allMockPatients.findIndex(p => p.id === patientToSelectId);
+      setSelectedPatientId(initialPatientId);
+      const patientIndex = allMockPatients.findIndex(p => p.id === initialPatientId);
       setCurrentPatientIndex(patientIndex);
+      setCurrentSearch(initialSearchTerm || ""); 
+    } else {
+      setSelectedPatientId(null); // Default to patient list view
+      setCurrentPatientIndex(-1);
+      // If initialSearchTerm is meant for patient list, set patientListSearch here.
+      // For now, initialSearchTerm is for event search after a patient is selected.
     }
-  }, [initialPatientId]); // Removed selectedPatientId and allMockPatients from deps as they are handled or constant
+  }, [initialPatientId, initialSearchTerm]);
 
   const handlePatientSelection = useCallback((patientId: string) => {
     setSelectedPatientId(patientId);
     const patientIndex = allMockPatients.findIndex(p => p.id === patientId);
     setCurrentPatientIndex(patientIndex);
-    setCurrentSearch(""); // Clear search on patient change
+    setCurrentSearch(""); // Clear event search on new patient selection
+    setPatientListSearch(""); // Clear patient list search as well
   }, []);
+
+  const handleBackToPatientList = () => {
+    setSelectedPatientId(null);
+    setCurrentPatientIndex(-1);
+    setCurrentSearch("");
+  };
 
   const handleNextPatient = () => {
     if (currentPatientIndex < allMockPatients.length - 1) {
@@ -299,45 +302,96 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
     return getSearchableStringFromEvent(event).includes(lowerSearch);
   });
 
-  if (!currentPatient) {
+  const filteredPatients = allMockPatients.filter(patient => {
+    if (!patientListSearch) return true;
+    const lowerSearch = patientListSearch.toLowerCase();
+    return patient.name.toLowerCase().includes(lowerSearch) || patient.id.toLowerCase().includes(lowerSearch) || patient.dob.includes(lowerSearch);
+  });
+
+  // Patient List View
+  if (!selectedPatientId) {
     return (
-      <div className="space-y-6 p-4 md:p-6">
-        <Card className="shadow-lg border-gray-200 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-medical-primary flex items-center">
-              <CalendarDays className="h-7 w-7 mr-3 text-medical-primary" />
-              Patient Medical History
+      <div className="space-y-6 p-2 md:p-4 lg:p-6">
+        <Card className="shadow-xl border-gray-200 dark:border-gray-700">
+          <CardHeader className="bg-slate-50 dark:bg-slate-800/50 p-6 border-b dark:border-slate-700">
+            <CardTitle className="text-2xl lg:text-3xl font-bold text-medical-primary flex items-center">
+              <Users className="h-8 w-8 mr-3 text-medical-primary" />
+              Select Patient
             </CardTitle>
-            <CardDescription>
-              No patient selected or patient data not found.
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Choose a patient from the list below to view their medical history.
             </CardDescription>
+            <div className="mt-4">
+              <Input
+                placeholder="Search patients by name, ID, or DOB..."
+                value={patientListSearch}
+                onChange={(e) => setPatientListSearch(e.target.value)}
+                className="w-full lg:max-w-lg text-base py-3 shadow-sm"
+                icon={<SearchIcon className="h-4 w-4 text-gray-400" />}
+              />
+            </div>
           </CardHeader>
-          <CardContent className="py-8">
-             <p className="text-center text-gray-500 dark:text-gray-400">Please select a patient from the list to view their medical history.</p>
-             <div className="max-w-md mx-auto mt-6">
-                <Select onValueChange={setSelectedPatientId} defaultValue={selectedPatientId || undefined}>
-                  <SelectTrigger className="w-full text-base py-3">
-                    <SelectValue placeholder="Select a patient..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allMockPatients.map(patient => (
-                      <SelectItem key={patient.id} value={patient.id} className="py-2">
-                        {patient.name} (ID: {patient.id}, DOB: {patient.dob})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <CardContent className="p-0">
+            {filteredPatients.length === 0 ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-12 px-6">
+                <Users className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+                <p className="text-xl font-semibold">
+                  {patientListSearch ? `No patients matching "${patientListSearch}"` : "No patients found."}
+                </p>
+                <p className="text-sm mt-1">
+                  {patientListSearch ? "Try a different search term." : "There are no patients in the system."}
+                </p>
               </div>
+            ) : (
+              <ScrollArea className="h-[calc(100vh-300px)]"> {/* Allow list to scroll if long */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 md:p-6">
+                  {filteredPatients.map(patient => (
+                    <Card 
+                      key={patient.id} 
+                      className="hover:shadow-lg transition-shadow cursor-pointer bg-white dark:bg-slate-800/60"
+                      onClick={() => handlePatientSelection(patient.id)}
+                    >
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-lg text-medical-secondary">{patient.name}</CardTitle>
+                        <CardDescription className="text-xs">
+                          ID: {patient.id} &bull; DOB: {patient.dob}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="text-xs">
+                        <p>Age: {patient.age}</p>
+                        <p>Gender: {patient.gender}</p>
+                        {patient.bloodType && <p>Blood Type: {patient.bloodType}</p>}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  // Patient Detail View (currentPatient must exist here)
+  if (!currentPatient) { // Should ideally not happen if selectedPatientId is set
+     return (
+        <div className="p-6">
+            <p>Error: Patient data could not be loaded. <Button variant="link" onClick={handleBackToPatientList}>Return to patient list.</Button></p>
+        </div>
+     );
+  }
+
   return (
     <div className="space-y-6 p-2 md:p-4 lg:p-6">
       <Card className="shadow-xl border-gray-200 dark:border-gray-700 overflow-hidden">
         <CardHeader className="bg-slate-50 dark:bg-slate-800/50 p-6 border-b dark:border-slate-700">
+          <div className="flex items-center mb-4">
+            <Button variant="outline" size="sm" onClick={handleBackToPatientList} className="mr-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Patient List
+            </Button>
+          </div>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
               <CardTitle className="text-2xl lg:text-3xl font-bold text-medical-primary flex items-center">
@@ -362,7 +416,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
               <div className="flex-grow lg:w-72">
                 <Select 
                   value={selectedPatientId || ""} 
-                  onValueChange={handlePatientSelection}
+                  onValueChange={handlePatientSelection} // This will re-trigger selection logic
                 >
                   <SelectTrigger className="w-full text-base py-3 shadow-sm h-11">
                     <SelectValue placeholder="Change patient..." />
@@ -397,7 +451,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0"> {/* Ensure no padding here if timeline has its own */}
           {filteredEvents.length === 0 ? (
             <div className="text-center text-gray-500 dark:text-gray-400 py-12 px-6">
               <FileText className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
@@ -409,22 +463,21 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
               </p>
             </div>
           ) : (
-            <ScrollArea className="h-[58vh] lg:h-[calc(100vh-380px)]">
-              <div className="relative p-6 space-y-8">
-                {/* Timeline Line */}
-                <div className="absolute left-10 top-6 bottom-6 w-0.5 bg-slate-200 dark:bg-slate-700 rounded-full" aria-hidden="true"></div>
-                
-                {filteredEvents.map((event, index) => (
-                  <HistoryEventCard key={event.id} event={event} isLast={index === filteredEvents.length -1} />
-                ))}
-              </div>
-            </ScrollArea>
+            // REMOVED ScrollArea and fixed height for full page scrolling of events
+            <div className="relative p-6 space-y-8">
+              {/* Timeline Line */}
+              <div className="absolute left-10 top-6 bottom-6 w-0.5 bg-slate-200 dark:bg-slate-700 rounded-full" aria-hidden="true"></div>
+              
+              {filteredEvents.map((event, index) => (
+                <HistoryEventCard key={event.id} event={event} isLast={index === filteredEvents.length -1} />
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
-      {initialSearchTerm && !currentSearch && ( 
+      {initialSearchTerm && !currentSearch && selectedPatientId && ( 
         <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
-          Search term "<span className="font-semibold">{initialSearchTerm}</span>" cleared.
+          Initial search term "<span className="font-semibold">{initialSearchTerm}</span>" was applied and then cleared or changed.
         </p>
       )}
     </div>
