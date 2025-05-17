@@ -1,14 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-// Update this import path
-import { HistoryEvent, VitalSignEvent } from './patient-history/types'; // Added VitalSignEvent for type safety
+import { HistoryEvent, VitalSignEvent } from './patient-history/types';
 import { cn } from '@/lib/utils';
-
-interface HistoryEventCardProps {
-  event: HistoryEvent;
-  isLast: boolean;
-}
 
 const getBadgeVariant = (type: HistoryEvent['type']): VariantProps<typeof Badge>['variant'] => {
   switch (type) {
@@ -33,27 +27,38 @@ const DetailItem: React.FC<{ label: string; value?: string | string[] | React.Re
   );
 };
 
-export const HistoryEventCard: React.FC<HistoryEventCardProps> = ({ event, isLast }) => {
+interface HistoryEventCardProps {
+  event: HistoryEvent;
+  isLast?: boolean; // Kept for potential other uses
+  isTimelineMode?: boolean; // New prop to adjust rendering for GraphicalTimeline
+}
+
+export const HistoryEventCard: React.FC<HistoryEventCardProps> = ({ event, isTimelineMode = false }) => {
   const EventIcon = event.icon;
 
   return (
-    <div className="relative pl-16 group">
-      {/* Icon and Dot on Timeline */}
-      <div className={cn(
-        "absolute left-0 top-1 transform translate-x-[calc(-50%+1.25rem)] -translate-y-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 flex items-center justify-center shadow-sm",
-        event.type === 'Diagnosis' || event.type === 'Allergy' ? "border-red-500 dark:border-red-400" : 
-        event.type === 'Prescription' ? "border-blue-500 dark:border-blue-400" :
-        "border-gray-300 dark:border-slate-600 group-hover:border-medical-primary transition-colors"
-      )}>
-        <EventIcon className={cn(
-          "h-5 w-5",
-          event.type === 'Diagnosis' || event.type === 'Allergy' ? "text-red-500 dark:text-red-400" :
-          event.type === 'Prescription' ? "text-blue-500 dark:text-blue-400" :
-          "text-gray-500 dark:text-gray-400 group-hover:text-medical-primary transition-colors"
-        )} />
-      </div>
+    <div className={cn(!isTimelineMode && "relative pl-16 group")}>
+      {/* Icon and Dot on Timeline - Render only if NOT in isTimelineMode */}
+      {!isTimelineMode && (
+        <div className={cn(
+          "absolute left-0 top-1 transform translate-x-[calc(-50%+1.25rem)] -translate-y-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 flex items-center justify-center shadow-sm",
+          event.type === 'Diagnosis' || event.type === 'Allergy' ? "border-red-500 dark:border-red-400" : 
+          event.type === 'Prescription' ? "border-blue-500 dark:border-blue-400" :
+          "border-gray-300 dark:border-slate-600 group-hover:border-medical-primary transition-colors"
+        )}>
+          <EventIcon className={cn(
+            "h-5 w-5",
+            event.type === 'Diagnosis' || event.type === 'Allergy' ? "text-red-500 dark:text-red-400" :
+            event.type === 'Prescription' ? "text-blue-500 dark:text-blue-400" :
+            "text-gray-500 dark:text-gray-400 group-hover:text-medical-primary transition-colors"
+          )} />
+        </div>
+      )}
 
-      <Card className="ml-2 hover:shadow-xl transition-shadow duration-300 ease-in-out border-gray-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/60 backdrop-blur-sm">
+      <Card className={cn(
+        "hover:shadow-xl transition-shadow duration-300 ease-in-out border-gray-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/60 backdrop-blur-sm",
+        !isTimelineMode && "ml-2" // Original margin if not in graphical timeline mode
+      )}>
         <CardHeader className="pb-3 pt-4 px-5">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
             <div className="flex-1">
@@ -111,7 +116,7 @@ export const HistoryEventCard: React.FC<HistoryEventCardProps> = ({ event, isLas
               <DetailItem label="Respiratory Rate" value={event.details.respiratoryRate} />
               <DetailItem label="Oxygen Sat." value={event.details.oxygenSaturation} />
               <DetailItem label="Pain Level" value={event.details.painLevel} />
-              <DetailItem label="Weight" value={(event as VitalSignEvent).details.weight} /> {/* Added weight display */}
+              <DetailItem label="Weight" value={(event as VitalSignEvent).details.weight} />
             </div>
           )}
           {event.type === 'Consultation' && (
@@ -144,8 +149,6 @@ export const HistoryEventCard: React.FC<HistoryEventCardProps> = ({ event, isLas
   );
 };
 
-// Helper for Badge variants, if needed by other components or for more complex logic
-// This is a simplified version of what might be needed for cva.
 interface VariantProps<T extends (...args: any) => any> {
   variant?: Parameters<T>[0]['variant'];
 }

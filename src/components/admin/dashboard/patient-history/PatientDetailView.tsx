@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search as SearchIcon, UserCircle2, CalendarDays, Activity, Pill, TestTube2, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { HistoryEventCard } from '../HistoryEventCard';
+// Removed HistoryEventCard import here as it's used by GraphicalTimeline
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Breadcrumb,
@@ -20,13 +20,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EncounterTable } from './details-tabs/EncounterTable';
 import { PrescriptionTable } from './details-tabs/PrescriptionTable';
 import { LabsAndVitalsDisplay } from './details-tabs/LabsAndVitalsDisplay';
-
+import { GraphicalTimeline } from './GraphicalTimeline'; // New import
 
 interface PatientDetailViewProps {
   patient: PatientSummary | undefined;
-  historyEvents: HistoryEvent[]; // This will be all events for the patient, sorted
-  searchTerm: string; // This is for the timeline search
-  setSearchTerm: (term: string) => void; // For timeline search
+  historyEvents: HistoryEvent[]; 
+  searchTerm: string; 
+  setSearchTerm: (term: string) => void; 
   onClearPatientSelection: () => void;
   allPatients: PatientSummary[];
   currentPatientId: string | null;
@@ -35,7 +35,7 @@ interface PatientDetailViewProps {
 
 export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
   patient,
-  historyEvents,
+  historyEvents, // This is already filtered for timeline search by the parent
   searchTerm,
   setSearchTerm,
   onClearPatientSelection,
@@ -69,14 +69,13 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
     );
   }
 
-  // Filter events for each tab
+  // Filter events for each tab using the already timeline-search-filtered historyEvents
   const consultationEvents = historyEvents.filter(event => event.type === 'Consultation') as ConsultationEvent[];
   const prescriptionEvents = historyEvents.filter(event => event.type === 'Prescription') as PrescriptionEvent[];
   const labResultEvents = historyEvents.filter(event => event.type === 'Lab Result') as LabResultEvent[];
   const vitalSignEvents = historyEvents.filter(event => event.type === 'Vital Sign') as VitalSignEvent[];
-
-  // Timeline events are already filtered by PatientHistoryTab's eventSearchTerm for the timeline
-  // The `historyEvents` prop passed here is already filtered for the timeline search.
+  
+  // The `historyEvents` prop is already filtered for the timeline search
   const timelineFilteredEvents = historyEvents;
 
 
@@ -87,7 +86,6 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              {/* This button could take user back to a general patient list view if that was a separate page */}
               <BreadcrumbLink onClick={onClearPatientSelection} className="cursor-pointer flex items-center text-medical-primary hover:underline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Patient List
@@ -137,7 +135,6 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                         </CardDescription>
                     </div>
                 </div>
-                 {/* Placeholder for actions like "Edit Patient" */}
               </div>
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm pt-2">
@@ -154,7 +151,7 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                 <CalendarDays className="h-4 w-4 mr-2"/>Timeline
               </TabsTrigger>
               <TabsTrigger value="encounters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-medical-primary data-[state=active]:shadow-md text-slate-600 dark:text-slate-300">
-                <Users className="h-4 w-4 mr-2"/>Encounters {/* Changed icon to Users for encounters */}
+                <Users className="h-4 w-4 mr-2"/>Encounters
               </TabsTrigger>
               <TabsTrigger value="prescriptions" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-medical-primary data-[state=active]:shadow-md text-slate-600 dark:text-slate-300">
                 <Pill className="h-4 w-4 mr-2"/>Prescriptions
@@ -172,14 +169,14 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                         <Input 
                             placeholder={`Search timeline for ${patient.name}...`}
-                            value={searchTerm} // This is the timeline search term
+                            value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 text-sm py-2 shadow-sm focus-visible:ring-medical-primary"
                             aria-label={`Search timeline events for ${patient.name}`}
                         />
                     </div>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className="p-0"> {/* Remove padding from CardContent if GraphicalTimeline handles its own */}
                   {timelineFilteredEvents.length === 0 ? (
                     <div className="text-center py-12 px-6">
                       <FileText className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
@@ -191,12 +188,8 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                       </p>
                     </div>
                   ) : (
-                    <div className="relative p-4 md:p-6 space-y-8">
-                      <div className="absolute left-7 md:left-10 top-6 bottom-6 w-0.5 bg-slate-200 dark:bg-slate-700 rounded-full" aria-hidden="true"></div>
-                      {timelineFilteredEvents.map((event, index) => (
-                        <HistoryEventCard key={event.id} event={event} isLast={index === timelineFilteredEvents.length -1} />
-                      ))}
-                    </div>
+                    // Use the new GraphicalTimeline component
+                    <GraphicalTimeline events={timelineFilteredEvents} />
                   )}
                 </CardContent>
               </Card>
