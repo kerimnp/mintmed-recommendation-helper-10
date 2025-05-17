@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 // Update this import path
-import { HistoryEvent } from './patient-history/types'; 
+import { HistoryEvent, VitalSignEvent } from './patient-history/types'; // Added VitalSignEvent for type safety
 import { cn } from '@/lib/utils';
 
 interface HistoryEventCardProps {
@@ -24,7 +24,7 @@ const getBadgeVariant = (type: HistoryEvent['type']): VariantProps<typeof Badge>
 };
 
 const DetailItem: React.FC<{ label: string; value?: string | string[] | React.ReactNode; className?: string }> = ({ label, value, className }) => {
-  if (!value) return null;
+  if (value === undefined || value === null || value === '') return null; // Also check for empty string
   return (
     <div className={cn("text-sm", className)}>
       <span className="font-semibold text-gray-700 dark:text-gray-300">{label}: </span>
@@ -111,6 +111,7 @@ export const HistoryEventCard: React.FC<HistoryEventCardProps> = ({ event, isLas
               <DetailItem label="Respiratory Rate" value={event.details.respiratoryRate} />
               <DetailItem label="Oxygen Sat." value={event.details.oxygenSaturation} />
               <DetailItem label="Pain Level" value={event.details.painLevel} />
+              <DetailItem label="Weight" value={(event as VitalSignEvent).details.weight} /> {/* Added weight display */}
             </div>
           )}
           {event.type === 'Consultation' && (

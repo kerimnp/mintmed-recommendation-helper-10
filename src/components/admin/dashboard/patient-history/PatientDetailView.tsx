@@ -1,11 +1,10 @@
-
 import React from 'react';
-import { PatientSummary, HistoryEvent } from './types';
+import { PatientSummary, HistoryEvent, ConsultationEvent, PrescriptionEvent, LabResultEvent, VitalSignEvent } from './types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search as SearchIcon, UserCircle2, CalendarDays, Activity, Pill, TestTube2, ShieldAlert, Users } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search as SearchIcon, UserCircle2, CalendarDays, Activity, Pill, TestTube2, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { HistoryEventCard } from '../HistoryEventCard'; // Re-use existing card for now
+import { HistoryEventCard } from '../HistoryEventCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Breadcrumb,
@@ -17,12 +16,18 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Import new tab content components
+import { EncounterTable } from './details-tabs/EncounterTable';
+import { PrescriptionTable } from './details-tabs/PrescriptionTable';
+import { LabsAndVitalsDisplay } from './details-tabs/LabsAndVitalsDisplay';
+
+
 interface PatientDetailViewProps {
   patient: PatientSummary | undefined;
-  historyEvents: HistoryEvent[];
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  onClearPatientSelection: () => void; // To go back to a "no patient selected" state if needed
+  historyEvents: HistoryEvent[]; // This will be all events for the patient, sorted
+  searchTerm: string; // This is for the timeline search
+  setSearchTerm: (term: string) => void; // For timeline search
+  onClearPatientSelection: () => void;
   allPatients: PatientSummary[];
   currentPatientId: string | null;
   onSelectPatient: (patientId: string) => void;
@@ -63,6 +68,17 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
       </div>
     );
   }
+
+  // Filter events for each tab
+  const consultationEvents = historyEvents.filter(event => event.type === 'Consultation') as ConsultationEvent[];
+  const prescriptionEvents = historyEvents.filter(event => event.type === 'Prescription') as PrescriptionEvent[];
+  const labResultEvents = historyEvents.filter(event => event.type === 'Lab Result') as LabResultEvent[];
+  const vitalSignEvents = historyEvents.filter(event => event.type === 'Vital Sign') as VitalSignEvent[];
+
+  // Timeline events are already filtered by PatientHistoryTab's eventSearchTerm for the timeline
+  // The `historyEvents` prop passed here is already filtered for the timeline search.
+  const timelineFilteredEvents = historyEvents;
+
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50 dark:bg-slate-900/50 h-full overflow-hidden">
@@ -138,7 +154,7 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                 <CalendarDays className="h-4 w-4 mr-2"/>Timeline
               </TabsTrigger>
               <TabsTrigger value="encounters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-medical-primary data-[state=active]:shadow-md text-slate-600 dark:text-slate-300">
-                <Activity className="h-4 w-4 mr-2"/>Encounters
+                <Users className="h-4 w-4 mr-2"/>Encounters {/* Changed icon to Users for encounters */}
               </TabsTrigger>
               <TabsTrigger value="prescriptions" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:text-medical-primary data-[state=active]:shadow-md text-slate-600 dark:text-slate-300">
                 <Pill className="h-4 w-4 mr-2"/>Prescriptions
@@ -156,7 +172,7 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                         <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                         <Input 
                             placeholder={`Search timeline for ${patient.name}...`}
-                            value={searchTerm}
+                            value={searchTerm} // This is the timeline search term
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 text-sm py-2 shadow-sm focus-visible:ring-medical-primary"
                             aria-label={`Search timeline events for ${patient.name}`}
@@ -164,7 +180,7 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  {historyEvents.length === 0 ? (
+                  {timelineFilteredEvents.length === 0 ? (
                     <div className="text-center py-12 px-6">
                       <FileText className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
                       <p className="text-xl font-semibold text-gray-600 dark:text-gray-300">
@@ -177,22 +193,22 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                   ) : (
                     <div className="relative p-4 md:p-6 space-y-8">
                       <div className="absolute left-7 md:left-10 top-6 bottom-6 w-0.5 bg-slate-200 dark:bg-slate-700 rounded-full" aria-hidden="true"></div>
-                      {historyEvents.map((event, index) => (
-                        <HistoryEventCard key={event.id} event={event} isLast={index === historyEvents.length -1} />
+                      {timelineFilteredEvents.map((event, index) => (
+                        <HistoryEventCard key={event.id} event={event} isLast={index === timelineFilteredEvents.length -1} />
                       ))}
                     </div>
                   )}
                 </CardContent>
               </Card>
             </TabsContent>
-            <TabsContent value="encounters">
-              <Card className="bg-white dark:bg-slate-800"><CardContent className="p-6">Encounter details (e.g., table of visits) will go here.</CardContent></Card>
+            <TabsContent value="encounters" className="mt-0">
+              <EncounterTable events={consultationEvents} />
             </TabsContent>
-            <TabsContent value="prescriptions">
-              <Card className="bg-white dark:bg-slate-800"><CardContent className="p-6">Prescriptions history (e.g., data grid) will go here.</CardContent></Card>
+            <TabsContent value="prescriptions" className="mt-0">
+              <PrescriptionTable events={prescriptionEvents} />
             </TabsContent>
-            <TabsContent value="labs">
-              <Card className="bg-white dark:bg-slate-800"><CardContent className="p-6">Labs & Vitals charts and data will go here.</CardContent></Card>
+            <TabsContent value="labs" className="mt-0">
+              <LabsAndVitalsDisplay labEvents={labResultEvents} vitalEvents={vitalSignEvents} />
             </TabsContent>
           </Tabs>
         </div>

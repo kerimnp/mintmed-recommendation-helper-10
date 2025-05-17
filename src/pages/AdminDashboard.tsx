@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
-import { useNavigate } from "react-router-dom"; // Link is used in sub-components
+import { useNavigate } from "react-router-dom"; 
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 
-// Import new layout components
 import { AdminHeader } from "@/components/admin/dashboard/layout/AdminHeader";
 import { SettingsDialog } from "@/components/admin/dashboard/layout/SettingsDialog";
 import { MobileMenuSheet } from "@/components/admin/dashboard/layout/MobileMenuSheet";
@@ -30,12 +30,10 @@ const AdminDashboard = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    // Add "history" to the list of valid tabs
     const validTabs = ["dashboard", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines", "history"];
     if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
       setActiveTab(tabParam);
     } else if (!tabParam || !validTabs.includes(tabParam)) {
-      // Default to dashboard if tab is invalid or not present
       navigate(`/admin?tab=dashboard`, { replace: true });
       if (activeTab !== "dashboard") setActiveTab("dashboard");
     }
@@ -79,21 +77,20 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 overflow-hidden">
-      <div className="hidden lg:block">
-        {/* AdminSidebar would ideally be updated here to include a "Patient History" link,
-            but it's not in the allowed files. You'll need to update it manually
-            or let me know if it becomes available for editing.
-            It should navigate to ?tab=history */}
-        <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      </div>
+      {activeTab !== 'history' && (
+        <div className="hidden lg:block">
+          <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
+      )}
       
-      <MobileMenuSheet
-        isOpen={isMobileMenuOpen}
-        onOpenChange={setIsMobileMenuOpen}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        // Similarly, MobileMenuSheet would need a "Patient History" item.
-      />
+      {activeTab !== 'history' && (
+        <MobileMenuSheet
+          isOpen={isMobileMenuOpen}
+          onOpenChange={setIsMobileMenuOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
 
       <SettingsDialog
         isOpen={isSettingsOpen}
@@ -104,6 +101,7 @@ const AdminDashboard = () => {
       />
 
       <main className="flex-1 overflow-hidden w-full flex flex-col h-screen">
+        {/* AdminHeader is always present, PatientHistoryTab calculates height based on it */}
         <AdminHeader
           theme={theme}
           setTheme={setTheme}
@@ -113,27 +111,38 @@ const AdminDashboard = () => {
           setIsMobileMenuOpen={setIsMobileMenuOpen}
           setIsSettingsOpen={setIsSettingsOpen}
           handleLogout={handleLogout}
+          // For mobile, if history tab is active, we might want to hide the hamburger menu icon in AdminHeader
+          // This would require AdminHeader to know about activeTab or a prop to hide menu toggle.
+          // For now, menu button in header will still show.
         />
         
         <div className="flex-1 overflow-auto">
-          <div className="max-w-full mx-auto p-4 md:p-6 pt-6">
+          {/*
+            When activeTab is 'history', PageHeaderSection might not be relevant or desired.
+            For simplicity, it's still rendered but DashboardContent will render PatientHistoryTab
+            which takes up the full content area below AdminHeader.
+          */}
+          <div className={`max-w-full mx-auto ${activeTab === 'history' ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
             <motion.div 
+              key={activeTab} // Add key here to re-trigger animation on tab change
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="space-y-6"
+              className={activeTab === 'history' ? '' : 'space-y-6'} // No extra spacing for history tab itself
             >
-              <PageHeaderSection
-                activeTab={activeTab}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                handleSearch={handleSearch}
-                setIsSettingsOpen={setIsSettingsOpen}
-              />
+              {activeTab !== 'history' && (
+                <PageHeaderSection
+                  activeTab={activeTab}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  handleSearch={handleSearch}
+                  setIsSettingsOpen={setIsSettingsOpen}
+                />
+              )}
               
               <DashboardContent activeTab={activeTab} searchTerm={searchTerm} />
             </motion.div>
-            <AdminFooter />
+            {activeTab !== 'history' && <AdminFooter />}
           </div>
         </div>
       </main>
@@ -142,3 +151,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
