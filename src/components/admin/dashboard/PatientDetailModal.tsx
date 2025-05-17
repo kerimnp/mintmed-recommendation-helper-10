@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,7 @@ export interface DetailedPatientInfo {
   reason?: string; // For upcoming appointments
   priority?: string; // For upcoming appointments
   drug?: string; // For prescriptions
+  timestamp?: string; // For prescriptions, added to fix TS error
   // Fake expanded details
   mockDetails: MockPatientSubDetails;
 }
@@ -51,7 +51,7 @@ const DetailSection: React.FC<{ title: string; icon: React.ElementType; children
 export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient, isOpen, onClose }) => {
   if (!patient) return null;
 
-  const { name, source, condition, status, lastUpdate, risk, time, reason, priority, drug, mockDetails } = patient;
+  const { name, source, condition, status, lastUpdate, risk, time, reason, priority, drug, mockDetails, timestamp } = patient; // Added timestamp here
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,7 +66,7 @@ export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient,
         </DialogHeader>
         
         <div className="py-4 space-y-3 overflow-y-auto flex-grow pr-2">
-          {source === 'active' && (
+           {source === 'active' && (
             <>
               <DetailSection title="Current Status" icon={Activity}>
                 <p><strong>Condition:</strong> {condition}</p>
@@ -92,7 +92,8 @@ export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient,
               <DetailSection title="Prescription Information" icon={Pill}>
                 <p><strong>Drug:</strong> {drug}</p>
                 <p><strong>Status:</strong> {status}</p>
-                <p><strong>Timestamp:</strong> {patient.timestamp}</p>
+                {/* Ensure timestamp is used here, it was patient.timestamp before, now it's destructured `timestamp` */}
+                <p><strong>Timestamp:</strong> {timestamp}</p> 
               </DetailSection>
             </>
           )}
@@ -160,4 +161,3 @@ export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient,
     </Dialog>
   );
 };
-

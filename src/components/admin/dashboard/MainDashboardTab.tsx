@@ -1,22 +1,21 @@
-import React, { useState } from "react"; // Added useState
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer } from "lucide-react";
+import { MapPin, Users, BellRing, TrendingUp, Activity, AlertTriangle, CheckCircle, Sun, Cloud, Zap, SmilePlus, Moon, CalendarDays, FilePenLine, Thermometer, User as UserIcon, Pill, FlaskConical, FileText as FileTextIcon, CalendarClock, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
-import { PatientDetailModal, DetailedPatientInfo, MockPatientSubDetails } from "./PatientDetailModal"; // Import new modal and types
+import { PatientDetailModal, DetailedPatientInfo, MockPatientSubDetails } from "./PatientDetailModal";
+
 
 interface MainDashboardTabProps {
   searchTerm?: string;
 }
 
 const getGreeting = () => {
-  // ... keep existing code (getGreeting function)
   const hour = new Date().getHours();
   if (hour < 12) return { message: "Good Morning", icon: <Sun className="h-7 w-7 text-yellow-500" /> };
   if (hour < 18) return { message: "Good Afternoon", icon: <Cloud className="h-7 w-7 text-blue-400" /> };
   return { message: "Good Evening", icon: <Moon className="h-7 w-7 text-indigo-400" /> };
 };
 
-// Helper to generate mock details
 const generateMockPatientSubDetails = (name: string, baseInfo?: Partial<DetailedPatientInfo>): MockPatientSubDetails => {
   const randomAge = Math.floor(Math.random() * 60) + 20; // Age between 20 and 80
   const genders: Array<'Male' | 'Female' | 'Other'> = ['Male', 'Female'];
@@ -86,7 +85,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
   const mockPrescriptions = [
     { id: "RX001", patientName: "John Doe", drug: "Amoxicillin 250mg", timestamp: "2 mins ago", status: "Pending" },
-    { id: "RX002", patientName: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" }, // Corrected 'name' to 'patientName' for consistency
+    { id: "RX002", patientName: "Jane Smith", drug: "Ciprofloxacin 500mg", timestamp: "10 mins ago", status: "Sent" },
     { id: "RX003", patientName: "Robert Johnson", drug: "Azithromycin 500mg", timestamp: "35 mins ago", status: "Sent" },
   ];
 
@@ -112,7 +111,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
   return (
     <div className="space-y-8 p-1">
-      {/* Greeting Section */}
       <motion.div 
         className="bg-gradient-to-r from-medical-primary/80 to-medical-accent/80 dark:from-medical-primary/50 dark:to-medical-accent/50 p-6 rounded-xl shadow-lg flex items-center justify-between"
         initial="hidden"
@@ -130,7 +128,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </div>
       </motion.div>
 
-      {/* Metrics Section */}
        <motion.div 
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
         initial="hidden"
@@ -157,9 +154,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         ))}
       </motion.div>
 
-      {/* Heatmap and Critical Alerts Section */}
       <motion.div className="grid gap-6 lg:grid-cols-2" initial="hidden" animate="visible" variants={sectionVariants}>
-        {/* Geographic Resistance Heatmap Section */}
         <motion.div variants={cardVariants} whileHover="hover">
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
@@ -191,7 +186,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           </Card>
         </motion.div>
 
-        {/* Critical Alerts Section */}
         <motion.div variants={cardVariants} whileHover="hover">
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
@@ -228,9 +222,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </motion.div>
       </motion.div>
 
-
       <motion.div className="grid gap-6 lg:grid-cols-2" initial="hidden" animate="visible" variants={sectionVariants}>
-        {/* Next Patients Section */}
         <motion.div variants={cardVariants} whileHover="hover">
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
@@ -283,7 +275,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
           </Card>
         </motion.div>
 
-        {/* Recent Prescription Activity Section */}
         <motion.div variants={cardVariants} whileHover="hover">
           <Card className="shadow-lg lg:col-span-1 h-full">
             <CardHeader>
@@ -310,7 +301,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName || rx.name}</p>
+                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{rx.patientName}</p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">{rx.drug}</p>
                       </div>
                       <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -341,8 +332,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </motion.div>
       </motion.div>
 
-      {/* Active Patient Tracker Section */}
-      <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
+       <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="text-xl text-gray-800 dark:text-white flex items-center">
@@ -415,7 +405,6 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         </Card>
       </motion.div>
 
-      {/* Search Term display */}
        {searchTerm && (
         <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400">
           Search term active: <span className="font-semibold">{searchTerm}</span>. Results are filtered.

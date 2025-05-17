@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -75,14 +74,15 @@ const mockHistoryEvents: HistoryEvent[] = [
     type: 'Consultation',
     title: 'Cardiology Consultation',
     details: 'Referred for palpitations. ECG normal. Advised lifestyle modifications.',
-    icon: User,
+    icon: User, // Using User icon from lucide-react
     physician: 'Dr. Ben Carter (Cardiologist)',
   },
 ];
 
+
 interface PatientHistoryTabProps {
-  searchTerm?: string; // For potential future filtering
-  patientId?: string; // For loading specific patient data in the future
+  searchTerm?: string;
+  patientId?: string;
 }
 
 export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm, patientId }) => {
@@ -91,7 +91,8 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
   const historyEvents = mockHistoryEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Filter logic can be added here if searchTerm is used
-  const filteredEvents = historyEvents; // Placeholder
+  const filteredEvents = historyEvents;
+
 
   return (
     <div className="space-y-6">
@@ -143,11 +144,11 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
                           </div>
                           <Badge variant={
                             event.type === 'Diagnosis' ? 'destructive' :
-                            event.type === 'Prescription' ? 'default' : // 'default' is often blue/primary
+                            event.type === 'Prescription' ? 'default' :
                             event.type === 'Lab Result' ? 'secondary' :
                             event.type === 'Vital Sign' ? 'outline' :
-                            event.type === 'Consultation' ? 'info' : // Custom variant, if available
-                            'outline' // Fallback
+                            event.type === 'Consultation' ? 'secondary' : // Changed "info" to "secondary"
+                            'outline'
                           } className="capitalize whitespace-nowrap">
                             {event.type}
                           </Badge>
