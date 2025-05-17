@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
@@ -31,15 +30,18 @@ const AdminDashboard = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam && tabParam !== activeTab) { // ensure tabParam is valid and different
+    // Add "history" to the list of valid tabs
+    const validTabs = ["dashboard", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines", "history"];
+    if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
       setActiveTab(tabParam);
-    } else if (!tabParam) {
-      navigate(`/admin?tab=${activeTab}`, { replace: true });
+    } else if (!tabParam || !validTabs.includes(tabParam)) {
+      // Default to dashboard if tab is invalid or not present
+      navigate(`/admin?tab=dashboard`, { replace: true });
+      if (activeTab !== "dashboard") setActiveTab("dashboard");
     }
   }, []); 
 
   useEffect(() => {
-    // Only update URL if it's different, to prevent loops
     const currentSearch = new URLSearchParams(window.location.search);
     if (currentSearch.get('tab') !== activeTab) {
       navigate(`/admin?tab=${activeTab}`, { replace: true });
@@ -69,6 +71,7 @@ const AdminDashboard = () => {
       else if (lowerSearchTerm.includes("guide") || lowerSearchTerm.includes("protocol")) setActiveTab("guidelines");
       else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) setActiveTab("effectiveness");
       else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) setActiveTab("education");
+      else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) setActiveTab("history"); // Added history search
     }
   };
 
@@ -77,6 +80,10 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 overflow-hidden">
       <div className="hidden lg:block">
+        {/* AdminSidebar would ideally be updated here to include a "Patient History" link,
+            but it's not in the allowed files. You'll need to update it manually
+            or let me know if it becomes available for editing.
+            It should navigate to ?tab=history */}
         <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
       
@@ -85,6 +92,7 @@ const AdminDashboard = () => {
         onOpenChange={setIsMobileMenuOpen}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        // Similarly, MobileMenuSheet would need a "Patient History" item.
       />
 
       <SettingsDialog
@@ -134,4 +142,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
