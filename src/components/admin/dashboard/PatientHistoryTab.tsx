@@ -1,12 +1,12 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Stethoscope, Pill, FileText, Activity, User as UserIconLucide, ShieldAlert, TestTube2 } from 'lucide-react';
+import { CalendarDays, Stethoscope, Pill, FileText, Activity, User as UserIconLucide, ShieldAlert, TestTube2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { HistoryEventCard } from './HistoryEventCard'; // New component
+import { Button } from "@/components/ui/button"; // Import Button
+import { HistoryEventCard } from './HistoryEventCard';
 
 // --- Enhanced Data Interfaces ---
 interface PatientSummary {
@@ -247,19 +247,46 @@ interface PatientHistoryTabProps {
 export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm: initialSearchTerm, patientId: initialPatientId }) => {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [currentSearch, setCurrentSearch] = useState(initialSearchTerm || "");
+  const [currentPatientIndex, setCurrentPatientIndex] = useState<number>(-1);
 
   useEffect(() => {
+    let patientToSelectId: string | null = null;
+
     if (initialPatientId && allMockPatients.some(p => p.id === initialPatientId)) {
-      setSelectedPatientId(initialPatientId);
-    } else if (allMockPatients.length > 0) {
-      // If no specific patient is selected via prop, or if the prop ID is invalid,
-      // select the first patient by default, but only if no patient is currently selected
-      // or if the current selection is invalid.
-      if (!selectedPatientId || !allMockPatients.some(p => p.id === selectedPatientId)) {
-        setSelectedPatientId(allMockPatients[0].id);
-      }
+      patientToSelectId = initialPatientId;
+    } else if (allMockPatients.length > 0 && (!selectedPatientId || !allMockPatients.some(p => p.id === selectedPatientId))) {
+      patientToSelectId = allMockPatients[0].id;
+    } else if (selectedPatientId) {
+      patientToSelectId = selectedPatientId; // Keep current selection if valid
     }
-  }, [initialPatientId, selectedPatientId]); // Removed allMockPatients from dep array as it's constant
+
+    if (patientToSelectId) {
+      setSelectedPatientId(patientToSelectId);
+      const patientIndex = allMockPatients.findIndex(p => p.id === patientToSelectId);
+      setCurrentPatientIndex(patientIndex);
+    }
+  }, [initialPatientId]); // Removed selectedPatientId and allMockPatients from deps as they are handled or constant
+
+  const handlePatientSelection = useCallback((patientId: string) => {
+    setSelectedPatientId(patientId);
+    const patientIndex = allMockPatients.findIndex(p => p.id === patientId);
+    setCurrentPatientIndex(patientIndex);
+    setCurrentSearch(""); // Clear search on patient change
+  }, []);
+
+  const handleNextPatient = () => {
+    if (currentPatientIndex < allMockPatients.length - 1) {
+      const nextPatientIndex = currentPatientIndex + 1;
+      handlePatientSelection(allMockPatients[nextPatientIndex].id);
+    }
+  };
+
+  const handlePreviousPatient = () => {
+    if (currentPatientIndex > 0) {
+      const prevPatientIndex = currentPatientIndex - 1;
+      handlePatientSelection(allMockPatients[prevPatientIndex].id);
+    }
+  };
 
   const currentPatient = allMockPatients.find(p => p.id === selectedPatientId);
   
@@ -321,19 +348,44 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ searchTerm
                 ID: {currentPatient.id} &bull; Age: {currentPatient.age} &bull; Gender: {currentPatient.gender} &bull; DOB: {currentPatient.dob} {currentPatient.bloodType && `• Blood Type: ${currentPatient.bloodType}`}
               </CardDescription>
             </div>
-            <div className="w-full lg:w-72">
-              <Select value={selectedPatientId || ""} onValueChange={(id) => {setSelectedPatientId(id); setCurrentSearch("");}}>
-                <SelectTrigger className="w-full text-base py-3 shadow-sm">
-                  <SelectValue placeholder="Change patient..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {allMockPatients.map(patient => (
-                    <SelectItem key={patient.id} value={patient.id} className="py-2">
-                      {patient.name} (ID: {patient.id})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-2 w-full lg:w-auto">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={handlePreviousPatient} 
+                disabled={currentPatientIndex <= 0}
+                aria-label="Previous Patient"
+                className="h-11 w-11 shadow-sm"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex-grow lg:w-72">
+                <Select 
+                  value={selectedPatientId || ""} 
+                  onValueChange={handlePatientSelection}
+                >
+                  <SelectTrigger className="w-full text-base py-3 shadow-sm h-11">
+                    <SelectValue placeholder="Change patient..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allMockPatients.map(patient => (
+                      <SelectItem key={patient.id} value={patient.id} className="py-2">
+                        {patient.name} (ID: {patient.id})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={handleNextPatient} 
+                disabled={currentPatientIndex >= allMockPatients.length - 1}
+                aria-label="Next Patient"
+                className="h-11 w-11 shadow-sm"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
             </div>
           </div>
           <div className="mt-6">
