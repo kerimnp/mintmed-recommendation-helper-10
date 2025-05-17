@@ -11,7 +11,8 @@ import {
   Users,
   PillIcon,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  History
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
+    { id: "history", label: "Patient History", icon: History, description: "View patient medical history" },
     { id: "antibiotics", label: "Antibiotics", icon: Shield, description: "Antibiotic guidelines and usage" },
     { id: "effectiveness", label: "Effectiveness", icon: PieChart, description: "Treatment effectiveness data" },
     { id: "resistance", label: "Resistance", icon: Microscope, description: "Resistance pattern mapping" },
@@ -89,6 +91,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
                     : ""
                 )}
                 onClick={() => setActiveTab(item.id)}
+                title={item.description}
               >
                 <item.icon className="h-4 w-4 mr-3" />
                 {item.label}
