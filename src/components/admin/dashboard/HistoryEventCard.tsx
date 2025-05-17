@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { HistoryEvent } from './PatientHistoryTab'; // Import the type from PatientHistoryTab
+// Update this import path
+import { HistoryEvent } from './patient-history/types'; 
 import { cn } from '@/lib/utils';
 
 interface HistoryEventCardProps {
