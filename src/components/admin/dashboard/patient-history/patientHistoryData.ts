@@ -1,4 +1,3 @@
-
 import { User, CalendarDays, Activity, Pill, TestTube2, ShieldAlert, FileText, Users, HeartPulse, Stethoscope } from 'lucide-react';
 import { HistoryEvent, PatientSummary, PrescriptionEvent, LabResultEvent, VitalSignEvent, ConsultationEvent, DiagnosisEvent, NoteEvent } from './types';
 
@@ -102,7 +101,7 @@ trackedPatientsData.forEach(tp => {
     { id: `${tp.id}-diag1`, date: generateRandomDate(2024,2024), title: `Diagnosis: ${tp.condition}`, type: 'Diagnosis', icon: ShieldAlert, physician: 'Dr. System Overview', details: { condition: tp.condition, severity: tp.risk === 'high' ? 'Severe' : tp.risk === 'medium' ? 'Moderate' : 'Mild', assessment: `Patient status: ${tp.status}. Last update: ${tp.lastUpdate}.` } },
     { id: `${tp.id}-consult1`, date: generateRandomDate(2024,2024), title: 'Initial Review', type: 'Consultation', icon: Stethoscope, physician: 'Dr. A. Manager', details: { specialty: 'Internal Medicine', reason: `Monitoring for ${tp.condition}`, findings: `Patient is ${tp.status}.`, recommendations: 'Continue observation.' } },
     { id: `${tp.id}-rx1`, date: generateRandomDate(2024,2024), title: 'Generic Prophylactic', type: 'Prescription', icon: Pill, physician: 'Dr. A. Manager', details: { drugName: 'Multivitamin', dosage: '1 tablet', route: 'Oral', frequency: 'Once daily', duration: '30 days', reason: 'General Health', instructions: 'Take with meal.' } },
-    { id: `${tp.id}-lab1`, date: generateRandomDate(2024,2024), title: 'Baseline CBC', type: 'Lab Result', icon: TestTube2, physician: 'Dr. A. Manager', labName: 'Clinic Labs', details: [{testName: 'WBC', value: (Math.random()*6+4).toFixed(1), unit: 'x10^9/L', referenceRange: '4.0-10.0', interpretation: 'Normal'}]} ],
+    { id: `${tp.id}-lab1`, date: generateRandomDate(2024,2024), title: 'Baseline CBC', type: 'Lab Result', icon: TestTube2, physician: 'Dr. A. Manager', labName: 'Clinic Labs', details: [{testName: 'WBC', value: (Math.random()*6+4).toFixed(1), unit: 'x10^9/L', referenceRange: '4.0-10.0', interpretation: 'Normal'}] },
     { id: `${tp.id}-vital1`, date: generateRandomDate(2024,2024), title: 'Routine Vitals', type: 'Vital Sign', icon: HeartPulse, physician: 'Nurse B. Keeper', details: { bloodPressure: '120/80 mmHg', heartRate: '75 bpm', temperature: '37.0 C', oxygenSaturation: '98%', weight: `${(Math.random()*30+50).toFixed(1)} kg` } },
   ];
 });
@@ -227,4 +226,3 @@ if (allMockHistoryEvents['pat2']) {
     );
     allMockHistoryEvents['pat2'].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
-
