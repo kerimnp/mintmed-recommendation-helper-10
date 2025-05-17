@@ -1,18 +1,20 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Link is used in sub-components
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
+
+// Import new layout components
 import { AdminHeader } from "@/components/admin/dashboard/layout/AdminHeader";
 import { SettingsDialog } from "@/components/admin/dashboard/layout/SettingsDialog";
 import { MobileMenuSheet } from "@/components/admin/dashboard/layout/MobileMenuSheet";
 import { PageHeaderSection } from "@/components/admin/dashboard/layout/PageHeaderSection";
 import { AdminFooter } from "@/components/admin/dashboard/layout/AdminFooter";
-import { PrescriptionProvider } from "@/contexts/PrescriptionContext"; // Import the provider
 
-const AdminDashboardInternal = () => {
+const AdminDashboard = () => {
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -29,20 +31,20 @@ const AdminDashboardInternal = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam && tabParam !== activeTab) {
+    if (tabParam && tabParam !== activeTab) { // ensure tabParam is valid and different
       setActiveTab(tabParam);
-    } else if (!tabParam && activeTab) { // Ensure activeTab is not empty
+    } else if (!tabParam) {
       navigate(`/admin?tab=${activeTab}`, { replace: true });
     }
-  }, [activeTab, navigate]); // Rerun if activeTab changes or navigate changes
+  }, []); 
 
   useEffect(() => {
+    // Only update URL if it's different, to prevent loops
     const currentSearch = new URLSearchParams(window.location.search);
-    if (currentSearch.get('tab') !== activeTab && activeTab) { // Ensure activeTab is not empty
+    if (currentSearch.get('tab') !== activeTab) {
       navigate(`/admin?tab=${activeTab}`, { replace: true });
     }
   }, [activeTab, navigate]);
-
 
   const handleLogout = () => {
     toast({
@@ -131,13 +133,5 @@ const AdminDashboardInternal = () => {
   );
 };
 
-// New wrapper component
-const AdminDashboard = () => {
-  return (
-    <PrescriptionProvider>
-      <AdminDashboardInternal />
-    </PrescriptionProvider>
-  );
-};
-
 export default AdminDashboard;
+

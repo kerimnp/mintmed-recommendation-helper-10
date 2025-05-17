@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,7 @@ export interface MockPatientSubDetails {
 
 export interface DetailedPatientInfo {
   id: string;
-  name: string; // For general use, or combined patient name for prescriptions
-  patientName?: string; // Specifically for prescriptions if different from 'name'
+  name: string;
   source: 'active' | 'upcoming' | 'prescription';
   // Fields from existing data
   condition?: string; // For active patients
@@ -28,7 +28,6 @@ export interface DetailedPatientInfo {
   reason?: string; // For upcoming appointments
   priority?: string; // For upcoming appointments
   drug?: string; // For prescriptions
-  timestamp?: string; // For prescriptions - added to fix TS error
   // Fake expanded details
   mockDetails: MockPatientSubDetails;
 }
@@ -52,18 +51,17 @@ const DetailSection: React.FC<{ title: string; icon: React.ElementType; children
 export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient, isOpen, onClose }) => {
   if (!patient) return null;
 
-  const { name, source, condition, status, lastUpdate, risk, time, reason, priority, drug, mockDetails, timestamp, patientName } = patient;
-  const displayName = source === 'prescription' && patientName ? patientName : name;
+  const { name, source, condition, status, lastUpdate, risk, time, reason, priority, drug, mockDetails } = patient;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl max-h-[85vh] flex flex-col">
         <DialogHeader className="pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-medical-primary flex items-center">
-            <User className="h-7 w-7 mr-3" /> Patient Details: {displayName}
+            <User className="h-7 w-7 mr-3" /> Patient Details: {name}
           </DialogTitle>
           <DialogDescription className="text-sm text-gray-500 dark:text-gray-400">
-            Displaying comprehensive information for {displayName}.
+            Displaying comprehensive information for {name}.
           </DialogDescription>
         </DialogHeader>
         
@@ -94,7 +92,7 @@ export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient,
               <DetailSection title="Prescription Information" icon={Pill}>
                 <p><strong>Drug:</strong> {drug}</p>
                 <p><strong>Status:</strong> {status}</p>
-                <p><strong>Timestamp:</strong> {timestamp}</p> {/* Used timestamp here */}
+                <p><strong>Timestamp:</strong> {patient.timestamp}</p>
               </DetailSection>
             </>
           )}
@@ -162,3 +160,4 @@ export const PatientDetailModal: React.FC<PatientDetailModalProps> = ({ patient,
     </Dialog>
   );
 };
+
