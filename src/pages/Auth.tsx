@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle, User as UserIcon } from "lucide-react"; // Added UserIcon
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -18,44 +17,34 @@ const Auth = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user: authUser, signIn, signUp, signInWithGoogle } = useAuth(); // Renamed user to authUser to avoid conflict
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState(""); // New state for first name
+  const [lastName, setLastName] = useState(""); // New state for last name
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [error, setError] = useState<string | null>(null);
-  const { signIn, signUp, signInWithGoogle } = useAuth();
 
   useEffect(() => {
-    // Clear error when switching tabs
     setError(null);
-    
-    // Clear form fields when switching tabs
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+    setFirstName(""); // Clear first name on tab switch
+    setLastName(""); // Clear last name on tab switch
   }, [activeTab]);
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/");
-      }
-    });
+    // If user is already authenticated (e.g. from a previous session), redirect to home.
+    if (authUser) {
+      navigate("/");
+    }
+  }, [authUser, navigate]);
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session) {
-          navigate("/");
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +58,8 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await signIn(email, password);
-      // Successful login is handled by the auth state change listener
+      // Successful login is handled by the auth state change listener in AuthContext
+      // which will update authUser and trigger the useEffect above to navigate.
     } catch (error: any) {
       console.error("Sign in error:", error);
       setError(error.message || (language === "en" 
@@ -84,8 +74,8 @@ const Auth = () => {
     e.preventDefault();
     setError(null);
     
-    if (!email || !password) {
-      setError(language === "en" ? "Please enter email and password" : "Molimo unesite email i lozinku");
+    if (!email || !password || !firstName || !lastName) { // Check for first and last name
+      setError(language === "en" ? "Please fill in all fields" : "Molimo popunite sva polja");
       return;
     }
 
@@ -101,18 +91,15 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      await signUp(email, password);
-      toast({
-        title: language === "en" ? "Account created" : "Račun stvoren",
-        description: language === "en" 
-          ? "Please check your email to confirm your account" 
-          : "Molimo provjerite svoj email za potvrdu računa",
-      });
+      await signUp(email, password, { first_name: firstName, last_name: lastName }); // Pass metadata
+      // Toast for success/email verification is handled in AuthContext
+      // If "Confirm email" is off, onAuthStateChange will trigger SIGNED_IN and navigate
+      // If "Confirm email" is on, user stays on page, sees toast from AuthContext.
     } catch (error: any) {
       console.error("Sign up error:", error);
       setError(error.message || (language === "en" 
-        ? "Failed to create account. This email might already be in use." 
-        : "Neuspjelo stvaranje računa. Ovaj email možda već postoji."));
+        ? "Failed to create account. This email might already be in use or another error occurred." 
+        : "Neuspjelo stvaranje računa. Ovaj email možda već postoji ili je došlo do druge greške."));
     } finally {
       setIsLoading(false);
     }
@@ -123,27 +110,21 @@ const Auth = () => {
       setIsLoading(true);
       setError(null);
       
-      // Fix: use the current origin instead of hardcoded localhost
-      const currentOrigin = window.location.origin;
-      console.log("Current origin for redirect:", currentOrigin);
+      await signInWithGoogle();
+      // Success is handled by the auth state change listener in AuthContext.
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${currentOrigin}/auth`
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Success is handled by the auth state change listener
     } catch (error: any) {
       console.error("Google sign in error:", error);
       setError(error.message || (language === "en" 
         ? "Failed to sign in with Google. Please try again." 
         : "Prijava putem Googlea nije uspjela. Molimo pokušajte ponovno."));
-      setIsLoading(false);
+      setIsLoading(false); // Ensure loading is set to false on error
     }
+    // No finally setIsLoading(false) here, as navigation might occur before it runs.
+    // AuthContext handles loading state for async auth operations.
+    // This local isLoading is more for the button's visual state.
+    // If Google sign-in pops a new window and returns, onAuthStateChange handles it.
+    // If it fails before redirect, error is caught.
   };
 
   return (
@@ -271,6 +252,39 @@ const Auth = () => {
 
               <TabsContent value="register">
                 <form onSubmit={handleEmailSignUp} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="first-name" className="text-sm font-medium">{language === "en" ? "First Name" : "Ime"}</Label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="first-name"
+                          type="text"
+                          placeholder={language === "en" ? "Enter your first name" : "Unesite svoje ime"}
+                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="last-name" className="text-sm font-medium">{language === "en" ? "Last Name" : "Prezime"}</Label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="last-name"
+                          type="text"
+                          placeholder={language === "en" ? "Enter your last name" : "Unesite svoje prezime"}
+                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="register-email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
                     <div className="relative">
