@@ -39,8 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (event === 'SIGNED_IN' && currentSession) {
           console.log('User signed in:', currentSession.user);
-          // Defer profile fetch to avoid deadlocks, if needed later
-          // setTimeout(() => fetchUserProfile(currentSession.user.id), 0);
           toast({
             title: language === 'en' ? 'Signed in successfully!' : 'Uspješna prijava!',
             description: language === 'en' 
@@ -63,8 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ? 'You have been signed out successfully.'
               : 'Uspješno ste odjavljeni.',
           });
-          // Optionally navigate to login or home page after sign out
-          // navigate('/auth'); 
+          navigate('/auth'); // Navigate to auth page on sign out
         }
         
         if (event === 'PASSWORD_RECOVERY') {
@@ -188,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Sign out error:', error);
         throw error;
       }
-      // State updates (setUser(null), setSession(null)) are handled by onAuthStateChange
+      // State updates (setUser(null), setSession(null)) and navigation are handled by onAuthStateChange
     } catch (error: any) {
       toast({
         title: language === 'en' ? 'Error signing out' : 'Greška pri odjavi',

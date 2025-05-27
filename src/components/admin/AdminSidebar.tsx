@@ -18,8 +18,8 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "@/components/ui/use-toast";
-// import { useAuth } from "@/contexts/AuthContext"; // Import if needed for dynamic user info
+import { toast as shadcnToast } from "@/components/ui/use-toast"; // Renamed to avoid conflict if useToast is used locally
+import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -28,7 +28,7 @@ interface AdminSidebarProps {
 
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
   const { theme } = useTheme();
-  // const { signOut } = useAuth(); // Uncomment if using context signOut
+  const { signOut, user } = useAuth(); // Get signOut from AuthContext
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
@@ -42,13 +42,10 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
   ];
 
   const handleLogout = async () => {
-    // await signOut(); // Use this if integrating with AuthContext signOut
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account.",
-    });
-    // Navigate to home page
-    setTimeout(() => window.location.href = "/", 500); // Consider using useNavigate from react-router-dom
+    if (signOut) {
+      await signOut();
+    }
+    // Navigation is handled by AuthContext's onAuthStateChange
   };
 
   return (
@@ -65,7 +62,9 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           />
           <div className="hidden lg:flex flex-col">
             <span className="font-medium">Horalix Admin</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Control Panel</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {user?.email ? user.email : 'Control Panel'}
+            </span>
           </div>
         </Link>
         
@@ -106,7 +105,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
               variant="ghost" 
               className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
               onClick={() => {
-                toast({
+                shadcnToast({ // Use renamed import
                   title: "User Management",
                   description: "User management will be implemented soon.",
                 });
@@ -120,7 +119,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
               variant="ghost" 
               className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
               onClick={() => {
-                toast({
+                shadcnToast({ // Use renamed import
                   title: "Settings",
                   description: "Settings will be implemented soon.",
                 });
@@ -155,7 +154,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           <Button 
             variant="ghost" 
             className="justify-start w-full rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-            onClick={handleLogout}
+            onClick={handleLogout} // Use updated handleLogout
           >
             <LogOut className="h-4 w-4 mr-3" />
             Log out
