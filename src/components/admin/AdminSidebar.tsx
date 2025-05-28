@@ -8,8 +8,7 @@ import {
   MapPin, 
   BookOpen, 
   Home,
-  // Settings, // Settings is handled by AdminHeader dialog
-  Users, // For User Management
+  Users, 
   PillIcon,
   LogOut,
   LayoutDashboard,
@@ -19,7 +18,6 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-// import { toast as shadcnToast } from "@/components/ui/use-toast"; // Not needed anymore for old buttons
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AdminSidebarProps {
@@ -28,6 +26,8 @@ interface AdminSidebarProps {
 }
 
 // Export navItems so MobileMenuSheet (if modified) can use it
+// This original navItems array is still exported for potential use by other components like MobileMenuSheet.
+// The filtering specifically for AdminSidebar will happen within the component.
 export const navItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
   { id: "history", label: "Patient History", icon: History, description: "View patient medical history" },
@@ -49,6 +49,14 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
       await signOut();
     }
   };
+
+  // Filter navItems based on user's email for display within this component
+  const displayedNavItems = navItems.filter(item => {
+    if (item.id === "user-management") {
+      return user?.email === 'kerim@horalix.com';
+    }
+    return true;
+  });
 
   return (
     <aside className="fixed top-0 left-0 right-0 z-20 lg:relative lg:top-auto lg:left-auto lg:right-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b lg:border-r lg:border-b-0 border-gray-200 dark:border-gray-800 h-full">
@@ -81,7 +89,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           <p className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">Main Navigation</p>
           
           <div className="space-y-1">
-            {navItems.map((item) => (
+            {displayedNavItems.map((item) => (
               <Button 
                 key={item.id}
                 variant="ghost"
@@ -99,13 +107,10 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
               </Button>
             ))}
           </div>
-          
-          {/* Removed the old Administration section with toast buttons */}
-          {/* Settings can be accessed from the header */}
         </div>
         
         <div className="lg:hidden flex justify-around overflow-x-auto no-scrollbar py-2">
-          {navItems.map((item) => ( // Assuming mobile menu will use the same navItems structure
+          {displayedNavItems.map((item) => ( 
             <Button 
               key={item.id}
               variant="ghost"
@@ -143,4 +148,3 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
     </aside>
   );
 };
-

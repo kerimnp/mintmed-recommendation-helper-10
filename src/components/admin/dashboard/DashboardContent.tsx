@@ -9,7 +9,10 @@ import { EducationTab } from "./EducationTab";
 import { ClinicalGuidelines } from "../ClinicalGuidelines";
 import { MainDashboardTab } from "./MainDashboardTab";
 import { PatientHistoryTab } from "./PatientHistoryTab";
-import { UserManagementTab } from "./UserManagementTab"; // Import the new tab
+import { UserManagementTab } from "./UserManagementTab";
+import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle } from "lucide-react";
 
 interface DashboardContentProps {
   activeTab: string;
@@ -20,6 +23,27 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   activeTab,
   searchTerm = "" 
 }) => {
+  const { user } = useAuth(); // Get user from AuthContext
+  const isUserManagementAuthorized = user?.email === 'kerim@horalix.com';
+
+  const renderUserManagementTab = () => {
+    if (isUserManagementAuthorized) {
+      return <UserManagementTab searchTerm={searchTerm} />;
+    }
+    return (
+      <Card className="mt-4 border-destructive bg-destructive/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle size={24} /> Access Denied
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>You do not have permission to access the User Management section.</p>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="w-full">
       {activeTab === "dashboard" && <MainDashboardTab searchTerm={searchTerm} />}
@@ -31,8 +55,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {activeTab === "education" && <EducationTab searchTerm={searchTerm} />}
       {activeTab === "clinical-guidelines" && <ClinicalGuidelines searchTerm={searchTerm} />}
       {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />}
-      {activeTab === "user-management" && <UserManagementTab searchTerm={searchTerm} />} {/* Add new tab */}
+      {activeTab === "user-management" && renderUserManagementTab()}
     </div>
   );
 };
-
