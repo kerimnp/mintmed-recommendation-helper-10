@@ -9,6 +9,190 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      antibiotic_recommendations: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          id: string
+          input_data: Json
+          is_accepted: boolean | null
+          notes: string | null
+          patient_id: string | null
+          prescription_id: string | null
+          recommendation_details: Json
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          id?: string
+          input_data: Json
+          is_accepted?: boolean | null
+          notes?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          recommendation_details: Json
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          input_data?: Json
+          is_accepted?: boolean | null
+          notes?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          recommendation_details?: Json
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "antibiotic_recommendations_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "antibiotic_recommendations_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "antibiotic_recommendations_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          address: string | null
+          allergies: Json | null
+          blood_type: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          date_of_birth: string
+          first_name: string
+          gender: string | null
+          id: string
+          known_conditions: Json | null
+          last_name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          allergies?: Json | null
+          blood_type?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          date_of_birth: string
+          first_name: string
+          gender?: string | null
+          id?: string
+          known_conditions?: Json | null
+          last_name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          allergies?: Json | null
+          blood_type?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          date_of_birth?: string
+          first_name?: string
+          gender?: string | null
+          id?: string
+          known_conditions?: Json | null
+          last_name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prescriptions: {
+        Row: {
+          antibiotic_name: string
+          created_at: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          end_date: string | null
+          frequency: string
+          id: string
+          notes: string | null
+          patient_id: string
+          reason_for_prescription: string | null
+          route: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          antibiotic_name: string
+          created_at?: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          end_date?: string | null
+          frequency: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reason_for_prescription?: string | null
+          route: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          antibiotic_name?: string
+          created_at?: string
+          doctor_id?: string
+          dosage?: string
+          duration?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reason_for_prescription?: string | null
+          route?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
