@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast"; 
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DashboardContent } from "@/components/admin/dashboard/DashboardContent";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom"; 
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,12 +19,14 @@ const AdminDashboard = () => {
   const { user, session, loading: authLoading, signOut } = useAuth();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation to get current URL parameters
+
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
 
   const isUserManagementAuthorized = user?.email === 'kerim@horalix.com';
 
@@ -41,39 +43,41 @@ const AdminDashboard = () => {
     }
   }, [authLoading, session, navigate]);
 
+  // Effect to synchronize activeTab state with URL
   useEffect(() => {
     if (session) { // Ensure session exists before trying to manage tabs
-      const urlParams = new URLSearchParams(window.location.search);
-      const tabParam = urlParams.get('tab');
+      const urlParams = new URLSearchParams(location.search);
+      let tabParam = urlParams.get('tab');
 
       if (tabParam === "user-management" && !isUserManagementAuthorized) {
-        // If trying to access user-management without auth, redirect to dashboard
         toast({ title: "Access Denied", description: "You are not authorized to view User Management.", variant: "destructive" });
+        tabParam = "dashboard"; // Fallback to dashboard
         navigate(`/admin?tab=dashboard`, { replace: true });
-        if (activeTab !== "dashboard") setActiveTab("dashboard");
-      } else if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
-        setActiveTab(tabParam);
       } else if (!tabParam || !validTabs.includes(tabParam)) {
-        // If no valid tab in URL, default to dashboard
+        tabParam = "dashboard"; // Default to dashboard if tab is invalid or missing
         navigate(`/admin?tab=dashboard`, { replace: true });
-        if (activeTab !== "dashboard") setActiveTab("dashboard");
+      }
+      
+      if (tabParam !== activeTab) {
+        setActiveTab(tabParam);
       }
     }
-  }, [session, navigate, activeTab, isUserManagementAuthorized, validTabs, toast]); 
+  }, [session, location.search, navigate, activeTab, isUserManagementAuthorized, validTabs, toast]);
 
-  useEffect(() => {
-    if (session) { 
-        const currentSearch = new URLSearchParams(window.location.search);
-        if (currentSearch.get('tab') !== activeTab) {
-            // Ensure we don't navigate to user-management if not authorized
-            if (activeTab === "user-management" && !isUserManagementAuthorized) {
-              navigate(`/admin?tab=dashboard`, { replace: true });
-            } else {
-              navigate(`/admin?tab=${activeTab}`, { replace: true });
-            }
-        }
+  // Callback to handle tab changes from UI (e.g., sidebar)
+  const handleSetActiveTab = useCallback((newTab: string) => {
+    if (newTab === "user-management" && !isUserManagementAuthorized) {
+      toast({ title: "Access Denied", description: "You are not authorized to view User Management.", variant: "destructive" });
+      // Optionally navigate to dashboard or do nothing to prevent URL change
+      navigate(`/admin?tab=dashboard`, { replace: true });
+      setActiveTab("dashboard"); // Ensure state matches
+      return;
     }
-  }, [activeTab, navigate, session, isUserManagementAuthorized]);
+    if (validTabs.includes(newTab)) {
+      setActiveTab(newTab);
+      navigate(`/admin?tab=${newTab}`, { replace: true });
+    }
+  }, [navigate, isUserManagementAuthorized, validTabs, toast]);
 
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
@@ -85,16 +89,15 @@ const AdminDashboard = () => {
       });
       const lowerSearchTerm = searchTerm.toLowerCase();
       // This search logic mainly navigates. The actual filtering is done within tabs.
-      if (lowerSearchTerm.includes("dashboard")) setActiveTab("dashboard");
-      else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && isUserManagementAuthorized) setActiveTab("user-management");
-      else if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) setActiveTab("antibiotics");
-      else if (lowerSearchTerm.includes("resist") || lowerSearchTerm.includes("pattern")) setActiveTab("resistance");
-      else if (lowerSearchTerm.includes("region") || lowerSearchTerm.includes("local")) setActiveTab("regional");
-      else if (lowerSearchTerm.includes("guide") || lowerSearchTerm.includes("protocol")) setActiveTab("guidelines");
-      else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) setActiveTab("effectiveness");
-      else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) setActiveTab("education");
-      else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) setActiveTab("history");
-      // If search for "user" or "member" but not authorized, don't switch tab or provide feedback
+      if (lowerSearchTerm.includes("dashboard")) handleSetActiveTab("dashboard");
+      else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && isUserManagementAuthorized) handleSetActiveTab("user-management");
+      else if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) handleSetActiveTab("antibiotics");
+      else if (lowerSearchTerm.includes("resist") || lowerSearchTerm.includes("pattern")) handleSetActiveTab("resistance");
+      else if (lowerSearchTerm.includes("region") || lowerSearchTerm.includes("local")) handleSetActiveTab("regional");
+      else if (lowerSearchTerm.includes("guide") || lowerSearchTerm.includes("protocol")) handleSetActiveTab("guidelines");
+      else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) handleSetActiveTab("effectiveness");
+      else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) handleSetActiveTab("education");
+      else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) handleSetActiveTab("history");
       else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && !isUserManagementAuthorized) {
         toast({ title: "Access Denied", description: "User management search is restricted.", variant: "destructive" });
       }
@@ -113,27 +116,20 @@ const AdminDashboard = () => {
     return null; 
   }
   
-  // Final check before rendering content
-  if (activeTab === "user-management" && !isUserManagementAuthorized && !authLoading && session) {
-     // This case should ideally be caught by useEffect redirecting, but as a fallback:
-     console.warn("Attempted to render user-management without authorization. ActiveTab was: ", activeTab);
-     // To prevent flicker or brief rendering of denied content, we could navigate here too,
-     // but useEffect should handle it. For safety, we can ensure DashboardContent receives a safe tab.
-     // Or, more simply, DashboardContent itself will handle the final rendering denial.
-  }
-
+  // Ensure DashboardContent receives a safe tab, especially if redirection is pending
+  const currentDisplayTab = (activeTab === "user-management" && !isUserManagementAuthorized) ? "dashboard" : activeTab;
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 overflow-hidden">
       <div className="hidden lg:block">
-        <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <AdminSidebar activeTab={activeTab} setActiveTab={handleSetActiveTab} />
       </div>
       
       <MobileMenuSheet
         isOpen={isMobileMenuOpen}
         onOpenChange={setIsMobileMenuOpen}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleSetActiveTab}
       />
 
       <SettingsDialog
@@ -157,23 +153,23 @@ const AdminDashboard = () => {
         />
         
         <div className="flex-1 overflow-auto">
-          <div className={`max-w-full mx-auto ${(activeTab === 'history' || (activeTab === 'user-management' && isUserManagementAuthorized)) ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
+          <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized)) ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
             {user && (
-              <div className={`mb-4 p-2 bg-blue-50 dark:bg-slate-800 rounded text-sm text-blue-700 dark:text-blue-300 ${((activeTab === 'history' || (activeTab === 'user-management' && isUserManagementAuthorized))) ? 'mx-4 mt-4 md:mx-6 md:mt-6' : ''}`}>
+              <div className={`mb-4 p-2 bg-blue-50 dark:bg-slate-800 rounded text-sm text-blue-700 dark:text-blue-300 ${((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) ? 'mx-4 mt-4 md:mx-6 md:mt-6' : ''}`}>
                 Logged in as: {user.email} 
                 {user.user_metadata?.first_name && ` (${user.user_metadata.first_name} ${user.user_metadata.last_name || ''})`}
               </div>
             )}
             <motion.div 
-              key={activeTab} 
+              key={currentDisplayTab} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className={((activeTab === 'history' || (activeTab === 'user-management' && isUserManagementAuthorized))) ? '' : 'space-y-6'}
+              className={((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) ? '' : 'space-y-6'}
             >
-              {(!(activeTab === 'history' || (activeTab === 'user-management' && isUserManagementAuthorized))) && (
+              {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) && (
                 <PageHeaderSection
-                  activeTab={activeTab}
+                  activeTab={currentDisplayTab}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
                   handleSearch={handleSearch}
@@ -181,9 +177,9 @@ const AdminDashboard = () => {
                 />
               )}
               
-              <DashboardContent activeTab={activeTab} searchTerm={searchTerm} />
+              <DashboardContent activeTab={currentDisplayTab} searchTerm={searchTerm} />
             </motion.div>
-            {(!(activeTab === 'history' || (activeTab === 'user-management' && isUserManagementAuthorized))) && <AdminFooter />}
+            {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) && <AdminFooter />}
           </div>
         </div>
       </main>
@@ -192,3 +188,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
