@@ -8,7 +8,8 @@ import { GuidelinesTab } from "./GuidelinesTab";
 import { EducationTab } from "./EducationTab";
 import { ClinicalGuidelines } from "../ClinicalGuidelines";
 import { MainDashboardTab } from "./MainDashboardTab";
-import { PatientHistoryTab } from "./PatientHistoryTab"; // Import the new tab
+import { PatientHistoryTab } from "./PatientHistoryTab";
+import { UserManagementTab } from "./UserManagementTab"; // Import the new tab
 
 interface DashboardContentProps {
   activeTab: string;
@@ -29,7 +30,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {activeTab === "guidelines" && <GuidelinesTab searchTerm={searchTerm} />}
       {activeTab === "education" && <EducationTab searchTerm={searchTerm} />}
       {activeTab === "clinical-guidelines" && <ClinicalGuidelines searchTerm={searchTerm} />}
-      {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />} {/* Add new tab */}
+      {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />}
+      {activeTab === "user-management" && <UserManagementTab searchTerm={searchTerm} />} {/* Add new tab */}
     </div>
   );
 };
+

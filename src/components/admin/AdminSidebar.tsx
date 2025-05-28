@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -7,8 +8,8 @@ import {
   MapPin, 
   BookOpen, 
   Home,
-  Settings,
-  Users,
+  // Settings, // Settings is handled by AdminHeader dialog
+  Users, // For User Management
   PillIcon,
   LogOut,
   LayoutDashboard,
@@ -18,34 +19,35 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { toast as shadcnToast } from "@/components/ui/use-toast"; // Renamed to avoid conflict if useToast is used locally
-import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
+// import { toast as shadcnToast } from "@/components/ui/use-toast"; // Not needed anymore for old buttons
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AdminSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
+// Export navItems so MobileMenuSheet (if modified) can use it
+export const navItems = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
+  { id: "history", label: "Patient History", icon: History, description: "View patient medical history" },
+  { id: "user-management", label: "User Management", icon: Users, description: "Manage users and roles"},
+  { id: "antibiotics", label: "Antibiotics", icon: Shield, description: "Antibiotic guidelines and usage" },
+  { id: "effectiveness", label: "Effectiveness", icon: PieChart, description: "Treatment effectiveness data" },
+  { id: "resistance", label: "Resistance", icon: Microscope, description: "Resistance pattern mapping" },
+  { id: "regional", label: "Regional", icon: MapPin, description: "Regional adaptation" },
+  { id: "education", label: "Education", icon: BookOpen, description: "Educational resources" },
+  { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
+];
+
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
   const { theme } = useTheme();
-  const { signOut, user } = useAuth(); // Get signOut from AuthContext
-
-  const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
-    { id: "history", label: "Patient History", icon: History, description: "View patient medical history" },
-    { id: "antibiotics", label: "Antibiotics", icon: Shield, description: "Antibiotic guidelines and usage" },
-    { id: "effectiveness", label: "Effectiveness", icon: PieChart, description: "Treatment effectiveness data" },
-    { id: "resistance", label: "Resistance", icon: Microscope, description: "Resistance pattern mapping" },
-    { id: "regional", label: "Regional", icon: MapPin, description: "Regional adaptation" },
-    { id: "education", label: "Education", icon: BookOpen, description: "Educational resources" },
-    { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
-  ];
+  const { signOut, user } = useAuth();
 
   const handleLogout = async () => {
     if (signOut) {
       await signOut();
     }
-    // Navigation is handled by AuthContext's onAuthStateChange
   };
 
   return (
@@ -98,41 +100,12 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
             ))}
           </div>
           
-          <div className="border-t border-gray-200 dark:border-gray-800 my-4 pt-4">
-            <p className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">Administration</p>
-            
-            <Button 
-              variant="ghost" 
-              className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
-              onClick={() => {
-                shadcnToast({ // Use renamed import
-                  title: "User Management",
-                  description: "User management will be implemented soon.",
-                });
-              }}
-            >
-              <Users className="h-4 w-4 mr-3" />
-              User Management
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              className="justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors"
-              onClick={() => {
-                shadcnToast({ // Use renamed import
-                  title: "Settings",
-                  description: "Settings will be implemented soon.",
-                });
-              }}
-            >
-              <Settings className="h-4 w-4 mr-3" />
-              Settings
-            </Button>
-          </div>
+          {/* Removed the old Administration section with toast buttons */}
+          {/* Settings can be accessed from the header */}
         </div>
         
         <div className="lg:hidden flex justify-around overflow-x-auto no-scrollbar py-2">
-          {navItems.map((item) => (
+          {navItems.map((item) => ( // Assuming mobile menu will use the same navItems structure
             <Button 
               key={item.id}
               variant="ghost"
@@ -154,7 +127,7 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           <Button 
             variant="ghost" 
             className="justify-start w-full rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-            onClick={handleLogout} // Use updated handleLogout
+            onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 mr-3" />
             Log out
@@ -170,3 +143,4 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
     </aside>
   );
 };
+
