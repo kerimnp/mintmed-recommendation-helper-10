@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
@@ -6,6 +5,8 @@ import { HistoryEvent, PatientSummary } from './patient-history/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertTriangle, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Json } from '@/integrations/supabase/types'; // Added import for Json
+import { differenceInYears } from 'date-fns'; // Added import for age calculation
 
 // Helper function to create a searchable string from event details (can be kept for future use)
 const getSearchableStringFromEvent = (event: HistoryEvent): string => {
@@ -39,8 +40,8 @@ interface PatientFromSupabase {
   contact_email?: string | null;
   address?: string | null;
   blood_type?: string | null;
-  allergies?: Json[] | null; // Assuming Json is string[] or similar
-  known_conditions?: Json[] | null; // Assuming Json is string[] or similar
+  allergies?: Json | null; // Corrected type from Json[] to Json
+  known_conditions?: Json | null; // Corrected type from Json[] to Json
   notes?: string | null;
 }
 
@@ -78,14 +79,30 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
           throw error;
         }
 
-        const mappedPatients: PatientSummary[] = data.map((p: PatientFromSupabase) => ({
-          id: p.id,
-          name: `${p.first_name} ${p.last_name}`,
-          dob: p.date_of_birth,
-          gender: mapGender(p.gender),
-          // Optional fields from PatientSummary are not directly available in patients table:
-          // lastVisit, primaryConcern, tags - these will be undefined
-        }));
+        const mappedPatients: PatientSummary[] = data.map((p: PatientFromSupabase) => {
+          let age = 0;
+          try {
+            // Ensure date_of_birth is a valid date string before parsing
+            if (p.date_of_birth && !isNaN(new Date(p.date_of_birth).getTime())) {
+              age = differenceInYears(new Date(), new Date(p.date_of_birth));
+            } else {
+              console.warn(`Invalid or missing date_of_birth for patient ${p.id}: ${p.date_of_birth}. Setting age to 0.`);
+            }
+          } catch (e) {
+            console.warn(`Error calculating age for patient ${p.id} with DOB ${p.date_of_birth}:`, e);
+          }
+          
+          return {
+            id: p.id,
+            name: `${p.first_name} ${p.last_name}`,
+            dob: p.date_of_birth,
+            age: age, // Added age calculation
+            gender: mapGender(p.gender),
+            // Optional fields from PatientSummary like bloodType, phone, email, address will be added if needed.
+            // For now, they default to undefined as per PatientSummary structure.
+            // Example: bloodType: p.blood_type || undefined, 
+          };
+        });
         setAllPatients(mappedPatients);
 
       } catch (err: any) {
