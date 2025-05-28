@@ -1,10 +1,9 @@
 import React from 'react';
 import { PatientSummary, HistoryEvent, ConsultationEvent, PrescriptionEvent, LabResultEvent, VitalSignEvent } from './types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search as SearchIcon, UserCircle2, CalendarDays, Activity, Pill, TestTube2, Users } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search as SearchIcon, UserCircle2, CalendarDays, Activity, Pill, TestTube2, Users, AlertTriangle, Loader2 } from 'lucide-react'; // Added AlertTriangle, Loader2
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-// Removed HistoryEventCard import here as it's used by GraphicalTimeline
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Breadcrumb,
@@ -16,11 +15,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Import new tab content components
 import { EncounterTable } from './details-tabs/EncounterTable';
 import { PrescriptionTable } from './details-tabs/PrescriptionTable';
 import { LabsAndVitalsDisplay } from './details-tabs/LabsAndVitalsDisplay';
-import { GraphicalTimeline } from './GraphicalTimeline'; // New import
+import { GraphicalTimeline } from './GraphicalTimeline';
 
 interface PatientDetailViewProps {
   patient: PatientSummary | undefined;
@@ -31,17 +29,21 @@ interface PatientDetailViewProps {
   allPatients: PatientSummary[];
   currentPatientId: string | null;
   onSelectPatient: (patientId: string) => void;
+  isLoadingHistory: boolean; // Added this prop
+  historyError: string | null; // Added this prop
 }
 
 export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
   patient,
-  historyEvents, // This is already filtered for timeline search by the parent
+  historyEvents,
   searchTerm,
   setSearchTerm,
   onClearPatientSelection,
   allPatients,
   currentPatientId,
-  onSelectPatient
+  onSelectPatient,
+  isLoadingHistory, // Destructure new prop
+  historyError, // Destructure new prop
 }) => {
 
   const currentPatientIndex = allPatients.findIndex(p => p.id === currentPatientId);
@@ -75,7 +77,6 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
   const labResultEvents = historyEvents.filter(event => event.type === 'Lab Result') as LabResultEvent[];
   const vitalSignEvents = historyEvents.filter(event => event.type === 'Vital Sign') as VitalSignEvent[];
   
-  // The `historyEvents` prop is already filtered for the timeline search
   const timelineFilteredEvents = historyEvents;
 
 
@@ -144,6 +145,7 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
             </CardContent>
           </Card>
 
+
           {/* Tabs for Detailed History */}
           <Tabs defaultValue="timeline" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-4 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-lg">
@@ -176,8 +178,20 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                         />
                     </div>
                 </CardHeader>
-                <CardContent className="p-0"> {/* Remove padding from CardContent if GraphicalTimeline handles its own */}
-                  {timelineFilteredEvents.length === 0 ? (
+                <CardContent className="p-0 min-h-[200px]"> {/* Added min-height for loading/error states */}
+                  {isLoadingHistory ? (
+                    <div className="flex flex-col items-center justify-center h-full py-12">
+                      <Loader2 className="h-12 w-12 animate-spin text-medical-primary" />
+                      <p className="mt-3 text-gray-600 dark:text-gray-400">Loading history events...</p>
+                    </div>
+                  ) : historyError ? (
+                    <div className="flex flex-col items-center justify-center h-full py-12 text-center px-6">
+                      <AlertTriangle className="h-12 w-12 text-destructive mb-3" />
+                      <p className="text-lg font-semibold text-destructive">Error Loading History</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{historyError}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Please try again or select another patient.</p>
+                    </div>
+                  ) : timelineFilteredEvents.length === 0 ? (
                     <div className="text-center py-12 px-6">
                       <FileText className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
                       <p className="text-xl font-semibold text-gray-600 dark:text-gray-300">
@@ -188,7 +202,6 @@ export const PatientDetailView: React.FC<PatientDetailViewProps> = ({
                       </p>
                     </div>
                   ) : (
-                    // Use the new GraphicalTimeline component
                     <GraphicalTimeline events={timelineFilteredEvents} />
                   )}
                 </CardContent>

@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
-import { HistoryEvent, PatientSummary } from './patient-history/types'; 
+import { HistoryEvent, PatientSummary, PrescriptionEvent } from './patient-history/types'; 
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, AlertTriangle, Users, FileText } from 'lucide-react'; // Added FileText for prescriptions
+import { Loader2, AlertTriangle, Users, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Json } from '@/integrations/supabase/types';
 import { differenceInYears } from 'date-fns';
-import { useAuth } from '@/contexts/AuthContext'; // To get logged-in user if needed for filtering
+import { useAuth } from '@/contexts/AuthContext';
 
 // Helper function to create a searchable string from event details (can be kept for future use)
 const getSearchableStringFromEvent = (event: HistoryEvent): string => {
   let searchableText = `${event.title} ${event.type} ${event.physician || ''} ${event.notes || ''}`;
 
-  if (typeof event.details === 'string') {
+  if (event.type === 'Prescription') {
+    const details = event.details as PrescriptionEvent['details'];
+    searchableText += ` ${details.drugName} ${details.dosage} ${details.route} ${details.frequency} ${details.duration} ${details.reason} ${details.instructions || ''}`;
+  } else if (typeof event.details === 'string') {
     searchableText += ` ${event.details}`;
   } else if (Array.isArray(event.details)) { 
     event.details.forEach(detail => {
@@ -41,8 +44,8 @@ interface PatientFromSupabase {
   contact_email?: string | null;
   address?: string | null;
   blood_type?: string | null;
-  allergies?: Json | null; // Corrected type from Json[] to Json
-  known_conditions?: Json | null; // Corrected type from Json[] to Json
+  allergies?: Json | null;
+  known_conditions?: Json | null;
   notes?: string | null;
 }
 
@@ -71,7 +74,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
 
-  const { user } = useAuth(); // Get current authenticated user
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -131,23 +134,19 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     }
   }, [initialPatientIdFromUrl, initialSearchTermFromUrl, allPatients, loadingPatients]);
 
-  // Fetch history events (prescriptions) for the selected patient
   useEffect(() => {
-    if (selectedPatientId && user) { // Ensure a patient is selected and user is available
+    if (selectedPatientId && user) {
       const fetchPatientHistory = async () => {
         setLoadingHistory(true);
         setHistoryError(null);
-        setSelectedPatientHistory([]); // Clear previous history
+        setSelectedPatientHistory([]);
         try {
-          // Fetch prescriptions for the selected patient
-          // For "real data from doctor", one might filter by doctor_id: .eq('doctor_id', user.id)
-          // For now, fetching all prescriptions for the patient.
           const { data: prescriptionsData, error: prescriptionsError } = await supabase
             .from('prescriptions')
             .select(`
               *,
               doctor:profiles (id, first_name, last_name, email)
-            `) // Fetch doctor details too
+            `)
             .eq('patient_id', selectedPatientId)
             .order('start_date', { ascending: false });
 
@@ -159,25 +158,25 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
             const doctorProfile = rx.doctor as {id: string, first_name: string | null, last_name: string | null, email: string | null} | null;
             const physicianName = doctorProfile ? `${doctorProfile.first_name || ''} ${doctorProfile.last_name || ''}`.trim() || doctorProfile.email || 'N/A' : 'N/A';
             
-            return ({
+            return { // This needs to be a PrescriptionEvent
               id: rx.id,
-              date: rx.start_date, // Or rx.created_at
+              date: rx.start_date, 
               type: 'Prescription',
               title: `Rx: ${rx.antibiotic_name}`,
               icon: FileText,
               details: {
-                Antibiotic: rx.antibiotic_name,
-                Dosage: rx.dosage,
-                Route: rx.route,
-                Frequency: rx.frequency,
-                Duration: rx.duration,
-                Status: rx.status,
-                Reason: rx.reason_for_prescription || 'N/A',
-                PrescribingDoctor: physicianName, // Add doctor's name
-                Notes: rx.notes || '',
+                drugName: rx.antibiotic_name,
+                dosage: rx.dosage,
+                route: rx.route,
+                frequency: rx.frequency,
+                duration: rx.duration,
+                reason: rx.reason_for_prescription || 'N/A',
+                instructions: rx.notes || undefined, // 'instructions' is optional
+                // Removed Status and PrescribingDoctor from here as they are not in PrescriptionEvent['details']
               },
-              physician: physicianName, // Store physician name directly
-            })
+              physician: physicianName, // physician is a top-level property in BaseHistoryEvent
+              notes: rx.status ? `Status: ${rx.status}` : undefined, // Can add status to general notes if needed, or modify type
+            } as PrescriptionEvent; // Explicitly cast to PrescriptionEvent
           });
           
           setSelectedPatientHistory(historyEvents);
@@ -192,9 +191,9 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
 
       fetchPatientHistory();
     } else {
-      setSelectedPatientHistory([]); // Clear history if no patient is selected
+      setSelectedPatientHistory([]);
     }
-  }, [selectedPatientId, user]); // Rerun when selectedPatientId or user changes
+  }, [selectedPatientId, user]);
 
   const handleSelectPatient = useCallback((patientId: string) => {
     setSelectedPatientId(patientId);
@@ -216,7 +215,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
       if (!eventSearchTerm) return true;
       return getSearchableStringFromEvent(event).includes(eventSearchTerm.toLowerCase());
     })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Already sorted by query, but good to have client-side sort too
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const mainContentHeight = "calc(100vh - 4rem)"; 
 
@@ -275,8 +274,8 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         allPatients={allPatients} 
         currentPatientId={selectedPatientId}
         onSelectPatient={handleSelectPatient}
-        isLoadingHistory={loadingHistory} // Pass loading state
-        historyError={historyError} // Pass error state
+        isLoadingHistory={loadingHistory} 
+        historyError={historyError} 
       />
     </div>
   );
