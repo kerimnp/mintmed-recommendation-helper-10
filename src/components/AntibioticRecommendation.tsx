@@ -76,6 +76,7 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
         recommendation={enhancedPrimaryRecommendation}
         selectedProduct={selectedProduct}
         isActive={true}
+        onPrescriptionClick={handlePrescriptionClick}
       />
 
       {availableProducts.length > 0 && (
