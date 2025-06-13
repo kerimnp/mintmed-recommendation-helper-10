@@ -58,8 +58,13 @@ export const useUpdateDoctorProfile = () => {
       };
 
       // Check if certification_expiry is a Date object and convert to string
-      if (updateData.certification_expiry && typeof updateData.certification_expiry === 'object' && updateData.certification_expiry instanceof Date) {
-        updateData.certification_expiry = updateData.certification_expiry.toISOString().split('T')[0];
+      if (updateData.certification_expiry) {
+        if (updateData.certification_expiry instanceof Date) {
+          updateData.certification_expiry = updateData.certification_expiry.toISOString().split('T')[0];
+        } else if (typeof updateData.certification_expiry === 'object' && updateData.certification_expiry !== null && 'toISOString' in updateData.certification_expiry) {
+          // Handle case where it might be a Date-like object
+          updateData.certification_expiry = (updateData.certification_expiry as Date).toISOString().split('T')[0];
+        }
       }
 
       const { data, error } = await supabase
