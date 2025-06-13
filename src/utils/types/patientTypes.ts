@@ -51,12 +51,13 @@ export interface PatientComorbidities {
 }
 
 export interface PatientData {
-  // Demographics
+  // Demographics - Updated to match form structure
   age: string;
   gender: 'male' | 'female';
   weight: string;
   height: string;
-  region: string;
+  region: string; // Changed from nationality to region to match interface
+  pregnancy?: string; // Added pregnancy property
   creatinine?: string;
   
   // Infection details
@@ -77,6 +78,15 @@ export interface PatientData {
   liverDisease: boolean;
   diabetes: boolean;
   immunosuppressed: boolean;
+
+  // Additional form fields
+  recentAntibiotics?: boolean;
+  labResults?: any;
+  firstName?: string;
+  lastName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  address?: string;
 }
 
 export interface PatientProfile {

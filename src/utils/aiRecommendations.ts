@@ -1,3 +1,4 @@
+
 import { PatientData } from "./types/patientTypes";
 import { EnhancedAntibioticRecommendation, AntibioticRationale } from "./types/recommendationTypes";
 import { getRegionalResistanceData } from "./antibioticRecommendations/data/regionalResistance";
@@ -35,8 +36,8 @@ export const generateAIRecommendation = async (patientData: PatientData): Promis
     }
   };
 
-  // Get regional resistance data
-  const resistance = getRegionalResistanceData(patientData.nationality);
+  // Get regional resistance data - use region instead of nationality
+  const resistance = getRegionalResistanceData(patientData.region);
 
   // Add regional resistance considerations
   let regionalConsiderations: string[] = [];

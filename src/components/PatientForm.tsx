@@ -40,7 +40,7 @@ export const PatientForm = () => {
     gender: "",
     weight: "",
     height: "",
-    nationality: "",
+    region: "", // Changed from nationality to region
     pregnancy: "",
     infectionSites: [] as string[],
     symptoms: "",
@@ -247,8 +247,13 @@ export const PatientForm = () => {
       const patient = await createPatientRecord();
       setCreatedPatientId(patient.id);
 
-      // Generate comprehensive rule-based recommendation
-      const recommendation = generateAntibioticRecommendation(formData);
+      // Generate comprehensive rule-based recommendation - map nationality to region
+      const patientDataForRecommendation = {
+        ...formData,
+        region: formData.region || "default"
+      };
+      
+      const recommendation = generateAntibioticRecommendation(patientDataForRecommendation);
       setRecommendation(recommendation);
 
       // Save recommendation record

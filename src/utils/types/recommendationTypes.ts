@@ -1,13 +1,4 @@
 
-export interface AntibioticRationale {
-  infectionType: string;
-  severity: string;
-  reasons: string[];
-  regionConsiderations?: string[];
-  allergyConsiderations?: string[];
-  doseAdjustments?: string[];
-}
-
 export interface DetailedRecommendation {
   name: string;
   dosage: string;
@@ -17,36 +8,44 @@ export interface DetailedRecommendation {
   reason: string;
 }
 
+export interface AntibioticRationale {
+  infectionType: string;
+  severity: string;
+  reasons: string[];
+  regionConsiderations?: string[];
+  allergyConsiderations?: string[];
+  doseAdjustments?: string[];
+}
+
 export interface RecommendationCalculations {
   weightBased?: string;
   renalAdjustment?: string;
   pediatricFactors?: string;
-}
-
-export interface RecommendationMetadata {
-  timestamp: string;
-  systemVersion: string;
-  evidenceLevel: string;
-  guidelineSource: string;
-  confidenceScore: number;
-  decisionAlgorithm: string;
-  reviewRequired: boolean;
-  auditTrail?: any;
+  gfr?: string; // Added gfr property
+  isPediatric?: string;
+  weightBasedDosing?: string;
+  [key: string]: string | undefined; // Allow additional string properties
 }
 
 export interface EnhancedAntibioticRecommendation {
-  primaryRecommendation: {
-    name: string;
-    dosage: string;
-    frequency: string;
-    duration: string;
-    route: string;
-    reason: string;
-  };
+  primaryRecommendation: DetailedRecommendation;
   reasoning: string;
   alternatives: DetailedRecommendation[];
   precautions: string[];
-  calculations?: RecommendationCalculations | string;
   rationale?: AntibioticRationale | string;
-  metadata?: RecommendationMetadata;
+  calculations?: RecommendationCalculations | string;
+  metadata?: {
+    timestamp: string;
+    systemVersion: string;
+    evidenceLevel: string;
+    guidelineSource: string;
+    confidenceScore: number;
+    decisionAlgorithm: string;
+    reviewRequired: boolean;
+    auditTrail?: {
+      inputValidation?: {
+        dataQualityScore: number;
+      };
+    };
+  };
 }
