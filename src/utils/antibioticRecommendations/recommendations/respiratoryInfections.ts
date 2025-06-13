@@ -23,9 +23,11 @@ export const generateRespiratoryRecommendation = (
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -41,16 +43,18 @@ export const generateRespiratoryRecommendation = (
   if (data.severity === "mild" && !isHospitalAcquired) {
     if (!hasPenicillinAllergy) {
       // Standard first-line therapy
-      const dose = isPediatric ? 
+      const dosage = isPediatric ? 
         "45-90mg/kg/day divided q12h" : 
         "875mg q12h";
       
       recommendation = {
         primaryRecommendation: {
           name: "Amoxicillin",
-          dose: dose,
+          dosage: dosage,
+          frequency: "q12h",
+          duration: "5-7 days",
           route: "PO",
-          duration: "5-7 days"
+          reason: "First-line therapy for mild community-acquired respiratory infection"
         },
         reasoning: "First-line therapy for mild community-acquired respiratory infection",
         alternatives: [],
@@ -69,9 +73,10 @@ export const generateRespiratoryRecommendation = (
       if (!hasMacrolideAllergy) {
         recommendation.alternatives.push({
           name: "Azithromycin",
-          dose: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
-          route: "PO",
+          dosage: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+          frequency: "daily",
           duration: "5 days",
+          route: "PO",
           reason: "Alternative for atypical pathogens or beta-lactam intolerance"
         });
       }
@@ -80,9 +85,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Azithromycin",
-          dose: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+          dosage: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+          frequency: "daily",
+          duration: "5 days",
           route: "PO",
-          duration: "5 days"
+          reason: "Alternative therapy for penicillin-allergic patients with mild respiratory infection"
         },
         reasoning: "Alternative therapy for penicillin-allergic patients with mild respiratory infection",
         alternatives: [],
@@ -102,9 +109,10 @@ export const generateRespiratoryRecommendation = (
       if (!hasCephalosporinAllergy && !hasFluoroquinoloneAllergy) {
         recommendation.alternatives.push({
           name: "Doxycycline",
-          dose: isPediatric && Number(data.age) >= 8 ? "2-4mg/kg/day divided q12h" : "100mg q12h",
-          route: "PO",
+          dosage: isPediatric && Number(data.age) >= 8 ? "2-4mg/kg/day divided q12h" : "100mg q12h",
+          frequency: "q12h",
           duration: "5-7 days",
+          route: "PO",
           reason: "Alternative for patients who cannot take macrolides"
         });
       }
@@ -113,9 +121,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Doxycycline",
-          dose: isPediatric && Number(data.age) >= 8 ? "2-4mg/kg/day divided q12h" : "100mg q12h",
+          dosage: isPediatric && Number(data.age) >= 8 ? "2-4mg/kg/day divided q12h" : "100mg q12h",
+          frequency: "q12h",
+          duration: "5-7 days",
           route: "PO",
-          duration: "5-7 days"
+          reason: "Alternative therapy for patients allergic to both penicillins and macrolides"
         },
         reasoning: "Alternative therapy for patients allergic to both penicillins and macrolides",
         alternatives: [],
@@ -138,9 +148,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Ceftriaxone",
-          dose: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+          dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+          frequency: "daily",
+          duration: "7-10 days",
           route: "IV",
-          duration: "7-10 days"
+          reason: "Treatment for moderate respiratory infection or early hospital-acquired pneumonia"
         },
         reasoning: "Treatment for moderate respiratory infection or early hospital-acquired pneumonia",
         alternatives: [],
@@ -159,9 +171,10 @@ export const generateRespiratoryRecommendation = (
       if (!hasMacrolideAllergy) {
         recommendation.alternatives.push({
           name: "Azithromycin",
-          dose: isPediatric ? "10mg/kg daily" : "500mg daily",
-          route: "IV/PO",
+          dosage: isPediatric ? "10mg/kg daily" : "500mg daily",
+          frequency: "daily",
           duration: "5 days",
+          route: "IV/PO",
           reason: "Added for atypical pathogen coverage"
         });
       }
@@ -170,9 +183,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Piperacillin-Tazobactam",
-          dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+          dosage: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+          frequency: "q6h",
+          duration: "7-10 days",
           route: "IV",
-          duration: "7-10 days"
+          reason: "Alternative for cephalosporin-allergic patients with moderate respiratory infection"
         },
         reasoning: "Alternative for cephalosporin-allergic patients with moderate respiratory infection",
         alternatives: [],
@@ -192,9 +207,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Levofloxacin",
-          dose: isPediatric ? "Not recommended in children" : "750mg daily",
+          dosage: isPediatric ? "Not recommended in children" : "750mg daily",
+          frequency: "daily",
+          duration: "7-10 days",
           route: "IV/PO",
-          duration: "7-10 days"
+          reason: "Alternative therapy for patients allergic to beta-lactams"
         },
         reasoning: "Alternative therapy for patients allergic to beta-lactams",
         alternatives: [],
@@ -217,9 +234,11 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Piperacillin-Tazobactam",
-          dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+          dosage: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+          frequency: "q6h",
+          duration: "10-14 days",
           route: "IV",
-          duration: "10-14 days"
+          reason: "Broad spectrum coverage for severe pneumonia with Pseudomonas risk"
         },
         reasoning: "Broad spectrum coverage for severe pneumonia with Pseudomonas risk",
         alternatives: [],
@@ -237,9 +256,10 @@ export const generateRespiratoryRecommendation = (
       if (hasMRSA) {
         recommendation.alternatives.push({
           name: "Vancomycin",
-          dose: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
-          route: "IV",
+          dosage: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
+          frequency: "q6-12h",
           duration: "10-14 days",
+          route: "IV",
           reason: "Added for MRSA coverage"
         });
       }
@@ -247,11 +267,13 @@ export const generateRespiratoryRecommendation = (
       recommendation = {
         primaryRecommendation: {
           name: "Ceftriaxone + Azithromycin",
-          dose: isPediatric ? 
+          dosage: isPediatric ? 
             "50-75mg/kg/day + 10mg/kg daily" : 
             "2g daily + 500mg daily",
+          frequency: "daily",
+          duration: "10-14 days",
           route: "IV",
-          duration: "10-14 days"
+          reason: "Combined therapy for severe community-acquired pneumonia"
         },
         reasoning: "Combined therapy for severe community-acquired pneumonia",
         alternatives: [],

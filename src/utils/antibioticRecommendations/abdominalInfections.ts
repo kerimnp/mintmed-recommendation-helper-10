@@ -1,42 +1,52 @@
-import { PatientData, AntibioticRecommendation } from './types';
-import { calculateAdjustedDose } from './antibioticDatabase';
+
+import { PatientData } from './types/patientTypes';
+import { EnhancedAntibioticRecommendation } from './types/recommendationTypes';
 import { isPediatricPatient } from './pediatricAdjustments';
 
-export const generateAbdominalInfectionRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const recommendation: AntibioticRecommendation = {
+export const generateAbdominalInfectionRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {
+  const recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
     precautions: []
   };
 
+  const isPediatric = isPediatricPatient(Number(data.age));
+
   if (data.severity === "mild") {
     recommendation.primaryRecommendation = {
       name: "Ciprofloxacin + Metronidazole",
-      dose: "500mg + 500mg",
+      dosage: "500mg + 500mg",
+      frequency: "q12h",
+      duration: "7-10 days",
       route: "oral",
-      duration: "7-10 days"
+      reason: "Coverage for aerobic and anaerobic organisms in mild intra-abdominal infections"
     };
     recommendation.reasoning = "Coverage for aerobic and anaerobic organisms in mild intra-abdominal infections";
   } else if (data.severity === "moderate" || data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Piperacillin-Tazobactam",
-      dose: "3.375g",
+      dosage: "3.375g",
+      frequency: "q6h",
+      duration: "10-14 days",
       route: "IV",
-      duration: "10-14 days"
+      reason: "Broad spectrum coverage for complicated intra-abdominal infections"
     };
     recommendation.reasoning = "Broad spectrum coverage for complicated intra-abdominal infections";
 
     recommendation.alternatives.push({
       name: "Meropenem",
-      dose: "1g",
-      route: "IV",
+      dosage: "1g",
+      frequency: "q8h",
       duration: "10-14 days",
+      route: "IV",
       reason: "Alternative broad spectrum option for severe infections"
     });
   }

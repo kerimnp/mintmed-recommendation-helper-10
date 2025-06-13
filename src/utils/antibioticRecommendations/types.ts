@@ -1,15 +1,15 @@
 
 export interface PatientData {
   age: string;
-  gender: string;
+  gender: 'male' | 'female';
   weight: string;
   height: string;
-  nationality: string;
+  region: string; // Changed from nationality to region
   pregnancy: string;
   infectionSites: string[];
   symptoms: string;
   duration: string;
-  severity: string;
+  severity: 'mild' | 'moderate' | 'severe';
   creatinine: string;
   recentAntibiotics: boolean;
   isHospitalAcquired: boolean;
@@ -36,9 +36,11 @@ export interface PatientData {
 export interface AntibioticRecommendation {
   primaryRecommendation: {
     name: string;
-    dose: string;
-    route: string;
+    dosage: string;
+    frequency: string;
     duration: string;
+    route: string;
+    reason: string;
   };
   reasoning: string;
   alternatives: DetailedRecommendation[];
@@ -60,9 +62,10 @@ export interface AntibioticRecommendation {
 
 export interface DetailedRecommendation {
   name: string;
-  dose: string;
-  route: string;
+  dosage: string;
+  frequency: string;
   duration: string;
+  route: string;
   reason: string;
 }
 

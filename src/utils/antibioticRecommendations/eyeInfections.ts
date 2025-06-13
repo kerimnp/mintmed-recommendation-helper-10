@@ -1,13 +1,17 @@
-import { PatientData, AntibioticRecommendation } from './types';
+
+import { PatientData } from '../types/patientTypes';
+import { EnhancedAntibioticRecommendation } from '../types/recommendationTypes';
 import { isPediatricPatient } from './pediatricAdjustments';
 
-export const generateEyeInfectionRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const recommendation: AntibioticRecommendation = {
+export const generateEyeInfectionRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {
+  const recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -19,18 +23,21 @@ export const generateEyeInfectionRecommendation = (data: PatientData): Antibioti
   if (data.severity === "mild") {
     recommendation.primaryRecommendation = {
       name: "Erythromycin",
-      dose: "1 drop",
+      dosage: "1 drop",
+      frequency: "q6h",
+      duration: "7 days",
       route: "topical",
-      duration: "7 days"
+      reason: "First-line treatment for mild conjunctivitis"
     };
     recommendation.reasoning = "First-line treatment for mild conjunctivitis";
 
     if (!data.allergies.fluoroquinolone) {
       recommendation.alternatives.push({
         name: "Ciprofloxacin",
-        dose: "1 drop q2h while awake",
-        route: "topical",
+        dosage: "1 drop",
+        frequency: "q2h while awake",
         duration: "7 days",
+        route: "topical",
         reason: "Alternative for bacterial conjunctivitis"
       });
     }
@@ -38,18 +45,22 @@ export const generateEyeInfectionRecommendation = (data: PatientData): Antibioti
     if (!data.allergies.fluoroquinolone) {
       recommendation.primaryRecommendation = {
         name: "Moxifloxacin",
-        dose: "1 drop q2h",
+        dosage: "1 drop",
+        frequency: "q2h",
+        duration: "7-10 days",
         route: "topical",
-        duration: "7-10 days"
+        reason: "Treatment for moderate eye infections/keratitis"
       };
       recommendation.reasoning = "Treatment for moderate eye infections/keratitis";
     }
   } else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Vancomycin + Ceftazidime",
-      dose: "1mg/0.1mL + 2.25mg/0.1mL",
+      dosage: "1mg/0.1mL + 2.25mg/0.1mL",
+      frequency: "Repeat as needed",
+      duration: "Based on clinical response",
       route: "intravitreal",
-      duration: "Repeat as needed based on clinical response"
+      reason: "Treatment for endophthalmitis"
     };
     recommendation.reasoning = "Treatment for endophthalmitis";
   }

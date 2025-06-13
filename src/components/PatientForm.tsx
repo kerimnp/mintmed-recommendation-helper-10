@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
@@ -37,15 +36,15 @@ export const PatientForm = () => {
   
   const [formData, setFormData] = useState({
     age: "",
-    gender: "",
+    gender: "" as "" | "male" | "female",
     weight: "",
     height: "",
-    region: "", // Changed from nationality to region
+    region: "",
     pregnancy: "",
     infectionSites: [] as string[],
     symptoms: "",
     duration: "",
-    severity: "",
+    severity: "" as "" | "mild" | "moderate" | "severe",
     creatinine: "",
     recentAntibiotics: false,
     isHospitalAcquired: false,
@@ -247,10 +246,13 @@ export const PatientForm = () => {
       const patient = await createPatientRecord();
       setCreatedPatientId(patient.id);
 
-      // Generate comprehensive rule-based recommendation - map nationality to region
+      // Generate comprehensive rule-based recommendation - ensure proper typing
       const patientDataForRecommendation = {
         ...formData,
-        region: formData.region || "default"
+        region: formData.region || "default",
+        // Ensure gender is properly typed
+        gender: (formData.gender || "male") as "male" | "female",
+        severity: (formData.severity || "mild") as "mild" | "moderate" | "severe"
       };
       
       const recommendation = generateAntibioticRecommendation(patientDataForRecommendation);
