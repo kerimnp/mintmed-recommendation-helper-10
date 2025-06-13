@@ -1,6 +1,6 @@
 
 import { PatientData } from "../../types/patientTypes";
-import { EnhancedAntibioticRecommendation } from "../../types/recommendationTypes";
+import { EnhancedAntibioticRecommendation, AntibioticRationale } from "../../types/recommendationTypes";
 
 export const generateBloodstreamRecommendation = (
   data: PatientData, 
@@ -16,9 +16,11 @@ export const generateBloodstreamRecommendation = (
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -35,51 +37,67 @@ export const generateBloodstreamRecommendation = (
     if (!hasCephalosporinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone",
-        dose: isPediatric ? "80-100mg/kg/day" : "2g q24h",
+        dosage: isPediatric ? "80-100mg/kg/day" : "2g q24h",
+        frequency: "q24h",
+        duration: "7-14 days",
         route: "IV",
-        duration: "7-14 days"
+        reason: "Empiric therapy for moderate bloodstream infections"
       };
       recommendation.reasoning = "Empiric therapy for moderate bloodstream infections";
-      recommendation.rationale.reasons = [
-        "Broad-spectrum coverage for common bloodstream pathogens",
-        "Once-daily dosing"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Broad-spectrum coverage for common bloodstream pathogens",
+          "Once-daily dosing"
+        ];
+      }
       
       if (hasMRSA) {
         recommendation.alternatives.push({
           name: "Vancomycin",
-          dose: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
-          route: "IV",
+          dosage: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
+          frequency: "q6-12h",
           duration: "7-14 days",
+          route: "IV",
           reason: "Added for MRSA coverage"
         });
       }
     } else if (!hasPenicillinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Piperacillin-Tazobactam",
-        dose: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
+        dosage: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
+        frequency: "q6h",
+        duration: "7-14 days",
         route: "IV",
-        duration: "7-14 days"
+        reason: "Alternative for cephalosporin-allergic patients"
       };
       recommendation.reasoning = "Alternative for cephalosporin-allergic patients";
-      recommendation.rationale.reasons = [
-        "Broad-spectrum coverage",
-        "Alternative for cephalosporin allergy"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Avoids cephalosporins due to allergy"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Broad-spectrum coverage",
+          "Alternative for cephalosporin allergy"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Avoids cephalosporins due to allergy"];
+      }
     } else {
       recommendation.primaryRecommendation = {
         name: "Meropenem",
-        dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
+        dosage: isPediatric ? "20mg/kg q8h" : "1g q8h",
+        frequency: "q8h",
+        duration: "7-14 days",
         route: "IV",
-        duration: "7-14 days"
+        reason: "Alternative for patients with multiple beta-lactam allergies"
       };
       recommendation.reasoning = "Alternative for patients with multiple beta-lactam allergies";
-      recommendation.rationale.reasons = [
-        "Broad spectrum including resistant organisms",
-        "Alternative for multiple antibiotic allergies"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected for multiple beta-lactam allergies"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Broad spectrum including resistant organisms",
+          "Alternative for multiple antibiotic allergies"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected for multiple beta-lactam allergies"];
+      }
     }
   } else if (data.severity === "severe") {
     if (hasMRSA || hasESBL || hasPseudomonas) {
@@ -90,47 +108,65 @@ export const generateBloodstreamRecommendation = (
       
       recommendation.primaryRecommendation = {
         name: primaryDrug,
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "20mg/kg q8h" + (hasMRSA ? " + 15mg/kg q6h" : "") :
           "1g q8h" + (hasMRSA ? " + 15-20mg/kg q8-12h" : ""),
+        frequency: "q8h" + (hasMRSA ? " + q6-12h" : ""),
+        duration: "10-14 days",
         route: "IV",
-        duration: "10-14 days"
+        reason: "Broad spectrum coverage for severe bloodstream infections with risk of resistant organisms"
       };
       recommendation.reasoning = "Broad spectrum coverage for severe bloodstream infections with risk of resistant organisms";
-      recommendation.rationale.reasons = [
-        "Carbapenem coverage for possible ESBL organisms",
-        "Appropriate for severe sepsis",
-        hasMRSA ? "Vancomycin added for MRSA coverage" : ""
-      ].filter(reason => reason);
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        const reasons = [
+          "Carbapenem coverage for possible ESBL organisms",
+          "Appropriate for severe sepsis"
+        ];
+        if (hasMRSA) {
+          reasons.push("Vancomycin added for MRSA coverage");
+        }
+        recommendation.rationale.reasons = reasons;
+      }
     } else if (!hasPenicillinAllergy && !hasCephalosporinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Piperacillin-Tazobactam + Vancomycin",
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "100mg/kg q6h + 15mg/kg q6h" :
           "4.5g q6h + 15-20mg/kg q8-12h",
+        frequency: "q6h + q6-12h",
+        duration: "10-14 days",
         route: "IV",
-        duration: "10-14 days"
+        reason: "Empiric coverage for severe bloodstream infections"
       };
       recommendation.reasoning = "Empiric coverage for severe bloodstream infections";
-      recommendation.rationale.reasons = [
-        "Broad-spectrum coverage for gram-positives and gram-negatives",
-        "Vancomycin added empirically until cultures return"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Broad-spectrum coverage for gram-positives and gram-negatives",
+          "Vancomycin added empirically until cultures return"
+        ];
+      }
     } else {
       recommendation.primaryRecommendation = {
         name: "Meropenem + Vancomycin",
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "20mg/kg q8h + 15mg/kg q6h" :
           "1g q8h + 15-20mg/kg q8-12h",
+        frequency: "q8h + q6-12h",
+        duration: "10-14 days",
         route: "IV",
-        duration: "10-14 days"
+        reason: "Alternative for patients with beta-lactam allergies"
       };
       recommendation.reasoning = "Alternative for patients with beta-lactam allergies";
-      recommendation.rationale.reasons = [
-        "Carbapenem often tolerated despite penicillin allergy",
-        "Provides necessary broad-spectrum coverage for severe sepsis"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected despite beta-lactam allergies due to severity"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Carbapenem often tolerated despite penicillin allergy",
+          "Provides necessary broad-spectrum coverage for severe sepsis"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected despite beta-lactam allergies due to severity"];
+      }
     }
   }
 
