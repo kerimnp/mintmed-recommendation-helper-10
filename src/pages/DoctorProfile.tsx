@@ -53,7 +53,17 @@ const DoctorProfile = () => {
 
   const handleFormSubmit = async (data: any) => {
     try {
-      await updateProfile.mutateAsync(data);
+      // Convert certification_expiry Date to string if present
+      const submitData = {
+        ...data,
+        certification_expiry: data.certification_expiry 
+          ? (data.certification_expiry instanceof Date 
+              ? data.certification_expiry.toISOString().split('T')[0] 
+              : data.certification_expiry)
+          : undefined,
+      };
+      
+      await updateProfile.mutateAsync(submitData);
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to update profile:', error);

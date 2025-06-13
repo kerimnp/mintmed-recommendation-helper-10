@@ -51,12 +51,19 @@ export const useUpdateDoctorProfile = () => {
     mutationFn: async (profileData: Partial<Omit<DoctorProfile, 'id' | 'created_at' | 'updated_at'>>) => {
       if (!user?.id) throw new Error('User not authenticated');
 
+      // Convert Date to string if certification_expiry is a Date object
+      const updateData = {
+        ...profileData,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (updateData.certification_expiry && updateData.certification_expiry instanceof Date) {
+        updateData.certification_expiry = updateData.certification_expiry.toISOString().split('T')[0];
+      }
+
       const { data, error } = await supabase
         .from('profiles')
-        .update({
-          ...profileData,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', user.id)
         .select()
         .single();
