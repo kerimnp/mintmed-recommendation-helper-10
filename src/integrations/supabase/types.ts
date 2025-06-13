@@ -94,6 +94,62 @@ export type Database = {
           },
         ]
       }
+      antibiotic_statistics: {
+        Row: {
+          adverse_events_count: number | null
+          antibiotic_name: string
+          average_duration_days: number | null
+          cost_total: number | null
+          created_at: string | null
+          department_id: string | null
+          generic_name: string
+          id: string
+          indication: string | null
+          month_year: string
+          resistance_reports: number | null
+          success_rate: number | null
+          total_prescriptions: number | null
+        }
+        Insert: {
+          adverse_events_count?: number | null
+          antibiotic_name: string
+          average_duration_days?: number | null
+          cost_total?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          generic_name: string
+          id?: string
+          indication?: string | null
+          month_year: string
+          resistance_reports?: number | null
+          success_rate?: number | null
+          total_prescriptions?: number | null
+        }
+        Update: {
+          adverse_events_count?: number | null
+          antibiotic_name?: string
+          average_duration_days?: number | null
+          cost_total?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          generic_name?: string
+          id?: string
+          indication?: string | null
+          month_year?: string
+          resistance_reports?: number | null
+          success_rate?: number | null
+          total_prescriptions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "antibiotic_statistics_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -201,6 +257,94 @@ export type Database = {
           },
         ]
       }
+      clinical_outcomes: {
+        Row: {
+          adverse_drug_reactions: Json | null
+          assessment_date: string
+          clinical_response: string
+          cost_effectiveness_score: number | null
+          created_at: string | null
+          culture_clearance: boolean | null
+          drug_level_monitoring: Json | null
+          id: string
+          laboratory_improvements: Json | null
+          length_of_stay: number | null
+          notes: string | null
+          patient_id: string | null
+          patient_satisfaction_score: number | null
+          physician_satisfaction_score: number | null
+          prescription_id: string | null
+          readmission_30_days: boolean | null
+          recorded_by: string | null
+          symptom_resolution: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          adverse_drug_reactions?: Json | null
+          assessment_date: string
+          clinical_response: string
+          cost_effectiveness_score?: number | null
+          created_at?: string | null
+          culture_clearance?: boolean | null
+          drug_level_monitoring?: Json | null
+          id?: string
+          laboratory_improvements?: Json | null
+          length_of_stay?: number | null
+          notes?: string | null
+          patient_id?: string | null
+          patient_satisfaction_score?: number | null
+          physician_satisfaction_score?: number | null
+          prescription_id?: string | null
+          readmission_30_days?: boolean | null
+          recorded_by?: string | null
+          symptom_resolution?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          adverse_drug_reactions?: Json | null
+          assessment_date?: string
+          clinical_response?: string
+          cost_effectiveness_score?: number | null
+          created_at?: string | null
+          culture_clearance?: boolean | null
+          drug_level_monitoring?: Json | null
+          id?: string
+          laboratory_improvements?: Json | null
+          length_of_stay?: number | null
+          notes?: string | null
+          patient_id?: string | null
+          patient_satisfaction_score?: number | null
+          physician_satisfaction_score?: number | null
+          prescription_id?: string | null
+          readmission_30_days?: boolean | null
+          recorded_by?: string | null
+          symptom_resolution?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_outcomes_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_outcomes_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_outcomes_recorded_by_fkey"
+            columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           contact_info: Json | null
@@ -290,6 +434,127 @@ export type Database = {
         }
         Relationships: []
       }
+      drug_formulations: {
+        Row: {
+          availability_status: string | null
+          brand_name: string
+          cost_per_unit: number | null
+          created_at: string | null
+          dosage_form: string
+          generic_name: string
+          id: string
+          insurance_tier: number | null
+          manufacturer: string
+          ndc_number: string | null
+          package_size: string | null
+          route: string
+          strength: string
+          updated_at: string | null
+        }
+        Insert: {
+          availability_status?: string | null
+          brand_name: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          dosage_form: string
+          generic_name: string
+          id?: string
+          insurance_tier?: number | null
+          manufacturer: string
+          ndc_number?: string | null
+          package_size?: string | null
+          route: string
+          strength: string
+          updated_at?: string | null
+        }
+        Update: {
+          availability_status?: string | null
+          brand_name?: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          dosage_form?: string
+          generic_name?: string
+          id?: string
+          insurance_tier?: number | null
+          manufacturer?: string
+          ndc_number?: string | null
+          package_size?: string | null
+          route?: string
+          strength?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      drug_interaction_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_acknowledged: boolean | null
+          clinical_significance: string | null
+          created_at: string | null
+          id: string
+          interacting_drug: string
+          interaction_mechanism: string | null
+          interaction_severity: string
+          management_recommendation: string | null
+          override_by: string | null
+          override_reason: string | null
+          prescription_id: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_acknowledged?: boolean | null
+          clinical_significance?: string | null
+          created_at?: string | null
+          id?: string
+          interacting_drug: string
+          interaction_mechanism?: string | null
+          interaction_severity: string
+          management_recommendation?: string | null
+          override_by?: string | null
+          override_reason?: string | null
+          prescription_id?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_acknowledged?: boolean | null
+          clinical_significance?: string | null
+          created_at?: string | null
+          id?: string
+          interacting_drug?: string
+          interaction_mechanism?: string | null
+          interaction_severity?: string
+          management_recommendation?: string | null
+          override_by?: string | null
+          override_reason?: string | null
+          prescription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drug_interaction_alerts_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_interaction_alerts_override_by_fkey"
+            columns: ["override_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_interaction_alerts_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drug_interactions: {
         Row: {
           created_at: string
@@ -322,6 +587,81 @@ export type Database = {
           severity?: string | null
         }
         Relationships: []
+      }
+      iv_po_conversions: {
+        Row: {
+          approved_by: string | null
+          bioavailability_factor: number | null
+          clinical_stability_score: number | null
+          conversion_criteria_met: Json | null
+          cost_savings_estimated: number | null
+          created_at: string | null
+          current_iv_dose: string
+          current_iv_drug: string
+          id: string
+          implemented_date: string | null
+          infection_severity: string | null
+          oral_intake_adequate: boolean | null
+          outcome_notes: string | null
+          prescription_id: string | null
+          recommendation_date: string | null
+          recommended_po_dose: string
+          recommended_po_drug: string
+        }
+        Insert: {
+          approved_by?: string | null
+          bioavailability_factor?: number | null
+          clinical_stability_score?: number | null
+          conversion_criteria_met?: Json | null
+          cost_savings_estimated?: number | null
+          created_at?: string | null
+          current_iv_dose: string
+          current_iv_drug: string
+          id?: string
+          implemented_date?: string | null
+          infection_severity?: string | null
+          oral_intake_adequate?: boolean | null
+          outcome_notes?: string | null
+          prescription_id?: string | null
+          recommendation_date?: string | null
+          recommended_po_dose: string
+          recommended_po_drug: string
+        }
+        Update: {
+          approved_by?: string | null
+          bioavailability_factor?: number | null
+          clinical_stability_score?: number | null
+          conversion_criteria_met?: Json | null
+          cost_savings_estimated?: number | null
+          created_at?: string | null
+          current_iv_dose?: string
+          current_iv_drug?: string
+          id?: string
+          implemented_date?: string | null
+          infection_severity?: string | null
+          oral_intake_adequate?: boolean | null
+          outcome_notes?: string | null
+          prescription_id?: string | null
+          recommendation_date?: string | null
+          recommended_po_dose?: string
+          recommended_po_drug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iv_po_conversions_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iv_po_conversions_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       patients: {
         Row: {
@@ -406,6 +746,148 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pharmaceutical_reports: {
+        Row: {
+          adverse_events_summary: Json | null
+          company_name: string | null
+          comparative_effectiveness: Json | null
+          cost_analysis: Json | null
+          generated_at: string | null
+          generated_by: string | null
+          geographic_distribution: Json | null
+          id: string
+          market_share_percentage: number | null
+          report_period_end: string
+          report_period_start: string
+          report_type: string
+          resistance_trends: Json | null
+          revenue_generated: number | null
+          status: string | null
+          top_indications: Json | null
+          total_prescriptions: number | null
+        }
+        Insert: {
+          adverse_events_summary?: Json | null
+          company_name?: string | null
+          comparative_effectiveness?: Json | null
+          cost_analysis?: Json | null
+          generated_at?: string | null
+          generated_by?: string | null
+          geographic_distribution?: Json | null
+          id?: string
+          market_share_percentage?: number | null
+          report_period_end: string
+          report_period_start: string
+          report_type: string
+          resistance_trends?: Json | null
+          revenue_generated?: number | null
+          status?: string | null
+          top_indications?: Json | null
+          total_prescriptions?: number | null
+        }
+        Update: {
+          adverse_events_summary?: Json | null
+          company_name?: string | null
+          comparative_effectiveness?: Json | null
+          cost_analysis?: Json | null
+          generated_at?: string | null
+          generated_by?: string | null
+          geographic_distribution?: Json | null
+          id?: string
+          market_share_percentage?: number | null
+          report_period_end?: string
+          report_period_start?: string
+          report_type?: string
+          resistance_trends?: Json | null
+          revenue_generated?: number | null
+          status?: string | null
+          top_indications?: Json | null
+          total_prescriptions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pharmaceutical_reports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescription_analytics: {
+        Row: {
+          adverse_events: Json | null
+          anonymized_at: string | null
+          antibiotic_class: string | null
+          cost_analysis: Json | null
+          created_at: string | null
+          department_type: string | null
+          diagnosis_code: string | null
+          duration_actual: number | null
+          duration_prescribed: number | null
+          geographic_region: string | null
+          hospital_type: string | null
+          id: string
+          indication: string | null
+          outcome: string | null
+          patient_age_group: string | null
+          patient_gender: string | null
+          prescriber_specialty: string | null
+          prescription_id: string | null
+          resistance_detected: boolean | null
+        }
+        Insert: {
+          adverse_events?: Json | null
+          anonymized_at?: string | null
+          antibiotic_class?: string | null
+          cost_analysis?: Json | null
+          created_at?: string | null
+          department_type?: string | null
+          diagnosis_code?: string | null
+          duration_actual?: number | null
+          duration_prescribed?: number | null
+          geographic_region?: string | null
+          hospital_type?: string | null
+          id?: string
+          indication?: string | null
+          outcome?: string | null
+          patient_age_group?: string | null
+          patient_gender?: string | null
+          prescriber_specialty?: string | null
+          prescription_id?: string | null
+          resistance_detected?: boolean | null
+        }
+        Update: {
+          adverse_events?: Json | null
+          anonymized_at?: string | null
+          antibiotic_class?: string | null
+          cost_analysis?: Json | null
+          created_at?: string | null
+          department_type?: string | null
+          diagnosis_code?: string | null
+          duration_actual?: number | null
+          duration_prescribed?: number | null
+          geographic_region?: string | null
+          hospital_type?: string | null
+          id?: string
+          indication?: string | null
+          outcome?: string | null
+          patient_age_group?: string | null
+          patient_gender?: string | null
+          prescriber_specialty?: string | null
+          prescription_id?: string | null
+          resistance_detected?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescription_analytics_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -652,6 +1134,89 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapeutic_drug_monitoring: {
+        Row: {
+          clinical_interpretation: string | null
+          created_at: string | null
+          dosage_adjustment_needed: boolean | null
+          drug_name: string
+          id: string
+          measured_level: number | null
+          measurement_date: string
+          new_dosage_recommendation: string | null
+          ordered_by: string | null
+          patient_id: string | null
+          prescription_id: string | null
+          reviewed_by: string | null
+          sample_type: string | null
+          target_level_max: number | null
+          target_level_min: number | null
+        }
+        Insert: {
+          clinical_interpretation?: string | null
+          created_at?: string | null
+          dosage_adjustment_needed?: boolean | null
+          drug_name: string
+          id?: string
+          measured_level?: number | null
+          measurement_date: string
+          new_dosage_recommendation?: string | null
+          ordered_by?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          reviewed_by?: string | null
+          sample_type?: string | null
+          target_level_max?: number | null
+          target_level_min?: number | null
+        }
+        Update: {
+          clinical_interpretation?: string | null
+          created_at?: string | null
+          dosage_adjustment_needed?: boolean | null
+          drug_name?: string
+          id?: string
+          measured_level?: number | null
+          measurement_date?: string
+          new_dosage_recommendation?: string | null
+          ordered_by?: string | null
+          patient_id?: string | null
+          prescription_id?: string | null
+          reviewed_by?: string | null
+          sample_type?: string | null
+          target_level_max?: number | null
+          target_level_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapeutic_drug_monitoring_ordered_by_fkey"
+            columns: ["ordered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapeutic_drug_monitoring_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapeutic_drug_monitoring_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "therapeutic_drug_monitoring_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
