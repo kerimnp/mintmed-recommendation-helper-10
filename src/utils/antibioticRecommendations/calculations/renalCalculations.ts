@@ -1,3 +1,4 @@
+
 import { PatientMetrics, RenalFunction } from '../types/patientTypes';
 import { WeightCalculations } from '../types/patientTypes';
 
@@ -34,4 +35,8 @@ export const calculateCrCl = (
         ? 'Moderate renal impairment - dose adjustments may be required'
         : undefined
   };
+};
+
+export const shouldAdjustForRenalFunction = (gfr: number): boolean => {
+  return gfr < 60;
 };
