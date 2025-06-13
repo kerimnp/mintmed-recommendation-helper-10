@@ -1,5 +1,5 @@
 
-import { PatientData } from './types/patientTypes';
+import { PatientData } from '../types/patientTypes';
 import { EnhancedAntibioticRecommendation } from './types/recommendationTypes';
 import { isPediatricPatient } from './pediatricAdjustments';
 

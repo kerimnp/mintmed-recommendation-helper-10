@@ -1,7 +1,8 @@
+
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
-import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
+import { generateAdvancedRecommendation } from "@/utils/antibioticRecommendations";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
 import { AllergySection } from "./AllergySection";
 import { RenalFunctionSection } from "./RenalFunctionSection";
@@ -255,7 +256,7 @@ export const PatientForm = () => {
         severity: (formData.severity || "mild") as "mild" | "moderate" | "severe"
       };
       
-      const recommendation = generateAntibioticRecommendation(patientDataForRecommendation);
+      const recommendation = generateAdvancedRecommendation(patientDataForRecommendation);
       setRecommendation(recommendation);
 
       // Save recommendation record
