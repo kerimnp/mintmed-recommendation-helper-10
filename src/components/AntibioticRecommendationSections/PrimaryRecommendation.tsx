@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Card } from "../ui/card";
-import { Pill, Info } from "lucide-react";
+import { Pill, Info, FileText } from "lucide-react";
+import { Button } from "../ui/button";
 import { DetailedRecommendation } from "@/utils/types/recommendationTypes";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
 
@@ -9,18 +10,30 @@ interface PrimaryRecommendationProps {
   recommendation: DetailedRecommendation;
   selectedProduct?: DrugProduct;
   isActive: boolean;
+  onPrescriptionClick: () => void;
 }
 
 export const PrimaryRecommendation: React.FC<PrimaryRecommendationProps> = ({ 
   recommendation, 
   selectedProduct,
-  isActive
+  isActive,
+  onPrescriptionClick
 }) => {
   return (
     <Card className="p-6 bg-white/50 backdrop-blur-sm border-mint-200">
-      <div className="flex items-center gap-2 mb-4">
-        <Pill className="h-6 w-6 text-mint-600" />
-        <h3 className="text-2xl font-semibold text-gray-900">Primary Recommendation</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Pill className="h-6 w-6 text-mint-600" />
+          <h3 className="text-2xl font-semibold text-gray-900">Primary Recommendation</h3>
+        </div>
+        <Button 
+          onClick={onPrescriptionClick}
+          className="bg-medical-primary hover:bg-medical-primary/90 text-white"
+          size="sm"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Print Prescription
+        </Button>
       </div>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
