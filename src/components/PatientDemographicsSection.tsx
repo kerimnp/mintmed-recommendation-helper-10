@@ -1,13 +1,10 @@
 
 import React from "react";
-import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import { cn } from "@/lib/utils";
-import { User, UserRound, Weight, Ruler, Flag, Baby } from "lucide-react";
 
 interface PatientDemographicsSectionProps {
   formData: {
@@ -17,202 +14,222 @@ interface PatientDemographicsSectionProps {
     height: string;
     nationality: string;
     pregnancy: string;
+    firstName: string;
+    lastName: string;
+    contactPhone: string;
+    contactEmail: string;
+    address: string;
   };
-  onInputChange: (field: string, value: any) => void;
-  errors?: { [key: string]: string };
+  onInputChange: (field: string, value: string) => void;
+  errors: { [key: string]: string };
 }
 
 export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProps> = ({
   formData,
   onInputChange,
-  errors = {},
+  errors
 }) => {
   const { language } = useLanguage();
-  const t = translations[language].patientDemographics;
-
-  // Common regions for suggestions
-  const suggestedRegions = [
-    "Serbia",
-    "Bosnia and Herzegovina",
-    "Croatia",
-    "North Macedonia",
-    "Montenegro",
-    "Albania",
-    "Kosovo",
-    "United States",
-    "United Kingdom",
-    "Germany",
-    "France",
-    "Italy",
-    "Spain",
-    "China",
-    "Japan",
-    "India"
-  ];
+  const t = translations[language];
 
   return (
-    <Card className="p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border border-gray-100 dark:border-gray-800 rounded-xl">
-      <div className="space-y-2 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <UserRound className="h-5 w-5 text-medical-primary" />
-          {t.title}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+    <div className="space-y-6">
+      {/* Basic Demographics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="space-y-2">
-          <Label 
-            htmlFor="age" 
-            className={cn(
-              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
-              errors.age && "text-destructive"
-            )}
-          >
-            <User className="h-3.5 w-3.5" />
-            {t.age}
+          <Label htmlFor="firstName" className="text-medical-deep font-medium">
+            {language === "en" ? "First Name" : "Ime"}
+          </Label>
+          <Input
+            id="firstName"
+            type="text"
+            placeholder={language === "en" ? "Enter first name" : "Unesite ime"}
+            value={formData.firstName}
+            onChange={(e) => onInputChange("firstName", e.target.value)}
+            className="border-medical-border focus:border-medical-primary"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="lastName" className="text-medical-deep font-medium">
+            {language === "en" ? "Last Name" : "Prezime"}
+          </Label>
+          <Input
+            id="lastName"
+            type="text"
+            placeholder={language === "en" ? "Enter last name" : "Unesite prezime"}
+            value={formData.lastName}
+            onChange={(e) => onInputChange("lastName", e.target.value)}
+            className="border-medical-border focus:border-medical-primary"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="age" className="text-medical-deep font-medium">
+            {t.age} {language === "en" ? "(years)" : "(godine)"}
           </Label>
           <Input
             id="age"
             type="number"
+            placeholder={language === "en" ? "Enter age" : "Unesite godine"}
             value={formData.age}
             onChange={(e) => onInputChange("age", e.target.value)}
-            className={cn(
-              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
-              errors.age 
-                ? "border-destructive focus:ring-destructive/30" 
-                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
-            )}
-            required
+            className={`border-medical-border focus:border-medical-primary ${
+              errors.age ? "border-red-500" : ""
+            }`}
+            min="0"
+            max="120"
           />
-          {errors.age && (
-            <p className="text-sm text-destructive mt-1">{errors.age}</p>
-          )}
+          {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label 
-            htmlFor="gender"
-            className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
-          >
-            <UserRound className="h-3.5 w-3.5" />
+          <Label htmlFor="gender" className="text-medical-deep font-medium">
             {t.gender}
           </Label>
           <Select value={formData.gender} onValueChange={(value) => onInputChange("gender", value)}>
-            <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
-              <SelectValue placeholder={t.gender} />
+            <SelectTrigger className="border-medical-border focus:border-medical-primary">
+              <SelectValue placeholder={language === "en" ? "Select gender" : "Odaberite pol"} />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg">
-              <SelectItem value="male">{t.genderOptions.male}</SelectItem>
-              <SelectItem value="female">{t.genderOptions.female}</SelectItem>
+            <SelectContent>
+              <SelectItem value="Male">{language === "en" ? "Male" : "Muški"}</SelectItem>
+              <SelectItem value="Female">{language === "en" ? "Female" : "Ženski"}</SelectItem>
+              <SelectItem value="Other">{language === "en" ? "Other" : "Ostalo"}</SelectItem>
+              <SelectItem value="Prefer not to say">{language === "en" ? "Prefer not to say" : "Ne želim reći"}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label 
-            htmlFor="weight" 
-            className={cn(
-              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
-              errors.weight && "text-destructive"
-            )}
-          >
-            <Weight className="h-3.5 w-3.5" />
-            {t.weight}
+          <Label htmlFor="weight" className="text-medical-deep font-medium">
+            {t.weight} {language === "en" ? "(kg)" : "(kg)"}
           </Label>
           <Input
             id="weight"
             type="number"
+            placeholder={language === "en" ? "Enter weight" : "Unesite težinu"}
             value={formData.weight}
             onChange={(e) => onInputChange("weight", e.target.value)}
-            className={cn(
-              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
-              errors.weight 
-                ? "border-destructive focus:ring-destructive/30" 
-                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
-            )}
-            required
+            className={`border-medical-border focus:border-medical-primary ${
+              errors.weight ? "border-red-500" : ""
+            }`}
+            min="0"
+            max="500"
+            step="0.1"
           />
-          {errors.weight && (
-            <p className="text-sm text-destructive mt-1">{errors.weight}</p>
-          )}
+          {errors.weight && <p className="text-red-500 text-sm">{errors.weight}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label 
-            htmlFor="height" 
-            className={cn(
-              "flex items-center gap-1.5 text-gray-700 dark:text-gray-300", 
-              errors.height && "text-destructive"
-            )}
-          >
-            <Ruler className="h-3.5 w-3.5" />
-            {t.height}
+          <Label htmlFor="height" className="text-medical-deep font-medium">
+            {t.height} {language === "en" ? "(cm)" : "(cm)"}
           </Label>
           <Input
             id="height"
             type="number"
+            placeholder={language === "en" ? "Enter height" : "Unesite visinu"}
             value={formData.height}
             onChange={(e) => onInputChange("height", e.target.value)}
-            className={cn(
-              "bg-white dark:bg-gray-800/80 border rounded-lg transition-colors",
-              errors.height 
-                ? "border-destructive focus:ring-destructive/30" 
-                : "border-gray-200 dark:border-gray-700 focus:border-medical-primary/50 focus:ring-medical-primary/20"
-            )}
-            required
+            className={`border-medical-border focus:border-medical-primary ${
+              errors.height ? "border-red-500" : ""
+            }`}
+            min="0"
+            max="300"
           />
-          {errors.height && (
-            <p className="text-sm text-destructive mt-1">{errors.height}</p>
-          )}
+          {errors.height && <p className="text-red-500 text-sm">{errors.height}</p>}
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label 
-            htmlFor="nationality"
-            className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
-          >
-            <Flag className="h-3.5 w-3.5" />
-            {t.nationality}
+      {/* Contact Information */}
+      <div className="border-t pt-6">
+        <h4 className="text-lg font-semibold text-medical-deep mb-4">
+          {language === "en" ? "Contact Information (Optional)" : "Kontakt Informacije (Opcionalno)"}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="contactPhone" className="text-medical-deep font-medium">
+              {language === "en" ? "Phone Number" : "Broj Telefona"}
+            </Label>
+            <Input
+              id="contactPhone"
+              type="tel"
+              placeholder={language === "en" ? "Enter phone number" : "Unesite broj telefona"}
+              value={formData.contactPhone}
+              onChange={(e) => onInputChange("contactPhone", e.target.value)}
+              className="border-medical-border focus:border-medical-primary"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="contactEmail" className="text-medical-deep font-medium">
+              {language === "en" ? "Email Address" : "Email Adresa"}
+            </Label>
+            <Input
+              id="contactEmail"
+              type="email"
+              placeholder={language === "en" ? "Enter email address" : "Unesite email adresu"}
+              value={formData.contactEmail}
+              onChange={(e) => onInputChange("contactEmail", e.target.value)}
+              className="border-medical-border focus:border-medical-primary"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2 mt-4">
+          <Label htmlFor="address" className="text-medical-deep font-medium">
+            {language === "en" ? "Address" : "Adresa"}
           </Label>
           <Input
-            id="nationality"
+            id="address"
             type="text"
-            value={formData.nationality}
-            onChange={(e) => onInputChange("nationality", e.target.value)}
-            className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors"
-            list="nationality-suggestions"
-            placeholder="Enter any nationality"
+            placeholder={language === "en" ? "Enter address" : "Unesite adresu"}
+            value={formData.address}
+            onChange={(e) => onInputChange("address", e.target.value)}
+            className="border-medical-border focus:border-medical-primary"
           />
-          <datalist id="nationality-suggestions">
-            {suggestedRegions.map((region) => (
-              <option key={region} value={region} />
-            ))}
-          </datalist>
         </div>
-
-        {formData.gender === "female" && (
-          <div className="space-y-2">
-            <Label 
-              htmlFor="pregnancy"
-              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300"
-            >
-              <Baby className="h-3.5 w-3.5" />
-              {t.pregnancy}
-            </Label>
-            <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
-              <SelectTrigger className="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
-                <SelectValue placeholder={t.pregnancy} />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border dark:border-gray-700 shadow-lg rounded-lg">
-                <SelectItem value="not-pregnant">{t.pregnancyOptions.notPregnant}</SelectItem>
-                <SelectItem value="pregnant">{t.pregnancyOptions.pregnant}</SelectItem>
-                <SelectItem value="breastfeeding">{t.pregnancyOptions.breastfeeding}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
       </div>
-    </Card>
+
+      {/* Additional Demographics */}
+      <div className="border-t pt-6">
+        <h4 className="text-lg font-semibold text-medical-deep mb-4">
+          {language === "en" ? "Additional Information (Optional)" : "Dodatne Informacije (Opcionalno)"}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="nationality" className="text-medical-deep font-medium">
+              {t.nationality}
+            </Label>
+            <Input
+              id="nationality"
+              type="text"
+              placeholder={language === "en" ? "Enter nationality" : "Unesite nacionalnost"}
+              value={formData.nationality}
+              onChange={(e) => onInputChange("nationality", e.target.value)}
+              className="border-medical-border focus:border-medical-primary"
+            />
+          </div>
+
+          {formData.gender === "Female" && (
+            <div className="space-y-2">
+              <Label htmlFor="pregnancy" className="text-medical-deep font-medium">
+                {t.pregnancy}
+              </Label>
+              <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
+                <SelectTrigger className="border-medical-border focus:border-medical-primary">
+                  <SelectValue placeholder={language === "en" ? "Select pregnancy status" : "Odaberite status trudnoće"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">{language === "en" ? "Not pregnant" : "Nije trudna"}</SelectItem>
+                  <SelectItem value="Yes">{language === "en" ? "Pregnant" : "Trudna"}</SelectItem>
+                  <SelectItem value="Unknown">{language === "en" ? "Unknown" : "Nepoznato"}</SelectItem>
+                  <SelectItem value="Possibly">{language === "en" ? "Possibly pregnant" : "Možda trudna"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

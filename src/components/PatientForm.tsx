@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
@@ -17,17 +18,21 @@ import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTy
 import { FormHeader } from "./PatientFormSections/FormHeader";
 import { SectionHeader } from "./PatientFormSections/SectionHeader";
 import { FormActions } from "./PatientFormSections/FormActions";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const PatientForm = () => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
+  const { user } = useAuth();
   const [recommendation, setRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [aiRecommendation, setAiRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [createdPatientId, setCreatedPatientId] = useState<string | null>(null);
   
   const sectionRefs = {
     demographics: useRef<HTMLDivElement>(null),
@@ -66,7 +71,13 @@ export const PatientForm = () => {
       cre: false,
       pseudomonas: false
     },
-    labResults: null
+    labResults: null,
+    // Additional patient fields for database storage
+    firstName: "",
+    lastName: "",
+    contactPhone: "",
+    contactEmail: "",
+    address: ""
   });
 
   const handleInputChange = (field: string, value: any) => {
@@ -128,6 +139,86 @@ export const PatientForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const createPatientRecord = async () => {
+    if (!user) {
+      throw new Error('User must be authenticated to create patient records');
+    }
+
+    // Calculate DOB from age if provided
+    let dateOfBirth = new Date();
+    if (formData.age) {
+      const currentYear = new Date().getFullYear();
+      const birthYear = currentYear - parseInt(formData.age);
+      dateOfBirth = new Date(birthYear, 0, 1); // January 1st of birth year
+    }
+
+    // Prepare allergies array
+    const allergiesArray = Object.entries(formData.allergies)
+      .filter(([_, isAllergic]) => isAllergic)
+      .map(([allergen, _]) => allergen);
+
+    // Prepare known conditions array
+    const conditionsArray = [];
+    if (formData.kidneyDisease) conditionsArray.push('Kidney Disease');
+    if (formData.liverDisease) conditionsArray.push('Liver Disease');
+    if (formData.diabetes) conditionsArray.push('Diabetes');
+    if (formData.immunosuppressed) conditionsArray.push('Immunosuppressed');
+
+    const patientData = {
+      first_name: formData.firstName || `Patient-${Date.now()}`,
+      last_name: formData.lastName || 'Unknown',
+      date_of_birth: dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
+      gender: formData.gender || null,
+      contact_phone: formData.contactPhone || null,
+      contact_email: formData.contactEmail || null,
+      address: formData.address || null,
+      allergies: allergiesArray,
+      known_conditions: conditionsArray,
+      notes: `Created from recommendation form. Infection sites: ${formData.infectionSites.join(', ')}. Symptoms: ${formData.symptoms || 'Not specified'}.`
+    };
+
+    const { data, error } = await supabase
+      .from('patients')
+      .insert([patientData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating patient:', error);
+      throw error;
+    }
+
+    return data;
+  };
+
+  const saveRecommendationRecord = async (patientId: string, recommendationData: EnhancedAntibioticRecommendation, source: 'rule-based' | 'ai') => {
+    if (!user) {
+      throw new Error('User must be authenticated to save recommendations');
+    }
+
+    const recommendationRecord = {
+      patient_id: patientId,
+      doctor_id: user.id,
+      input_data: formData,
+      recommendation_details: recommendationData,
+      source: source,
+      notes: `${source === 'ai' ? 'AI-generated' : 'Rule-based'} recommendation created from patient form`
+    };
+
+    const { data, error } = await supabase
+      .from('antibiotic_recommendations')
+      .insert([recommendationRecord])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving recommendation:', error);
+      throw error;
+    }
+
+    return data;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -142,23 +233,43 @@ export const PatientForm = () => {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: language === "en" ? "Authentication Required" : "Potrebna Autentifikacija",
+        description: language === "en"
+          ? "Please sign in to generate recommendations"
+          : "Molimo prijavite se da biste generisali preporuke",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // Create patient record first
+      const patient = await createPatientRecord();
+      setCreatedPatientId(patient.id);
+
+      // Generate recommendation
       const recommendation = generateAntibioticRecommendation(formData);
       setRecommendation(recommendation);
+
+      // Save recommendation record
+      await saveRecommendationRecord(patient.id, recommendation, 'rule-based');
       
       toast({
-        title: language === "en" ? "Recommendation Generated" : "Preporuka Generisana",
+        title: language === "en" ? "Success" : "Uspjeh",
         description: language === "en"
-          ? "Antibiotic recommendation has been generated based on patient data"
-          : "Preporuka antibiotika je generisana na osnovu podataka o pacijentu",
+          ? "Patient created and recommendation generated successfully"
+          : "Pacijent kreiran i preporuka uspješno generisana",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error in form submission:', error);
       toast({
         title: language === "en" ? "Error" : "Greška",
-        description: language === "en"
-          ? "An error occurred while generating the recommendation. Please try again."
-          : "Došlo je do greške prilikom generisanja preporuke. Molimo pokušajte ponovo.",
+        description: error.message || (language === "en"
+          ? "An error occurred while processing your request. Please try again."
+          : "Došlo je do greške prilikom obrade zahtjeva. Molimo pokušajte ponovo."),
         variant: "destructive"
       });
     } finally {
@@ -178,25 +289,47 @@ export const PatientForm = () => {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: language === "en" ? "Authentication Required" : "Potrebna Autentifikacija",
+        description: language === "en"
+          ? "Please sign in to get AI recommendations"
+          : "Molimo prijavite se da biste dobili AI preporuke",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoadingAI(true);
-    setAiRecommendation(null); // Clear previous recommendation
+    setAiRecommendation(null);
     try {
+      // Create patient record if not already created
+      let patientId = createdPatientId;
+      if (!patientId) {
+        const patient = await createPatientRecord();
+        patientId = patient.id;
+        setCreatedPatientId(patientId);
+      }
+
       console.log("Getting AI recommendation with data:", formData);
       const aiResponse = await getAIRecommendation(formData);
       console.log("AI recommendation response:", aiResponse);
 
       if (aiResponse && aiResponse.primaryRecommendation && aiResponse.primaryRecommendation.name && aiResponse.primaryRecommendation.name.trim() !== "") {
         setAiRecommendation(aiResponse);
+
+        // Save AI recommendation record
+        await saveRecommendationRecord(patientId, aiResponse, 'ai');
+
         toast({
           title: "AI Recommendation Ready",
           description: "The AI has analyzed the patient data and provided recommendations.",
         });
       } else {
-        // This case handles when aiResponse is technically not an error, but lacks meaningful content.
         setAiRecommendation(null); 
         toast({
           title: "AI Analysis Incomplete",
-          description: "The AI analysis was generated but appears to be missing key details. Please check your input data or try again. If the problem persists, ensure the AI service is properly configured.",
+          description: "The AI analysis was generated but appears to be missing key details. Please check your input data or try again.",
           variant: "default", 
         });
       }
@@ -306,7 +439,10 @@ export const PatientForm = () => {
       </form>
 
       {recommendation && (
-        <AntibioticRecommendation recommendation={recommendation} />
+        <AntibioticRecommendation 
+          recommendation={recommendation} 
+          patientId={createdPatientId}
+        />
       )}
     </div>
   );
