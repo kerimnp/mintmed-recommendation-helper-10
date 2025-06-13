@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Menu, Search, Bell, Sun, Moon } from 'lucide-react';
 import { toast as sonnerToast } from "sonner";
-import { RealTimeClock } from './RealTimeClock'; // Import the new clock component
+import { RealTimeClock } from './RealTimeClock';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminHeaderProps {
   theme: string | undefined;
@@ -35,6 +37,30 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   setIsSettingsOpen,
   handleLogout,
 }) => {
+  const { user } = useAuth();
+
+  // Get user's initials for avatar
+  const getUserInitials = () => {
+    if (user?.user_metadata?.first_name && user?.user_metadata?.last_name) {
+      return `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`.toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
+  // Get user's display name
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.first_name && user?.user_metadata?.last_name) {
+      return `${user.user_metadata.first_name} ${user.user_metadata.last_name}`;
+    }
+    if (user?.user_metadata?.first_name) {
+      return user.user_metadata.first_name;
+    }
+    return user?.email || 'User';
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
@@ -103,7 +129,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <Button variant="ghost" className="rounded-full h-9 w-9 p-0 focus-visible:ring-2 focus-visible:ring-medical-primary focus-visible:ring-offset-2">
                 <Avatar className="h-9 w-9 border-2 border-transparent hover:border-medical-primary transition-colors">
                   <AvatarImage src="/lovable.svg" alt="User Avatar" />
-                  <AvatarFallback className="bg-medical-primary/20 text-medical-primary font-semibold">KS</AvatarFallback>
+                  <AvatarFallback className="bg-medical-primary/20 text-medical-primary font-semibold">
+                    {getUserInitials()}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -111,11 +139,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <div className="flex items-center p-2 gap-3 mb-1">
                 <Avatar className="h-11 w-11">
                   <AvatarImage src="/lovable.svg" alt="User Avatar"/>
-                  <AvatarFallback className="bg-medical-primary/20 text-medical-primary font-semibold">KS</AvatarFallback>
+                  <AvatarFallback className="bg-medical-primary/20 text-medical-primary font-semibold">
+                    {getUserInitials()}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Dr. Kerim Sabic</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">kerim.sabic@horalix.com</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{getUserDisplayName()}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
                 </div>
               </div>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700"/>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Json } from '@/integrations/supabase/types';
 import { differenceInYears } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Helper function to create a searchable string from event details (can be kept for future use)
 const getSearchableStringFromEvent = (event: HistoryEvent): string => {
@@ -75,6 +76,158 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   const [historyError, setHistoryError] = useState<string | null>(null);
 
   const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Real-time subscriptions
+  useEffect(() => {
+    // Set up real-time subscription for patients table
+    const patientsChannel = supabase
+      .channel('patients-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'patients'
+        },
+        (payload) => {
+          console.log('Real-time patients change:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newPatient = payload.new as PatientFromSupabase;
+            const mappedPatient = mapPatientFromSupabase(newPatient);
+            setAllPatients(prev => [...prev, mappedPatient]);
+            toast({
+              title: "New Patient Added",
+              description: `${mappedPatient.name} has been added to the system.`,
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedPatient = payload.new as PatientFromSupabase;
+            const mappedPatient = mapPatientFromSupabase(updatedPatient);
+            setAllPatients(prev => prev.map(p => p.id === mappedPatient.id ? mappedPatient : p));
+            toast({
+              title: "Patient Updated",
+              description: `${mappedPatient.name}'s information has been updated.`,
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedPatient = payload.old as PatientFromSupabase;
+            setAllPatients(prev => prev.filter(p => p.id !== deletedPatient.id));
+            toast({
+              title: "Patient Removed",
+              description: `A patient has been removed from the system.`,
+              variant: "destructive",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(patientsChannel);
+    };
+  }, [toast]);
+
+  // Real-time subscription for prescriptions when a patient is selected
+  useEffect(() => {
+    if (!selectedPatientId) return;
+
+    const prescriptionsChannel = supabase
+      .channel(`prescriptions-changes-${selectedPatientId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescriptions',
+          filter: `patient_id=eq.${selectedPatientId}`
+        },
+        (payload) => {
+          console.log('Real-time prescriptions change:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newPrescription = payload.new as any;
+            const newEvent = mapPrescriptionToHistoryEvent(newPrescription);
+            setSelectedPatientHistory(prev => [newEvent, ...prev]);
+            toast({
+              title: "New Prescription Added",
+              description: `${newPrescription.antibiotic_name} prescription has been added.`,
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedPrescription = payload.new as any;
+            const updatedEvent = mapPrescriptionToHistoryEvent(updatedPrescription);
+            setSelectedPatientHistory(prev => 
+              prev.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+            );
+            toast({
+              title: "Prescription Updated",
+              description: `${updatedPrescription.antibiotic_name} prescription has been updated.`,
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedPrescription = payload.old as any;
+            setSelectedPatientHistory(prev => 
+              prev.filter(event => event.id !== deletedPrescription.id)
+            );
+            toast({
+              title: "Prescription Removed",
+              description: `A prescription has been removed.`,
+              variant: "destructive",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(prescriptionsChannel);
+    };
+  }, [selectedPatientId, toast]);
+
+  // Helper function to map PatientFromSupabase to PatientSummary
+  const mapPatientFromSupabase = (p: PatientFromSupabase): PatientSummary => {
+    let age = 0;
+    try {
+      if (p.date_of_birth && !isNaN(new Date(p.date_of_birth).getTime())) {
+        age = differenceInYears(new Date(), new Date(p.date_of_birth));
+      } else {
+        console.warn(`Invalid or missing date_of_birth for patient ${p.id}: ${p.date_of_birth}. Setting age to 0.`);
+      }
+    } catch (e) {
+      console.warn(`Error calculating age for patient ${p.id} with DOB ${p.date_of_birth}:`, e);
+    }
+    
+    return {
+      id: p.id,
+      name: `${p.first_name} ${p.last_name}`,
+      dob: p.date_of_birth,
+      age: age,
+      gender: mapGender(p.gender),
+    };
+  };
+
+  // Helper function to map prescription to history event
+  const mapPrescriptionToHistoryEvent = (rx: any): PrescriptionEvent => {
+    const doctorProfile = rx.doctor as {id: string, first_name: string | null, last_name: string | null, email: string | null} | null;
+    const physicianName = doctorProfile ? `${doctorProfile.first_name || ''} ${doctorProfile.last_name || ''}`.trim() || doctorProfile.email || 'N/A' : 'N/A';
+    
+    return {
+      id: rx.id,
+      date: rx.start_date, 
+      type: 'Prescription',
+      title: `Rx: ${rx.antibiotic_name}`,
+      icon: FileText,
+      details: {
+        drugName: rx.antibiotic_name,
+        dosage: rx.dosage,
+        route: rx.route,
+        frequency: rx.frequency,
+        duration: rx.duration,
+        reason: rx.reason_for_prescription || 'N/A',
+        instructions: rx.notes || undefined,
+      },
+      physician: physicianName,
+      notes: rx.status ? `Status: ${rx.status}` : undefined,
+    } as PrescriptionEvent;
+  };
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -89,27 +242,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
           throw error;
         }
         
-        const mappedPatients: PatientSummary[] = data.map((p: PatientFromSupabase) => {
-          let age = 0;
-          try {
-            if (p.date_of_birth && !isNaN(new Date(p.date_of_birth).getTime())) {
-              age = differenceInYears(new Date(), new Date(p.date_of_birth));
-            } else {
-              console.warn(`Invalid or missing date_of_birth for patient ${p.id}: ${p.date_of_birth}. Setting age to 0.`);
-            }
-          } catch (e) {
-            console.warn(`Error calculating age for patient ${p.id} with DOB ${p.date_of_birth}:`, e);
-          }
-          
-          return {
-            id: p.id,
-            name: `${p.first_name} ${p.last_name}`,
-            dob: p.date_of_birth,
-            age: age,
-            gender: mapGender(p.gender),
-            // Example: bloodType: p.blood_type || undefined,
-          };
-        });
+        const mappedPatients: PatientSummary[] = data.map(mapPatientFromSupabase);
         setAllPatients(mappedPatients);
 
       } catch (err: any) {
@@ -154,30 +287,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
             throw prescriptionsError;
           }
 
-          const historyEvents: HistoryEvent[] = prescriptionsData.map((rx: any) => {
-            const doctorProfile = rx.doctor as {id: string, first_name: string | null, last_name: string | null, email: string | null} | null;
-            const physicianName = doctorProfile ? `${doctorProfile.first_name || ''} ${doctorProfile.last_name || ''}`.trim() || doctorProfile.email || 'N/A' : 'N/A';
-            
-            return { // This needs to be a PrescriptionEvent
-              id: rx.id,
-              date: rx.start_date, 
-              type: 'Prescription',
-              title: `Rx: ${rx.antibiotic_name}`,
-              icon: FileText,
-              details: {
-                drugName: rx.antibiotic_name,
-                dosage: rx.dosage,
-                route: rx.route,
-                frequency: rx.frequency,
-                duration: rx.duration,
-                reason: rx.reason_for_prescription || 'N/A',
-                instructions: rx.notes || undefined, // 'instructions' is optional
-                // Removed Status and PrescribingDoctor from here as they are not in PrescriptionEvent['details']
-              },
-              physician: physicianName, // physician is a top-level property in BaseHistoryEvent
-              notes: rx.status ? `Status: ${rx.status}` : undefined, // Can add status to general notes if needed, or modify type
-            } as PrescriptionEvent; // Explicitly cast to PrescriptionEvent
-          });
+          const historyEvents: HistoryEvent[] = prescriptionsData.map(mapPrescriptionToHistoryEvent);
           
           setSelectedPatientHistory(historyEvents);
 
