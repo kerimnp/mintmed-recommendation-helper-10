@@ -51,13 +51,14 @@ export const useUpdateDoctorProfile = () => {
     mutationFn: async (profileData: Partial<Omit<DoctorProfile, 'id' | 'created_at' | 'updated_at'>>) => {
       if (!user?.id) throw new Error('User not authenticated');
 
-      // Convert Date to string if certification_expiry is a Date object
+      // Handle certification_expiry conversion from Date to string if needed
       const updateData = {
         ...profileData,
         updated_at: new Date().toISOString(),
       };
 
-      if (updateData.certification_expiry && updateData.certification_expiry instanceof Date) {
+      // Check if certification_expiry is a Date object and convert to string
+      if (updateData.certification_expiry && typeof updateData.certification_expiry === 'object' && updateData.certification_expiry instanceof Date) {
         updateData.certification_expiry = updateData.certification_expiry.toISOString().split('T')[0];
       }
 
