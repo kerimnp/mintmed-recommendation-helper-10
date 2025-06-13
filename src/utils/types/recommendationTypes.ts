@@ -17,6 +17,12 @@ export interface DetailedRecommendation {
   reason: string;
 }
 
+export interface RecommendationCalculations {
+  weightBased?: string;
+  renalAdjustment?: string;
+  pediatricFactors?: string;
+}
+
 export interface RecommendationMetadata {
   timestamp: string;
   systemVersion: string;
@@ -40,7 +46,7 @@ export interface EnhancedAntibioticRecommendation {
   reasoning: string;
   alternatives: DetailedRecommendation[];
   precautions: string[];
-  calculations?: string;
-  rationale?: string;
+  calculations?: RecommendationCalculations | string;
+  rationale?: AntibioticRationale | string;
   metadata?: RecommendationMetadata;
 }

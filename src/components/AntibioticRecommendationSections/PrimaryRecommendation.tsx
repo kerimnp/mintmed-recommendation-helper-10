@@ -46,7 +46,7 @@ export const PrimaryRecommendation: React.FC<PrimaryRecommendationProps> = ({
           </div>
           <div>
             <p className="text-sm text-gray-500">Dose</p>
-            <p className="text-lg font-medium">{recommendation.dose}</p>
+            <p className="text-lg font-medium">{recommendation.dosage}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Route</p>

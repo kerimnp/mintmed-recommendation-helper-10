@@ -19,4 +19,7 @@ export function getRegionalResistanceData(region?: string): RegionalResistanceDa
   };
 }
 
+// Export for backwards compatibility
+export const regionalResistanceData = getRegionalResistanceData();
+
 export { RegionalResistanceData };

@@ -30,7 +30,7 @@ export const AlternativesList: React.FC<AlternativesListProps> = ({
               </div>
               <div>
                 <p className="text-sm text-gray-500">Dose</p>
-                <p className="text-lg font-medium">{alt.dose}</p>
+                <p className="text-lg font-medium">{alt.dosage}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Route</p>

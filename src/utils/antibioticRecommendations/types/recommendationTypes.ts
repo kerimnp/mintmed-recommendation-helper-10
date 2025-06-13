@@ -10,26 +10,31 @@ export interface AntibioticRationale {
 
 export interface DetailedRecommendation {
   name: string;
-  dose: string;
-  route: string;
+  dosage: string;
+  frequency: string;
   duration: string;
+  route: string;
   reason: string;
+}
+
+export interface RecommendationCalculations {
+  weightBased?: string;
+  renalAdjustment?: string;
+  pediatricFactors?: string;
 }
 
 export interface EnhancedAntibioticRecommendation {
   primaryRecommendation: {
     name: string;
-    dose: string;
-    route: string;
+    dosage: string;
+    frequency: string;
     duration: string;
+    route: string;
+    reason: string;
   };
   reasoning: string;
   alternatives: DetailedRecommendation[];
   precautions: string[];
-  calculations?: {
-    weightBased?: string;
-    renalAdjustment?: string;
-    pediatricFactors?: string;
-  };
-  rationale: AntibioticRationale;
+  calculations?: RecommendationCalculations | string;
+  rationale?: AntibioticRationale | string;
 }
