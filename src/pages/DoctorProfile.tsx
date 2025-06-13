@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainNavigation } from '@/components/navigation/MainNavigation';
-import { DoctorProfileCard } from '@/components/doctor/DoctorProfileCard';
+import { EnhancedDoctorProfileCard } from '@/components/doctor/EnhancedDoctorProfileCard';
 import { DoctorProfileForm } from '@/components/doctor/DoctorProfileForm';
 import { useDoctorProfile, useUpdateDoctorProfile } from '@/hooks/useDoctorProfile';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,7 +26,7 @@ const DoctorProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800">
         <MainNavigation />
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="text-center space-y-4">
@@ -40,7 +40,7 @@ const DoctorProfile = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800">
         <MainNavigation />
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto">
@@ -85,7 +85,7 @@ const DoctorProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800">
       <MainNavigation />
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -144,7 +144,7 @@ const DoctorProfile = () => {
             />
           ) : (
             doctorProfile && (
-              <DoctorProfileCard
+              <EnhancedDoctorProfileCard
                 doctor={doctorProfile}
                 onEdit={() => setIsEditing(true)}
                 isOwnProfile={true}

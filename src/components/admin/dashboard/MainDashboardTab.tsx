@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { DashboardMetrics } from "./DashboardMetrics";
 import { RecentActivity } from "./RecentActivity";
+import { QuickActions } from "./QuickActions";
 import { 
   Activity,
   Users,
@@ -58,33 +59,8 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
       {/* Main Content Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button className="w-full justify-start" variant="outline">
-              <Stethoscope className="h-4 w-4 mr-2" />
-              New Consultation
-            </Button>
-            <Button className="w-full justify-start" variant="outline">
-              <Users className="h-4 w-4 mr-2" />
-              Patient Management
-            </Button>
-            <Button className="w-full justify-start" variant="outline">
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              Review Alerts
-            </Button>
-            <Button className="w-full justify-start" variant="outline">
-              <FileText className="h-4 w-4 mr-2" />
-              Generate Report
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Quick Actions - Now using the new component */}
+        <QuickActions />
 
         {/* System Status */}
         <Card>
