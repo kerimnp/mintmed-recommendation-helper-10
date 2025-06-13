@@ -1,3 +1,4 @@
+
 import { PatientData, AntibioticRecommendation } from "./types";
 import { calculateGFR } from "./renalAdjustments/gfrCalculation";
 import { getRegionalResistance } from "./resistanceData";
@@ -9,15 +10,17 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
     gender: data.gender
   });
 
-  const resistance = getRegionalResistance(data.nationality);
+  const resistance = getRegionalResistance(data.region);
   const isComplicated = data.diabetes || data.immunosuppressed || gfr < 30;
 
   let recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -28,9 +31,11 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   if (data.severity === "mild" && !isComplicated && !data.resistances.esbl) {
     recommendation.primaryRecommendation = {
       name: "Nitrofurantoin",
-      dose: "100 mg",
-      route: "PO BID",
-      duration: "5 days"
+      dosage: "100 mg",
+      frequency: "BID",
+      duration: "5 days",
+      route: "PO",
+      reason: "First-line therapy for uncomplicated UTI with low resistance rates"
     };
     recommendation.reasoning = "First-line therapy for uncomplicated UTI with low resistance rates";
   }
@@ -38,9 +43,11 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   else if (data.severity === "moderate" || isComplicated) {
     recommendation.primaryRecommendation = {
       name: "Ceftriaxone",
-      dose: "1-2 g",
-      route: "IV daily",
-      duration: "10-14 days"
+      dosage: "1-2 g",
+      frequency: "daily",
+      duration: "10-14 days",
+      route: "IV",
+      reason: "Broad-spectrum coverage for complicated UTI or pyelonephritis"
     };
     recommendation.reasoning = "Broad-spectrum coverage for complicated UTI or pyelonephritis";
   }
@@ -48,9 +55,11 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Meropenem",
-      dose: "1 g",
-      route: "IV q8h",
-      duration: "14 days"
+      dosage: "1 g",
+      frequency: "q8h",
+      duration: "14 days",
+      route: "IV",
+      reason: "Broad-spectrum coverage for severe presentation with possible resistant organisms"
     };
     recommendation.reasoning = "Broad-spectrum coverage for severe presentation with possible resistant organisms";
   }
@@ -59,9 +68,10 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   if (data.allergies.penicillin) {
     recommendation.alternatives.push({
       name: "Ciprofloxacin",
-      dose: "500 mg",
-      route: "PO BID",
+      dosage: "500 mg",
+      frequency: "BID",
       duration: recommendation.primaryRecommendation.duration,
+      route: "PO",
       reason: "Alternative for beta-lactam allergy"
     });
   }
@@ -69,9 +79,10 @@ export const generateUrinaryRecommendation = (data: PatientData): AntibioticReco
   if (data.resistances.esbl) {
     recommendation.alternatives.push({
       name: "Ertapenem",
-      dose: "1 g",
-      route: "IV daily",
+      dosage: "1 g",
+      frequency: "daily",
       duration: recommendation.primaryRecommendation.duration,
+      route: "IV",
       reason: "Coverage for ESBL-producing organisms"
     });
   }

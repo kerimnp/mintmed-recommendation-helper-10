@@ -1,3 +1,4 @@
+
 import { PatientData, AntibioticRecommendation } from './types';
 import { calculateAdjustedDose } from './antibioticDatabase';
 import { isPediatricPatient } from './pediatricAdjustments';
@@ -6,9 +7,11 @@ export const generateSepsisRecommendation = (data: PatientData): AntibioticRecom
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -21,33 +24,38 @@ export const generateSepsisRecommendation = (data: PatientData): AntibioticRecom
   if (!data.allergies.cephalosporin) {
     recommendation.primaryRecommendation = {
       name: "Cefepime + Vancomycin",
-      dose: isPediatric ? 
+      dosage: isPediatric ? 
         "50mg/kg q8h + 15mg/kg q6h" : 
         "2g q8h + 15-20mg/kg q8-12h",
+      frequency: "q6-8h",
+      duration: "7-14 days",
       route: "IV",
-      duration: "7-14 days"
+      reason: "Broad spectrum coverage for sepsis including MRSA"
     };
     recommendation.reasoning = "Broad spectrum coverage for sepsis including MRSA";
     
     if (!data.allergies.penicillin) {
       recommendation.alternatives.push({
         name: "Piperacillin-Tazobactam + Vancomycin",
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "100mg/kg q6h + 15mg/kg q6h" :
           "4.5g q6h + 15-20mg/kg q8-12h",
-        route: "IV",
+        frequency: "q6h",
         duration: "7-14 days",
+        route: "IV",
         reason: "Alternative broad spectrum coverage"
       });
     }
   } else {
     recommendation.primaryRecommendation = {
       name: "Meropenem + Vancomycin",
-      dose: isPediatric ?
+      dosage: isPediatric ?
         "20mg/kg q8h + 15mg/kg q6h" :
         "1g q8h + 15-20mg/kg q8-12h",
+      frequency: "q6-8h",
+      duration: "7-14 days",
       route: "IV",
-      duration: "7-14 days"
+      reason: "Alternative coverage for patients with cephalosporin allergy"
     };
     recommendation.reasoning = "Alternative coverage for patients with cephalosporin allergy";
   }

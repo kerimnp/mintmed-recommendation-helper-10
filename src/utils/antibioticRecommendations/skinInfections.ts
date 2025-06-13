@@ -1,3 +1,4 @@
+
 import { PatientData, AntibioticRecommendation } from './types';
 import { calculateDoseForPatient } from './doseCalculations';
 import { isPediatricPatient } from './pediatricAdjustments';
@@ -7,9 +8,11 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -29,18 +32,21 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
       const doseCalc = calculateDoseForPatient("Cephalexin", data, "mild");
       recommendation.primaryRecommendation = {
         name: "Cephalexin",
-        dose: doseCalc.dose,
+        dosage: doseCalc.dosage,
+        frequency: "q6h",
+        duration: "7-10 days",
         route: "oral",
-        duration: "7-10 days"
+        reason: "First-line treatment for uncomplicated skin infections"
       };
       recommendation.reasoning = "First-line treatment for uncomplicated skin infections";
       
       if (!data.allergies.sulfa) {
         recommendation.alternatives.push({
           name: "Trimethoprim-Sulfamethoxazole",
-          dose: isPediatric ? "8-12mg/kg/day divided BID" : "160/800mg BID",
-          route: "oral",
+          dosage: isPediatric ? "8-12mg/kg/day divided BID" : "160/800mg BID",
+          frequency: "q12h",
           duration: "7-10 days",
+          route: "oral",
           reason: "Alternative for MRSA coverage"
         });
       }
@@ -48,9 +54,11 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
       // Penicillin allergic patient
       recommendation.primaryRecommendation = {
         name: "Clindamycin",
-        dose: isPediatric ? "10-20mg/kg/day divided TID" : "300-450mg TID",
+        dosage: isPediatric ? "10-20mg/kg/day divided TID" : "300-450mg TID",
+        frequency: "q8h",
+        duration: "7-10 days",
         route: "oral",
-        duration: "7-10 days"
+        reason: "Alternative for penicillin-allergic patients"
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
@@ -59,17 +67,20 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
   else if (data.severity === "moderate" || data.resistances.mrsa) {
     recommendation.primaryRecommendation = {
       name: "Vancomycin",
-      dose: "15-20mg/kg/dose q8-12h",
+      dosage: "15-20mg/kg/dose q8-12h",
+      frequency: "q8-12h",
+      duration: "7-14 days",
       route: "IV",
-      duration: "7-14 days"
+      reason: "Coverage for possible MRSA and moderate severity"
     };
     recommendation.reasoning = "Coverage for possible MRSA and moderate severity";
 
     recommendation.alternatives.push({
       name: "Daptomycin",
-      dose: isPediatric ? "6-10mg/kg/day" : "6mg/kg/day",
-      route: "IV",
+      dosage: isPediatric ? "6-10mg/kg/day" : "6mg/kg/day",
+      frequency: "daily",
       duration: "7-14 days",
+      route: "IV",
       reason: "Alternative for MRSA coverage"
     });
   }
@@ -77,9 +88,11 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
   else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Vancomycin + Piperacillin-Tazobactam",
-      dose: "15-20mg/kg/dose q8-12h + 4.5g q6h",
+      dosage: "15-20mg/kg/dose q8-12h + 4.5g q6h",
+      frequency: "q6-8h",
+      duration: "14-21 days",
       route: "IV",
-      duration: "14-21 days"
+      reason: "Broad spectrum coverage for severe skin/soft tissue infection"
     };
     recommendation.reasoning = "Broad spectrum coverage for severe skin/soft tissue infection";
   }

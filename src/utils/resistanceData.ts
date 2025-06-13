@@ -57,19 +57,20 @@ export function getResistanceConsiderations(region: string): string[] {
   
   const resistanceData = regionalResistanceData[mappedRegion];
   
-  if (resistanceData.Respiratory.macrolideResistance > RESISTANCE_THRESHOLDS.macrolide) {
+  // Use the actual structure of the regional resistance data
+  if (resistanceData && resistanceData.Respiratory && resistanceData.Respiratory.macrolideResistance > RESISTANCE_THRESHOLDS.macrolide) {
     considerations.push(`High macrolide resistance in ${mappedRegion} (${resistanceData.Respiratory.macrolideResistance}%) - consider alternatives for respiratory infections.`);
   }
   
-  if (resistanceData.Respiratory.penicillinResistance > RESISTANCE_THRESHOLDS.penicillin) {
+  if (resistanceData && resistanceData.Respiratory && resistanceData.Respiratory.penicillinResistance > RESISTANCE_THRESHOLDS.penicillin) {
     considerations.push(`High penicillin resistance in ${mappedRegion} (${resistanceData.Respiratory.penicillinResistance}%) - consider higher doses or alternatives.`);
   }
   
-  if (resistanceData.UTI.ESBL_prevalence > RESISTANCE_THRESHOLDS.esbl) {
+  if (resistanceData && resistanceData.UTI && resistanceData.UTI.ESBL_prevalence > RESISTANCE_THRESHOLDS.esbl) {
     considerations.push(`High ESBL prevalence in ${mappedRegion} (${resistanceData.UTI.ESBL_prevalence}%) - consider carbapenem for severe UTIs.`);
   }
   
-  if (resistanceData.MRSA_prevalence > RESISTANCE_THRESHOLDS.mrsa) {
+  if (resistanceData && resistanceData.MRSA_prevalence > RESISTANCE_THRESHOLDS.mrsa) {
     considerations.push(`High MRSA prevalence in ${mappedRegion} (${resistanceData.MRSA_prevalence}%) - consider MRSA coverage for skin/soft tissue infections.`);
   }
   

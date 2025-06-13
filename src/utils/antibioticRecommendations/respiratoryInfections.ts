@@ -1,3 +1,4 @@
+
 import { PatientData, AntibioticRecommendation } from './types';
 import { calculateAdjustedDose } from './antibioticDatabase';
 import { isPediatricPatient } from './pediatricAdjustments';
@@ -6,9 +7,11 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   const recommendation: AntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -24,17 +27,21 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     if (!data.allergies.penicillin) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
-        dose: isPediatric ? "45-90mg/kg/day divided q12h" : "1g",
+        dosage: isPediatric ? "45-90mg/kg/day divided q12h" : "1g",
+        frequency: "q12h",
+        duration: "5-7 days",
         route: "oral",
-        duration: "5-7 days"
+        reason: "First-line treatment for mild community-acquired pneumonia"
       };
       recommendation.reasoning = "First-line treatment for mild community-acquired pneumonia";
     } else {
       recommendation.primaryRecommendation = {
         name: "Azithromycin",
-        dose: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+        dosage: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+        frequency: "daily",
+        duration: "5 days",
         route: "oral",
-        duration: "5 days"
+        reason: "Alternative for penicillin-allergic patients"
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
@@ -42,18 +49,21 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     if (!data.allergies.cephalosporin) {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone",
-        dose: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+        dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+        frequency: "daily",
+        duration: "7-10 days",
         route: "IV",
-        duration: "7-10 days"
+        reason: "Treatment for moderate CAP or early HAP"
       };
       recommendation.reasoning = "Treatment for moderate CAP or early HAP";
 
       if (!data.allergies.macrolide) {
         recommendation.alternatives.push({
           name: "Azithromycin",
-          dose: isPediatric ? "10mg/kg daily" : "500mg daily",
-          route: "IV",
+          dosage: isPediatric ? "10mg/kg daily" : "500mg daily",
+          frequency: "daily",
           duration: "5 days",
+          route: "IV",
           reason: "Added for atypical coverage"
         });
       }
@@ -61,18 +71,21 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
   } else if (data.severity === "severe") {
     recommendation.primaryRecommendation = {
       name: "Piperacillin-Tazobactam",
-      dose: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+      dosage: isPediatric ? "90mg/kg q6h" : "4.5g q6h",
+      frequency: "q6h",
+      duration: "10-14 days",
       route: "IV",
-      duration: "10-14 days"
+      reason: "Broad spectrum coverage for severe pneumonia"
     };
     recommendation.reasoning = "Broad spectrum coverage for severe pneumonia";
 
     if (data.resistances.mrsa) {
       recommendation.alternatives.push({
         name: "Vancomycin",
-        dose: "15-20mg/kg q8-12h",
-        route: "IV",
+        dosage: "15-20mg/kg q8-12h",
+        frequency: "q8-12h",
         duration: "10-14 days",
+        route: "IV",
         reason: "Added for MRSA coverage"
       });
     }
@@ -80,9 +93,10 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
     if (data.resistances.pseudomonas) {
       recommendation.alternatives.push({
         name: "Meropenem",
-        dose: isPediatric ? "20mg/kg q8h" : "1g q8h",
-        route: "IV",
+        dosage: isPediatric ? "20mg/kg q8h" : "1g q8h",
+        frequency: "q8h",
         duration: "10-14 days",
+        route: "IV",
         reason: "Alternative for suspected Pseudomonas"
       });
     }
