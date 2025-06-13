@@ -1,222 +1,229 @@
 
 import { PatientData } from "../../types/patientTypes";
 import { EnhancedAntibioticRecommendation } from "../../types/recommendationTypes";
+import { isPediatricPatient } from "../pediatricAdjustments";
+import { shouldAdjustForRenalFunction } from "../calculations/renalCalculations";
 
 export const generateSkinRecommendation = (
-  data: PatientData, 
-  gfr: number, 
+  data: PatientData,
+  gfr: number,
   isPediatric: boolean
 ): EnhancedAntibioticRecommendation => {
-  const hasPenicillinAllergy = data.allergies.penicillin;
-  const hasCephalosporinAllergy = data.allergies.cephalosporin;
-  const hasMRSA = data.resistances.mrsa;
-  const isDiabetic = data.diabetes;
-  const isImmunosuppressed = data.immunosuppressed;
-  
-  let recommendation: EnhancedAntibioticRecommendation = {
+  const recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
     precautions: [],
+    calculations: {
+      gfr: `${Math.round(gfr)} mL/min`,
+      isPediatric: isPediatric.toString(),
+      weightBasedDosing: isPediatric ? "Required" : "Not required"
+    },
     rationale: {
-      infectionType: "skin",
+      infectionType: "Skin and soft tissue infection",
       severity: data.severity,
       reasons: []
     }
   };
-  
-  // Uncomplicated skin infection
-  if (data.severity === "mild" && !hasMRSA && !isDiabetic && !isImmunosuppressed) {
-    if (!hasCephalosporinAllergy) {
-      recommendation = {
-        primaryRecommendation: {
+
+  // Ensure rationale.reasons is always an array
+  const rationale = recommendation.rationale as {
+    infectionType: string;
+    severity: string;
+    reasons: string[];
+  };
+
+  if (data.severity === "mild") {
+    if (!data.resistances.mrsa) {
+      if (!data.allergies.penicillin) {
+        recommendation.primaryRecommendation = {
           name: "Cephalexin",
-          dose: isPediatric ? "25-50mg/kg/day divided q6h" : "500mg QID",
-          route: "PO",
-          duration: "7-10 days"
-        },
-        reasoning: "First-line treatment for uncomplicated skin infections",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "skin",
-          severity: data.severity,
-          reasons: [
-            "Effective against Streptococcus and MSSA",
-            "Appropriate for uncomplicated cellulitis"
-          ]
-        }
-      };
-      
-      // Add alternative for MRSA risk
-      if (!data.allergies.sulfa) {
-        recommendation.alternatives.push({
-          name: "Trimethoprim-Sulfamethoxazole",
-          dose: isPediatric ? "8-12mg/kg/day divided BID" : "1-2 DS tablets BID",
-          route: "PO",
+          dosage: isPediatric ? "25-50mg/kg/day divided q6h" : "500mg",
+          frequency: "q6h",
           duration: "7-10 days",
-          reason: "Alternative with MRSA coverage"
+          route: "oral",
+          reason: "First-line therapy for uncomplicated skin infections"
+        };
+        recommendation.reasoning = "Standard therapy for cellulitis/skin infections";
+        rationale.reasons.push("Uncomplicated skin infection");
+
+        recommendation.alternatives.push({
+          name: "Amoxicillin/Clavulanate",
+          dosage: isPediatric ? "45mg/kg/day divided q12h" : "875/125mg",
+          frequency: "q12h",
+          duration: "7-10 days",
+          route: "oral",
+          reason: "Alternative with anaerobic coverage"
         });
-      }
-    } else if (!hasPenicillinAllergy) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Dicloxacillin",
-          dose: isPediatric ? "12.5-25mg/kg/day divided QID" : "500mg QID",
-          route: "PO",
-          duration: "7-10 days"
-        },
-        reasoning: "Alternative for cephalosporin-allergic patients",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "skin",
-          severity: data.severity,
-          reasons: [
-            "Narrow-spectrum coverage for skin pathogens",
-            "Active against Staphylococcus aureus"
-          ],
-          allergyConsiderations: ["Avoids cephalosporins due to allergy"]
-        }
-      };
-    } else {
-      recommendation = {
-        primaryRecommendation: {
+      } else {
+        recommendation.primaryRecommendation = {
           name: "Clindamycin",
-          dose: isPediatric ? "10-20mg/kg/day divided TID" : "300-450mg TID",
-          route: "PO",
-          duration: "7-10 days"
-        },
-        reasoning: "Alternative for beta-lactam allergic patients",
-        alternatives: [],
-        precautions: ["Risk of C. difficile infection"],
-        rationale: {
-          infectionType: "skin",
-          severity: data.severity,
-          reasons: [
-            "Option for beta-lactam allergic patients",
-            "Effective against Streptococcus and Staphylococcus"
-          ],
-          allergyConsiderations: ["Selected due to beta-lactam allergies"]
+          dosage: isPediatric ? "20-30mg/kg/day divided q8h" : "300mg",
+          frequency: "q8h",
+          duration: "7-10 days",
+          route: "oral",
+          reason: "Penicillin allergy - good skin penetration"
+        };
+        recommendation.reasoning = "Alternative for penicillin-allergic patients";
+        rationale.reasons.push("Penicillin allergy");
+
+        if (!data.allergies.macrolide) {
+          recommendation.alternatives.push({
+            name: "Azithromycin",
+            dosage: isPediatric ? "10mg/kg day 1, then 5mg/kg" : "500mg day 1, then 250mg",
+            frequency: "daily",
+            duration: "5 days",
+            route: "oral",
+            reason: "Macrolide alternative"
+          });
         }
+      }
+    } else {
+      // MRSA suspected
+      recommendation.primaryRecommendation = {
+        name: "Clindamycin",
+        dosage: isPediatric ? "20-30mg/kg/day divided q8h" : "300-450mg",
+        frequency: "q8h",
+        duration: "7-10 days",
+        route: "oral",
+        reason: "MRSA coverage for skin infections"
       };
+      recommendation.reasoning = "MRSA-active therapy for skin infection";
+      rationale.reasons.push("MRSA suspected or confirmed");
+
+      recommendation.alternatives.push({
+        name: "Doxycycline",
+        dosage: isPediatric && parseInt(data.age) >= 8 ? "2mg/kg q12h" : "100mg",
+        frequency: "q12h",
+        duration: "7-10 days",
+        route: "oral",
+        reason: "Alternative MRSA-active oral agent"
+      });
     }
-  } 
-  // Moderate infection or MRSA risk
-  else if (data.severity === "moderate" || hasMRSA || isDiabetic) {
-    if (hasMRSA) {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Vancomycin",
-          dose: "15-20mg/kg/dose q8-12h",
+  } else if (data.severity === "moderate") {
+    if (!data.resistances.mrsa) {
+      if (!data.allergies.penicillin) {
+        recommendation.primaryRecommendation = {
+          name: "Cefazolin",
+          dosage: isPediatric ? "50mg/kg q8h" : "2g",
+          frequency: "q8h",
+          duration: "7-10 days",
           route: "IV",
-          duration: "7-14 days"
-        },
-        reasoning: "Coverage for possible MRSA and moderate severity",
-        alternatives: [],
-        precautions: ["Monitor drug levels", "Adjust dose based on renal function"],
-        rationale: {
-          infectionType: "skin",
-          severity: data.severity,
-          reasons: [
-            "Selected for MRSA coverage",
-            "Appropriate for moderate to severe infections"
-          ]
-        }
+          reason: "IV therapy for moderate skin infections"
+        };
+        recommendation.reasoning = "Moderate severity requires IV therapy";
+        rationale.reasons.push("Moderate severity infection");
+
+        recommendation.alternatives.push({
+          name: "Ampicillin/Sulbactam",
+          dosage: isPediatric ? "100mg/kg q6h" : "3g",
+          frequency: "q6h",
+          duration: "7-10 days",
+          route: "IV",
+          reason: "Alternative with anaerobic coverage"
+        });
+      } else {
+        recommendation.primaryRecommendation = {
+          name: "Clindamycin",
+          dosage: isPediatric ? "25-40mg/kg/day divided q8h" : "600mg",
+          frequency: "q8h",
+          duration: "7-10 days",
+          route: "IV",
+          reason: "IV clindamycin for penicillin-allergic patients"
+        };
+        recommendation.reasoning = "Moderate infection with penicillin allergy";
+        rationale.reasons.push("Moderate severity with penicillin allergy");
+      }
+    } else {
+      // MRSA suspected
+      recommendation.primaryRecommendation = {
+        name: "Vancomycin",
+        dosage: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
+        frequency: isPediatric ? "q6h" : "q8-12h",
+        duration: "7-10 days",
+        route: "IV",
+        reason: "MRSA-active IV therapy"
       };
-      
+      recommendation.reasoning = "MRSA-active therapy for moderate skin infection";
+      rationale.reasons.push("MRSA suspected with moderate severity");
+
       recommendation.alternatives.push({
         name: "Linezolid",
-        dose: isPediatric ? "10mg/kg q8h" : "600mg BID",
+        dosage: isPediatric ? "10mg/kg q8h" : "600mg",
+        frequency: isPediatric ? "q8h" : "q12h",
+        duration: "7-10 days",
         route: "IV/PO",
-        duration: "7-14 days",
-        reason: "Alternative for MRSA coverage, no renal adjustment needed"
+        reason: "Alternative MRSA-active agent"
       });
-    } else {
-      recommendation = {
-        primaryRecommendation: {
-          name: "Cefazolin",
-          dose: isPediatric ? "50mg/kg/day divided q8h" : "1-2g q8h",
-          route: "IV",
-          duration: "7-10 days"
-        },
-        reasoning: "Parenteral therapy for moderate skin infection",
-        alternatives: [],
-        precautions: [],
-        rationale: {
-          infectionType: "skin",
-          severity: data.severity,
-          reasons: [
-            "Narrow-spectrum but effective for skin pathogens",
-            "Appropriate for moderate infections requiring IV therapy"
-          ]
-        }
+    }
+  } else if (data.severity === "severe") {
+    if (data.resistances.mrsa || data.immunosuppressed) {
+      recommendation.primaryRecommendation = {
+        name: "Vancomycin + Piperacillin/Tazobactam",
+        dosage: isPediatric ? 
+          "15mg/kg q6h + 200mg/kg/day q6h" : 
+          "15-20mg/kg q8-12h + 4.5g q6h",
+        frequency: "q6-8h",
+        duration: "10-14 days",
+        route: "IV",
+        reason: "Broad spectrum including MRSA for severe infection"
       };
-    }
-  }
-  // Severe skin infection
-  else if (data.severity === "severe") {
-    recommendation = {
-      primaryRecommendation: {
-        name: "Vancomycin + Piperacillin-Tazobactam",
-        dose: "15-20mg/kg/dose q8-12h + 4.5g q6h",
+      recommendation.reasoning = "Severe infection requiring broad spectrum coverage";
+      rationale.reasons.push("Severe infection with MRSA risk");
+    } else {
+      recommendation.primaryRecommendation = {
+        name: "Cefepime",
+        dosage: isPediatric ? "50mg/kg q8h" : "2g",
+        frequency: "q8h",
+        duration: "10-14 days",
         route: "IV",
-        duration: "14-21 days"
-      },
-      reasoning: "Broad spectrum coverage for severe skin/soft tissue infection",
-      alternatives: [],
-      precautions: [
-        "Monitor vancomycin levels",
-        "Consider surgical consultation"
-      ],
-      rationale: {
-        infectionType: "skin",
-        severity: data.severity,
-        reasons: [
-          "Combination therapy for severe infection",
-          "Covers MRSA and gram-negative pathogens"
-        ]
-      }
-    };
-    
-    // Add alternative for penicillin allergy
-    if (hasPenicillinAllergy) {
+        reason: "Broad spectrum therapy for severe skin infection"
+      };
+      recommendation.reasoning = "Severe skin infection requiring broad coverage";
+      rationale.reasons.push("Severe infection requiring hospitalization");
+
       recommendation.alternatives.push({
-        name: "Vancomycin + Aztreonam",
-        dose: "15-20mg/kg/dose q8-12h + 2g q8h",
+        name: "Piperacillin/Tazobactam",
+        dosage: isPediatric ? "200mg/kg/day q6h" : "4.5g",
+        frequency: "q6h",
+        duration: "10-14 days",
         route: "IV",
-        duration: "14-21 days",
-        reason: "Alternative for patients with penicillin allergy"
+        reason: "Alternative broad spectrum option"
       });
     }
+
+    recommendation.precautions.push(
+      "Consider surgical debridement if indicated",
+      "Monitor for systemic complications"
+    );
   }
 
-  // Add special considerations
-  if (isDiabetic) {
-    recommendation.precautions = [
-      ...(recommendation.precautions || []),
-      "Diabetic patient - monitor glycemic control",
-      "Consider longer duration of therapy",
-      "Higher risk of treatment failure"
-    ];
+  // Add renal considerations
+  if (shouldAdjustForRenalFunction(gfr)) {
+    recommendation.precautions.push("Dose adjustment required for renal function");
+    if (typeof recommendation.calculations === 'object') {
+      recommendation.calculations.renalAdjustment = "Required";
+    }
   }
 
-  if (gfr < 30) {
-    recommendation.precautions = [
-      ...(recommendation.precautions || []),
-      "Severe renal impairment - dose adjustment required",
-      "Monitor drug levels if using vancomycin"
-    ];
-    recommendation.calculations = {
-      ...recommendation.calculations,
-      renalAdjustment: `GFR ${Math.round(gfr)} mL/min - requires dose adjustment`
-    };
+  // Add diabetes considerations
+  if (data.diabetes) {
+    recommendation.precautions.push("Diabetic patient - monitor wound healing");
+    rationale.reasons.push("Diabetes may impair wound healing");
   }
-  
+
+  // Add immunocompromised considerations
+  if (data.immunosuppressed) {
+    recommendation.precautions.push("Immunocompromised - consider broader coverage");
+    rationale.reasons.push("Immunosuppression increases infection risk");
+  }
+
   return recommendation;
 };

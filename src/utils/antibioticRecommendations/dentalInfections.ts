@@ -1,13 +1,17 @@
-import { PatientData, AntibioticRecommendation } from './types';
+
+import { PatientData } from '../types/patientTypes';
+import { EnhancedAntibioticRecommendation } from './types/recommendationTypes';
 import { isPediatricPatient } from './pediatricAdjustments';
 
-export const generateDentalInfectionRecommendation = (data: PatientData): AntibioticRecommendation => {
-  const recommendation: AntibioticRecommendation = {
+export const generateDentalInfectionRecommendation = (data: PatientData): EnhancedAntibioticRecommendation => {
+  const recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -20,53 +24,53 @@ export const generateDentalInfectionRecommendation = (data: PatientData): Antibi
     if (!data.allergies.penicillin) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
-        dose: isPediatric ? "50mg/kg/day divided q8h" : "500mg q8h",
+        dosage: isPediatric ? "20-40mg/kg/day divided q8h" : "500mg",
+        frequency: "q8h",
+        duration: "7 days",
         route: "oral",
-        duration: "7 days"
+        reason: "First-line treatment for dental infections"
       };
       recommendation.reasoning = "First-line treatment for dental infections";
-    } else if (!data.allergies.macrolide) {
+
+      recommendation.alternatives.push({
+        name: "Penicillin V",
+        dosage: isPediatric ? "25-50mg/kg/day divided q6h" : "500mg",
+        frequency: "q6h",
+        duration: "7 days",
+        route: "oral",
+        reason: "Alternative first-line treatment"
+      });
+    } else {
       recommendation.primaryRecommendation = {
+        name: "Clindamycin",
+        dosage: isPediatric ? "10-20mg/kg/day divided q8h" : "300mg",
+        frequency: "q8h",
+        duration: "7 days",
+        route: "oral",
+        reason: "Penicillin-allergic patients"
+      };
+      recommendation.reasoning = "Penicillin-allergic patients";
+
+      recommendation.alternatives.push({
         name: "Azithromycin",
-        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
+        dosage: isPediatric ? "10mg/kg day 1, then 5mg/kg" : "500mg day 1, then 250mg",
+        frequency: "daily",
+        duration: "5 days",
         route: "oral",
-        duration: "5 days"
-      };
-      recommendation.reasoning = "Alternative for penicillin-allergic patients";
+        reason: "Alternative for penicillin-allergic patients"
+      });
     }
-  } else if (data.severity === "moderate") {
-    if (!data.allergies.penicillin) {
-      recommendation.primaryRecommendation = {
-        name: "Amoxicillin-Clavulanate",
-        dose: isPediatric ? "45mg/kg/day divided q12h" : "875/125mg q12h",
-        route: "oral",
-        duration: "7-10 days"
-      };
-      recommendation.reasoning = "Treatment for moderate dental infections";
-    }
-  } else if (data.severity === "severe") {
+  } else if (data.severity === "moderate" || data.severity === "severe") {
     recommendation.primaryRecommendation = {
-      name: "Ampicillin-Sulbactam + Metronidazole",
-      dose: isPediatric ?
-        "50mg/kg q6h + 7.5mg/kg q6h" :
-        "3g q6h + 500mg q6h",
-      route: "IV",
-      duration: "10-14 days"
+      name: "Amoxicillin/Clavulanate",
+      dosage: isPediatric ? "45mg/kg/day divided q12h" : "875/125mg",
+      frequency: "q12h",
+      duration: "7-10 days",
+      route: "oral",
+      reason: "Broad spectrum coverage for moderate to severe infections"
     };
-    recommendation.reasoning = "Treatment for severe dental infections";
+    recommendation.reasoning = "Broad spectrum coverage for moderate to severe infections";
   }
-
-  if (data.diabetes) {
-    recommendation.precautions.push(
-      "Higher risk of complications",
-      "Consider longer duration of therapy"
-    );
-  }
-
-  recommendation.precautions.push(
-    "Dental consultation recommended",
-    "Consider surgical drainage if abscess present"
-  );
 
   return recommendation;
 };

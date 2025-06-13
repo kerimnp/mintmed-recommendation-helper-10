@@ -1,8 +1,7 @@
-
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
-import { generateAdvancedRecommendation } from "@/utils/antibioticRecommendations";
+import { generateAdvancedRecommendation } from "@/utils/antibioticRecommendations/index";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
 import { AllergySection } from "./AllergySection";
 import { RenalFunctionSection } from "./RenalFunctionSection";
@@ -73,7 +72,8 @@ export const PatientForm = () => {
     lastName: "",
     contactPhone: "",
     contactEmail: "",
-    address: ""
+    address: "",
+    nationality: ""
   });
 
   const handleInputChange = (field: string, value: any) => {
