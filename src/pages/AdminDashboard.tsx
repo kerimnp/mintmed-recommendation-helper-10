@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast"; 
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
@@ -20,7 +19,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation(); // Use useLocation to get current URL parameters
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -79,7 +78,6 @@ const AdminDashboard = () => {
     }
   }, [navigate, isUserManagementAuthorized, validTabs, toast]);
 
-
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -88,7 +86,6 @@ const AdminDashboard = () => {
         description: `Searching for: "${searchTerm}"`,
       });
       const lowerSearchTerm = searchTerm.toLowerCase();
-      // This search logic mainly navigates. The actual filtering is done within tabs.
       if (lowerSearchTerm.includes("dashboard")) handleSetActiveTab("dashboard");
       else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && isUserManagementAuthorized) handleSetActiveTab("user-management");
       else if (lowerSearchTerm.includes("antibiotic") || lowerSearchTerm.includes("drug") || lowerSearchTerm.includes("medication")) handleSetActiveTab("antibiotics");
@@ -142,14 +139,13 @@ const AdminDashboard = () => {
 
       <main className="flex-1 overflow-hidden w-full flex flex-col h-screen">
         <AdminHeader
-          theme={theme}
-          setTheme={setTheme}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          handleSearch={handleSearch}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
+          theme={theme}
+          setTheme={setTheme}
           setIsSettingsOpen={setIsSettingsOpen}
           handleLogout={signOut}
+          handleSearch={handleSearch}
         />
         
         <div className="flex-1 overflow-auto">
@@ -188,4 +184,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

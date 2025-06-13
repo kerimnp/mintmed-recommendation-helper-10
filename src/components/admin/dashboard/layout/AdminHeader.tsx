@@ -11,14 +11,42 @@ import { ProfileDropdown } from "./ProfileDropdown";
 interface AdminHeaderProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  theme?: string;
+  setTheme?: (theme: string) => void;
+  setIsMobileMenuOpen?: (open: boolean) => void;
+  setIsSettingsOpen?: (open: boolean) => void;
+  handleLogout?: () => void;
+  handleSearch?: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-export const AdminHeader = ({ searchTerm, setSearchTerm }: AdminHeaderProps) => {
+export const AdminHeader = ({ 
+  searchTerm, 
+  setSearchTerm,
+  theme: externalTheme,
+  setTheme: externalSetTheme,
+  setIsSettingsOpen,
+  handleLogout
+}: AdminHeaderProps) => {
   const { theme, setTheme } = useTheme();
+  const [isSettingsOpen, setLocalSettingsOpen] = React.useState(false);
+
+  // Use external theme controls if provided, otherwise use internal ones
+  const currentTheme = externalTheme || theme;
+  const currentSetTheme = externalSetTheme || setTheme;
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    currentSetTheme(currentTheme === "dark" ? "light" : "dark");
   };
+
+  const handleSettingsOpen = (open: boolean) => {
+    if (setIsSettingsOpen) {
+      setIsSettingsOpen(open);
+    } else {
+      setLocalSettingsOpen(open);
+    }
+  };
+
+  const currentSettingsOpen = setIsSettingsOpen ? false : isSettingsOpen;
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
@@ -45,14 +73,30 @@ export const AdminHeader = ({ searchTerm, setSearchTerm }: AdminHeaderProps) => 
             onClick={toggleTheme}
             className="h-9 w-9"
           >
-            {theme === "dark" ? (
+            {currentTheme === "dark" ? (
               <Sun className="h-4 w-4" />
             ) : (
               <Moon className="h-4 w-4" />
             )}
           </Button>
 
-          <SettingsDialog />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleSettingsOpen(true)}
+            className="h-9 w-9"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+
+          <SettingsDialog
+            isOpen={currentSettingsOpen}
+            onOpenChange={handleSettingsOpen}
+            theme={currentTheme}
+            setTheme={currentSetTheme}
+            handleLogout={handleLogout || (() => {})}
+          />
+
           <ProfileDropdown />
         </div>
       </div>
