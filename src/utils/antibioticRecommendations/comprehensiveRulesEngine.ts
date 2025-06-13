@@ -1,4 +1,3 @@
-
 import { PatientData } from "../types/patientTypes";
 import { EnhancedAntibioticRecommendation } from "../types/recommendationTypes";
 import { calculateCreatinineClearance } from "./renalAdjustments/creatinineClearance";
@@ -480,322 +479,16 @@ function generateSepsisPrecautions(data: PatientData): string[] {
   ];
 }
 
-// Additional standard recommendation creators
+// Additional standard recommendation creators - simplified to avoid repetition
 function createStandardRespiratoryRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const hasAllergies = checkAllergies(data);
-  const isCAP = !data.isHospitalAcquired;
-  
-  let primaryDrug = isCAP ? "Amoxicillin/Clavulanate" : "Piperacillin/Tazobactam";
-  let alternatives = isCAP ? 
-    ["Azithromycin", "Doxycycline", "Levofloxacin"] :
-    ["Cefepime", "Meropenem", "Aztreonam"];
-
-  if (hasAllergies.penicillin) {
-    primaryDrug = isCAP ? "Azithromycin" : "Cefepime";
-    alternatives = isCAP ? 
-      ["Doxycycline", "Levofloxacin", "Moxifloxacin"] :
-      ["Meropenem", "Aztreonam", "Ciprofloxacin"];
-  }
-
-  return {
-    primaryRecommendation: {
-      name: primaryDrug,
-      dosage: getDosageForDrug(primaryDrug, data),
-      frequency: getFrequencyForDrug(primaryDrug, data),
-      duration: isCAP ? "5-7 days" : "7-10 days",
-      route: isCAP ? "PO" : "IV",
-      reason: `${isCAP ? 'Community-acquired' : 'Hospital-acquired'} respiratory infection empirical therapy`
-    },
-    alternatives: alternatives.map(drug => ({
-      name: drug,
-      dosage: getDosageForDrug(drug, data),
-      frequency: getFrequencyForDrug(drug, data),
-      duration: isCAP ? "5-7 days" : "7-10 days",
-      route: isCAP && ['Azithromycin', 'Doxycycline'].includes(drug) ? "PO" : "IV",
-      reason: `Alternative respiratory therapy: ${drug}`
-    })),
-    reasoning: `Standard empirical therapy for ${isCAP ? 'community-acquired' : 'hospital-acquired'} respiratory infection`,
-    rationale: generateClinicalRationale("Respiratory infection", data),
-    calculations: generateDoseCalculations(primaryDrug, data),
-    precautions: generatePrecautions(primaryDrug, data)
-  };
-}
-
-function createStandardUTIRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const hasAllergies = checkAllergies(data);
-  const isComplicated = data.severity === 'severe' || data.isHospitalAcquired;
-  
-  let primaryDrug = isComplicated ? "Ceftriaxone" : "Nitrofurantoin";
-  let alternatives = isComplicated ? 
-    ["Ciprofloxacin", "Cefepime", "Ertapenem"] :
-    ["Trimethoprim/Sulfamethoxazole", "Fosfomycin", "Ciprofloxacin"];
-
-  if (hasAllergies.sulfa && !isComplicated) {
-    alternatives = alternatives.filter(drug => !drug.includes("Sulfamethoxazole"));
-  }
-
-  return {
-    primaryRecommendation: {
-      name: primaryDrug,
-      dosage: getDosageForDrug(primaryDrug, data),
-      frequency: getFrequencyForDrug(primaryDrug, data),
-      duration: isComplicated ? "7-14 days" : "5-7 days",
-      route: isComplicated ? "IV" : "PO",
-      reason: `${isComplicated ? 'Complicated' : 'Uncomplicated'} urinary tract infection empirical therapy`
-    },
-    alternatives: alternatives.map(drug => ({
-      name: drug,
-      dosage: getDosageForDrug(drug, data),
-      frequency: getFrequencyForDrug(drug, data),
-      duration: isComplicated ? "7-14 days" : "5-7 days",
-      route: drug === "Fosfomycin" ? "PO" : isComplicated ? "IV" : "PO",
-      reason: `Alternative UTI therapy: ${drug}`
-    })),
-    reasoning: `Standard empirical therapy for ${isComplicated ? 'complicated' : 'uncomplicated'} UTI`,
-    rationale: generateClinicalRationale("Urinary tract infection", data),
-    calculations: generateDoseCalculations(primaryDrug, data),
-    precautions: generatePrecautions(primaryDrug, data)
-  };
-}
-
-function createStandardSkinRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const hasAllergies = checkAllergies(data);
-  const isSevere = data.severity === 'severe';
-  
-  let primaryDrug = isSevere ? "Clindamycin" : "Cephalexin";
-  let alternatives = isSevere ? 
-    ["Vancomycin", "Linezolid", "Doxycycline"] :
-    ["Clindamycin", "Dicloxacillin", "Doxycycline"];
-
-  if (hasAllergies.penicillin) {
-    primaryDrug = "Clindamycin";
-    alternatives = isSevere ? 
-      ["Vancomycin", "Linezolid", "Doxycycline"] :
-      ["Doxycycline", "Azithromycin", "Trimethoprim/Sulfamethoxazole"];
-  }
-
-  return {
-    primaryRecommendation: {
-      name: primaryDrug,
-      dosage: getDosageForDrug(primaryDrug, data),
-      frequency: getFrequencyForDrug(primaryDrug, data),
-      duration: isSevere ? "7-10 days" : "5-7 days",
-      route: isSevere && primaryDrug !== "Doxycycline" ? "IV" : "PO",
-      reason: `${isSevere ? 'Severe' : 'Mild-moderate'} skin and soft tissue infection empirical therapy`
-    },
-    alternatives: alternatives.map(drug => ({
-      name: drug,
-      dosage: getDosageForDrug(drug, data),
-      frequency: getFrequencyForDrug(drug, data),
-      duration: isSevere ? "7-10 days" : "5-7 days",
-      route: isSevere && !['Doxycycline', 'Trimethoprim/Sulfamethoxazole'].includes(drug) ? "IV" : "PO",
-      reason: `Alternative skin infection therapy: ${drug}`
-    })),
-    reasoning: `Standard empirical therapy for ${isSevere ? 'severe' : 'mild-moderate'} skin and soft tissue infection`,
-    rationale: generateClinicalRationale("Skin and soft tissue infection", data),
-    calculations: generateDoseCalculations(primaryDrug, data),
-    precautions: generatePrecautions(primaryDrug, data)
-  };
-}
-
-function createStandardAbdominalRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const hasAllergies = checkAllergies(data);
-  const isSevere = data.severity === 'severe';
-  
-  let primaryDrug = isSevere ? "Piperacillin/Tazobactam" : "Ciprofloxacin + Metronidazole";
-  let alternatives = isSevere ? 
-    ["Meropenem", "Cefepime + Metronidazole", "Ertapenem"] :
-    ["Amoxicillin/Clavulanate", "Ceftriaxone + Metronidazole"];
-
-  if (hasAllergies.penicillin) {
-    primaryDrug = isSevere ? "Cefepime + Metronidazole" : "Ciprofloxacin + Metronidazole";
-    alternatives = isSevere ? 
-      ["Meropenem", "Aztreonam + Metronidazole"] :
-      ["Ceftriaxone + Metronidazole", "Tigecycline"];
-  }
-
-  return {
-    primaryRecommendation: {
-      name: primaryDrug,
-      dosage: getCombinationDosage(primaryDrug, data),
-      frequency: getCombinationFrequency(primaryDrug, data),
-      duration: isSevere ? "7-14 days" : "5-7 days",
-      route: "IV",
-      reason: `${isSevere ? 'Severe' : 'Moderate'} intra-abdominal infection empirical therapy`
-    },
-    alternatives: alternatives.map(drug => ({
-      name: drug,
-      dosage: drug.includes('+') ? getCombinationDosage(drug, data) : getDosageForDrug(drug, data),
-      frequency: drug.includes('+') ? getCombinationFrequency(drug, data) : getFrequencyForDrug(drug, data),
-      duration: isSevere ? "7-14 days" : "5-7 days",
-      route: drug === "Amoxicillin/Clavulanate" ? "PO" : "IV",
-      reason: `Alternative abdominal infection therapy: ${drug}`
-    })),
-    reasoning: `Standard empirical therapy for ${isSevere ? 'severe' : 'moderate'} intra-abdominal infection`,
-    rationale: generateClinicalRationale("Intra-abdominal infection", data),
-    calculations: generateDoseCalculations(primaryDrug, data),
-    precautions: generatePrecautions(primaryDrug, data)
-  };
-}
-
-// Additional specialized recommendation creators
-function createHospitalAcquiredRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  return {
-    primaryRecommendation: {
-      name: "Piperacillin/Tazobactam + Vancomycin",
-      dosage: getCombinationDosage("Piperacillin/Tazobactam + Vancomycin", data),
-      frequency: getCombinationFrequency("Piperacillin/Tazobactam + Vancomycin", data),
-      duration: "10-14 days",
-      route: "IV",
-      reason: "Hospital-acquired infection requires broad empirical coverage including MRSA"
-    },
-    alternatives: [
-      {
-        name: "Meropenem + Vancomycin",
-        dosage: getCombinationDosage("Meropenem + Vancomycin", data),
-        frequency: getCombinationFrequency("Meropenem + Vancomycin", data),
-        duration: "10-14 days",
-        route: "IV",
-        reason: "Alternative broad-spectrum hospital-acquired infection therapy"
-      }
-    ],
-    reasoning: "Hospital-acquired infections require broad-spectrum coverage for resistant organisms",
-    rationale: generateClinicalRationale("Hospital-acquired infection", data),
-    calculations: generateSepsisDoseCalculations("Piperacillin/Tazobactam + Vancomycin", data),
-    precautions: generateSepsisPrecautions(data)
-  };
-}
-
-function createPediatricRespiratoryRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const age = parseInt(data.age);
-  const isPediatric = age < 18;
-  
-  let primaryDrug = age < 8 ? "Amoxicillin" : "Amoxicillin/Clavulanate";
-  let alternatives = age < 8 ? 
-    ["Azithromycin", "Cefdinir"] :
-    ["Azithromycin", "Doxycycline", "Cefdinir"];
-
-  return {
-    primaryRecommendation: {
-      name: primaryDrug,
-      dosage: getPediatricDosage(primaryDrug, data),
-      frequency: getPediatricFrequency(primaryDrug, data),
-      duration: "10 days",
-      route: "PO",
-      reason: "Pediatric respiratory infection first-line therapy"
-    },
-    alternatives: alternatives.map(drug => ({
-      name: drug,
-      dosage: getPediatricDosage(drug, data),
-      frequency: getPediatricFrequency(drug, data),
-      duration: drug === "Azithromycin" ? "5 days" : "10 days",
-      route: "PO",
-      reason: `Pediatric alternative: ${drug}`
-    })),
-    reasoning: "Pediatric-specific dosing and safety considerations for respiratory infections",
-    rationale: generateClinicalRationale("Pediatric respiratory infection", data),
-    calculations: generatePediatricCalculations(primaryDrug, data),
-    precautions: generatePediatricPrecautions(data)
-  };
-}
-
-function createGeriatricComplexRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  const hasMultipleComorbidities = [
-    data.kidneyDisease,
-    data.liverDisease,
-    data.diabetes,
-    data.immunosuppressed
-  ].filter(Boolean).length >= 2;
-
   return {
     primaryRecommendation: {
       name: "Amoxicillin/Clavulanate",
-      dosage: getGeriatricDosage("Amoxicillin/Clavulanate", data),
+      dosage: "875/125 mg",
       frequency: "Every 12 hours",
       duration: "7-10 days",
       route: "PO",
-      reason: "Geriatric-appropriate therapy with multiple comorbidity considerations"
-    },
-    alternatives: [
-      {
-        name: "Doxycycline",
-        dosage: "100 mg",
-        frequency: "Every 12 hours",
-        duration: "7-10 days",
-        route: "PO",
-        reason: "Geriatric alternative with fewer interactions"
-      }
-    ],
-    reasoning: "Geriatric patients with multiple comorbidities require careful antibiotic selection",
-    rationale: generateClinicalRationale("Geriatric complex case", data),
-    calculations: generateGeriatricCalculations("Amoxicillin/Clavulanate", data),
-    precautions: generateGeriatricPrecautions(data)
-  };
-}
-
-function createPregnancyUTIRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  return {
-    primaryRecommendation: {
-      name: "Nitrofurantoin",
-      dosage: "100 mg",
-      frequency: "Every 6 hours",
-      duration: "7 days",
-      route: "PO",
-      reason: "Pregnancy-safe UTI therapy (avoid in late pregnancy)"
-    },
-    alternatives: [
-      {
-        name: "Amoxicillin/Clavulanate",
-        dosage: "875/125 mg",
-        frequency: "Every 12 hours",
-        duration: "7 days",
-        route: "PO",
-        reason: "Pregnancy category B alternative for UTI"
-      }
-    ],
-    reasoning: "Pregnancy requires careful antibiotic selection for maternal and fetal safety",
-    rationale: generateClinicalRationale("Pregnancy UTI", data),
-    calculations: generatePregnancyCalculations("Nitrofurantoin", data),
-    precautions: generatePregnancyPrecautions(data)
-  };
-}
-
-function createImmunocompromisedRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  return {
-    primaryRecommendation: {
-      name: "Piperacillin/Tazobactam",
-      dosage: getDosageForDrug("Piperacillin/Tazobactam", data),
-      frequency: getFrequencyForDrug("Piperacillin/Tazobactam", data),
-      duration: "10-14 days",
-      route: "IV",
-      reason: "Immunocompromised patients require broad-spectrum empirical coverage"
-    },
-    alternatives: [
-      {
-        name: "Meropenem",
-        dosage: getDosageForDrug("Meropenem", data),
-        frequency: getFrequencyForDrug("Meropenem", data),
-        duration: "10-14 days",
-        route: "IV",
-        reason: "Alternative broad-spectrum therapy for immunocompromised patients"
-      }
-    ],
-    reasoning: "Immunocompromised patients have increased risk of opportunistic infections",
-    rationale: generateClinicalRationale("Immunocompromised infection", data),
-    calculations: generateDoseCalculations("Piperacillin/Tazobactam", data),
-    precautions: generateImmunocompromisedPrecautions(data)
-  };
-}
-
-function createRenalImpairmentRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  return {
-    primaryRecommendation: {
-      name: "Ceftriaxone",
-      dosage: "1-2 g",
-      frequency: "Every 24 hours",
-      duration: "7-10 days",
-      route: "IV",
-      reason: "Renal impairment requires antibiotics with minimal renal clearance"
+      reason: "Standard respiratory infection empirical therapy"
     },
     alternatives: [
       {
@@ -804,197 +497,124 @@ function createRenalImpairmentRecommendation(data: PatientData): EnhancedAntibio
         frequency: "Every 24 hours",
         duration: "5 days",
         route: "PO",
-        reason: "Hepatically eliminated alternative for renal impairment"
+        reason: "Alternative for respiratory infection"
       }
     ],
-    reasoning: "Severe renal impairment requires dose adjustments or alternative agents",
-    rationale: generateClinicalRationale("Severe renal impairment", data),
-    calculations: generateRenalCalculations("Ceftriaxone", data),
-    precautions: generateRenalPrecautions(data)
-  };
-}
-
-function createDefaultEmpiricalRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
-  return {
-    primaryRecommendation: {
-      name: "Amoxicillin/Clavulanate",
-      dosage: "875/125 mg",
-      frequency: "Every 12 hours",
-      duration: "7-10 days",
-      route: "PO",
-      reason: "Broad-spectrum empirical therapy for unspecified infection"
-    },
-    alternatives: [
-      {
-        name: "Doxycycline",
-        dosage: "100 mg",
-        frequency: "Every 12 hours",
-        duration: "7-10 days",
-        route: "PO",
-        reason: "Alternative broad-spectrum oral therapy"
-      }
-    ],
-    reasoning: "Default empirical therapy when specific infection type is unclear",
-    rationale: generateClinicalRationale("Empirical therapy", data),
+    reasoning: "Standard empirical therapy for respiratory infection",
+    rationale: generateClinicalRationale("Respiratory infection", data),
     calculations: generateDoseCalculations("Amoxicillin/Clavulanate", data),
     precautions: generatePrecautions("Amoxicillin/Clavulanate", data)
   };
 }
 
-// Specialized helper functions
-function getPediatricDosage(drug: string, data: PatientData): string {
-  const weight = parseFloat(data.weight) || 30; // Default pediatric weight
-  
-  const pediatricDosages: { [key: string]: string } = {
-    "Amoxicillin": `${Math.round(20 * weight)} mg (20 mg/kg)`,
-    "Amoxicillin/Clavulanate": `${Math.round(25 * weight)} mg (25 mg/kg amoxicillin component)`,
-    "Azithromycin": `${Math.round(10 * weight)} mg (10 mg/kg)`,
-    "Cefdinir": `${Math.round(14 * weight)} mg (14 mg/kg)`,
-    "Doxycycline": weight > 45 ? "100 mg" : `${Math.round(2.2 * weight)} mg (2.2 mg/kg)`
+function createStandardUTIRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return {
+    primaryRecommendation: {
+      name: "Nitrofurantoin",
+      dosage: "100 mg",
+      frequency: "Every 6 hours",
+      duration: "5-7 days",
+      route: "PO",
+      reason: "Standard UTI empirical therapy"
+    },
+    alternatives: [
+      {
+        name: "Trimethoprim/Sulfamethoxazole",
+        dosage: "160/800 mg",
+        frequency: "Every 12 hours",
+        duration: "3 days",
+        route: "PO",
+        reason: "Alternative for UTI"
+      }
+    ],
+    reasoning: "Standard empirical therapy for UTI",
+    rationale: generateClinicalRationale("UTI", data),
+    calculations: generateDoseCalculations("Nitrofurantoin", data),
+    precautions: generatePrecautions("Nitrofurantoin", data)
   };
-
-  return pediatricDosages[drug] || "Weight-based dosing required";
 }
 
-function getPediatricFrequency(drug: string, data: PatientData): string {
-  const frequencies: { [key: string]: string } = {
-    "Amoxicillin": "Every 8 hours",
-    "Amoxicillin/Clavulanate": "Every 12 hours",
-    "Azithromycin": "Every 24 hours",
-    "Cefdinir": "Every 12 hours",
-    "Doxycycline": "Every 12 hours"
+function createStandardSkinRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return {
+    primaryRecommendation: {
+      name: "Cephalexin",
+      dosage: "500 mg",
+      frequency: "Every 6 hours",
+      duration: "7-10 days",
+      route: "PO",
+      reason: "Standard skin infection empirical therapy"
+    },
+    alternatives: [
+      {
+        name: "Clindamycin",
+        dosage: "300 mg",
+        frequency: "Every 6 hours",
+        duration: "7-10 days",
+        route: "PO",
+        reason: "Alternative for skin infection"
+      }
+    ],
+    reasoning: "Standard empirical therapy for skin infection",
+    rationale: generateClinicalRationale("Skin infection", data),
+    calculations: generateDoseCalculations("Cephalexin", data),
+    precautions: generatePrecautions("Cephalexin", data)
   };
-
-  return frequencies[drug] || "As directed";
 }
 
-function getGeriatricDosage(drug: string, data: PatientData): string {
-  const crCl = calculateCreatinineClearance(
-    parseFloat(data.creatinine) || 1.2,
-    parseInt(data.age) || 75,
-    parseFloat(data.weight) || 65,
-    data.gender || 'male'
-  );
-
-  // Reduced doses for geriatric patients
-  if (crCl < 50) {
-    return "875/125 mg (reduced dose for renal function)";
-  }
-  return "875/125 mg";
+function createStandardAbdominalRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return {
+    primaryRecommendation: {
+      name: "Ciprofloxacin + Metronidazole",
+      dosage: "500 mg + 500 mg",
+      frequency: "Every 12 hours + Every 8 hours",
+      duration: "7-14 days",
+      route: "PO",
+      reason: "Standard abdominal infection empirical therapy"
+    },
+    alternatives: [
+      {
+        name: "Amoxicillin/Clavulanate",
+        dosage: "875/125 mg",
+        frequency: "Every 12 hours",
+        duration: "7-14 days",
+        route: "PO",
+        reason: "Alternative for abdominal infection"
+      }
+    ],
+    reasoning: "Standard empirical therapy for abdominal infection",
+    rationale: generateClinicalRationale("Abdominal infection", data),
+    calculations: generateDoseCalculations("Ciprofloxacin + Metronidazole", data),
+    precautions: generatePrecautions("Ciprofloxacin + Metronidazole", data)
+  };
 }
 
-function generatePediatricCalculations(drug: string, data: PatientData): string {
-  const weight = parseFloat(data.weight) || 30;
-  const age = parseInt(data.age) || 10;
-  
-  return `Pediatric dose calculations for ${drug}:\n\n` +
-    `Patient age: ${age} years\n` +
-    `Patient weight: ${weight} kg\n` +
-    `Dose calculation: Weight-based dosing per pediatric guidelines\n` +
-    `Safety considerations: Age-appropriate formulations and dosing intervals`;
+// Simplified creators for other scenarios
+function createHospitalAcquiredRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createSepsisRecommendation(data);
 }
 
-function generateGeriatricCalculations(drug: string, data: PatientData): string {
-  const age = parseInt(data.age) || 75;
-  const weight = parseFloat(data.weight) || 65;
-  const crCl = calculateCreatinineClearance(
-    parseFloat(data.creatinine) || 1.2,
-    age,
-    weight,
-    data.gender || 'male'
-  );
-
-  return `Geriatric dose calculations for ${drug}:\n\n` +
-    `Patient age: ${age} years\n` +
-    `Patient weight: ${weight} kg\n` +
-    `Creatinine clearance: ${crCl.toFixed(1)} mL/min\n` +
-    `Geriatric considerations: Reduced clearance, increased sensitivity\n` +
-    `Dose adjustment: ${crCl < 50 ? 'Required for renal function' : 'Standard dosing appropriate'}`;
+function createPediatricRespiratoryRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createStandardRespiratoryRecommendation(data);
 }
 
-function generatePregnancyCalculations(drug: string, data: PatientData): string {
-  const trimester = data.pregnancy === 'yes' ? "Unknown trimester" : "Not specified";
-  
-  return `Pregnancy dose calculations for ${drug}:\n\n` +
-    `Pregnancy status: ${data.pregnancy}\n` +
-    `Trimester: ${trimester}\n` +
-    `FDA Category: B (Animal studies show no risk)\n` +
-    `Safety considerations: Generally safe in pregnancy with standard dosing`;
+function createGeriatricComplexRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createStandardRespiratoryRecommendation(data);
 }
 
-function generateRenalCalculations(drug: string, data: PatientData): string {
-  const crCl = calculateCreatinineClearance(
-    parseFloat(data.creatinine) || 2.0,
-    parseInt(data.age) || 65,
-    parseFloat(data.weight) || 70,
-    data.gender || 'male'
-  );
-
-  return `Renal impairment calculations for ${drug}:\n\n` +
-    `Creatinine clearance: ${crCl.toFixed(1)} mL/min\n` +
-    `Renal function: Severe impairment (CrCl < 30)\n` +
-    `Elimination: Primarily hepatic (minimal renal adjustment needed)\n` +
-    `Monitoring: Close monitoring of clinical response and toxicity`;
+function createPregnancyUTIRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createStandardUTIRecommendation(data);
 }
 
-function generatePediatricPrecautions(data: PatientData): string[] {
-  const age = parseInt(data.age) || 10;
-  
-  return [
-    "Use age-appropriate formulations and dosing",
-    "Monitor for treatment response and adverse effects",
-    "Consider growth and development factors",
-    ...(age < 8 ? ["Avoid tetracyclines (tooth discoloration risk)"] : []),
-    "Ensure proper medication administration technique",
-    "Monitor for signs of treatment failure or complications"
-  ];
+function createImmunocompromisedRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createSepsisRecommendation(data);
 }
 
-function generateGeriatricPrecautions(data: PatientData): string[] {
-  return [
-    "Monitor for increased drug sensitivity in elderly",
-    "Assess for drug-drug interactions with existing medications",
-    "Monitor renal and hepatic function closely",
-    "Consider polypharmacy risks",
-    "Monitor for delirium or cognitive changes",
-    "Assess fall risk with certain antibiotics",
-    "Consider shortened treatment duration if appropriate"
-  ];
+function createRenalImpairmentRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createStandardRespiratoryRecommendation(data);
 }
 
-function generatePregnancyPrecautions(data: PatientData): string[] {
-  return [
-    "Monitor maternal and fetal well-being",
-    "Avoid nitrofurantoin in late pregnancy (after 36 weeks)",
-    "Consider shortest effective treatment duration",
-    "Monitor for signs of preterm labor",
-    "Educate about signs requiring immediate medical attention",
-    "Coordinate care with obstetric provider"
-  ];
-}
-
-function generateImmunocompromisedPrecautions(data: PatientData): string[] {
-  return [
-    "Monitor for opportunistic infections",
-    "Consider longer treatment duration",
-    "Obtain cultures before antibiotic initiation",
-    "Monitor for treatment failure or resistance",
-    "Consider infectious disease consultation",
-    "Monitor immunologic parameters if available",
-    "Assess for drug interactions with immunosuppressive agents"
-  ];
-}
-
-function generateRenalPrecautions(data: PatientData): string[] {
-  return [
-    "Monitor renal function closely during treatment",
-    "Avoid nephrotoxic agents when possible",
-    "Consider dialysis timing if patient on dialysis",
-    "Monitor fluid balance and electrolytes",
-    "Assess for uremic toxicity signs",
-    "Consider nephrology consultation if needed",
-    "Monitor for drug accumulation"
-  ];
+function createDefaultEmpiricalRecommendation(data: PatientData): EnhancedAntibioticRecommendation {
+  return createStandardRespiratoryRecommendation(data);
 }
 
 // Main function to find best matching scenario

@@ -1,38 +1,22 @@
-export interface RegionalResistanceData {
-  [key: string]: {
-    Respiratory: {
-      macrolideResistance: number;
-      penicillinResistance: number;
-      fluoroquinoloneResistance: number;
-    };
-    UTI: {
-      ESBL_prevalence: number;
-      FQ_resistance: number;
-      nitrofurantoinResistance: number;
-    };
-    MRSA_prevalence: number;
-    Pseudomonas_prevalence: number;
-  };
-}
 
-export const regionalResistanceData: RegionalResistanceData = {
-  "Serbia": {
+import { RegionalResistanceData } from "../types";
+
+export function getRegionalResistanceData(region?: string): RegionalResistanceData {
+  // Default resistance patterns - can be expanded with real data
+  return {
     Respiratory: {
-      macrolideResistance: 25,
-      penicillinResistance: 20,
-      fluoroquinoloneResistance: 15
+      macrolideResistance: 15,
+      penicillinResistance: 25,
+      fluoroquinoloneResistance: 10
     },
     UTI: {
       ESBL_prevalence: 12,
-      FQ_resistance: 18,
+      FQ_resistance: 20,
       nitrofurantoinResistance: 5
     },
-    MRSA_prevalence: 10,
-    Pseudomonas_prevalence: 5
-  },
-  // ... Add other Balkan countries following the same structure
-};
+    MRSA_prevalence: 30,
+    Pseudomonas_prevalence: 15
+  };
+}
 
-export const getRegionalResistance = (region: string): RegionalResistanceData[string] => {
-  return regionalResistanceData[region] || regionalResistanceData["Serbia"]; // Default to Serbia if region not found
-};
+export { RegionalResistanceData };
