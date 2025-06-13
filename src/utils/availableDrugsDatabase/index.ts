@@ -33,3 +33,29 @@ export const availableDrugs: DrugDatabase = {
   ...monobactams,
   ...sulfonamides
 };
+
+export const getAvailableProducts = (drugName: string) => {
+  // Normalize the drug name for searching
+  const normalizedDrugName = drugName.toLowerCase().trim();
+  
+  // Search through all drug categories for matches
+  for (const [categoryName, products] of Object.entries(availableDrugs)) {
+    if (categoryName.toLowerCase().includes(normalizedDrugName) || 
+        normalizedDrugName.includes(categoryName.toLowerCase())) {
+      return products;
+    }
+    
+    // Also search within product names
+    const matchingProducts = products.filter(product => 
+      product.name.toLowerCase().includes(normalizedDrugName) ||
+      normalizedDrugName.includes(product.name.toLowerCase())
+    );
+    
+    if (matchingProducts.length > 0) {
+      return matchingProducts;
+    }
+  }
+  
+  // If no direct matches, return empty array
+  return [];
+};

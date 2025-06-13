@@ -45,11 +45,18 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
     setSelectedProduct(product);
   };
 
-  // Add reason to alternatives if missing
+  // Add reason to alternatives if missing and ensure all required properties are present
   const enhancedAlternatives = recommendation.alternatives?.map(alt => ({
     ...alt,
     reason: alt.reason || "Alternative treatment option"
   })) || [];
+
+  // Create enhanced primary recommendation with reason
+  const enhancedPrimaryRecommendation = {
+    ...recommendation.primaryRecommendation,
+    frequency: recommendation.primaryRecommendation.frequency || "As directed",
+    reason: recommendation.reasoning || "Primary treatment recommendation based on patient profile"
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in">
@@ -66,11 +73,9 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
       </div>
 
       <PrimaryRecommendation 
-        recommendation={{
-          ...recommendation.primaryRecommendation,
-          frequency: recommendation.primaryRecommendation.frequency || "As directed"
-        }}
-        onPrescriptionClick={handlePrescriptionClick}
+        recommendation={enhancedPrimaryRecommendation}
+        selectedProduct={selectedProduct}
+        isActive={true}
       />
 
       {availableProducts.length > 0 && (
@@ -95,7 +100,12 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
       )}
 
       {enhancedAlternatives && enhancedAlternatives.map((alt, index) => (
-        <AlternativeRecommendation key={index} recommendation={alt} />
+        <AlternativeRecommendation 
+          key={index} 
+          recommendation={alt} 
+          index={index}
+          isActive={false}
+        />
       ))}
 
       {recommendation.rationale && (
