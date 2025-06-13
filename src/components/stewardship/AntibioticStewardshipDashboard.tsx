@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -222,7 +221,7 @@ export const AntibioticStewardshipDashboard: React.FC = () => {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    3 patients on prolonged vancomycin therapy (>7 days) require review
+                    3 patients on prolonged vancomycin therapy ({">"}7 days) require review
                   </AlertDescription>
                 </Alert>
                 <Alert>
