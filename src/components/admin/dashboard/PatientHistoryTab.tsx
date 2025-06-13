@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
@@ -10,7 +11,7 @@ import { differenceInYears } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-// Helper function to create a searchable string from event details (can be kept for future use)
+// Helper function to create a searchable string from event details
 const getSearchableStringFromEvent = (event: HistoryEvent): string => {
   let searchableText = `${event.title} ${event.type} ${event.physician || ''} ${event.notes || ''}`;
 
@@ -78,45 +79,48 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Real-time subscriptions
+  // Enhanced real-time subscriptions with better error handling
   useEffect(() => {
-    // Set up real-time subscription for patients table
     const patientsChannel = supabase
       .channel('patients-changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all changes (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'patients'
         },
         (payload) => {
           console.log('Real-time patients change:', payload);
           
-          if (payload.eventType === 'INSERT') {
-            const newPatient = payload.new as PatientFromSupabase;
-            const mappedPatient = mapPatientFromSupabase(newPatient);
-            setAllPatients(prev => [...prev, mappedPatient]);
-            toast({
-              title: "New Patient Added",
-              description: `${mappedPatient.name} has been added to the system.`,
-            });
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedPatient = payload.new as PatientFromSupabase;
-            const mappedPatient = mapPatientFromSupabase(updatedPatient);
-            setAllPatients(prev => prev.map(p => p.id === mappedPatient.id ? mappedPatient : p));
-            toast({
-              title: "Patient Updated",
-              description: `${mappedPatient.name}'s information has been updated.`,
-            });
-          } else if (payload.eventType === 'DELETE') {
-            const deletedPatient = payload.old as PatientFromSupabase;
-            setAllPatients(prev => prev.filter(p => p.id !== deletedPatient.id));
-            toast({
-              title: "Patient Removed",
-              description: `A patient has been removed from the system.`,
-              variant: "destructive",
-            });
+          try {
+            if (payload.eventType === 'INSERT') {
+              const newPatient = payload.new as PatientFromSupabase;
+              const mappedPatient = mapPatientFromSupabase(newPatient);
+              setAllPatients(prev => [...prev, mappedPatient]);
+              toast({
+                title: "New Patient Added",
+                description: `${mappedPatient.name} has been added to the system.`,
+              });
+            } else if (payload.eventType === 'UPDATE') {
+              const updatedPatient = payload.new as PatientFromSupabase;
+              const mappedPatient = mapPatientFromSupabase(updatedPatient);
+              setAllPatients(prev => prev.map(p => p.id === mappedPatient.id ? mappedPatient : p));
+              toast({
+                title: "Patient Updated",
+                description: `${mappedPatient.name}'s information has been updated.`,
+              });
+            } else if (payload.eventType === 'DELETE') {
+              const deletedPatient = payload.old as PatientFromSupabase;
+              setAllPatients(prev => prev.filter(p => p.id !== deletedPatient.id));
+              toast({
+                title: "Patient Removed",
+                description: `A patient has been removed from the system.`,
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            console.error('Error processing real-time patient update:', error);
           }
         }
       )
@@ -127,7 +131,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     };
   }, [toast]);
 
-  // Real-time subscription for prescriptions when a patient is selected
+  // Enhanced real-time subscription for prescriptions with better data fetching
   useEffect(() => {
     if (!selectedPatientId) return;
 
@@ -141,37 +145,63 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
           table: 'prescriptions',
           filter: `patient_id=eq.${selectedPatientId}`
         },
-        (payload) => {
+        async (payload) => {
           console.log('Real-time prescriptions change:', payload);
           
-          if (payload.eventType === 'INSERT') {
-            const newPrescription = payload.new as any;
-            const newEvent = mapPrescriptionToHistoryEvent(newPrescription);
-            setSelectedPatientHistory(prev => [newEvent, ...prev]);
-            toast({
-              title: "New Prescription Added",
-              description: `${newPrescription.antibiotic_name} prescription has been added.`,
-            });
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedPrescription = payload.new as any;
-            const updatedEvent = mapPrescriptionToHistoryEvent(updatedPrescription);
-            setSelectedPatientHistory(prev => 
-              prev.map(event => event.id === updatedEvent.id ? updatedEvent : event)
-            );
-            toast({
-              title: "Prescription Updated",
-              description: `${updatedPrescription.antibiotic_name} prescription has been updated.`,
-            });
-          } else if (payload.eventType === 'DELETE') {
-            const deletedPrescription = payload.old as any;
-            setSelectedPatientHistory(prev => 
-              prev.filter(event => event.id !== deletedPrescription.id)
-            );
-            toast({
-              title: "Prescription Removed",
-              description: `A prescription has been removed.`,
-              variant: "destructive",
-            });
+          try {
+            if (payload.eventType === 'INSERT') {
+              // Fetch the complete prescription data with doctor profile
+              const { data: prescriptionData, error } = await supabase
+                .from('prescriptions')
+                .select(`
+                  *,
+                  doctor:profiles (id, first_name, last_name, email)
+                `)
+                .eq('id', payload.new.id)
+                .single();
+
+              if (!error && prescriptionData) {
+                const newEvent = mapPrescriptionToHistoryEvent(prescriptionData);
+                setSelectedPatientHistory(prev => [newEvent, ...prev]);
+                toast({
+                  title: "New Prescription Added",
+                  description: `${prescriptionData.antibiotic_name} prescription has been added.`,
+                });
+              }
+            } else if (payload.eventType === 'UPDATE') {
+              // Fetch updated prescription data
+              const { data: prescriptionData, error } = await supabase
+                .from('prescriptions')
+                .select(`
+                  *,
+                  doctor:profiles (id, first_name, last_name, email)
+                `)
+                .eq('id', payload.new.id)
+                .single();
+
+              if (!error && prescriptionData) {
+                const updatedEvent = mapPrescriptionToHistoryEvent(prescriptionData);
+                setSelectedPatientHistory(prev => 
+                  prev.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+                );
+                toast({
+                  title: "Prescription Updated",
+                  description: `${prescriptionData.antibiotic_name} prescription has been updated.`,
+                });
+              }
+            } else if (payload.eventType === 'DELETE') {
+              const deletedPrescription = payload.old as any;
+              setSelectedPatientHistory(prev => 
+                prev.filter(event => event.id !== deletedPrescription.id)
+              );
+              toast({
+                title: "Prescription Removed",
+                description: `A prescription has been removed.`,
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            console.error('Error processing real-time prescription update:', error);
           }
         }
       )
@@ -229,6 +259,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     } as PrescriptionEvent;
   };
 
+  // Enhanced patient fetching with better error handling
   useEffect(() => {
     const fetchPatients = async () => {
       setLoadingPatients(true);
@@ -236,7 +267,8 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
       try {
         const { data, error } = await supabase
           .from('patients')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) {
           throw error;
@@ -267,6 +299,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     }
   }, [initialPatientIdFromUrl, initialSearchTermFromUrl, allPatients, loadingPatients]);
 
+  // Enhanced patient history fetching with better error handling
   useEffect(() => {
     if (selectedPatientId && user) {
       const fetchPatientHistory = async () => {

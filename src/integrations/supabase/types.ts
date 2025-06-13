@@ -71,6 +71,27 @@ export type Database = {
             referencedRelation: "prescriptions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_recommendations_doctor"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_recommendations_patient"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_recommendations_prescription"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
         ]
       }
       patients: {
@@ -177,6 +198,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_prescriptions_doctor"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_prescriptions_patient"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "prescriptions_doctor_id_fkey"
             columns: ["doctor_id"]

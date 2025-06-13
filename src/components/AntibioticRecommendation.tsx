@@ -7,13 +7,14 @@ import { ClinicalRationale } from "./AntibioticRecommendationSections/ClinicalRa
 import { DoseCalculations } from "./AntibioticRecommendationSections/DoseCalculations";
 import { Precautions } from "./AntibioticRecommendationSections/Precautions";
 import { AlternativeRecommendation } from "./AntibioticRecommendationSections/AlternativeRecommendation";
-import { DrugSelectionModal } from "./DrugSelectionModal";
 import { PrescriptionModal } from "./PrescriptionModal";
 import { AvailableDrugs } from "./AvailableDrugs";
 import { DrugProduct, getAvailableProducts } from "@/utils/availableDrugsDatabase";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
+import { useToast } from "./ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AntibioticRecommendationProps {
   recommendation: EnhancedAntibioticRecommendation;
@@ -23,6 +24,7 @@ interface AntibioticRecommendationProps {
 export const AntibioticRecommendation = ({ recommendation, patientId }: AntibioticRecommendationProps) => {
   const { language } = useLanguage();
   const t = translations[language];
+  const { toast } = useToast();
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<DrugProduct>();
   const [availableProducts, setAvailableProducts] = useState<DrugProduct[]>([]);
@@ -36,6 +38,47 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
       }
     }
   }, [recommendation.primaryRecommendation.name]);
+
+  // Set up real-time subscription for prescription updates
+  useEffect(() => {
+    if (!patientId) return;
+
+    const channel = supabase
+      .channel(`prescriptions-${patientId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescriptions',
+          filter: `patient_id=eq.${patientId}`
+        },
+        (payload) => {
+          console.log('Real-time prescription update:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: language === "en" ? "Prescription Created" : "Recept Kreiran",
+              description: language === "en" 
+                ? "A new prescription has been successfully created."
+                : "Novi recept je uspješno kreiran.",
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            toast({
+              title: language === "en" ? "Prescription Updated" : "Recept Ažuriran",
+              description: language === "en" 
+                ? "Prescription has been updated."
+                : "Recept je ažuriran.",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [patientId, language, toast]);
 
   const handlePrescriptionClick = () => {
     setIsPrescriptionModalOpen(true);
