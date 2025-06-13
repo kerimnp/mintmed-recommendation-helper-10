@@ -7,7 +7,8 @@ import { DoctorProfileForm } from '@/components/doctor/DoctorProfileForm';
 import { useDoctorProfile, useUpdateDoctorProfile } from '@/hooks/useDoctorProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Loader2, User, Settings, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const DoctorProfile = () => {
@@ -25,10 +26,13 @@ const DoctorProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
         <MainNavigation />
         <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-medical-primary" />
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-medical-primary mx-auto" />
+            <p className="text-gray-600 dark:text-gray-400">Loading your profile...</p>
+          </div>
         </div>
       </div>
     );
@@ -36,16 +40,26 @@ const DoctorProfile = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
         <MainNavigation />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Profile</h1>
-            <p className="text-gray-600 mb-4">There was an error loading your profile.</p>
-            <Button onClick={() => navigate('/admin')}>
-              Return to Dashboard
-            </Button>
-          </div>
+          <Card className="max-w-md mx-auto">
+            <CardContent className="text-center p-8 space-y-4">
+              <Shield className="h-12 w-12 text-red-500 mx-auto" />
+              <h1 className="text-2xl font-bold text-red-600">Error Loading Profile</h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                There was an error loading your profile. This might be because your profile hasn't been set up yet.
+              </p>
+              <div className="space-y-2">
+                <Button onClick={() => navigate('/admin')} className="w-full">
+                  Return to Dashboard
+                </Button>
+                <Button variant="outline" onClick={() => window.location.reload()} className="w-full">
+                  Retry Loading
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -71,39 +85,56 @@ const DoctorProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
       <MainNavigation />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Navigation Header */}
+        <div className="mb-8">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/admin')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 mb-4 hover:bg-white dark:hover:bg-slate-800"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Button>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {isEditing ? 'Edit Profile' : 'Doctor Profile'}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                {isEditing 
+                  ? 'Update your professional information and credentials'
+                  : 'Manage your professional information and credentials'
+                }
+              </p>
+            </div>
+            
+            {!isEditing && doctorProfile && (
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  Edit Profile
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto"
+          className="space-y-6"
         >
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {isEditing ? 'Edit Profile' : 'Doctor Profile'}
-            </h1>
-            <p className="text-gray-600">
-              {isEditing 
-                ? 'Update your professional information and credentials'
-                : 'Manage your professional information and credentials'
-              }
-            </p>
-          </div>
-
           {isEditing ? (
             <DoctorProfileForm
               doctor={doctorProfile}
