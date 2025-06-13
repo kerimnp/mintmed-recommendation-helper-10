@@ -57,12 +57,19 @@ export const useUpdateDoctorProfile = () => {
         updated_at: new Date().toISOString(),
       };
 
-      // Check if certification_expiry is a Date object and convert to string
-      if (updateData.certification_expiry) {
+      // Check if certification_expiry needs to be converted from Date to string
+      if (updateData.certification_expiry !== null && updateData.certification_expiry !== undefined) {
+        // Check if it's a Date object
         if (updateData.certification_expiry instanceof Date) {
           updateData.certification_expiry = updateData.certification_expiry.toISOString().split('T')[0];
-        } else if (typeof updateData.certification_expiry === 'object' && updateData.certification_expiry !== null && 'toISOString' in updateData.certification_expiry) {
-          // Handle case where it might be a Date-like object
+        }
+        // Check if it's a Date-like object with toISOString method
+        else if (
+          typeof updateData.certification_expiry === 'object' && 
+          updateData.certification_expiry !== null && 
+          'toISOString' in updateData.certification_expiry &&
+          typeof updateData.certification_expiry.toISOString === 'function'
+        ) {
           updateData.certification_expiry = (updateData.certification_expiry as Date).toISOString().split('T')[0];
         }
       }
