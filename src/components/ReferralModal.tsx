@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
@@ -49,7 +48,11 @@ export const ReferralModal = ({ open, onClose, recommendationData, patientData }
   const [allergies, setAllergies] = useState("");
   const [physicalExam, setPhysicalExam] = useState("");
   const [investigations, setInvestigations] = useState("");
-  const [assessment, setAssessment] = useState(recommendationData?.rationale?.infectionType || "");
+  const [assessment, setAssessment] = useState(
+    typeof recommendationData?.rationale === 'object' && recommendationData.rationale?.infectionType 
+      ? recommendationData.rationale.infectionType 
+      : ""
+  );
   const [specificQuestions, setSpecificQuestions] = useState("");
   const [plan, setPlan] = useState("");
 

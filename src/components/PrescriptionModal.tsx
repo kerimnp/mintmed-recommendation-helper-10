@@ -8,7 +8,7 @@ import { useToast } from "./ui/use-toast";
 import { Printer, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import { DrugProduct } from "@/utils/availableDrugsDatabase";
-import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
+import { EnhancedAntibioticRecommendation, AntibioticRationale } from "@/utils/types/recommendationTypes";
 import { ReferralModal } from "./ReferralModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,11 +42,13 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
         patient_id: patientId,
         doctor_id: user.id,
         antibiotic_name: recommendationData.primaryRecommendation.name,
-        dosage: recommendationData.primaryRecommendation.dose,
+        dosage: recommendationData.primaryRecommendation.dosage,
         route: recommendationData.primaryRecommendation.route,
         frequency: recommendationData.primaryRecommendation.frequency || 'As directed',
         duration: recommendationData.primaryRecommendation.duration,
-        reason_for_prescription: recommendationData.rationale?.infectionType || 'Antibiotic treatment',
+        reason_for_prescription: typeof recommendationData.rationale === 'object' && recommendationData.rationale?.infectionType 
+          ? recommendationData.rationale.infectionType 
+          : 'Antibiotic treatment',
         status: 'active',
         notes: selectedProduct ? `Product: ${selectedProduct.name} (${selectedProduct.manufacturer})` : undefined,
         start_date: new Date().toISOString().split('T')[0], // Today's date
@@ -143,12 +145,12 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
         doc.text(`Selected Product: ${selectedProduct.name}`, 25, 130);
         doc.text(`Manufacturer: ${selectedProduct.manufacturer}`, 25, 140);
       }
-      doc.text(`Dose: ${recommendationData.primaryRecommendation.dose}`, 25, 150);
+      doc.text(`Dose: ${recommendationData.primaryRecommendation.dosage}`, 25, 150);
       doc.text(`Route: ${recommendationData.primaryRecommendation.route}`, 25, 160);
       doc.text(`Duration: ${recommendationData.primaryRecommendation.duration}`, 25, 170);
       
       // Add rationale information if available
-      if (recommendationData.rationale) {
+      if (recommendationData.rationale && typeof recommendationData.rationale === 'object') {
         doc.setFillColor(249, 250, 251);
         doc.rect(20, 180, 170, 30, "F");
         doc.setTextColor(71, 85, 105);
