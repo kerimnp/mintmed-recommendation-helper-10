@@ -58,39 +58,39 @@ const AntibioticAdvisor = () => {
       </header>
 
       <main className="relative">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
           {/* Hero Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4 leading-tight">
                 {language === "en" ? "Clinical Decision Support" : "Klinička Podrška za Odlučivanje"}
               </h1>
-              <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed font-light">
+              <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed font-light">
                 {language === "en" 
                   ? "Evidence-based antibiotic recommendations powered by clinical guidelines"
                   : "Preporuke za antibiotike zasnovane na dokazima uz kliničke smernice"}
               </p>
               
               {/* Feature Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 }}
-                  className="group p-6 bg-white/70 dark:bg-gray-800/50 rounded-2xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  className="group p-4 bg-white/70 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                     {language === "en" ? "Safety First" : "Sigurnost na Prvom Mestu"}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     {language === "en" ? "Comprehensive allergy and interaction checks" : "Sveobuhvatne provjere alergija i interakcija"}
                   </p>
                 </motion.div>
@@ -99,15 +99,15 @@ const AntibioticAdvisor = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="group p-6 bg-white/70 dark:bg-gray-800/50 rounded-2xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  className="group p-4 bg-white/70 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Zap className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                     {language === "en" ? "Instant Results" : "Trenutni Rezultati"}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     {language === "en" ? "Real-time analysis with detailed rationale" : "Analiza u realnom vremenu s detaljnim objašnjenjem"}
                   </p>
                 </motion.div>
@@ -116,15 +116,15 @@ const AntibioticAdvisor = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
-                  className="group p-6 bg-white/70 dark:bg-gray-800/50 rounded-2xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  className="group p-4 bg-white/70 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-700/30 backdrop-blur-sm hover:bg-white/90 dark:hover:bg-gray-800/70 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Award className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                     {language === "en" ? "Evidence-Based" : "Zasnovano na Dokazima"}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     {language === "en" ? "Following IDSA, CDC, and WHO guidelines" : "Prati IDSA, CDC i WHO smernice"}
                   </p>
                 </motion.div>
@@ -139,22 +139,7 @@ const AntibioticAdvisor = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-white/80 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-gray-700/30 shadow-2xl shadow-gray-900/5 dark:shadow-black/20 overflow-hidden">
-              <div className="p-8 sm:p-12">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                    {language === "en" ? "Patient Assessment" : "Procjena Pacijenta"}
-                  </h2>
-                  <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                    {language === "en" 
-                      ? "Complete the form below to receive personalized antibiotic recommendations"
-                      : "Kompletujte formu ispod za personalizirane preporuke antibiotika"}
-                  </p>
-                </div>
-                <PatientForm />
-              </div>
-            </div>
+            <PatientForm />
           </motion.div>
         </div>
       </main>

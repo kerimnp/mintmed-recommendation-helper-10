@@ -17,6 +17,7 @@ import { FormHeader } from "./PatientFormSections/FormHeader";
 import { FormActions } from "./PatientFormSections/FormActions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Progress } from "./ui/progress";
 
 interface SectionHeaderProps {
   number: number;
@@ -26,15 +27,14 @@ interface SectionHeaderProps {
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({ number, title, subtitle }) => {
   return (
-    <div className="text-center mb-8">
-      <div className="flex items-center justify-center gap-4 mb-4">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-medical-primary to-medical-accent text-white font-bold text-lg shadow-lg">
-          {number}
-        </div>
-        <div className="h-px bg-gradient-to-r from-medical-primary/20 via-medical-primary/40 to-medical-primary/20 flex-1 max-w-20"></div>
+    <div className="flex items-start gap-4 mb-6">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-medical-primary to-medical-accent text-white font-bold text-sm shadow-md flex-shrink-0 mt-1">
+        {number}
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">{subtitle}</p>
+      <div className="flex-1">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{subtitle}</p>
+      </div>
     </div>
   );
 };
@@ -49,6 +49,7 @@ export const PatientForm = () => {
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
   
   const sectionRefs = {
     demographics: useRef<HTMLDivElement>(null),
@@ -96,6 +97,31 @@ export const PatientForm = () => {
     address: "",
     nationality: ""
   });
+
+  // Calculate form completion progress
+  const calculateProgress = () => {
+    let completedFields = 0;
+    let totalRequiredFields = 2; // infection sites and severity are required
+    
+    // Check required fields
+    if (formData.infectionSites.length > 0) completedFields++;
+    if (formData.severity) completedFields++;
+    
+    // Count optional fields that are filled
+    let optionalCompleted = 0;
+    let totalOptionalFields = 8;
+    
+    if (formData.age) optionalCompleted++;
+    if (formData.gender) optionalCompleted++;
+    if (formData.weight) optionalCompleted++;
+    if (formData.symptoms) optionalCompleted++;
+    if (formData.creatinine) optionalCompleted++;
+    if (Object.values(formData.allergies).some(Boolean)) optionalCompleted++;
+    if (formData.kidneyDisease || formData.liverDisease || formData.diabetes || formData.immunosuppressed) optionalCompleted++;
+    if (formData.labResults) optionalCompleted++;
+    
+    return Math.round(((completedFields / totalRequiredFields) * 60) + ((optionalCompleted / totalOptionalFields) * 40));
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -307,25 +333,43 @@ export const PatientForm = () => {
     handleInputChange("labResults", results);
   };
 
+  const progress = calculateProgress();
+
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 animate-fade-in">
+    <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
       <FormHeader errors={errors} showErrors={showErrors} />
       
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <Card className="relative overflow-hidden bg-white/80 dark:bg-gray-800/60 backdrop-blur-xl border-0 shadow-2xl shadow-gray-900/5 dark:shadow-black/20">
-          <div className="absolute inset-0 bg-gradient-to-br from-medical-primary/5 via-transparent to-medical-accent/5"></div>
-          <div className="relative p-8 sm:p-12 space-y-16">
+      {/* Progress Bar */}
+      <Card className="p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            {language === "en" ? "Form Completion" : "Završenost Forme"}
+          </h3>
+          <span className="text-sm font-bold text-medical-primary">{progress}%</span>
+        </div>
+        <Progress value={progress} className="h-2" />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          {language === "en" 
+            ? "Complete required fields (infection details) to generate recommendations" 
+            : "Kompletujte obavezna polja (detalji infekcije) za generisanje preporuka"}
+        </p>
+      </Card>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-medical-primary/3 via-transparent to-medical-accent/3"></div>
+          <div className="relative p-6 sm:p-8 space-y-8">
             
             <div ref={sectionRefs.demographics}>
               <SectionHeader 
                 number={1} 
                 title={t.title} 
                 subtitle={language === "en" 
-                  ? "Patient demographics help determine appropriate dosing and safety considerations"
-                  : "Demografski podaci pacijenta pomažu u određivanju odgovarajućeg doziranja i sigurnosnih razmatranja"
+                  ? "Basic patient information for dosing calculations and safety checks"
+                  : "Osnovne informacije o pacijentu za kalkulacije doziranja i sigurnosne provjere"
                 } 
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-white/70 dark:bg-gray-700/50 rounded-xl p-5 border border-gray-200/50 dark:border-gray-600/50">
                 <PatientDemographicsSection 
                   formData={formData} 
                   onInputChange={handleInputChange}
@@ -334,20 +378,16 @@ export const PatientForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-center">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-full max-w-md"></div>
-            </div>
-            
-            <div>
+            <div className="border-t border-gray-200/50 dark:border-gray-600/50 pt-6">
               <SectionHeader 
                 number={2} 
                 title={t.allergies.title} 
                 subtitle={language === "en"
-                  ? "Drug allergies are critical for safe antibiotic selection and preventing adverse reactions"
-                  : "Alergije na lijekove su kritične za siguran izbor antibiotika i sprečavanje štetnih reakcija"
+                  ? "Critical for safe antibiotic selection and preventing adverse reactions"
+                  : "Kritično za siguran izbor antibiotika i sprečavanje neželjenih reakcija"
                 } 
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-white/70 dark:bg-gray-700/50 rounded-xl p-5 border border-gray-200/50 dark:border-gray-600/50">
                 <AllergySection 
                   allergies={formData.allergies} 
                   onAllergyChange={(allergy, checked) => {
@@ -360,20 +400,16 @@ export const PatientForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-center">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-full max-w-md"></div>
-            </div>
-            
-            <div>
+            <div className="border-t border-gray-200/50 dark:border-gray-600/50 pt-6">
               <SectionHeader 
                 number={3} 
                 title={t.renalFunction.title} 
                 subtitle={language === "en"
-                  ? "Kidney function determines antibiotic dosing adjustments and safety considerations"
-                  : "Funkcija bubrega određuje prilagođavanja doziranja antibiotika i sigurnosna razmatranja"
+                  ? "Kidney function assessment for proper dosing adjustments"
+                  : "Procjena funkcije bubrega za pravilna prilagođavanja doziranja"
                 } 
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-white/70 dark:bg-gray-700/50 rounded-xl p-5 border border-gray-200/50 dark:border-gray-600/50">
                 <RenalFunctionSection 
                   creatinine={formData.creatinine} 
                   onCreatinineChange={(value) => handleInputChange("creatinine", value)}
@@ -385,20 +421,16 @@ export const PatientForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-center">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-full max-w-md"></div>
-            </div>
-            
-            <div>
+            <div className="border-t border-gray-200/50 dark:border-gray-600/50 pt-6">
               <SectionHeader 
                 number={4} 
                 title={t.comorbidities.title} 
                 subtitle={language === "en"
-                  ? "Medical conditions affect antibiotic choice, dosing, and monitoring requirements"
-                  : "Medicinska stanja utječu na izbor antibiotika, doziranje i zahtjeve za praćenje"
+                  ? "Medical conditions affecting antibiotic choice and monitoring"
+                  : "Medicinska stanja koja utječu na izbor antibiotika i praćenje"
                 } 
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-white/70 dark:bg-gray-700/50 rounded-xl p-5 border border-gray-200/50 dark:border-gray-600/50">
                 <ComorbiditySection 
                   formData={formData} 
                   onInputChange={handleInputChange}
@@ -406,20 +438,16 @@ export const PatientForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-center">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-full max-w-md"></div>
-            </div>
-            
-            <div ref={sectionRefs.infection}>
+            <div className="border-t border-gray-200/50 dark:border-gray-600/50 pt-6" ref={sectionRefs.infection}>
               <SectionHeader 
                 number={5} 
                 title={t.infectionDetails.title} 
                 subtitle={language === "en"
-                  ? "Infection characteristics determine the most appropriate empirical therapy"
-                  : "Karakteristike infekcije određuju najodgovarajuću empirijsku terapiju"
+                  ? "Essential information for selecting appropriate empirical therapy"
+                  : "Osnovne informacije za izbor odgovarajuće empirijske terapije"
                 } 
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-red-50/80 dark:bg-red-900/20 rounded-xl p-5 border border-red-200/50 dark:border-red-700/50">
                 <InfectionDetailsSection 
                   formData={formData} 
                   onInputChange={handleInputChange}
@@ -428,68 +456,56 @@ export const PatientForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-center">
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent w-full max-w-md"></div>
-            </div>
-            
-            <div>
+            <div className="border-t border-gray-200/50 dark:border-gray-600/50 pt-6">
               <SectionHeader 
                 number={6}
                 title={language === "en" ? "Laboratory Results" : "Laboratorijski Rezultati"}
                 subtitle={language === "en" 
-                  ? "Laboratory data guides targeted therapy and monitoring decisions" 
-                  : "Laboratorijski podaci usmjeravaju ciljanu terapiju i odluke o praćenju"
+                  ? "Laboratory data for targeted therapy decisions" 
+                  : "Laboratorijski podaci za odluke o ciljanoj terapiji"
                 }
               />
-              <div className="bg-white/60 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-200/30 dark:border-gray-600/30">
+              <div className="bg-white/70 dark:bg-gray-700/50 rounded-xl p-5 border border-gray-200/50 dark:border-gray-600/50">
                 <LabResultsSection 
                   onLabResultsChange={handleLabResultsChange}
                 />
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-medical-primary/10 via-medical-accent/5 to-purple-500/10 p-8 rounded-3xl border border-medical-primary/20 backdrop-blur-sm">
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="h-3 w-3 bg-medical-primary rounded-full animate-pulse"></div>
-                  <h3 className="text-xl font-bold text-medical-deep dark:text-white">
-                    {language === "en" ? "Clinical Decision Support" : "Klinička Podrška za Odlučivanje"}
-                  </h3>
-                  <div className="h-3 w-3 bg-medical-accent rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-                </div>
-                <p className="text-medical-text dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <div className="bg-gradient-to-br from-medical-primary/8 via-medical-accent/4 to-purple-500/8 p-6 rounded-2xl border border-medical-primary/20 backdrop-blur-sm">
+              <div className="text-center mb-5">
+                <h3 className="text-lg font-bold text-medical-deep dark:text-white mb-2">
+                  {language === "en" ? "Clinical Decision Support" : "Klinička Podrška za Odlučivanje"}
+                </h3>
+                <p className="text-sm text-medical-text dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
                   {language === "en"
-                    ? "This system uses evidence-based algorithms incorporating the latest clinical guidelines (IDSA, CDC, WHO) to provide comprehensive antibiotic recommendations based on patient-specific factors."
-                    : "Ovaj sistem koristi algoritme zasnovane na dokazima koji uključuju najnovije kliničke smernice (IDSA, CDC, WHO) za pružanje sveobuhvatnih preporuka antibiotika na osnovu faktora specifičnih za pacijenta."
+                    ? "Evidence-based algorithms following IDSA, CDC, and WHO guidelines for comprehensive recommendations."
+                    : "Algoritmi zasnovani na dokazima koji prate IDSA, CDC i WHO smernice za sveobuhvatne preporuke."
                   }
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-green-200/50 dark:border-green-500/30">
-                    <div className="h-3 w-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium">{language === "en" ? "Evidence-based protocols" : "Protokoli zasnovani na dokazima"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-purple-200/50 dark:border-purple-500/30">
-                    <div className="h-3 w-3 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm font-medium">{language === "en" ? "Resistance patterns" : "Obrasci rezistencije"}</span>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="flex items-center gap-2 p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-green-200/50">
+                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                  <span className="text-xs font-medium">{language === "en" ? "Evidence-based" : "Zasnovano na dokazima"}</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-blue-200/50 dark:border-blue-500/30">
-                    <div className="h-3 w-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm font-medium">{language === "en" ? "Safety validations" : "Sigurnosne validacije"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl border border-orange-200/50 dark:border-orange-500/30">
-                    <div className="h-3 w-3 bg-orange-500 rounded-full"></div>
-                    <span className="text-sm font-medium">{language === "en" ? "Dosing calculations" : "Kalkulacije doziranja"}</span>
-                  </div>
+                <div className="flex items-center gap-2 p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-blue-200/50">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-xs font-medium">{language === "en" ? "Safety checks" : "Sigurnosne provjere"}</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-purple-200/50">
+                  <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+                  <span className="text-xs font-medium">{language === "en" ? "Resistance data" : "Podaci o rezistenciji"}</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-orange-200/50">
+                  <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
+                  <span className="text-xs font-medium">{language === "en" ? "Dose optimization" : "Optimizacija doze"}</span>
                 </div>
               </div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center pt-4">
               <FormActions isSubmitting={isSubmitting} />
             </div>
           </div>
