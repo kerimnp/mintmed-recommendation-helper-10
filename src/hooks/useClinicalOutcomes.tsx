@@ -35,10 +35,10 @@ export const useCreateClinicalOutcome = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (outcome: Partial<ClinicalOutcome>) => {
+    mutationFn: async (outcome: Omit<ClinicalOutcome, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('clinical_outcomes')
-        .insert([outcome])
+        .insert(outcome)
         .select()
         .single();
 

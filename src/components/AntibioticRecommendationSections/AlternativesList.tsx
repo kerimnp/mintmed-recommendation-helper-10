@@ -7,7 +7,7 @@ import { DetailedRecommendation } from "@/utils/types/recommendationTypes";
 
 interface AlternativesListProps {
   alternatives: DetailedRecommendation[];
-  onSelectAlternative: (index: number) => void;
+  onSelectAlternative?: (index: number) => void;
 }
 
 export const AlternativesList: React.FC<AlternativesListProps> = ({ 
@@ -42,13 +42,15 @@ export const AlternativesList: React.FC<AlternativesListProps> = ({
               </div>
             </div>
             <p className="text-gray-700 mt-2">{alt.reason}</p>
-            <Button 
-              variant="outline" 
-              className="self-end mt-2 flex items-center gap-2"
-              onClick={() => onSelectAlternative(index)}
-            >
-              View Details <ArrowRight className="h-4 w-4" />
-            </Button>
+            {onSelectAlternative && (
+              <Button 
+                variant="outline" 
+                className="self-end mt-2 flex items-center gap-2"
+                onClick={() => onSelectAlternative(index)}
+              >
+                View Details <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         ))}
       </div>

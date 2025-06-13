@@ -28,6 +28,10 @@ export const EnhancedAntibioticRecommendation: React.FC<EnhancedAntibioticRecomm
 }) => {
   const [selectedFormulation, setSelectedFormulation] = useState(null);
 
+  const handleSelectAlternative = (index: number) => {
+    console.log('Selected alternative:', index, recommendation.alternatives[index]);
+  };
+
   return (
     <Card className={className}>
       <CardContent className="p-6">
@@ -60,11 +64,13 @@ export const EnhancedAntibioticRecommendation: React.FC<EnhancedAntibioticRecomm
               calculations={recommendation.calculations}
             />
             
-            <AlternativesList alternatives={recommendation.alternatives} />
+            <AlternativesList 
+              alternatives={recommendation.alternatives}
+              onSelectAlternative={handleSelectAlternative}
+            />
             
             <ClinicalRationale 
-              reasoning={recommendation.reasoning}
-              rationale={recommendation.rationale}
+              rationale={recommendation.rationale || recommendation.reasoning}
             />
             
             <DoseCalculations calculations={recommendation.calculations} />
