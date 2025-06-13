@@ -3,9 +3,7 @@ import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
 import { generateAntibioticRecommendation } from "@/utils/antibioticRecommendations";
-import { getAIRecommendation } from "@/utils/aiRecommendations";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
-import { AIRecommendationSection } from "./AIRecommendationSection";
 import { AllergySection } from "./AllergySection";
 import { RenalFunctionSection } from "./RenalFunctionSection";
 import { PatientDemographicsSection } from "./PatientDemographicsSection";
@@ -30,8 +28,6 @@ export const PatientForm = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiRecommendation, setAiRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
-  const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState<string | null>(null);
   
   const sectionRefs = {
@@ -95,7 +91,7 @@ export const PatientForm = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Only validate the truly required fields
+    // Required fields validation
     if (!formData.infectionSites || formData.infectionSites.length === 0) {
       newErrors.infectionSites = t.errors?.requiredField || "Infection site is required";
     }
@@ -104,7 +100,7 @@ export const PatientForm = () => {
       newErrors.severity = t.errors?.requiredField || "Severity is required";
     }
 
-    // Only validate other fields if they're provided but invalid
+    // Validate optional fields if provided
     if (formData.age && (Number(formData.age) < 0 || Number(formData.age) > 120)) {
       newErrors.age = t.errors?.invalidAge || "Please enter a valid age";
     }
@@ -149,7 +145,7 @@ export const PatientForm = () => {
     if (formData.age) {
       const currentYear = new Date().getFullYear();
       const birthYear = currentYear - parseInt(formData.age);
-      dateOfBirth = new Date(birthYear, 0, 1); // January 1st of birth year
+      dateOfBirth = new Date(birthYear, 0, 1);
     }
 
     // Prepare allergies array
@@ -167,13 +163,14 @@ export const PatientForm = () => {
     const patientData = {
       first_name: formData.firstName || `Patient-${Date.now()}`,
       last_name: formData.lastName || 'Unknown',
-      date_of_birth: dateOfBirth.toISOString().split('T')[0], // YYYY-MM-DD format
+      date_of_birth: dateOfBirth.toISOString().split('T')[0],
       gender: formData.gender || null,
       contact_phone: formData.contactPhone || null,
       contact_email: formData.contactEmail || null,
       address: formData.address || null,
       allergies: allergiesArray,
       known_conditions: conditionsArray,
+      attending_physician_id: user.id,
       notes: `Created from recommendation form. Infection sites: ${formData.infectionSites.join(', ')}. Symptoms: ${formData.symptoms || 'Not specified'}.`
     };
 
@@ -191,7 +188,7 @@ export const PatientForm = () => {
     return data;
   };
 
-  const saveRecommendationRecord = async (patientId: string, recommendationData: EnhancedAntibioticRecommendation, source: 'rule-based' | 'ai') => {
+  const saveRecommendationRecord = async (patientId: string, recommendationData: EnhancedAntibioticRecommendation) => {
     if (!user) {
       throw new Error('User must be authenticated to save recommendations');
     }
@@ -199,10 +196,10 @@ export const PatientForm = () => {
     const recommendationRecord = {
       patient_id: patientId,
       doctor_id: user.id,
-      input_data: formData as any, // Cast to any to satisfy Json type
-      recommendation_details: recommendationData as any, // Cast to any to satisfy Json type
-      source: source,
-      notes: `${source === 'ai' ? 'AI-generated' : 'Rule-based'} recommendation created from patient form`
+      input_data: formData as any,
+      recommendation_details: recommendationData as any,
+      source: 'rule-based',
+      notes: 'Rule-based recommendation generated from comprehensive clinical algorithms'
     };
 
     const { data, error } = await supabase
@@ -250,18 +247,18 @@ export const PatientForm = () => {
       const patient = await createPatientRecord();
       setCreatedPatientId(patient.id);
 
-      // Generate recommendation
+      // Generate comprehensive rule-based recommendation
       const recommendation = generateAntibioticRecommendation(formData);
       setRecommendation(recommendation);
 
       // Save recommendation record
-      await saveRecommendationRecord(patient.id, recommendation, 'rule-based');
+      await saveRecommendationRecord(patient.id, recommendation);
       
       toast({
         title: language === "en" ? "Success" : "Uspjeh",
         description: language === "en"
-          ? "Patient created and recommendation generated successfully"
-          : "Pacijent kreiran i preporuka uspješno generisana",
+          ? "Patient created and clinical recommendation generated successfully"
+          : "Pacijent kreiran i klinička preporuka uspješno generisana",
       });
     } catch (error: any) {
       console.error('Error in form submission:', error);
@@ -277,75 +274,6 @@ export const PatientForm = () => {
     }
   };
 
-  const handleGetAIRecommendation = async () => {
-    if (!validateForm()) {
-      toast({
-        title: language === "en" ? "Validation Error" : "Greška Validacije",
-        description: language === "en" 
-          ? "Please fill in all required fields before getting AI recommendation"
-          : "Molimo popunite sva obavezna polja prije dobivanja AI preporuke",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!user) {
-      toast({
-        title: language === "en" ? "Authentication Required" : "Potrebna Autentifikacija",
-        description: language === "en"
-          ? "Please sign in to get AI recommendations"
-          : "Molimo prijavite se da biste dobili AI preporuke",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoadingAI(true);
-    setAiRecommendation(null);
-    try {
-      // Create patient record if not already created
-      let patientId = createdPatientId;
-      if (!patientId) {
-        const patient = await createPatientRecord();
-        patientId = patient.id;
-        setCreatedPatientId(patientId);
-      }
-
-      console.log("Getting AI recommendation with data:", formData);
-      const aiResponse = await getAIRecommendation(formData);
-      console.log("AI recommendation response:", aiResponse);
-
-      if (aiResponse && aiResponse.primaryRecommendation && aiResponse.primaryRecommendation.name && aiResponse.primaryRecommendation.name.trim() !== "") {
-        setAiRecommendation(aiResponse);
-
-        // Save AI recommendation record
-        await saveRecommendationRecord(patientId, aiResponse, 'ai');
-
-        toast({
-          title: "AI Recommendation Ready",
-          description: "The AI has analyzed the patient data and provided recommendations.",
-        });
-      } else {
-        setAiRecommendation(null); 
-        toast({
-          title: "AI Analysis Incomplete",
-          description: "The AI analysis was generated but appears to be missing key details. Please check your input data or try again.",
-          variant: "default", 
-        });
-      }
-    } catch (error) {
-      console.error('AI Recommendation error:', error);
-      setAiRecommendation(null);
-      toast({
-        title: "Error Getting AI Recommendation",
-        description: error instanceof Error ? error.message : "Failed to get AI recommendation. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoadingAI(false);
-    }
-  };
-
   const handleLabResultsChange = (results: any) => {
     handleInputChange("labResults", results);
   };
@@ -357,7 +285,14 @@ export const PatientForm = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-6 space-y-8">
           <div ref={sectionRefs.demographics}>
-            <SectionHeader number={1} title={t.title} subtitle={t.subtitle} />
+            <SectionHeader 
+              number={1} 
+              title={t.title} 
+              subtitle={language === "en" 
+                ? "Patient demographics help determine appropriate dosing and safety considerations"
+                : "Demografski podaci pacijenta pomažu u određivanju odgovarajućeg doziranja i sigurnosnih razmatranja"
+              } 
+            />
             <PatientDemographicsSection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -368,7 +303,14 @@ export const PatientForm = () => {
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           <div>
-            <SectionHeader number={2} title={t.allergies.title} subtitle={t.allergies.subtitle} />
+            <SectionHeader 
+              number={2} 
+              title={t.allergies.title} 
+              subtitle={language === "en"
+                ? "Drug allergies are critical for safe antibiotic selection and preventing adverse reactions"
+                : "Alergije na lijekove su kritične za siguran izbor antibiotika i sprečavanje štetnih reakcija"
+              } 
+            />
             <AllergySection 
               allergies={formData.allergies} 
               onAllergyChange={(allergy, checked) => {
@@ -383,7 +325,14 @@ export const PatientForm = () => {
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           <div>
-            <SectionHeader number={3} title={t.renalFunction.title} subtitle={t.renalFunction.subtitle} />
+            <SectionHeader 
+              number={3} 
+              title={t.renalFunction.title} 
+              subtitle={language === "en"
+                ? "Kidney function determines antibiotic dosing adjustments and safety considerations"
+                : "Funkcija bubrega određuje prilagođavanja doziranja antibiotika i sigurnosna razmatranja"
+              } 
+            />
             <RenalFunctionSection 
               creatinine={formData.creatinine} 
               onCreatinineChange={(value) => handleInputChange("creatinine", value)}
@@ -397,7 +346,14 @@ export const PatientForm = () => {
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           <div>
-            <SectionHeader number={4} title={t.comorbidities.title} subtitle={t.comorbidities.subtitle} />
+            <SectionHeader 
+              number={4} 
+              title={t.comorbidities.title} 
+              subtitle={language === "en"
+                ? "Medical conditions affect antibiotic choice, dosing, and monitoring requirements"
+                : "Medicinska stanja utječu na izbor antibiotika, doziranje i zahtjeve za praćenje"
+              } 
+            />
             <ComorbiditySection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -407,7 +363,14 @@ export const PatientForm = () => {
           <div className="h-px bg-gray-200 dark:bg-gray-700" />
           
           <div ref={sectionRefs.infection}>
-            <SectionHeader number={5} title={t.infectionDetails.title} subtitle={t.infectionDetails.subtitle} />
+            <SectionHeader 
+              number={5} 
+              title={t.infectionDetails.title} 
+              subtitle={language === "en"
+                ? "Infection characteristics determine the most appropriate empirical therapy"
+                : "Karakteristike infekcije određuju najodgovarajuću empirijsku terapiju"
+              } 
+            />
             <InfectionDetailsSection 
               formData={formData} 
               onInputChange={handleInputChange}
@@ -421,18 +384,48 @@ export const PatientForm = () => {
             <SectionHeader 
               number={6}
               title={language === "en" ? "Laboratory Results" : "Laboratorijski Rezultati"}
-              subtitle={language === "en" ? "Enter available lab results if applicable (optional)" : "Unesite dostupne laboratorijske rezultate ako su dostupni (opcionalno)"}
+              subtitle={language === "en" 
+                ? "Laboratory data guides targeted therapy and monitoring decisions" 
+                : "Laboratorijski podaci usmjeravaju ciljanu terapiju i odluke o praćenju"
+              }
             />
             <LabResultsSection 
               onLabResultsChange={handleLabResultsChange}
             />
           </div>
 
-          <AIRecommendationSection
-            isLoading={isLoadingAI}
-            recommendation={aiRecommendation}
-            onGetRecommendation={handleGetAIRecommendation}
-          />
+          <div className="bg-gradient-to-r from-medical-primary/5 to-medical-accent/5 p-6 rounded-xl border border-medical-primary/20">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-3 w-3 bg-medical-primary rounded-full"></div>
+              <h3 className="text-lg font-semibold text-medical-deep">
+                {language === "en" ? "Clinical Decision Support" : "Klinička Podrška za Odlučivanje"}
+              </h3>
+            </div>
+            <p className="text-medical-text mb-4">
+              {language === "en"
+                ? "This system uses evidence-based algorithms incorporating the latest clinical guidelines (IDSA, CDC, WHO) to provide comprehensive antibiotic recommendations based on patient-specific factors."
+                : "Ovaj sistem koristi algoritme zasnovane na dokazima koji uključuju najnovije kliničke smernice (IDSA, CDC, WHO) za pružanje sveobuhvatnih preporuka antibiotika na osnovu faktora specifičnih za pacijenta."
+              }
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <span>{language === "en" ? "Evidence-based protocols" : "Protokoli zasnovani na dokazima"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <span>{language === "en" ? "Safety validations" : "Sigurnosne validacije"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+                <span>{language === "en" ? "Resistance patterns" : "Obrasci rezistencije"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-orange-500 rounded-full"></div>
+                <span>{language === "en" ? "Dosing calculations" : "Kalkulacije doziranja"}</span>
+              </div>
+            </div>
+          </div>
 
           <FormActions isSubmitting={isSubmitting} />
         </Card>
