@@ -13,7 +13,7 @@ export interface DoctorProfile {
   hospital_affiliation?: string;
   license_number?: string;
   department_id?: string;
-  role?: string;
+  role?: 'admin' | 'doctor' | 'nurse' | 'pharmacist' | 'researcher' | 'viewer';
   is_active?: boolean;
   certification_expiry?: string;
   created_at: string;
@@ -48,7 +48,7 @@ export const useUpdateDoctorProfile = () => {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async (profileData: Partial<DoctorProfile>) => {
+    mutationFn: async (profileData: Partial<Omit<DoctorProfile, 'id' | 'created_at' | 'updated_at'>>) => {
       if (!user?.id) throw new Error('User not authenticated');
 
       const { data, error } = await supabase

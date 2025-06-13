@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarIcon, Save } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -27,7 +26,14 @@ const doctorProfileSchema = z.object({
 type DoctorProfileFormData = z.infer<typeof doctorProfileSchema>;
 
 interface DoctorProfileFormProps {
-  doctor?: Partial<DoctorProfileFormData & { certification_expiry: string }>;
+  doctor?: {
+    first_name?: string;
+    last_name?: string;
+    specialization?: string;
+    hospital_affiliation?: string;
+    license_number?: string;
+    certification_expiry?: string;
+  };
   onSubmit: (data: DoctorProfileFormData) => void;
   onCancel?: () => void;
   isLoading?: boolean;

@@ -12,6 +12,7 @@ import AntibioticAdvisor from "@/pages/AntibioticAdvisor";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Auth from "@/pages/Auth";
 import About from "@/pages/About";
+import DoctorProfile from "@/pages/DoctorProfile";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
@@ -39,6 +40,7 @@ function App() {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/profile" element={<DoctorProfile />} />
                     <Route path="*" element={<Index />} />
                   </Routes>
                   <Toaster />
