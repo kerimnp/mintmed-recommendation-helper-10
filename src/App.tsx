@@ -10,9 +10,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "@/pages/Index";
 import AntibioticAdvisor from "@/pages/AntibioticAdvisor";
 import AdminDashboard from "@/pages/AdminDashboard";
+import ClinicalDashboard from "@/pages/ClinicalDashboard";
 import Auth from "@/pages/Auth";
 import About from "@/pages/About";
-import DoctorProfile from "@/pages/DoctorProfile";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
@@ -38,9 +38,9 @@ function App() {
                     <Route path="/" element={<Index />} />
                     <Route path="/advisor" element={<AntibioticAdvisor />} />
                     <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/clinical" element={<ClinicalDashboard />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/profile" element={<DoctorProfile />} />
                     <Route path="*" element={<Index />} />
                   </Routes>
                   <Toaster />
