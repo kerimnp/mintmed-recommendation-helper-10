@@ -11,8 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCreateClinicalOutcome } from '@/hooks/useClinicalOutcomes';
-import { Calendar, CalendarIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +21,7 @@ const clinicalOutcomeSchema = z.object({
   prescriptionId: z.string().uuid(),
   patientId: z.string().uuid(),
   assessmentDate: z.date(),
-  clinicalResponse: z.enum(['excellent', 'good', 'fair', 'poor', 'deterioration']),
+  clinicalResponse: z.enum(['complete', 'partial', 'no_response', 'worsened']),
   symptomResolution: z.object({
     fever: z.boolean().optional(),
     pain: z.boolean().optional(),
@@ -160,11 +161,10 @@ export const ClinicalOutcomeForm: React.FC<ClinicalOutcomeFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="excellent">Excellent</SelectItem>
-                        <SelectItem value="good">Good</SelectItem>
-                        <SelectItem value="fair">Fair</SelectItem>
-                        <SelectItem value="poor">Poor</SelectItem>
-                        <SelectItem value="deterioration">Deterioration</SelectItem>
+                        <SelectItem value="complete">Complete</SelectItem>
+                        <SelectItem value="partial">Partial</SelectItem>
+                        <SelectItem value="no_response">No Response</SelectItem>
+                        <SelectItem value="worsened">Worsened</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

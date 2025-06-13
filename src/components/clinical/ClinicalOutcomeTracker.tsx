@@ -23,12 +23,21 @@ export const ClinicalOutcomeTracker: React.FC<ClinicalOutcomeTrackerProps> = ({
 
   const getResponseBadgeColor = (response: string) => {
     switch (response) {
-      case 'excellent': return 'bg-green-100 text-green-800';
-      case 'good': return 'bg-blue-100 text-blue-800';
-      case 'fair': return 'bg-yellow-100 text-yellow-800';
-      case 'poor': return 'bg-orange-100 text-orange-800';
-      case 'deterioration': return 'bg-red-100 text-red-800';
+      case 'complete': return 'bg-green-100 text-green-800';
+      case 'partial': return 'bg-blue-100 text-blue-800';
+      case 'no_response': return 'bg-yellow-100 text-yellow-800';
+      case 'worsened': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatResponseText = (response: string) => {
+    switch (response) {
+      case 'complete': return 'Complete';
+      case 'partial': return 'Partial';
+      case 'no_response': return 'No Response';
+      case 'worsened': return 'Worsened';
+      default: return response.charAt(0).toUpperCase() + response.slice(1);
     }
   };
 
@@ -103,7 +112,7 @@ export const ClinicalOutcomeTracker: React.FC<ClinicalOutcomeTrackerProps> = ({
                             </span>
                           </div>
                           <Badge className={getResponseBadgeColor(outcome.clinical_response)}>
-                            {outcome.clinical_response.charAt(0).toUpperCase() + outcome.clinical_response.slice(1)}
+                            {formatResponseText(outcome.clinical_response)}
                           </Badge>
                         </div>
 
@@ -170,7 +179,7 @@ export const ClinicalOutcomeTracker: React.FC<ClinicalOutcomeTrackerProps> = ({
                 <Card>
                   <CardContent className="p-4">
                     <div className="text-2xl font-bold text-green-600">
-                      {outcomes?.filter(o => o.clinical_response === 'excellent' || o.clinical_response === 'good').length || 0}
+                      {outcomes?.filter(o => o.clinical_response === 'complete' || o.clinical_response === 'partial').length || 0}
                     </div>
                     <p className="text-sm text-gray-600">Positive Responses</p>
                   </CardContent>
@@ -179,7 +188,7 @@ export const ClinicalOutcomeTracker: React.FC<ClinicalOutcomeTrackerProps> = ({
                 <Card>
                   <CardContent className="p-4">
                     <div className="text-2xl font-bold text-amber-600">
-                      {outcomes?.reduce((sum, o) => sum + (o.length_of_stay || 0), 0) / (outcomes?.length || 1) || 0}
+                      {Math.round((outcomes?.reduce((sum, o) => sum + (o.length_of_stay || 0), 0) / (outcomes?.length || 1)) || 0)}
                     </div>
                     <p className="text-sm text-gray-600">Avg Length of Stay</p>
                   </CardContent>
