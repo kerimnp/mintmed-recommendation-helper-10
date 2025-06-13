@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { DashboardMetrics } from "./DashboardMetrics";
 import { RecentActivity } from "./RecentActivity";
 import { QuickActions } from "./QuickActions";
+import { useDoctorProfile } from "@/hooks/useDoctorProfile";
 import { 
   Activity,
   Users,
@@ -23,10 +24,19 @@ interface MainDashboardTabProps {
 }
 
 export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }) => {
+  const { data: doctorProfile } = useDoctorProfile();
+  
   // Filter logic based on searchTerm if needed
   const filteredContent = searchTerm ? 
     `Showing results for: "${searchTerm}"` : 
     null;
+
+  const getWelcomeMessage = () => {
+    if (doctorProfile?.first_name && doctorProfile?.last_name) {
+      return `Welcome back Dr. ${doctorProfile.first_name} ${doctorProfile.last_name}`;
+    }
+    return "Welcome back Doctor";
+  };
 
   return (
     <div className="space-y-6">
@@ -38,7 +48,7 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
 
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-medical-primary to-blue-600 text-white rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-2">Welcome to MediAid Dashboard</h2>
+        <h2 className="text-2xl font-bold mb-2">{getWelcomeMessage()}</h2>
         <p className="text-blue-100 mb-4">
           Your comprehensive antibiotic stewardship and clinical decision support platform
         </p>
