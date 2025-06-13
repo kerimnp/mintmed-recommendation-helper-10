@@ -32,7 +32,7 @@ export const generateSkinInfectionRecommendation = (data: PatientData): Antibiot
       const doseCalc = calculateDoseForPatient("Cephalexin", data, "mild");
       recommendation.primaryRecommendation = {
         name: "Cephalexin",
-        dosage: doseCalc.dosage,
+        dosage: doseCalc.dose, // Fix: use 'dose' instead of 'dosage'
         frequency: "q6h",
         duration: "7-10 days",
         route: "oral",

@@ -1,4 +1,5 @@
 
+
 import { regionalResistanceData } from "./antibioticRecommendations/data/regionalResistance";
 
 // Global default resistance thresholds
@@ -57,21 +58,17 @@ export function getResistanceConsiderations(region: string): string[] {
   
   const resistanceData = regionalResistanceData[mappedRegion];
   
-  // Use the actual structure of the regional resistance data
-  if (resistanceData && resistanceData.Respiratory && resistanceData.Respiratory.macrolideResistance > RESISTANCE_THRESHOLDS.macrolide) {
-    considerations.push(`High macrolide resistance in ${mappedRegion} (${resistanceData.Respiratory.macrolideResistance}%) - consider alternatives for respiratory infections.`);
-  }
-  
-  if (resistanceData && resistanceData.Respiratory && resistanceData.Respiratory.penicillinResistance > RESISTANCE_THRESHOLDS.penicillin) {
-    considerations.push(`High penicillin resistance in ${mappedRegion} (${resistanceData.Respiratory.penicillinResistance}%) - consider higher doses or alternatives.`);
-  }
-  
-  if (resistanceData && resistanceData.UTI && resistanceData.UTI.ESBL_prevalence > RESISTANCE_THRESHOLDS.esbl) {
-    considerations.push(`High ESBL prevalence in ${mappedRegion} (${resistanceData.UTI.ESBL_prevalence}%) - consider carbapenem for severe UTIs.`);
-  }
-  
+  // Fix: Use the actual structure from regionalResistanceData which has flat properties
   if (resistanceData && resistanceData.MRSA_prevalence > RESISTANCE_THRESHOLDS.mrsa) {
     considerations.push(`High MRSA prevalence in ${mappedRegion} (${resistanceData.MRSA_prevalence}%) - consider MRSA coverage for skin/soft tissue infections.`);
+  }
+  
+  if (resistanceData && resistanceData.ESBL_prevalence > RESISTANCE_THRESHOLDS.esbl) {
+    considerations.push(`High ESBL prevalence in ${mappedRegion} (${resistanceData.ESBL_prevalence}%) - consider carbapenem for severe infections.`);
+  }
+  
+  if (resistanceData && resistanceData.Pseudomonas_prevalence > RESISTANCE_THRESHOLDS.pseudomonas) {
+    considerations.push(`High Pseudomonas prevalence in ${mappedRegion} (${resistanceData.Pseudomonas_prevalence}%) - consider anti-pseudomonal coverage.`);
   }
   
   return considerations;
