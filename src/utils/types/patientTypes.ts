@@ -1,33 +1,90 @@
-export interface PatientData {
+
+export interface PatientMetrics {
   age: string;
-  gender: string;
+  gender: 'male' | 'female';
   weight: string;
   height: string;
-  nationality: string;
-  pregnancy: string;
-  infectionSites: string[];
+  region: string;
+  creatinine?: string;
+}
+
+export interface WeightCalculations {
+  ibw: number;
+  adjBW?: number;
+  useAdjustedWeight: boolean;
+}
+
+export interface RenalFunction {
+  crCl: number;
+  requiresDoseAdjustment: boolean;
+  recommendedAdjustment?: string;
+}
+
+export interface AllergiesProfile {
+  penicillin: boolean;
+  cephalosporin: boolean;
+  sulfa: boolean;
+  macrolide: boolean;
+  fluoroquinolone: boolean;
+}
+
+export interface ResistanceProfile {
+  mrsa: boolean;
+  vre: boolean;
+  esbl: boolean;
+  cre: boolean;
+  pseudomonas: boolean;
+}
+
+export interface InfectionDetails {
+  sites: string[];
   symptoms: string;
   duration: string;
-  severity: string;
-  creatinine: string;
-  recentAntibiotics: boolean;
-  isHospitalAcquired: boolean;
-  allergies: {
-    penicillin: boolean;
-    cephalosporin: boolean;
-    sulfa: boolean;
-    macrolide: boolean;
-    fluoroquinolone: boolean;
-  };
+  severity: 'mild' | 'moderate' | 'severe';
+}
+
+export interface PatientComorbidities {
   kidneyDisease: boolean;
   liverDisease: boolean;
   diabetes: boolean;
   immunosuppressed: boolean;
-  resistances: {
-    mrsa: boolean;
-    vre: boolean;
-    esbl: boolean;
-    cre: boolean;
-    pseudomonas: boolean;
-  };
+}
+
+export interface PatientData {
+  // Demographics
+  age: string;
+  gender: 'male' | 'female';
+  weight: string;
+  height: string;
+  region: string;
+  creatinine?: string;
+  
+  // Infection details
+  infectionSites: string[];
+  symptoms: string;
+  duration: string;
+  severity: 'mild' | 'moderate' | 'severe';
+  isHospitalAcquired?: boolean;
+  
+  // Allergies
+  allergies: AllergiesProfile;
+  
+  // Resistance patterns
+  resistances: ResistanceProfile;
+  
+  // Comorbidities
+  kidneyDisease: boolean;
+  liverDisease: boolean;
+  diabetes: boolean;
+  immunosuppressed: boolean;
+}
+
+export interface PatientProfile {
+  metrics: PatientMetrics;
+  weightCalculations: WeightCalculations;
+  renalFunction: RenalFunction;
+  allergies: AllergiesProfile;
+  resistances: ResistanceProfile;
+  infection: InfectionDetails;
+  comorbidities: PatientComorbidities;
 }

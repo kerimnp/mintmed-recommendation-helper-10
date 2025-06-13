@@ -17,9 +17,11 @@ export const generateDentalRecommendation = (
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -35,91 +37,128 @@ export const generateDentalRecommendation = (
     if (!hasPenicillinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
-        dose: isPediatric ? "50mg/kg/day divided q8h" : "500mg q8h",
+        dosage: isPediatric ? "50mg/kg/day divided q8h" : "500mg q8h",
+        frequency: "q8h",
+        duration: "7 days",
         route: "oral",
-        duration: "7 days"
+        reason: "First-line treatment for dental infections"
       };
       recommendation.reasoning = "First-line treatment for dental infections";
-      recommendation.rationale.reasons = [
-        "Effective against common oral pathogens",
-        "Appropriate for mild odontogenic infections"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Effective against common oral pathogens",
+          "Appropriate for mild odontogenic infections"
+        ];
+      }
     } else if (!hasMacrolideAllergy) {
       recommendation.primaryRecommendation = {
         name: "Azithromycin",
-        dose: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
+        dosage: isPediatric ? "10mg/kg day 1, then 5mg/kg/day" : "500mg day 1, then 250mg daily",
+        frequency: "daily",
+        duration: "5 days",
         route: "oral",
-        duration: "5 days"
+        reason: "Alternative for penicillin-allergic patients"
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
-      recommendation.rationale.reasons = [
-        "Alternative for penicillin-allergic patients",
-        "Good compliance with once-daily dosing"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Alternative for penicillin-allergic patients",
+          "Good compliance with once-daily dosing"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
+      }
     } else if (!hasClindamycinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Clindamycin",
-        dose: isPediatric ? "10mg/kg TID (max 300mg/dose)" : "300mg QID", // Pediatric dose corrected, QID can be TID/QID
+        dosage: isPediatric ? "10mg/kg TID (max 300mg/dose)" : "300mg QID",
+        frequency: "TID-QID",
+        duration: "7 days",
         route: "oral",
-        duration: "7 days"
+        reason: "Alternative for patients with penicillin and macrolide allergies"
       };
       recommendation.reasoning = "Alternative for patients with penicillin and macrolide allergies";
-      recommendation.rationale.reasons = [
-        "Effective against oral anaerobes",
-        "Option for penicillin and macrolide allergies"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected due to penicillin and macrolide allergies"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Effective against oral anaerobes",
+          "Option for penicillin and macrolide allergies"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected due to penicillin and macrolide allergies"];
+      }
     } else {
       recommendation.primaryRecommendation = {
         name: "Complex Case: Consult Specialist",
-        dose: "N/A",
+        dosage: "N/A",
+        frequency: "N/A",
+        duration: "N/A",
         route: "N/A",
-        duration: "N/A"
+        reason: "Standard oral options exhausted due to multiple allergies for mild infection"
       };
-      recommendation.reasoning = "Standard oral options exhausted due to multiple allergies (penicillin, macrolide, clindamycin). Specialist consultation advised.";
-      recommendation.rationale.reasons.push("Multiple allergies limit standard oral choices for mild dental infection.");
-      recommendation.rationale.allergyConsiderations = ["Penicillin, macrolide, and clindamycin allergies indicated."];
+      recommendation.reasoning = "Standard oral options exhausted due to multiple allergies for mild infection. Specialist consultation advised.";
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons.push("Multiple allergies limit standard oral choices");
+        recommendation.rationale.allergyConsiderations = ["Penicillin, macrolide, and clindamycin allergies indicated"];
+      }
     }
   } else if (data.severity === "moderate") {
     if (!hasPenicillinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin-Clavulanate",
-        dose: isPediatric ? "45mg/kg/day divided q12h (amoxicillin component)" : "875/125mg q12h",
+        dosage: isPediatric ? "45mg/kg/day divided q12h (amoxicillin component)" : "875/125mg q12h",
+        frequency: "q12h",
+        duration: "7-10 days",
         route: "oral",
-        duration: "7-10 days"
+        reason: "Treatment for moderate dental infections"
       };
       recommendation.reasoning = "Treatment for moderate dental infections";
-      recommendation.rationale.reasons = [
-        "Beta-lactamase coverage added",
-        "Effective for moderate facial cellulitis"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Beta-lactamase coverage added",
+          "Effective for moderate facial cellulitis"
+        ];
+      }
     } else if (!hasClindamycinAllergy) {
       recommendation.primaryRecommendation = {
         name: "Clindamycin",
-        dose: isPediatric ? "10-13mg/kg q6-8h (max 450mg/dose)" : "300-450mg QID", // q6-8h for peds
+        dosage: isPediatric ? "10-13mg/kg q6-8h (max 450mg/dose)" : "300-450mg QID",
+        frequency: "q6-8h",
+        duration: "7-10 days",
         route: "oral",
-        duration: "7-10 days"
+        reason: "Alternative for penicillin-allergic patients in moderate dental infections"
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients in moderate dental infections";
-      recommendation.rationale.reasons = [
-        "Good coverage of oral anaerobes",
-        "Alternative for beta-lactam allergies"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Good coverage of oral anaerobes",
+          "Alternative for beta-lactam allergies"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
+      }
     } else {
        recommendation.primaryRecommendation = {
         name: "Moxifloxacin (adults, if no FQ allergy) or Consult Specialist",
-        dose: "400mg daily (adults)", // Moxifloxacin is generally not for pediatrics
+        dosage: "400mg daily (adults)",
+        frequency: "daily",
+        duration: "7-10 days",
         route: "oral",
-        duration: "7-10 days"
+        reason: "Alternative for moderate dental infection with penicillin and clindamycin allergy"
       };
       recommendation.reasoning = "Alternative for moderate dental infection with penicillin and clindamycin allergy. Fluoroquinolones have activity but are broad. Specialist consultation advised, especially for pediatrics.";
-      recommendation.rationale.reasons.push("Multiple allergies limit choices. Fluoroquinolones are an option for adults if not contraindicated.");
-      recommendation.rationale.allergyConsiderations = ["Penicillin and clindamycin allergy."];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons.push("Multiple allergies limit choices. Fluoroquinolones are an option for adults if not contraindicated.");
+        recommendation.rationale.allergyConsiderations = ["Penicillin and clindamycin allergy."];
+      }
+      
       if (isPediatric || data.allergies.fluoroquinolone) {
          recommendation.primaryRecommendation.name = "Complex Case: Consult Specialist";
-         recommendation.primaryRecommendation.dose = "N/A";
+         recommendation.primaryRecommendation.dosage = "N/A";
+         recommendation.primaryRecommendation.frequency = "N/A";
          recommendation.primaryRecommendation.route = "N/A";
          recommendation.reasoning = "Standard options exhausted due to multiple allergies or contraindications. Specialist consultation advised.";
       }
@@ -128,36 +167,41 @@ export const generateDentalRecommendation = (
     // Severe dental infections often require IV therapy and may need surgical intervention.
     if (!hasPenicillinAllergy) {
       recommendation.primaryRecommendation = {
-        name: "Ampicillin-Sulbactam", // Metronidazole often added for enhanced anaerobic coverage
-        dose: isPediatric ?
-          "50mg/kg q6h (ampicillin component)" : // Max 2g ampicillin/dose
-          "3g q6h", // Amp/Sulbactam combo dose
+        name: "Ampicillin-Sulbactam",
+        dosage: isPediatric ?
+          "50mg/kg q6h (ampicillin component)" :
+          "3g q6h",
+        frequency: "q6h",
+        duration: "10-14 days (or until clinically stable for oral step-down)",
         route: "IV",
-        duration: "10-14 days (or until clinically stable for oral step-down)"
+        reason: "Treatment for severe dental infections, often with Metronidazole for enhanced anaerobic coverage"
       };
       recommendation.reasoning = "Treatment for severe dental infections, often with Metronidazole for enhanced anaerobic coverage.";
-      recommendation.rationale.reasons = [
-        "Broad-spectrum coverage including oral anaerobes",
-        "Appropriate for severe infections requiring hospitalization"
-      ];
-      // Optionally, always add Metronidazole for severe cases if not contraindicated
-      // recommendation.primaryRecommendation.name += " + Metronidazole";
-      // recommendation.primaryRecommendation.dose += isPediatric ? " + 7.5mg/kg q6h" : " + 500mg q6h";
-    } else { // Penicillin-allergic, severe
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Broad-spectrum coverage including oral anaerobes",
+          "Appropriate for severe infections requiring hospitalization"
+        ];
+      }
+    } else {
       recommendation.primaryRecommendation = {
         name: "Clindamycin",
-        dose: isPediatric ? "10-13mg/kg q6-8h (max 900mg/dose)" : "600-900mg q8h",
+        dosage: isPediatric ? "10-13mg/kg q6-8h (max 900mg/dose)" : "600-900mg q8h",
+        frequency: "q6-8h",
+        duration: "10-14 days (or until clinically stable for oral step-down)",
         route: "IV",
-        duration: "10-14 days (or until clinically stable for oral step-down)"
+        reason: "Alternative for severe dental infections in penicillin-allergic patients"
       };
       recommendation.reasoning = "Alternative for severe dental infections in penicillin-allergic patients";
-      recommendation.rationale.reasons = [
-        "Excellent anaerobic coverage",
-        "Alternative for beta-lactam allergic patients"
-      ];
-      recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
-      // Consider adding a Gram-negative agent like a fluoroquinolone (e.g., Moxifloxacin if adult, no FQ allergy) or aminoglycoside if polymicrobial infection suspected and clindamycin alone is insufficient.
-      // This gets complex and often warrants specialist input.
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Excellent anaerobic coverage",
+          "Alternative for beta-lactam allergic patients"
+        ];
+        recommendation.rationale.allergyConsiderations = ["Selected due to penicillin allergy"];
+      }
     }
   }
 
@@ -176,11 +220,10 @@ export const generateDentalRecommendation = (
   if (gfr < 60 && recommendation.primaryRecommendation.name && !recommendation.primaryRecommendation.name.includes("Consult Specialist")) {
     recommendation.precautions.push("Adjust doses for renal impairment if applicable for chosen antibiotic(s).");
     recommendation.calculations = {
-        ...recommendation.calculations,
-        renalAdjustment: `GFR ${Math.round(gfr)} mL/min - check antibiotic for dose adjustment.`
+      ...recommendation.calculations,
+      renalAdjustment: `GFR ${Math.round(gfr)} mL/min - check antibiotic for dose adjustment.`
     };
   }
-
 
   return recommendation;
 };

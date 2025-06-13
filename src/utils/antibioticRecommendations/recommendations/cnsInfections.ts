@@ -15,9 +15,11 @@ export const generateCNSRecommendation = (
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
       name: "",
-      dose: "",
+      dosage: "",
+      frequency: "",
+      duration: "",
       route: "",
-      duration: ""
+      reason: ""
     },
     reasoning: "",
     alternatives: [],
@@ -33,24 +35,30 @@ export const generateCNSRecommendation = (
   if (data.severity === "moderate") {
     recommendation.primaryRecommendation = {
       name: "Ceftriaxone + Vancomycin",
-      dose: isPediatric ? 
+      dosage: isPediatric ? 
         "100mg/kg/day divided q12h + 15mg/kg q6h" : 
         "2g q12h + 15-20mg/kg q8-12h",
+      frequency: "q12h + q6-12h",
+      duration: "10-14 days",
       route: "IV",
-      duration: "10-14 days"
+      reason: "Standard treatment for bacterial meningitis"
     };
     recommendation.reasoning = "Standard treatment for bacterial meningitis";
-    recommendation.rationale.reasons = [
-      "Empiric coverage for common meningitis pathogens",
-      "Vancomycin added for possible resistant pneumococci"
-    ];
+    
+    if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+      recommendation.rationale.reasons = [
+        "Empiric coverage for common meningitis pathogens",
+        "Vancomycin added for possible resistant pneumococci"
+      ];
+    }
 
     if (!hasPenicillinAllergy) {
       recommendation.alternatives.push({
         name: "Ampicillin",
-        dose: isPediatric ? "100mg/kg q6h" : "2g q4h",
-        route: "IV",
+        dosage: isPediatric ? "100mg/kg q6h" : "2g q4h",
+        frequency: "q4-6h",
         duration: "10-14 days",
+        route: "IV",
         reason: "Added for Listeria coverage in at-risk patients"
       });
     }
@@ -58,31 +66,41 @@ export const generateCNSRecommendation = (
     if (hasMRSA || hasPseudomonas) {
       recommendation.primaryRecommendation = {
         name: "Meropenem + Vancomycin",
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "40mg/kg q8h + 15mg/kg q6h" :
           "2g q8h + 15-20mg/kg q8-12h",
+        frequency: "q8h + q6-12h",
+        duration: "14-21 days",
         route: "IV",
-        duration: "14-21 days"
+        reason: "Broad spectrum coverage including resistant organisms"
       };
       recommendation.reasoning = "Broad spectrum coverage including resistant organisms";
-      recommendation.rationale.reasons = [
-        "Carbapenem for broad-spectrum coverage including Pseudomonas",
-        "Vancomycin added for MRSA and resistant pneumococci"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Carbapenem for broad-spectrum coverage including Pseudomonas",
+          "Vancomycin added for MRSA and resistant pneumococci"
+        ];
+      }
     } else {
       recommendation.primaryRecommendation = {
         name: "Ceftriaxone + Vancomycin + Ampicillin",
-        dose: isPediatric ?
+        dosage: isPediatric ?
           "100mg/kg/day divided q12h + 15mg/kg q6h + 100mg/kg q6h" :
           "2g q12h + 15-20mg/kg q8-12h + 2g q4h",
+        frequency: "q12h + q6-12h + q4h",
+        duration: "14-21 days",
         route: "IV",
-        duration: "14-21 days"
+        reason: "Comprehensive coverage for severe CNS infections"
       };
       recommendation.reasoning = "Comprehensive coverage for severe CNS infections";
-      recommendation.rationale.reasons = [
-        "Triple therapy for severe meningitis",
-        "Covers all common pathogens including Listeria"
-      ];
+      
+      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+        recommendation.rationale.reasons = [
+          "Triple therapy for severe meningitis",
+          "Covers all common pathogens including Listeria"
+        ];
+      }
     }
   }
 
@@ -97,9 +115,12 @@ export const generateCNSRecommendation = (
       "Consider coverage for opportunistic pathogens",
       "Extended duration may be necessary"
     );
-    recommendation.rationale.reasons.push(
-      "Immunosuppression increases risk of unusual pathogens"
-    );
+    
+    if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+      recommendation.rationale.reasons.push(
+        "Immunosuppression increases risk of unusual pathogens"
+      );
+    }
   }
 
   if (data.kidneyDisease || gfr < 60) {

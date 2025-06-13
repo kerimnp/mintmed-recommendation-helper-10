@@ -1,3 +1,4 @@
+
 import { PatientData } from "../../types/patientTypes";
 
 // Define a type for regional resistance data
@@ -12,7 +13,7 @@ export type RegionalResistanceData = {
 };
 
 // Mock data for different regions
-const regionalResistanceData: { [key: string]: RegionalResistanceData } = {
+export const regionalResistanceData: { [key: string]: RegionalResistanceData } = {
   "US": {
     MRSA_prevalence: 25,
     VRE_prevalence: 10,

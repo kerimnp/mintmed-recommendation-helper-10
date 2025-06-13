@@ -15,9 +15,16 @@ import { generateDentalRecommendation } from "./recommendations/dentalInfections
 import { generateEyeRecommendation } from "./recommendations/eyeInfections";
 
 export const findBestClinicalScenario = (data: PatientData): EnhancedAntibioticRecommendation => {
-  // Calculate patient parameters
-  const gfr = calculateCreatinineClearance(data);
-  const isPediatric = isPediatricPatient(data);
+  // Calculate patient parameters - create proper parameters for creatinine clearance
+  const creatinineParams = {
+    age: parseInt(data.age),
+    weight: parseFloat(data.weight),
+    creatinine: parseFloat(data.creatinine || "1.0"),
+    isFemale: data.gender === 'female'
+  };
+  
+  const gfr = calculateCreatinineClearance(creatinineParams);
+  const isPediatric = parseInt(data.age) < 18;
   
   // Determine infection type and route to appropriate handler
   const primaryInfectionSite = data.infectionSites[0];
@@ -26,10 +33,10 @@ export const findBestClinicalScenario = (data: PatientData): EnhancedAntibioticR
   
   switch (primaryInfectionSite) {
     case 'respiratory':
-      recommendation = generateRespiratoryRecommendation(data);
+      recommendation = generateRespiratoryRecommendation(data, gfr, isPediatric);
       break;
     case 'urinary':
-      recommendation = generateUTIRecommendation(data);
+      recommendation = generateUTIRecommendation(data, gfr, isPediatric);
       break;
     case 'skin':
       recommendation = generateSkinRecommendation(data, gfr, isPediatric);
@@ -57,17 +64,23 @@ export const findBestClinicalScenario = (data: PatientData): EnhancedAntibioticR
       break;
     default:
       // Fallback to respiratory for unknown infection types
-      recommendation = generateRespiratoryRecommendation(data);
+      recommendation = generateRespiratoryRecommendation(data, gfr, isPediatric);
       break;
   }
 
-  // Add common metadata and calculations
-  recommendation.calculations = {
-    ...recommendation.calculations,
-    gfr: `${Math.round(gfr)} mL/min`,
-    isPediatric: isPediatric.toString(),
-    weightBasedDosing: isPediatric ? "Required" : "Not required"
-  };
+  // Add common metadata and calculations - ensure calculations exists
+  if (!recommendation.calculations) {
+    recommendation.calculations = {};
+  }
+  
+  if (typeof recommendation.calculations === 'object') {
+    recommendation.calculations = {
+      ...recommendation.calculations,
+      gfr: `${Math.round(gfr)} mL/min`,
+      isPediatric: isPediatric.toString(),
+      weightBasedDosing: isPediatric ? "Required" : "Not required"
+    };
+  }
 
   // Add common precautions based on patient factors
   if (data.immunosuppressed) {
