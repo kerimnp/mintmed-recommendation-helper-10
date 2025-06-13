@@ -1,243 +1,217 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { useClinicalOutcomes, useCreateClinicalOutcome } from '@/hooks/useClinicalOutcomes';
-import { ClinicalOutcome } from '@/utils/antibioticRecommendations/types/databaseTypes';
-import { useAuth } from '@/contexts/AuthContext';
-import { Activity, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useClinicalOutcomes } from '@/hooks/useClinicalOutcomes';
+import { ClinicalOutcomeForm } from './ClinicalOutcomeForm';
+import { Plus, TrendingUp, Calendar, FileText } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface ClinicalOutcomeTrackerProps {
   prescriptionId: string;
   patientId: string;
-  className?: string;
 }
 
 export const ClinicalOutcomeTracker: React.FC<ClinicalOutcomeTrackerProps> = ({
   prescriptionId,
-  patientId,
-  className = ""
+  patientId
 }) => {
-  const { user } = useAuth();
-  const { data: outcomes, isLoading } = useClinicalOutcomes(prescriptionId);
-  const createOutcome = useCreateClinicalOutcome();
+  const [showForm, setShowForm] = useState(false);
+  const { data: outcomes, isLoading, error } = useClinicalOutcomes(prescriptionId);
 
-  const [newOutcome, setNewOutcome] = useState({
-    clinical_response: '',
-    culture_clearance: false,
-    length_of_stay: '',
-    readmission_30_days: false,
-    physician_satisfaction_score: '',
-    patient_satisfaction_score: '',
-    notes: '',
-  });
-
-  const handleSubmitOutcome = async () => {
-    if (!newOutcome.clinical_response) return;
-
-    const outcomeData = {
-      prescription_id: prescriptionId,
-      patient_id: patientId,
-      assessment_date: new Date().toISOString().split('T')[0],
-      clinical_response: newOutcome.clinical_response as ClinicalOutcome['clinical_response'],
-      culture_clearance: newOutcome.culture_clearance,
-      length_of_stay: newOutcome.length_of_stay ? parseInt(newOutcome.length_of_stay) : null,
-      readmission_30_days: newOutcome.readmission_30_days,
-      physician_satisfaction_score: newOutcome.physician_satisfaction_score ? 
-        parseInt(newOutcome.physician_satisfaction_score) : null,
-      patient_satisfaction_score: newOutcome.patient_satisfaction_score ? 
-        parseInt(newOutcome.patient_satisfaction_score) : null,
-      notes: newOutcome.notes || null,
-      recorded_by: user?.id,
-    };
-
-    await createOutcome.mutateAsync(outcomeData);
-    
-    // Reset form
-    setNewOutcome({
-      clinical_response: '',
-      culture_clearance: false,
-      length_of_stay: '',
-      readmission_30_days: false,
-      physician_satisfaction_score: '',
-      patient_satisfaction_score: '',
-      notes: '',
-    });
-  };
-
-  const getResponseIcon = (response: string) => {
+  const getResponseBadgeColor = (response: string) => {
     switch (response) {
-      case 'complete': return <CheckCircle className="text-green-600" size={16} />;
-      case 'partial': return <TrendingUp className="text-yellow-600" size={16} />;
-      case 'no_response': return <Activity className="text-orange-600" size={16} />;
-      case 'worsened': return <AlertTriangle className="text-red-600" size={16} />;
-      default: return null;
-    }
-  };
-
-  const getResponseColor = (response: string) => {
-    switch (response) {
-      case 'complete': return 'bg-green-100 text-green-800';
-      case 'partial': return 'bg-yellow-100 text-yellow-800';
-      case 'no_response': return 'bg-orange-100 text-orange-800';
-      case 'worsened': return 'bg-red-100 text-red-800';
+      case 'excellent': return 'bg-green-100 text-green-800';
+      case 'good': return 'bg-blue-100 text-blue-800';
+      case 'fair': return 'bg-yellow-100 text-yellow-800';
+      case 'poor': return 'bg-orange-100 text-orange-800';
+      case 'deterioration': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span>Loading clinical outcomes...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-red-600">Failed to load clinical outcomes. Please try again.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Activity size={20} />
-          Clinical Outcomes Tracking
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Existing Outcomes */}
-        {outcomes && outcomes.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="font-medium">Previous Assessments</h3>
-            {outcomes.map((outcome) => (
-              <div key={outcome.id} className="border rounded-lg p-3">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-2">
-                    {getResponseIcon(outcome.clinical_response)}
-                    <Badge className={getResponseColor(outcome.clinical_response)}>
-                      {outcome.clinical_response.replace('_', ' ')}
-                    </Badge>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <CardTitle>Clinical Outcome Tracking</CardTitle>
+            </div>
+            <Button
+              onClick={() => setShowForm(!showForm)}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {showForm ? 'Cancel' : 'Record Outcome'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="outcomes" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="outcomes">Recorded Outcomes</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="outcomes" className="space-y-4">
+              {showForm && (
+                <ClinicalOutcomeForm
+                  prescriptionId={prescriptionId}
+                  patientId={patientId}
+                  onSuccess={() => setShowForm(false)}
+                />
+              )}
+
+              <div className="space-y-4">
+                {outcomes && outcomes.length > 0 ? (
+                  outcomes.map((outcome) => (
+                    <Card key={outcome.id} className="border-l-4 border-l-blue-500">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-gray-500" />
+                            <span className="font-medium">
+                              {format(new Date(outcome.assessment_date), 'PPP')}
+                            </span>
+                          </div>
+                          <Badge className={getResponseBadgeColor(outcome.clinical_response)}>
+                            {outcome.clinical_response.charAt(0).toUpperCase() + outcome.clinical_response.slice(1)}
+                          </Badge>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          {outcome.length_of_stay && (
+                            <div>
+                              <span className="text-sm text-gray-500">Length of Stay</span>
+                              <p className="font-medium">{outcome.length_of_stay} days</p>
+                            </div>
+                          )}
+                          {outcome.physician_satisfaction_score && (
+                            <div>
+                              <span className="text-sm text-gray-500">Physician Satisfaction</span>
+                              <p className="font-medium">{outcome.physician_satisfaction_score}/10</p>
+                            </div>
+                          )}
+                          {outcome.patient_satisfaction_score && (
+                            <div>
+                              <span className="text-sm text-gray-500">Patient Satisfaction</span>
+                              <p className="font-medium">{outcome.patient_satisfaction_score}/10</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {outcome.readmission_30_days && (
+                          <div className="mb-3">
+                            <Badge variant="destructive">30-Day Readmission</Badge>
+                          </div>
+                        )}
+
+                        {outcome.notes && (
+                          <div className="border-t pt-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="h-4 w-4 text-gray-500" />
+                              <span className="text-sm font-medium text-gray-700">Notes</span>
+                            </div>
+                            <p className="text-sm text-gray-600">{outcome.notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium mb-2">No outcomes recorded yet</h3>
+                    <p className="text-sm">Record the first clinical outcome to start tracking treatment effectiveness.</p>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {new Date(outcome.assessment_date).toLocaleDateString()}
-                  </span>
-                </div>
-                {outcome.notes && (
-                  <p className="text-sm text-gray-600 mt-2">{outcome.notes}</p>
                 )}
-                <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                  {outcome.culture_clearance && (
-                    <span>✓ Culture cleared</span>
-                  )}
-                  {outcome.length_of_stay && (
-                    <span>LOS: {outcome.length_of_stay} days</span>
-                  )}
-                  {outcome.physician_satisfaction_score && (
-                    <span>MD Satisfaction: {outcome.physician_satisfaction_score}/10</span>
-                  )}
-                </div>
               </div>
-            ))}
-          </div>
-        )}
+            </TabsContent>
 
-        {/* New Outcome Form */}
-        <div className="space-y-4 border-t pt-4">
-          <h3 className="font-medium">Record New Assessment</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="clinical_response">Clinical Response</Label>
-              <Select 
-                value={newOutcome.clinical_response} 
-                onValueChange={(value) => setNewOutcome(prev => ({ ...prev, clinical_response: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select response" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="complete">Complete Response</SelectItem>
-                  <SelectItem value="partial">Partial Response</SelectItem>
-                  <SelectItem value="no_response">No Response</SelectItem>
-                  <SelectItem value="worsened">Worsened</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <TabsContent value="analytics" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {outcomes?.length || 0}
+                    </div>
+                    <p className="text-sm text-gray-600">Total Assessments</p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-green-600">
+                      {outcomes?.filter(o => o.clinical_response === 'excellent' || o.clinical_response === 'good').length || 0}
+                    </div>
+                    <p className="text-sm text-gray-600">Positive Responses</p>
+                  </CardContent>
+                </Card>
 
-            <div>
-              <Label htmlFor="length_of_stay">Length of Stay (days)</Label>
-              <Input
-                id="length_of_stay"
-                type="number"
-                value={newOutcome.length_of_stay}
-                onChange={(e) => setNewOutcome(prev => ({ ...prev, length_of_stay: e.target.value }))}
-                placeholder="Days"
-              />
-            </div>
-          </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-amber-600">
+                      {outcomes?.reduce((sum, o) => sum + (o.length_of_stay || 0), 0) / (outcomes?.length || 1) || 0}
+                    </div>
+                    <p className="text-sm text-gray-600">Avg Length of Stay</p>
+                  </CardContent>
+                </Card>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="physician_satisfaction">Physician Satisfaction (1-10)</Label>
-              <Input
-                id="physician_satisfaction"
-                type="number"
-                min="1"
-                max="10"
-                value={newOutcome.physician_satisfaction_score}
-                onChange={(e) => setNewOutcome(prev => ({ ...prev, physician_satisfaction_score: e.target.value }))}
-                placeholder="1-10"
-              />
-            </div>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {outcomes?.filter(o => o.readmission_30_days).length || 0}
+                    </div>
+                    <p className="text-sm text-gray-600">30-Day Readmissions</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-            <div>
-              <Label htmlFor="patient_satisfaction">Patient Satisfaction (1-10)</Label>
-              <Input
-                id="patient_satisfaction"
-                type="number"
-                min="1"
-                max="10"
-                value={newOutcome.patient_satisfaction_score}
-                onChange={(e) => setNewOutcome(prev => ({ ...prev, patient_satisfaction_score: e.target.value }))}
-                placeholder="1-10"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="culture_clearance"
-                checked={newOutcome.culture_clearance}
-                onCheckedChange={(checked) => setNewOutcome(prev => ({ ...prev, culture_clearance: checked }))}
-              />
-              <Label htmlFor="culture_clearance">Culture Clearance</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="readmission"
-                checked={newOutcome.readmission_30_days}
-                onCheckedChange={(checked) => setNewOutcome(prev => ({ ...prev, readmission_30_days: checked }))}
-              />
-              <Label htmlFor="readmission">30-day Readmission</Label>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="notes">Clinical Notes</Label>
-            <Textarea
-              id="notes"
-              value={newOutcome.notes}
-              onChange={(e) => setNewOutcome(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="Additional clinical observations..."
-              rows={3}
-            />
-          </div>
-
-          <Button 
-            onClick={handleSubmitOutcome}
-            disabled={!newOutcome.clinical_response || createOutcome.isPending}
-            className="w-full"
-          >
-            {createOutcome.isPending ? 'Recording...' : 'Record Clinical Outcome'}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <h4 className="font-medium mb-4">Treatment Effectiveness Summary</h4>
+                  <div className="space-y-2">
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>Note:</strong> Advanced analytics charts and trending data will be implemented 
+                        as we collect more outcome data and integrate with reporting systems.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
