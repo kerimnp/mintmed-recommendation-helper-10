@@ -66,7 +66,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         <div className="space-y-2">
           <Label htmlFor="age" className="text-medical-deep font-medium">
-            {t.age} {language === "en" ? "(years)" : "(godine)"}
+            {language === "en" ? "Age" : "Godine"} {language === "en" ? "(years)" : "(godine)"}
           </Label>
           <Input
             id="age"
@@ -85,7 +85,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         <div className="space-y-2">
           <Label htmlFor="gender" className="text-medical-deep font-medium">
-            {t.gender}
+            {language === "en" ? "Gender" : "Pol"}
           </Label>
           <Select value={formData.gender} onValueChange={(value) => onInputChange("gender", value)}>
             <SelectTrigger className="border-medical-border focus:border-medical-primary">
@@ -102,7 +102,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         <div className="space-y-2">
           <Label htmlFor="weight" className="text-medical-deep font-medium">
-            {t.weight} {language === "en" ? "(kg)" : "(kg)"}
+            {language === "en" ? "Weight" : "Težina"} {language === "en" ? "(kg)" : "(kg)"}
           </Label>
           <Input
             id="weight"
@@ -122,7 +122,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
 
         <div className="space-y-2">
           <Label htmlFor="height" className="text-medical-deep font-medium">
-            {t.height} {language === "en" ? "(cm)" : "(cm)"}
+            {language === "en" ? "Height" : "Visina"} {language === "en" ? "(cm)" : "(cm)"}
           </Label>
           <Input
             id="height"
@@ -198,7 +198,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="nationality" className="text-medical-deep font-medium">
-              {t.nationality}
+              {language === "en" ? "Nationality" : "Nacionalnost"}
             </Label>
             <Input
               id="nationality"
@@ -213,7 +213,7 @@ export const PatientDemographicsSection: React.FC<PatientDemographicsSectionProp
           {formData.gender === "Female" && (
             <div className="space-y-2">
               <Label htmlFor="pregnancy" className="text-medical-deep font-medium">
-                {t.pregnancy}
+                {language === "en" ? "Pregnancy Status" : "Status Trudnoće"}
               </Label>
               <Select value={formData.pregnancy} onValueChange={(value) => onInputChange("pregnancy", value)}>
                 <SelectTrigger className="border-medical-border focus:border-medical-primary">

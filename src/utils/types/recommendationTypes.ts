@@ -5,6 +5,7 @@ export interface DetailedRecommendation {
   route: string;
   duration: string;
   reason: string;
+  frequency?: string;
 }
 
 export interface EnhancedAntibioticRecommendation {
@@ -13,6 +14,7 @@ export interface EnhancedAntibioticRecommendation {
     dose: string;
     route: string;
     duration: string;
+    frequency?: string;
   };
   reasoning: string;
   alternatives: DetailedRecommendation[];

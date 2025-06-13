@@ -45,6 +45,12 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
     setSelectedProduct(product);
   };
 
+  // Add reason to alternatives if missing
+  const enhancedAlternatives = recommendation.alternatives?.map(alt => ({
+    ...alt,
+    reason: alt.reason || "Alternative treatment option"
+  })) || [];
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in">
       <div className="bg-gradient-to-r from-medical-primary/10 to-medical-accent/10 p-6 rounded-xl border border-medical-primary/20">
@@ -60,7 +66,10 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
       </div>
 
       <PrimaryRecommendation 
-        recommendation={recommendation.primaryRecommendation}
+        recommendation={{
+          ...recommendation.primaryRecommendation,
+          frequency: recommendation.primaryRecommendation.frequency || "As directed"
+        }}
         onPrescriptionClick={handlePrescriptionClick}
       />
 
@@ -78,20 +87,23 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
         </Card>
       )}
 
-      {recommendation.alternatives && recommendation.alternatives.length > 0 && (
-        <AlternativesList alternatives={recommendation.alternatives} />
+      {enhancedAlternatives && enhancedAlternatives.length > 0 && (
+        <AlternativesList 
+          alternatives={enhancedAlternatives} 
+          onSelectAlternative={() => {}} 
+        />
       )}
 
-      {recommendation.alternatives && recommendation.alternatives.map((alt, index) => (
-        <AlternativeRecommendation key={index} alternative={alt} />
+      {enhancedAlternatives && enhancedAlternatives.map((alt, index) => (
+        <AlternativeRecommendation key={index} recommendation={alt} />
       ))}
 
       {recommendation.rationale && (
         <ClinicalRationale rationale={recommendation.rationale} />
       )}
 
-      {recommendation.doseCalculations && (
-        <DoseCalculations calculations={recommendation.doseCalculations} />
+      {recommendation.calculations && (
+        <DoseCalculations calculations={recommendation.calculations} />
       )}
 
       {recommendation.precautions && (

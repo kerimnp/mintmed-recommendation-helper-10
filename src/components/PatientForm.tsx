@@ -199,8 +199,8 @@ export const PatientForm = () => {
     const recommendationRecord = {
       patient_id: patientId,
       doctor_id: user.id,
-      input_data: formData,
-      recommendation_details: recommendationData,
+      input_data: formData as any, // Cast to any to satisfy Json type
+      recommendation_details: recommendationData as any, // Cast to any to satisfy Json type
       source: source,
       notes: `${source === 'ai' ? 'AI-generated' : 'Rule-based'} recommendation created from patient form`
     };
