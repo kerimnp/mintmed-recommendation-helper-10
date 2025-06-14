@@ -80,15 +80,6 @@ export const AdminHeader = ({
             )}
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleSettingsOpen(true)}
-            className="h-9 w-9"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-
           <SettingsDialog
             isOpen={currentSettingsOpen}
             onOpenChange={handleSettingsOpen}

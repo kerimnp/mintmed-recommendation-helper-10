@@ -107,13 +107,21 @@ export const ProfileDropdown: React.FC = () => {
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={() => navigate('/admin?tab=dashboard')} className="cursor-pointer">
-          <Settings className="h-4 w-4 mr-2" />
+          <BarChart3 className="h-4 w-4 mr-2" />
           Dashboard
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={() => navigate('/clinical')} className="cursor-pointer">
           <TrendingUp className="h-4 w-4 mr-2" />
           Stats
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        {/* Settings and Profile Section */}
+        <DropdownMenuItem onClick={() => navigate('/admin?tab=settings')} className="cursor-pointer">
+          <Settings className="h-4 w-4 mr-2" />
+          Settings
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
