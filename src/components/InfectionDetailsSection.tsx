@@ -41,6 +41,14 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
     onInputChange("infectionSites", [site]); // Changed to only allow one site at a time
   };
 
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty input or positive numbers only
+    if (value === '' || (/^\d+$/.test(value) && parseInt(value) >= 0)) {
+      onInputChange("duration", value);
+    }
+  };
+
   const getIconForSite = (siteId: string) => {
     switch(siteId) {
       case 'respiratory': return <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a1 1 0 0 1 .993.883L13 3v2.05a5.51 5.51 0 0 1 3.91 2.062A5.49 5.49 0 0 1 22 12a1 1 0 1 1-2 0 3.49 3.49 0 0 0-3-3.45v2.456l.351.1a3 3 0 0 1 1.29 5.233l-6.993 4.994A1 1 0 0 1 11 21a1 1 0 0 1-.649-.238l-6.993-5a3 3 0 0 1 1.298-5.23l.337-.096V5.5A3.5 3.5 0 0 0 2 9a1 1 0 0 1-2 0 5.51 5.51 0 0 1 5.096-5.49L5 3.05V3a1 1 0 0 1 1-1h6Zm3 9a1 1 0 0 1 0 2H9a1 1 0 1 1 0-2h6Z"/></svg>;
@@ -194,8 +202,10 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               <div className="flex items-center gap-2">
                 <Input 
                   id="duration" 
-                  type="number" 
-                  placeholder={t.duration as string}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="Enter number of days"
                   className={cn(
                     "bg-white dark:bg-gray-800/80 border rounded-lg placeholder:text-gray-400 dark:placeholder:text-gray-500",
                     errors.duration
@@ -203,7 +213,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                       : "border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-medical-primary/20 focus:border-medical-primary/40"
                   )}
                   value={formData.duration}
-                  onChange={(e) => onInputChange("duration", e.target.value)}
+                  onChange={handleDurationChange}
                 />
                 <span className="text-gray-500 dark:text-gray-400">days</span>
               </div>
