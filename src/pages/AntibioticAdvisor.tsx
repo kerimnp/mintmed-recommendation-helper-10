@@ -6,9 +6,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "next-themes";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { ArrowLeft, Shield, Zap, Award } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Shield, Zap, Award } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ProfileDropdown } from "@/components/admin/dashboard/layout/ProfileDropdown";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
@@ -32,7 +32,7 @@ const AntibioticAdvisor = () => {
                 <img 
                   src={theme === 'dark' ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} 
                   alt="Horalix Logo" 
-                  className="h-8 w-auto" 
+                  className="h-8 w-auto cursor-pointer" 
                 />
               </Link>
               <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
@@ -45,14 +45,7 @@ const AntibioticAdvisor = () => {
                 </p>
               </div>
             </div>
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200">
-                <ArrowLeft className="h-4 w-4" />
-                {!isMobile && (
-                  <span>{language === "en" ? "Back to Home" : "Natrag na Početnu"}</span>
-                )}
-              </Button>
-            </Link>
+            <ProfileDropdown />
           </div>
         </div>
       </header>

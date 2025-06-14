@@ -339,21 +339,23 @@ export const PatientForm = () => {
     <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
       <FormHeader errors={errors} showErrors={showErrors} />
       
-      {/* Progress Bar */}
-      <Card className="p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            {language === "en" ? "Form Completion" : "Završenost Forme"}
-          </h3>
-          <span className="text-sm font-bold text-medical-primary">{progress}%</span>
-        </div>
-        <Progress value={progress} className="h-2" />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-          {language === "en" 
-            ? "Complete required fields (infection details) to generate recommendations" 
-            : "Kompletujte obavezna polja (detalji infekcije) za generisanje preporuka"}
-        </p>
-      </Card>
+      {/* Sticky Progress Bar */}
+      <div className="sticky top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 py-3">
+        <Card className="p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {language === "en" ? "Form Completion" : "Završenost Forme"}
+            </h3>
+            <span className="text-sm font-bold text-medical-primary">{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            {language === "en" 
+              ? "Complete required fields (infection details) to generate recommendations" 
+              : "Kompletujte obavezna polja (detalji infekcije) za generisanje preporuka"}
+          </p>
+        </Card>
+      </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="relative overflow-hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
