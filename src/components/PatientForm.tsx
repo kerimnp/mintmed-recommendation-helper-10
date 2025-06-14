@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
@@ -245,8 +244,8 @@ export const PatientForm = () => {
       doctor_id: user.id,
       input_data: formData as any,
       recommendation_details: recommendationData as any,
-      source: 'rule-based',
-      notes: 'Rule-based recommendation generated from comprehensive clinical algorithms'
+      source: 'system_generated', // Changed from 'rule-based' to match database enum
+      notes: 'System-generated recommendation using comprehensive clinical algorithms'
     };
 
     const { data, error } = await supabase
