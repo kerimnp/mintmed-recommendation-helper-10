@@ -9,6 +9,7 @@ import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { LabResultsSection } from "./LabResultsSection";
+import { FreeCreditsDisplay } from "./FreeCreditsDisplay";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
@@ -16,6 +17,7 @@ import { FormHeader } from "./PatientFormSections/FormHeader";
 import { FormActions } from "./PatientFormSections/FormActions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { Progress } from "./ui/progress";
 
 interface SectionHeaderProps {
@@ -43,6 +45,7 @@ export const PatientForm = () => {
   const t = translations[language];
   const { toast } = useToast();
   const { user } = useAuth();
+  const { profile, loading: profileLoading, decrementCredits } = useUserProfile();
   const [recommendation, setRecommendation] = useState<EnhancedAntibioticRecommendation | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showErrors, setShowErrors] = useState(false);
@@ -287,6 +290,18 @@ export const PatientForm = () => {
       return;
     }
 
+    // Check if user has credits remaining
+    if (!profile || profile.free_credits_left <= 0) {
+      toast({
+        title: language === "en" ? "No Credits Remaining" : "Nema Preostalih Kredita",
+        description: language === "en"
+          ? "You've used all your free credits. Contact support to continue using the service."
+          : "Iskoristili ste sve besplatne kredite. Kontaktirajte podršku za nastavak korištenja usluge.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Create patient record first
@@ -307,12 +322,18 @@ export const PatientForm = () => {
 
       // Save recommendation record
       await saveRecommendationRecord(patient.id, recommendation);
+
+      // Decrement credits after successful recommendation
+      const creditDecremented = await decrementCredits();
+      if (!creditDecremented) {
+        console.warn('Failed to decrement credits, but recommendation was generated');
+      }
       
       toast({
         title: language === "en" ? "Success" : "Uspjeh",
         description: language === "en"
-          ? "Patient created and clinical recommendation generated successfully"
-          : "Pacijent kreiran i klinička preporuka uspješno generisana",
+          ? `Patient created and clinical recommendation generated successfully. ${profile.free_credits_left - 1} credits remaining.`
+          : `Pacijent kreiran i klinička preporuka uspješno generisana. ${profile.free_credits_left - 1} kredita preostalo.`,
       });
     } catch (error: any) {
       console.error('Error in form submission:', error);
@@ -333,10 +354,29 @@ export const PatientForm = () => {
   };
 
   const progress = calculateProgress();
+  const hasCredits = profile && profile.free_credits_left > 0;
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-medical-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            {language === "en" ? "Loading..." : "Učitavanje..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
       <FormHeader errors={errors} showErrors={showErrors} />
+      
+      {/* Credits Display */}
+      {profile && (
+        <FreeCreditsDisplay creditsLeft={profile.free_credits_left} />
+      )}
       
       {/* Sticky Progress Bar */}
       <div className="sticky top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 py-3">
@@ -507,7 +547,10 @@ export const PatientForm = () => {
             </div>
 
             <div className="text-center pt-4">
-              <FormActions isSubmitting={isSubmitting} />
+              <FormActions 
+                isSubmitting={isSubmitting} 
+                disabled={!hasCredits}
+              />
             </div>
           </div>
         </Card>

@@ -554,6 +554,7 @@ export type Database = {
           department_id: string | null
           email: string | null
           first_name: string | null
+          free_credits_left: number
           hospital_affiliation: string | null
           id: string
           is_active: boolean | null
@@ -569,6 +570,7 @@ export type Database = {
           department_id?: string | null
           email?: string | null
           first_name?: string | null
+          free_credits_left?: number
           hospital_affiliation?: string | null
           id: string
           is_active?: boolean | null
@@ -584,6 +586,7 @@ export type Database = {
           department_id?: string | null
           email?: string | null
           first_name?: string | null
+          free_credits_left?: number
           hospital_affiliation?: string | null
           id?: string
           is_active?: boolean | null
