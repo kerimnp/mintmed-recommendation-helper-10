@@ -63,12 +63,6 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
             alt="Horalix Logo" 
             className="h-8 w-auto"
           />
-          <div className="hidden lg:flex flex-col">
-            <span className="font-medium">Horalix Admin</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {user?.email ? user.email : 'Control Panel'}
-            </span>
-          </div>
         </Link>
         
         <div className="hidden lg:flex flex-col space-y-1 w-full">
