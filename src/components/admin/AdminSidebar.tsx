@@ -10,7 +10,6 @@ import {
   Home,
   Users, 
   PillIcon,
-  LogOut,
   LayoutDashboard,
   History
 } from "lucide-react";
@@ -42,13 +41,7 @@ export const navItems = [
 
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
   const { theme } = useTheme();
-  const { signOut, user } = useAuth();
-
-  const handleLogout = async () => {
-    if (signOut) {
-      await signOut();
-    }
-  };
+  const { user } = useAuth();
 
   // Filter navItems based on user's email for display within this component
   const displayedNavItems = navItems.filter(item => {
@@ -129,14 +122,6 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
         
         <div className="mt-auto hidden lg:block pt-4">
           <Separator className="mb-4" />
-          <Button 
-            variant="ghost" 
-            className="justify-start w-full rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4 mr-3" />
-            Log out
-          </Button>
           
           <div className="border-t border-gray-200 dark:border-gray-800 mt-4 pt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
