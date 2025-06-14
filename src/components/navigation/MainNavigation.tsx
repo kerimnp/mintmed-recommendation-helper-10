@@ -2,21 +2,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ProfileDropdown } from '@/components/admin/dashboard/layout/ProfileDropdown';
 import { 
   Menu, 
   Home, 
   Stethoscope, 
   Shield, 
   User, 
-  Settings, 
   LogOut,
-  ChevronDown,
   Pill
 } from 'lucide-react';
 
@@ -44,10 +41,6 @@ export const MainNavigation: React.FC = () => {
       icon: Shield,
     }] : []),
   ];
-
-  const userInitials = user?.user_metadata?.first_name && user?.user_metadata?.last_name
-    ? `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`
-    : user?.email?.[0]?.toUpperCase() || 'U';
 
   const handleSignOut = async () => {
     await signOut();
@@ -164,43 +157,7 @@ export const MainNavigation: React.FC = () => {
             <LanguageToggle />
             
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 px-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-medical-primary text-white text-sm">
-                        {userInitials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden md:block text-sm font-medium">
-                      {user.user_metadata?.first_name || 'User'}
-                    </span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium">
-                      {user.user_metadata?.first_name} {user.user_metadata?.last_name}
-                    </p>
-                    <p className="text-xs text-gray-500">{user.email}</p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/profile')}>
-                    <User className="h-4 w-4 mr-2" />
-                    {language === 'en' ? 'Profile' : 'Profil'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/admin?tab=dashboard')}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    {language === 'en' ? 'Dashboard' : 'Nadzorna Ploča'}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {language === 'en' ? 'Sign Out' : 'Odjava'}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ProfileDropdown />
             ) : (
               <div className="hidden md:flex items-center space-x-2">
                 <Button variant="ghost" asChild>
