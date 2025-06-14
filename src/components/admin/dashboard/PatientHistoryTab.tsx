@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
+import { AddPatientModal } from './patient-history/AddPatientModal';
 import { HistoryEvent, PatientSummary, PrescriptionEvent } from './patient-history/types'; 
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertTriangle, Users, FileText } from 'lucide-react';
@@ -75,6 +75,9 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   const [selectedPatientHistory, setSelectedPatientHistory] = useState<HistoryEvent[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  
+  // New state for the add patient modal
+  const [isAddPatientModalOpen, setIsAddPatientModalOpen] = useState(false);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -343,6 +346,18 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     setEventSearchTerm(""); 
   }, []);
 
+  // Handler for the Add New Patient button
+  const handleAddPatient = () => {
+    setIsAddPatientModalOpen(true);
+  };
+
+  // Handler for when a patient is successfully added
+  const handlePatientAdded = (newPatientId: string) => {
+    // Select the newly added patient
+    handleSelectPatient(newPatientId);
+    // Toast is already handled in the modal
+  };
+
   const filteredPatientsForSidebar = allPatients.filter(patient => {
     if (!patientListSearch) return true;
     const lowerSearch = patientListSearch.toLowerCase();
@@ -395,6 +410,13 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         <Users className="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
         <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">No Patients Found</h3>
         <p className="text-gray-500 dark:text-gray-400">There are currently no patients in the system.</p>
+        <Button 
+          className="mt-4 bg-medical-primary hover:bg-medical-primary/90"
+          onClick={handleAddPatient}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add New Patient
+        </Button>
       </div>
     );
   }
@@ -407,6 +429,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         onSelectPatient={handleSelectPatient}
         searchTerm={patientListSearch}
         setSearchTerm={setPatientListSearch}
+        onAddPatient={handleAddPatient}
       />
       <PatientDetailView
         patient={selectedPatientData}
@@ -419,6 +442,11 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         onSelectPatient={handleSelectPatient}
         isLoadingHistory={loadingHistory} 
         historyError={historyError} 
+      />
+      <AddPatientModal 
+        isOpen={isAddPatientModalOpen}
+        onClose={() => setIsAddPatientModalOpen(false)}
+        onPatientAdded={handlePatientAdded}
       />
     </div>
   );

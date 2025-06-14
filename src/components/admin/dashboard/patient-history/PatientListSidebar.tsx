@@ -14,6 +14,7 @@ interface PatientListSidebarProps {
   onSelectPatient: (patientId: string) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  onAddPatient: () => void; // Added this prop
 }
 
 const getInitials = (name: string) => {
@@ -28,6 +29,7 @@ export const PatientListSidebar: React.FC<PatientListSidebarProps> = ({
   onSelectPatient,
   searchTerm,
   setSearchTerm,
+  onAddPatient,
 }) => {
   return (
     <div className="w-[20%] min-w-[280px] max-w-[350px] bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-lg">
@@ -66,8 +68,6 @@ export const PatientListSidebar: React.FC<PatientListSidebarProps> = ({
                 >
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-10 w-10">
-                      {/* Placeholder for actual image if available */}
-                      {/* <AvatarImage src={patient.avatarUrl} alt={patient.name} /> */}
                       <AvatarFallback className={cn(
                         "text-sm font-medium",
                         selectedPatientId === patient.id ? "bg-medical-primary text-white" : "bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-300"
@@ -89,7 +89,11 @@ export const PatientListSidebar: React.FC<PatientListSidebarProps> = ({
         )}
       </ScrollArea>
       <div className="p-4 border-t border-gray-200 dark:border-slate-700">
-        <Button variant="outline" className="w-full border-medical-primary text-medical-primary hover:bg-medical-primary/10 hover:text-medical-primary">
+        <Button 
+          variant="outline" 
+          className="w-full border-medical-primary text-medical-primary hover:bg-medical-primary/10 hover:text-medical-primary"
+          onClick={onAddPatient}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add New Patient
         </Button>
