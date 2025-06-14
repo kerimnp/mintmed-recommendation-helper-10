@@ -1,10 +1,9 @@
 
 import React from 'react';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Search as SearchIcon, User } from 'lucide-react';
+import { Search as SearchIcon, User } from 'lucide-react';
 import { PatientSummary } from './types';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +13,6 @@ interface PatientListSidebarProps {
   onSelectPatient: (patientId: string) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  onAddPatient: () => void; // Added this prop
 }
 
 const getInitials = (name: string) => {
@@ -29,7 +27,6 @@ export const PatientListSidebar: React.FC<PatientListSidebarProps> = ({
   onSelectPatient,
   searchTerm,
   setSearchTerm,
-  onAddPatient,
 }) => {
   return (
     <div className="w-[20%] min-w-[280px] max-w-[350px] bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col h-full shadow-lg">
@@ -88,16 +85,6 @@ export const PatientListSidebar: React.FC<PatientListSidebarProps> = ({
           </ul>
         )}
       </ScrollArea>
-      <div className="p-4 border-t border-gray-200 dark:border-slate-700">
-        <Button 
-          variant="outline" 
-          className="w-full border-medical-primary text-medical-primary hover:bg-medical-primary/10 hover:text-medical-primary"
-          onClick={onAddPatient}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Patient
-        </Button>
-      </div>
     </div>
   );
 };
