@@ -121,7 +121,6 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
         </div>
         
         <div className="mt-auto hidden lg:block pt-4">
-          <Separator className="mb-4" />
           
           <div className="border-t border-gray-200 dark:border-gray-800 mt-4 pt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
