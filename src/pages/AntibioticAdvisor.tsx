@@ -81,7 +81,7 @@ const AntibioticAdvisor = () => {
                     <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
-                    {language === "en" ? "Safety First" : "Sigurnost na Prvom Mestu"}
+                    {language === "en" ? "Safety First" : "Sigurnost na Prvom Mjestu"}
                   </h3>
                   <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                     {language === "en" ? "Comprehensive allergy and interaction checks" : "Sveobuhvatne provjere alergija i interakcija"}
