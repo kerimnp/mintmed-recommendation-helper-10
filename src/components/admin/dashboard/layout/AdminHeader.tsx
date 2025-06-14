@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Search } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Input } from "@/components/ui/input";
-import { RealTimeClock } from "./RealTimeClock";
 import { SettingsDialog } from "./SettingsDialog";
 import { ProfileDropdown } from "./ProfileDropdown";
 
@@ -65,8 +64,6 @@ export const AdminHeader = ({
         </div>
 
         <div className="flex items-center space-x-4">
-          <RealTimeClock />
-          
           <Button
             variant="ghost"
             size="icon"
