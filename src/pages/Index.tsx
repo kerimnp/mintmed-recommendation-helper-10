@@ -229,7 +229,7 @@ const Index = () => {
                   <div className="relative overflow-hidden rounded-3xl shadow-xl">
                     <img 
                       src={theme === 'dark' 
-                        ? "/lovable-uploads/92a7493e-1412-4613-a90f-3a412e6e77c4.png"
+                        ? "/lovable-uploads/2cafe844-3b46-45a9-8503-ee8b3a5b5e96.png"
                         : "/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png"
                       } 
                       alt="Horalix Dashboard" 
