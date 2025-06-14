@@ -93,6 +93,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
           </Label>
           <div className="grid grid-cols-2 gap-3">
             <Button
+              type="button"
               variant={formData.isHospitalAcquired ? "outline" : "default"}
               className={cn(
                 "flex items-center justify-center gap-2 py-5",
@@ -107,6 +108,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
               </div>
             </Button>
             <Button
+              type="button"
               variant={formData.isHospitalAcquired ? "default" : "outline"}
               className={cn(
                 "flex items-center justify-center gap-2 py-5",
@@ -134,6 +136,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
             {availableSites.map((site) => (
               <button
                 key={site.id}
+                type="button"
                 onClick={() => handleSiteSelect(site.id)}
                 className={cn(
                   "p-3 text-sm rounded-lg transition-all duration-200 border flex flex-col items-center gap-2",
@@ -218,6 +221,7 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
                 {Object.entries(t.severityLevels as Record<string, string>).map(([value, label]) => (
                   <button
                     key={value}
+                    type="button"
                     onClick={() => onInputChange("severity", value)}
                     className={cn(
                       "p-2.5 text-sm rounded-lg border transition-all duration-200",
