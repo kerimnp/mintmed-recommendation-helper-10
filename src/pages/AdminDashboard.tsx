@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast"; 
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
@@ -150,12 +151,6 @@ const AdminDashboard = () => {
         
         <div className="flex-1 overflow-auto">
           <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized)) ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
-            {user && (
-              <div className={`mb-4 p-2 bg-blue-50 dark:bg-slate-800 rounded text-sm text-blue-700 dark:text-blue-300 ${((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) ? 'mx-4 mt-4 md:mx-6 md:mt-6' : ''}`}>
-                Logged in as: {user.email} 
-                {user.user_metadata?.first_name && ` (${user.user_metadata.first_name} ${user.user_metadata.last_name || ''})`}
-              </div>
-            )}
             <motion.div 
               key={currentDisplayTab} 
               initial={{ opacity: 0, y: 20 }}

@@ -32,8 +32,8 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
     null;
 
   const getWelcomeMessage = () => {
-    if (doctorProfile?.first_name && doctorProfile?.last_name) {
-      return `Welcome back Dr. ${doctorProfile.first_name} ${doctorProfile.last_name}`;
+    if (doctorProfile?.last_name) {
+      return `Welcome back Dr. ${doctorProfile.last_name}`;
     }
     return "Welcome back Doctor";
   };
@@ -52,14 +52,10 @@ export const MainDashboardTab: React.FC<MainDashboardTabProps> = ({ searchTerm }
         <p className="text-blue-100 mb-4">
           Your comprehensive antibiotic stewardship and clinical decision support platform
         </p>
-        <div className="flex gap-4">
+        <div className="flex justify-center">
           <Button variant="secondary" size="sm">
             <FileText className="h-4 w-4 mr-2" />
             View Guidelines
-          </Button>
-          <Button variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-blue-600">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
           </Button>
         </div>
       </div>
