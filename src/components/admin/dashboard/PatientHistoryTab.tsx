@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
@@ -341,18 +342,6 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     setSelectedPatientId(patientId);
     setEventSearchTerm(""); 
   }, []);
-
-  // Handler for the Add New Patient button
-  const handleAddPatient = () => {
-    setIsAddPatientModalOpen(true);
-  };
-
-  // Handler for when a patient is successfully added
-  const handlePatientAdded = (newPatientId: string) => {
-    // Select the newly added patient
-    handleSelectPatient(newPatientId);
-    // Toast is already handled in the modal
-  };
 
   const filteredPatientsForSidebar = allPatients.filter(patient => {
     if (!patientListSearch) return true;
