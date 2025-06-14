@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -12,6 +12,7 @@ import { EnhancedAntibioticRecommendation, AntibioticRationale } from "@/utils/t
 import { ReferralModal } from "./ReferralModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDoctorProfile } from "@/hooks/useDoctorProfile";
 
 interface PrescriptionModalProps {
   open: boolean;
@@ -24,12 +25,52 @@ interface PrescriptionModalProps {
 export const PrescriptionModal = ({ open, onClose, recommendationData, selectedProduct, patientId }: PrescriptionModalProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { data: doctorProfile } = useDoctorProfile();
   const [patientName, setPatientName] = useState("");
   const [patientSurname, setPatientSurname] = useState("");
   const [doctorName, setDoctorName] = useState("");
   const [doctorSurname, setDoctorSurname] = useState("");
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Auto-fill doctor information when component loads or profile changes
+  useEffect(() => {
+    if (doctorProfile) {
+      setDoctorName(doctorProfile.first_name || "");
+      setDoctorSurname(doctorProfile.last_name || "");
+    }
+  }, [doctorProfile]);
+
+  // Fetch and prefill patient information if patientId is available
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      if (!patientId) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('patients')
+          .select('first_name, last_name')
+          .eq('id', patientId)
+          .single();
+
+        if (error) {
+          console.error('Error fetching patient data:', error);
+          return;
+        }
+
+        if (data) {
+          setPatientName(data.first_name || "");
+          setPatientSurname(data.last_name || "");
+        }
+      } catch (error) {
+        console.error('Failed to fetch patient data:', error);
+      }
+    };
+
+    if (open && patientId) {
+      fetchPatientData();
+    }
+  }, [open, patientId]);
 
   const savePrescriptionToDatabase = async () => {
     if (!user || !patientId) {
@@ -203,7 +244,7 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Printer className="h-5 w-5" />
@@ -239,6 +280,8 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
                   value={doctorName}
                   onChange={(e) => setDoctorName(e.target.value)}
                   placeholder="First name"
+                  disabled
+                  className="bg-gray-100 dark:bg-gray-800"
                 />
               </div>
               <div>
@@ -248,6 +291,8 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
                   value={doctorSurname}
                   onChange={(e) => setDoctorSurname(e.target.value)}
                   placeholder="Last name"
+                  disabled
+                  className="bg-gray-100 dark:bg-gray-800"
                 />
               </div>
             </div>
@@ -257,14 +302,8 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
               </div>
             )}
           </div>
-          <DialogFooter className="flex-col space-y-2">
-            <div className="flex w-full justify-end space-x-2">
-              <Button variant="outline" onClick={onClose} disabled={isSaving}>Cancel</Button>
-              <Button onClick={generatePrescription} disabled={isSaving}>
-                {isSaving ? "Saving..." : "Generate Prescription"}
-              </Button>
-            </div>
-            <div className="flex w-full justify-center pt-4 border-t">
+          <DialogFooter className="flex-col space-y-4">
+            <div className="flex w-full justify-center">
               <Button 
                 variant="secondary" 
                 className="flex items-center gap-2"
@@ -273,6 +312,12 @@ export const PrescriptionModal = ({ open, onClose, recommendationData, selectedP
               >
                 <FileText className="h-4 w-4" />
                 Create Referral Letter
+              </Button>
+            </div>
+            <div className="flex w-full justify-end space-x-2">
+              <Button variant="outline" onClick={onClose} disabled={isSaving}>Cancel</Button>
+              <Button onClick={generatePrescription} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Generate"}
               </Button>
             </div>
           </DialogFooter>
