@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDoctorProfile } from '@/hooks/useDoctorProfile';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { User, Settings, LogOut, ChevronDown, Stethoscope, Coins, BarChart3, TrendingUp, Pill } from 'lucide-react';
 
 export const ProfileDropdown: React.FC = () => {
   const { user, signOut } = useAuth();
   const { data: profile, isLoading } = useDoctorProfile();
+  const { profile: userProfile } = useUserProfile();
   const navigate = useNavigate();
 
   if (!user) return null;
@@ -29,8 +31,8 @@ export const ProfileDropdown: React.FC = () => {
     navigate('/');
   };
 
-  // Mock credits - replace with actual data later
-  const availableCredits = 5;
+  // Use actual credits from database
+  const availableCredits = userProfile?.free_credits_left || 0;
 
   return (
     <DropdownMenu>
