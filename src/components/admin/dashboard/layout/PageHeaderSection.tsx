@@ -50,15 +50,6 @@ export const PageHeaderSection: React.FC<PageHeaderSectionProps> = ({
             <span className="hidden md:inline">Back to Home</span>
           </Button>
         </Link>
-        
-        <Button 
-          variant="default" 
-          className="bg-medical-primary hover:bg-medical-primary/90 rounded-full flex items-center gap-2"
-          onClick={() => setIsSettingsOpen(true)}
-        >
-          <Settings className="h-4 w-4" />
-          <span className="hidden md:inline">Settings</span>
-        </Button>
       </div>
     </div>
   );
