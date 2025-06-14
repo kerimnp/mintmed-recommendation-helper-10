@@ -1,18 +1,35 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap } from "lucide-react";
+import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap, User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { translations } from "@/translations";
 
 const Index = () => {
   const { language } = useLanguage();
+  const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const t = translations[language];
+  
+  const userInitials = user?.user_metadata?.first_name && user?.user_metadata?.last_name
+    ? `${user.user_metadata.first_name[0]}${user.user_metadata.last_name[0]}`
+    : user?.email?.[0]?.toUpperCase() || 'U';
+
+  const displayName = user?.user_metadata?.first_name 
+    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`.trim()
+    : user?.email?.split('@')[0] || 'User';
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
   
   const features = [
     {
@@ -105,15 +122,60 @@ const Index = () => {
                   )}
                 </Button>
                 <LanguageToggle />
-                <Link to="/auth">
-                  <Button 
-                    size="sm" 
-                    className="flex items-center gap-2 bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-sm"
-                  >
-                    <LogIn className="h-4 w-4" />
-                    <span>{language === "en" ? "Sign In" : "Prijava"}</span>
-                  </Button>
-                </Link>
+                
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="flex items-center space-x-2 px-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-medical-primary text-white text-sm">
+                            {userInitials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden md:block text-sm font-medium">
+                          {displayName}
+                        </span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <div className="px-2 py-1.5">
+                        <p className="text-sm font-medium">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/advisor" className="cursor-pointer">
+                          <User className="h-4 w-4 mr-2" />
+                          {language === "en" ? "Antibiotic Advisor" : "Antibiotski Savjetnik"}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="cursor-pointer">
+                          <Settings className="h-4 w-4 mr-2" />
+                          {language === "en" ? "Dashboard" : "Nadzorna Ploča"}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                        <LogOut className="h-4 w-4 mr-2" />
+                        {language === "en" ? "Sign Out" : "Odjava"}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link to="/auth">
+                    <Button 
+                      size="sm" 
+                      className="flex items-center gap-2 bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-sm"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      <span>{language === "en" ? "Sign In" : "Prijava"}</span>
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
