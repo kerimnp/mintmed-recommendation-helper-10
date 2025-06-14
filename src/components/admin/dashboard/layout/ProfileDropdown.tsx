@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDoctorProfile } from '@/hooks/useDoctorProfile';
-import { User, Settings, LogOut, ChevronDown, Stethoscope } from 'lucide-react';
+import { User, Settings, LogOut, ChevronDown, Stethoscope, Coins, BarChart3, TrendingUp, Pill } from 'lucide-react';
 
 export const ProfileDropdown: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -27,6 +28,9 @@ export const ProfileDropdown: React.FC = () => {
     await signOut();
     navigate('/');
   };
+
+  // Mock credits - replace with actual data later
+  const availableCredits = 5;
 
   return (
     <DropdownMenu>
@@ -51,6 +55,7 @@ export const ProfileDropdown: React.FC = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
+        {/* User Info Section */}
         <div className="px-3 py-2">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
@@ -73,16 +78,30 @@ export const ProfileDropdown: React.FC = () => {
             </div>
           </div>
         </div>
+        
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-          <User className="h-4 w-4 mr-2" />
-          View Profile
-        </DropdownMenuItem>
+        {/* Credits Section */}
+        <div className="px-3 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Coins className="h-4 w-4 text-amber-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Free Credits
+              </span>
+            </div>
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+              {availableCredits} left
+            </Badge>
+          </div>
+        </div>
         
-        <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-          <Stethoscope className="h-4 w-4 mr-2" />
-          Edit Profile
+        <DropdownMenuSeparator />
+        
+        {/* Navigation Section */}
+        <DropdownMenuItem onClick={() => navigate('/advisor')} className="cursor-pointer">
+          <Pill className="h-4 w-4 mr-2" />
+          Antibiotic Advisor
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={() => navigate('/admin?tab=dashboard')} className="cursor-pointer">
@@ -90,8 +109,19 @@ export const ProfileDropdown: React.FC = () => {
           Dashboard
         </DropdownMenuItem>
         
+        <DropdownMenuItem onClick={() => navigate('/clinical')} className="cursor-pointer">
+          <TrendingUp className="h-4 w-4 mr-2" />
+          Stats
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+          <User className="h-4 w-4 mr-2" />
+          View Profile
+        </DropdownMenuItem>
+        
         <DropdownMenuSeparator />
         
+        {/* Sign Out Section */}
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 dark:text-red-400">
           <LogOut className="h-4 w-4 mr-2" />
           Sign Out
