@@ -150,12 +150,12 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
           
           try {
             if (payload.eventType === 'INSERT') {
-              // Fetch the complete prescription data with doctor profile
+              // Fetch the complete prescription data with doctor profile - FIXED QUERY
               const { data: prescriptionData, error } = await supabase
                 .from('prescriptions')
                 .select(`
                   *,
-                  doctor:profiles (id, first_name, last_name, email)
+                  doctor:profiles!prescriptions_doctor_id_fkey (id, first_name, last_name, email)
                 `)
                 .eq('id', payload.new.id)
                 .single();
@@ -169,12 +169,12 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
                 });
               }
             } else if (payload.eventType === 'UPDATE') {
-              // Fetch updated prescription data
+              // Fetch updated prescription data - FIXED QUERY
               const { data: prescriptionData, error } = await supabase
                 .from('prescriptions')
                 .select(`
                   *,
-                  doctor:profiles (id, first_name, last_name, email)
+                  doctor:profiles!prescriptions_doctor_id_fkey (id, first_name, last_name, email)
                 `)
                 .eq('id', payload.new.id)
                 .single();
@@ -299,7 +299,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     }
   }, [initialPatientIdFromUrl, initialSearchTermFromUrl, allPatients, loadingPatients]);
 
-  // Enhanced patient history fetching with better error handling
+  // Enhanced patient history fetching with better error handling - FIXED QUERY
   useEffect(() => {
     if (selectedPatientId && user) {
       const fetchPatientHistory = async () => {
@@ -311,7 +311,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
             .from('prescriptions')
             .select(`
               *,
-              doctor:profiles (id, first_name, last_name, email)
+              doctor:profiles!prescriptions_doctor_id_fkey (id, first_name, last_name, email)
             `)
             .eq('patient_id', selectedPatientId)
             .order('start_date', { ascending: false });
