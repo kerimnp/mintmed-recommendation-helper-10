@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
 import { useToast } from "./ui/use-toast";
@@ -14,7 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 import { FormHeader } from "./PatientFormSections/FormHeader";
-import { FormActions } from "./FormActions";
+import { FormActions } from "./PatientFormSections/FormActions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
