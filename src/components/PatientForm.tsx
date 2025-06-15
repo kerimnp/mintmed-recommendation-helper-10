@@ -14,7 +14,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
 import { FormHeader } from "./PatientFormSections/FormHeader";
-import { FormActions } from "./PatientFormSections/FormActions";
+import { FormActions } from "./FormActions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -100,7 +100,6 @@ export const PatientForm = () => {
     nationality: ""
   });
 
-  // Calculate form completion progress
   const calculateProgress = () => {
     let completedFields = 0;
     let totalRequiredFields = 2; // infection sites and severity are required
@@ -184,10 +183,63 @@ export const PatientForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const ensureUserProfile = async () => {
+    if (!user) {
+      throw new Error('User must be authenticated');
+    }
+
+    try {
+      // Check if profile exists
+      const { data: existingProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error checking user profile:', profileError);
+        throw new Error('Failed to verify user profile');
+      }
+
+      if (!existingProfile) {
+        // Create profile if it doesn't exist
+        console.log('Creating missing user profile...');
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: user.id,
+            email: user.email,
+            first_name: user.user_metadata?.first_name || 'Unknown',
+            last_name: user.user_metadata?.last_name || 'User',
+            role: 'doctor',
+            free_credits_left: 5
+          }])
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+          throw new Error('Failed to create user profile');
+        }
+
+        console.log('User profile created successfully:', newProfile);
+        return newProfile;
+      }
+
+      return existingProfile;
+    } catch (error) {
+      console.error('Error in ensureUserProfile:', error);
+      throw error;
+    }
+  };
+
   const createPatientRecord = async () => {
     if (!user) {
       throw new Error('User must be authenticated to create patient records');
     }
+
+    // Ensure user profile exists first
+    await ensureUserProfile();
 
     // Calculate DOB from age if provided
     let dateOfBirth = new Date();
@@ -305,7 +357,9 @@ export const PatientForm = () => {
     setIsSubmitting(true);
     try {
       // Create patient record first
+      console.log('Creating patient record...');
       const patient = await createPatientRecord();
+      console.log('Patient created successfully:', patient);
       setCreatedPatientId(patient.id);
 
       // Generate comprehensive rule-based recommendation - ensure proper typing
@@ -317,10 +371,12 @@ export const PatientForm = () => {
         severity: (formData.severity || "mild") as "mild" | "moderate" | "severe"
       };
       
+      console.log('Generating recommendation...');
       const recommendation = generateAdvancedRecommendation(patientDataForRecommendation);
       setRecommendation(recommendation);
 
       // Save recommendation record
+      console.log('Saving recommendation record...');
       await saveRecommendationRecord(patient.id, recommendation);
 
       // Decrement credits after successful recommendation
@@ -337,9 +393,18 @@ export const PatientForm = () => {
       });
     } catch (error: any) {
       console.error('Error in form submission:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message;
+      if (error.message.includes('foreign key constraint')) {
+        errorMessage = language === "en"
+          ? "There was an issue with user authentication. Please try refreshing the page and logging in again."
+          : "Došlo je do problema s autentifikacijom korisnika. Molimo osvježite stranicu i ponovno se prijavite.";
+      }
+      
       toast({
         title: language === "en" ? "Error" : "Greška",
-        description: error.message || (language === "en"
+        description: errorMessage || (language === "en"
           ? "An error occurred while processing your request. Please try again."
           : "Došlo je do greške prilikom obrade zahtjeva. Molimo pokušajte ponovo."),
         variant: "destructive"
