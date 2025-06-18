@@ -1,6 +1,6 @@
 
 import { Article } from "../types/articleTypes";
-import { Zap, Shield, Target, Dna2, Microscope, Activity } from "lucide-react";
+import { Zap, Shield, Target, Dna, Microscope, Activity } from "lucide-react";
 
 export const antibioticMechanismsArticles: Article[] = [
   {
@@ -139,7 +139,7 @@ export const antibioticMechanismsArticles: Article[] = [
     id: 'dna-replication-inhibitors',
     title: 'DNA Replication and Repair Inhibitors',
     description: 'Fluoroquinolones and DNA gyrase targeting mechanisms',
-    icon: Dna2,
+    icon: Dna,
     category: 'fundamentals',
     readTime: '11 min',
     lastUpdated: 'March 28, 2025',

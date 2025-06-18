@@ -1,13 +1,13 @@
 
 import { Article } from "../types/articleTypes";
-import { FileText, Stethoscope, Heart, Brain, Lungs, Users } from "lucide-react";
+import { FileText, Stethoscope, Heart, Brain, Activity, Users } from "lucide-react";
 
 export const clinicalCasesArticles: Article[] = [
   {
     id: 'pneumonia-case-series',
     title: 'Community-Acquired Pneumonia: Case Series',
     description: 'Multiple clinical scenarios with varying severity and patient factors',
-    icon: Lungs,
+    icon: Activity,
     category: 'clinical',
     readTime: '25 min',
     lastUpdated: 'March 29, 2025',
