@@ -15,7 +15,7 @@ const criticalInteractions: DrugInteraction[] = [
     clinicalManagement: 'Continuous cardiac monitoring, avoid if possible',
     onsetTime: 'Hours',
     evidenceLevel: 'High',
-    frequency: 'Rare but critical',
+    frequency: 'Rare',
     riskFactors: ['Emergency department', 'Cardiac arrhythmias'],
     alternativeOptions: ['Azithromycin', 'Doxycycline'],
     reference: 'Ann Emerg Med 2019;73:456-463'
@@ -31,7 +31,7 @@ const criticalInteractions: DrugInteraction[] = [
     clinicalManagement: 'Reduce dopamine dose by 50%, monitor BP closely',
     onsetTime: 'Hours',
     evidenceLevel: 'High',
-    frequency: 'Common in ICU',
+    frequency: 'Common',
     riskFactors: ['Septic shock', 'Mechanical ventilation'],
     alternativeOptions: ['Vancomycin', 'Daptomycin'],
     reference: 'Crit Care 2018;22:234'
@@ -47,7 +47,7 @@ const criticalInteractions: DrugInteraction[] = [
     clinicalManagement: 'Monitor neuromuscular function, adjust paralytic dose',
     onsetTime: '30 minutes to 2 hours',
     evidenceLevel: 'High',
-    frequency: 'Common in OR',
+    frequency: 'Common',
     riskFactors: ['Surgery', 'Mechanical ventilation'],
     alternativeOptions: ['Colistin', 'Alternative paralytic'],
     reference: 'Anesthesiology 2017;127:567-574'
@@ -63,7 +63,7 @@ const criticalInteractions: DrugInteraction[] = [
     clinicalManagement: 'Reduce warfarin dose by 50%, monitor INR daily',
     onsetTime: '2-5 days',
     evidenceLevel: 'High',
-    frequency: 'Rare but serious',
+    frequency: 'Rare',
     riskFactors: ['Limited antibiotic options', 'CNS infections'],
     alternativeOptions: ['Third-generation cephalosporins'],
     reference: 'Antimicrob Agents Chemother 2016;60:1234-1241'

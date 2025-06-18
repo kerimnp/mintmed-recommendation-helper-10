@@ -54,7 +54,7 @@ export const phase1Interactions: DrugInteraction[] = [
     clinicalManagement: 'Contraindicated - use alternative antibiotic or separate by 48h',
     onsetTime: 'Minutes to hours',
     evidenceLevel: 'High',
-    frequency: 'Rare but fatal',
+    frequency: 'Rare',
     riskFactors: ['Neonates', 'IV calcium administration', 'Concurrent infusion'],
     alternativeOptions: ['Ceftazidime', 'Cefepime'],
     reference: 'FDA Safety Alert 2007, Pediatrics 2009;123:609-614'
@@ -112,7 +112,7 @@ export const phase1Interactions: DrugInteraction[] = [
     clinicalManagement: 'Avoid combination, continuous cardiac monitoring if unavoidable',
     onsetTime: 'Hours',
     evidenceLevel: 'High',
-    frequency: 'Uncommon but serious',
+    frequency: 'Uncommon',
     riskFactors: ['Female gender', 'Hypokalemia', 'Heart disease'],
     alternativeOptions: ['Azithromycin', 'Doxycycline'],
     reference: 'Heart Rhythm 2017;14:1661-1666'

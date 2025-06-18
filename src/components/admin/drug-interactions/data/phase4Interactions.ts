@@ -1,4 +1,3 @@
-
 import { DrugInteraction } from './expandedInteractionsData';
 
 // Phase 4: Advanced Clinical Scenarios (150+ interactions)
@@ -205,7 +204,7 @@ export const phase4Interactions: DrugInteraction[] = [
     clinicalManagement: 'Avoid in pregnancy, use pregnancy-safe alternative',
     onsetTime: 'First trimester exposure',
     evidenceLevel: 'High',
-    frequency: 'Uncommon but serious',
+    frequency: 'Uncommon',
     riskFactors: ['First trimester pregnancy'],
     alternativeOptions: ['Azithromycin', 'Amoxicillin'],
     reference: 'BMJ 2017;359:j4323'
