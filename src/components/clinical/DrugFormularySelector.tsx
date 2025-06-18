@@ -1,17 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDrugFormulations } from '@/hooks/useDrugFormulations';
-import { DrugFormulation } from '@/utils/antibioticRecommendations/types/databaseTypes';
-import { Search, DollarSign, Building } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Search, DollarSign, Package, CheckCircle } from 'lucide-react';
+
+interface DrugFormulation {
+  id: string;
+  generic_name: string;
+  brand_name: string;
+  manufacturer: string;
+  strength: string;
+  dosage_form: string;
+  route: string;
+  package_size?: string;
+  ndc_number?: string;
+  cost_per_unit?: number;
+  insurance_tier?: number;
+  availability_status: string;
+}
 
 interface DrugFormularySelectorProps {
-  selectedDrug?: string;
-  onDrugSelect: (formulation: DrugFormulation) => void;
+  selectedDrug: string;
+  onDrugSelect: (formulation: DrugFormulation | null) => void;
   className?: string;
 }
 
@@ -20,33 +34,51 @@ export const DrugFormularySelector: React.FC<DrugFormularySelectorProps> = ({
   onDrugSelect,
   className = ""
 }) => {
-  const [searchTerm, setSearchTerm] = useState(selectedDrug || "");
-  const [routeFilter, setRouteFilter] = useState<string>("all");
-  
-  const { data: formulations, isLoading, error } = useDrugFormulations(
-    searchTerm.length > 2 ? searchTerm : undefined
-  );
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFormulation, setSelectedFormulation] = useState<DrugFormulation | null>(null);
 
-  const filteredFormulations = formulations?.filter(formulation => {
-    if (routeFilter !== "all" && formulation.route !== routeFilter) return false;
-    return formulation.generic_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           formulation.brand_name.toLowerCase().includes(searchTerm.toLowerCase());
+  const { data: formulations, isLoading } = useQuery({
+    queryKey: ['drug-formulations', selectedDrug, searchTerm],
+    queryFn: async () => {
+      let query = supabase
+        .from('drug_formulations')
+        .select('*')
+        .eq('availability_status', 'available')
+        .order('cost_per_unit', { ascending: true });
+
+      if (selectedDrug) {
+        query = query.ilike('generic_name', `%${selectedDrug}%`);
+      }
+
+      if (searchTerm) {
+        query = query.or(`generic_name.ilike.%${searchTerm}%,brand_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query.limit(20);
+      if (error) throw error;
+      return data as DrugFormulation[];
+    }
   });
 
-  const getTierColor = (tier: number) => {
+  const getTierColor = (tier?: number) => {
     switch (tier) {
-      case 1: return "bg-green-100 text-green-800";
-      case 2: return "bg-yellow-100 text-yellow-800";
-      case 3: return "bg-orange-100 text-orange-800";
-      default: return "bg-gray-100 text-gray-800";
+      case 1: return 'bg-green-100 text-green-800';
+      case 2: return 'bg-yellow-100 text-yellow-800';
+      case 3: return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  if (error) {
+  const handleSelectFormulation = (formulation: DrugFormulation) => {
+    setSelectedFormulation(formulation);
+    onDrugSelect(formulation);
+  };
+
+  if (isLoading) {
     return (
       <Card className={className}>
         <CardContent className="p-4">
-          <p className="text-red-600">Error loading drug formulations</p>
+          <p className="text-gray-500">Loading formulary...</p>
         </CardContent>
       </Card>
     );
@@ -56,89 +88,88 @@ export const DrugFormularySelector: React.FC<DrugFormularySelectorProps> = ({
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Search size={20} />
-          Drug Formulary Selector
+          <Package size={20} />
+          Drug Formulary
         </CardTitle>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+          <Input
+            placeholder="Search medications..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Input
-              placeholder="Search by generic or brand name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
+        {formulations?.length === 0 ? (
+          <div className="text-center py-8">
+            <Package className="mx-auto mb-2 text-gray-400" size={32} />
+            <p className="text-gray-600">No formulations found</p>
+            <p className="text-sm text-gray-500">
+              This feature will be enhanced with comprehensive formulary data
+            </p>
           </div>
-          <Select value={routeFilter} onValueChange={setRouteFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Routes</SelectItem>
-              <SelectItem value="oral">Oral</SelectItem>
-              <SelectItem value="IV">IV</SelectItem>
-              <SelectItem value="IM">IM</SelectItem>
-              <SelectItem value="topical">Topical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {isLoading && (
-          <div className="text-center py-4">
-            <p className="text-gray-500">Loading formulations...</p>
-          </div>
-        )}
-
-        <div className="space-y-2 max-h-64 overflow-y-auto">
-          {filteredFormulations?.map((formulation) => (
-            <div
-              key={formulation.id}
-              className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
-              onClick={() => onDrugSelect(formulation)}
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="font-medium text-sm">
-                    {formulation.brand_name}
+        ) : (
+          <div className="space-y-3">
+            {formulations?.map((formulation) => (
+              <div
+                key={formulation.id}
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  selectedFormulation?.id === formulation.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => handleSelectFormulation(formulation)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-medium">{formulation.brand_name}</h3>
+                    <p className="text-sm text-gray-600">{formulation.generic_name}</p>
                   </div>
-                  <div className="text-xs text-gray-600">
-                    {formulation.generic_name} - {formulation.strength}
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">
-                      {formulation.dosage_form}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {formulation.route}
-                    </Badge>
-                    <Badge className={`text-xs ${getTierColor(formulation.insurance_tier)}`}>
+                  {selectedFormulation?.id === formulation.id && (
+                    <CheckCircle className="text-blue-500" size={20} />
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline">
+                    {formulation.strength} - {formulation.dosage_form}
+                  </Badge>
+                  <Badge variant="outline">{formulation.route}</Badge>
+                  {formulation.insurance_tier && (
+                    <Badge className={getTierColor(formulation.insurance_tier)}>
                       Tier {formulation.insurance_tier}
                     </Badge>
-                  </div>
+                  )}
                 </div>
-                <div className="text-right">
+                
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">{formulation.manufacturer}</span>
                   {formulation.cost_per_unit && (
-                    <div className="text-sm font-medium flex items-center gap-1">
-                      <DollarSign size={12} />
-                      {formulation.cost_per_unit.toFixed(2)}
+                    <div className="flex items-center gap-1 text-green-600">
+                      <DollarSign size={14} />
+                      <span>${formulation.cost_per_unit.toFixed(2)}/unit</span>
                     </div>
                   )}
-                  <div className="text-xs text-gray-500 flex items-center gap-1">
-                    <Building size={10} />
-                    {formulation.manufacturer}
-                  </div>
                 </div>
+                
+                {formulation.package_size && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Package: {formulation.package_size}
+                  </p>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
-
-        {filteredFormulations?.length === 0 && searchTerm.length > 2 && (
-          <div className="text-center py-4">
-            <p className="text-gray-500">No formulations found for "{searchTerm}"</p>
+            ))}
           </div>
         )}
+        
+        <div className="bg-blue-50 p-3 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Note:</strong> Formulary data is being continuously updated. 
+            Always verify availability and pricing with your pharmacy.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

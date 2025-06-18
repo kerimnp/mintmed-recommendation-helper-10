@@ -1,199 +1,46 @@
 
 import { PatientData } from "../../types/patientTypes";
-import { EnhancedAntibioticRecommendation, AntibioticRationale } from "../../types/recommendationTypes";
+import { EnhancedAntibioticRecommendation } from "../../types/recommendationTypes";
 
 export const generateBloodstreamRecommendation = (
   data: PatientData, 
   gfr: number, 
   isPediatric: boolean
 ): EnhancedAntibioticRecommendation => {
-  const hasPenicillinAllergy = data.allergies.penicillin;
-  const hasCephalosporinAllergy = data.allergies.cephalosporin;
-  const hasMRSA = data.resistances.mrsa;
-  const hasPseudomonas = data.resistances.pseudomonas;
-  const hasESBL = data.resistances.esbl;
-  
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
-      name: "",
-      dosage: "",
-      frequency: "",
-      duration: "",
-      route: "",
-      reason: ""
+      name: "Vancomycin",
+      dosage: "15-20mg/kg q8-12h",
+      frequency: "q8-12h",
+      duration: "14-21 days",
+      route: "IV",
+      reason: "Empirical therapy for bloodstream infections"
     },
-    reasoning: "",
+    reasoning: "Broad-spectrum empirical therapy pending culture results",
     alternatives: [],
     precautions: [],
     rationale: {
       infectionType: "bloodstream",
       severity: data.severity,
-      reasons: []
+      reasons: ["Empirical coverage for gram-positive organisms", "Pending blood culture results"]
     }
   };
 
-  // Bloodstream infections are always treated as at least moderate severity
-  if (data.severity === "moderate") {
-    if (!hasCephalosporinAllergy) {
-      recommendation.primaryRecommendation = {
-        name: "Ceftriaxone",
-        dosage: isPediatric ? "80-100mg/kg/day" : "2g q24h",
-        frequency: "q24h",
-        duration: "7-14 days",
-        route: "IV",
-        reason: "Empiric therapy for moderate bloodstream infections"
-      };
-      recommendation.reasoning = "Empiric therapy for moderate bloodstream infections";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Broad-spectrum coverage for common bloodstream pathogens",
-          "Once-daily dosing"
-        ];
-      }
-      
-      if (hasMRSA) {
-        recommendation.alternatives.push({
-          name: "Vancomycin",
-          dosage: isPediatric ? "15mg/kg q6h" : "15-20mg/kg q8-12h",
-          frequency: "q6-12h",
-          duration: "7-14 days",
-          route: "IV",
-          reason: "Added for MRSA coverage"
-        });
-      }
-    } else if (!hasPenicillinAllergy) {
-      recommendation.primaryRecommendation = {
-        name: "Piperacillin-Tazobactam",
-        dosage: isPediatric ? "100mg/kg q6h" : "4.5g q6h",
-        frequency: "q6h",
-        duration: "7-14 days",
-        route: "IV",
-        reason: "Alternative for cephalosporin-allergic patients"
-      };
-      recommendation.reasoning = "Alternative for cephalosporin-allergic patients";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Broad-spectrum coverage",
-          "Alternative for cephalosporin allergy"
-        ];
-        recommendation.rationale.allergyConsiderations = ["Avoids cephalosporins due to allergy"];
-      }
-    } else {
-      recommendation.primaryRecommendation = {
-        name: "Meropenem",
-        dosage: isPediatric ? "20mg/kg q8h" : "1g q8h",
-        frequency: "q8h",
-        duration: "7-14 days",
-        route: "IV",
-        reason: "Alternative for patients with multiple beta-lactam allergies"
-      };
-      recommendation.reasoning = "Alternative for patients with multiple beta-lactam allergies";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Broad spectrum including resistant organisms",
-          "Alternative for multiple antibiotic allergies"
-        ];
-        recommendation.rationale.allergyConsiderations = ["Selected for multiple beta-lactam allergies"];
-      }
-    }
-  } else if (data.severity === "severe") {
-    if (hasMRSA || hasESBL || hasPseudomonas) {
-      let primaryDrug = "Meropenem";
-      if (hasMRSA) {
-        primaryDrug += " + Vancomycin";
-      }
-      
-      recommendation.primaryRecommendation = {
-        name: primaryDrug,
-        dosage: isPediatric ?
-          "20mg/kg q8h" + (hasMRSA ? " + 15mg/kg q6h" : "") :
-          "1g q8h" + (hasMRSA ? " + 15-20mg/kg q8-12h" : ""),
-        frequency: "q8h" + (hasMRSA ? " + q6-12h" : ""),
-        duration: "10-14 days",
-        route: "IV",
-        reason: "Broad spectrum coverage for severe bloodstream infections with risk of resistant organisms"
-      };
-      recommendation.reasoning = "Broad spectrum coverage for severe bloodstream infections with risk of resistant organisms";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        const reasons = [
-          "Carbapenem coverage for possible ESBL organisms",
-          "Appropriate for severe sepsis"
-        ];
-        if (hasMRSA) {
-          reasons.push("Vancomycin added for MRSA coverage");
-        }
-        recommendation.rationale.reasons = reasons;
-      }
-    } else if (!hasPenicillinAllergy && !hasCephalosporinAllergy) {
-      recommendation.primaryRecommendation = {
-        name: "Piperacillin-Tazobactam + Vancomycin",
-        dosage: isPediatric ?
-          "100mg/kg q6h + 15mg/kg q6h" :
-          "4.5g q6h + 15-20mg/kg q8-12h",
-        frequency: "q6h + q6-12h",
-        duration: "10-14 days",
-        route: "IV",
-        reason: "Empiric coverage for severe bloodstream infections"
-      };
-      recommendation.reasoning = "Empiric coverage for severe bloodstream infections";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Broad-spectrum coverage for gram-positives and gram-negatives",
-          "Vancomycin added empirically until cultures return"
-        ];
-      }
-    } else {
-      recommendation.primaryRecommendation = {
-        name: "Meropenem + Vancomycin",
-        dosage: isPediatric ?
-          "20mg/kg q8h + 15mg/kg q6h" :
-          "1g q8h + 15-20mg/kg q8-12h",
-        frequency: "q8h + q6-12h",
-        duration: "10-14 days",
-        route: "IV",
-        reason: "Alternative for patients with beta-lactam allergies"
-      };
-      recommendation.reasoning = "Alternative for patients with beta-lactam allergies";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Carbapenem often tolerated despite penicillin allergy",
-          "Provides necessary broad-spectrum coverage for severe sepsis"
-        ];
-        recommendation.rationale.allergyConsiderations = ["Selected despite beta-lactam allergies due to severity"];
-      }
-    }
-  }
+  recommendation.alternatives.push({
+    name: "Piperacillin-Tazobactam",
+    dosage: isPediatric ? "100mg/kg q8h" : "4.5g q8h",
+    frequency: "q8h",
+    duration: "14-21 days",
+    route: "IV",
+    reason: "Additional gram-negative coverage"
+  });
 
-  // Add standard precautions for all bloodstream infections
   recommendation.precautions.push(
-    "Obtain blood cultures before starting antibiotics when possible",
-    "Consider source control when applicable",
-    "De-escalate therapy based on culture results",
-    "Consult infectious disease specialist"
+    "Obtain blood cultures before starting therapy",
+    "Remove any infected intravascular devices",
+    "Monitor for sepsis complications",
+    "Infectious disease consultation recommended"
   );
-
-  if (data.kidneyDisease || gfr < 60) {
-    recommendation.precautions.push(
-      "Adjust doses based on renal function",
-      "Monitor drug levels for vancomycin"
-    );
-    recommendation.calculations = {
-      renalAdjustment: `GFR ${Math.round(gfr)} mL/min - requires dose adjustment`
-    };
-  }
-
-  if (data.immunosuppressed) {
-    recommendation.precautions.push(
-      "Consider broader empiric coverage",
-      "May need longer duration of therapy"
-    );
-  }
 
   return recommendation;
 };

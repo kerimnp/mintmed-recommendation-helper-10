@@ -7,10 +7,9 @@ export const generateUTIRecommendation = (
   gfr: number, 
   isPediatric: boolean
 ): EnhancedAntibioticRecommendation => {
+  const hasPenicillinAllergy = data.allergies.penicillin;
   const hasSulfaAllergy = data.allergies.sulfa;
   const hasFluoroquinoloneAllergy = data.allergies.fluoroquinolone;
-  const hasESBL = data.resistances.esbl;
-  const hasRenalImpairment = data.kidneyDisease || gfr < 60;
   
   let recommendation: EnhancedAntibioticRecommendation = {
     primaryRecommendation: {
@@ -25,139 +24,145 @@ export const generateUTIRecommendation = (
     alternatives: [],
     precautions: [],
     rationale: {
-      infectionType: "urinary",
+      infectionType: "urinary tract",
       severity: data.severity,
       reasons: []
     }
   };
 
   if (data.severity === "mild") {
-    if (!hasSulfaAllergy && !hasESBL) {
+    if (!hasSulfaAllergy && gfr > 30) {
       recommendation.primaryRecommendation = {
         name: "Trimethoprim-Sulfamethoxazole",
-        dosage: isPediatric ? "8-12mg/kg/day (TMP component)" : "160/800mg",
+        dosage: isPediatric ? "6-12mg/kg/day (TMP component) divided q12h" : "160/800mg",
         frequency: "q12h",
         duration: "3 days",
-        route: "PO",
-        reason: "First-line therapy for uncomplicated UTI"
+        route: "oral",
+        reason: "First-line treatment for uncomplicated cystitis"
       };
-      recommendation.reasoning = "Standard treatment for uncomplicated urinary tract infections";
+      recommendation.reasoning = "Standard first-line therapy for uncomplicated urinary tract infections";
       
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+      if (typeof recommendation.rationale === 'object') {
         recommendation.rationale.reasons = [
+          "Excellent urinary tract penetration",
           "Effective against common uropathogens",
-          "Short course for uncomplicated UTI"
+          "Short course therapy reduces resistance"
         ];
       }
     } else if (!hasFluoroquinoloneAllergy && !isPediatric) {
       recommendation.primaryRecommendation = {
         name: "Ciprofloxacin",
         dosage: "250mg",
-        frequency: "q12h", 
+        frequency: "q12h",
         duration: "3 days",
-        route: "PO",
-        reason: "Alternative for sulfa-allergic patients or ESBL organisms"
+        route: "oral",
+        reason: "Alternative first-line therapy for uncomplicated UTI"
       };
-      recommendation.reasoning = "Fluoroquinolone alternative for complicated cases";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Alternative for sulfa allergy or ESBL resistance",
-          "Good urinary concentration"
-        ];
-        if (hasSulfaAllergy) {
-          recommendation.rationale.allergyConsiderations = ["Selected due to sulfa allergy"];
-        }
-      }
-    } else {
+      recommendation.reasoning = "Fluoroquinolone alternative for sulfa-allergic patients";
+    } else if (gfr > 30) {
       recommendation.primaryRecommendation = {
         name: "Nitrofurantoin",
-        dosage: isPediatric ? "5-7mg/kg/day" : "100mg",
+        dosage: isPediatric ? "5-7mg/kg/day divided q6h" : "100mg",
         frequency: "q6h",
         duration: "5 days",
-        route: "PO",
-        reason: "Alternative for patients with allergies or pediatric cases"
+        route: "oral",
+        reason: "Alternative for patients with multiple drug allergies"
       };
-      recommendation.reasoning = "Safe alternative for complicated allergy profiles";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Safe in pregnancy and pediatrics",
-          "Good option for multiple allergies"
-        ];
-        if (hasSulfaAllergy && hasFluoroquinoloneAllergy) {
-          recommendation.rationale.allergyConsiderations = ["Selected due to sulfa and fluoroquinolone allergies"];
-        }
-      }
+      recommendation.reasoning = "Urinary-specific antibiotic with minimal resistance";
     }
-  } else if (data.severity === "moderate" || data.severity === "severe") {
+  } else if (data.severity === "moderate") {
     if (!hasFluoroquinoloneAllergy && !isPediatric) {
       recommendation.primaryRecommendation = {
         name: "Ciprofloxacin",
-        dosage: data.severity === "severe" ? "400mg" : "500mg",
+        dosage: "500mg",
         frequency: "q12h",
-        duration: "7-10 days", 
-        route: data.severity === "severe" ? "IV" : "PO",
-        reason: "Broad spectrum coverage for complicated UTI"
+        duration: "7 days",
+        route: "oral",
+        reason: "Treatment for complicated UTI or pyelonephritis"
       };
-      recommendation.reasoning = "Fluoroquinolone for complicated urinary tract infections";
+      recommendation.reasoning = "Fluoroquinolone therapy for complicated urinary infections";
       
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
+      if (typeof recommendation.rationale === 'object') {
         recommendation.rationale.reasons = [
-          "Broad spectrum coverage for complicated UTI",
-          "Good tissue penetration"
+          "Excellent tissue and urinary penetration",
+          "Broad-spectrum gram-negative coverage",
+          "Oral bioavailability allows outpatient treatment"
+        ];
+      }
+    } else if (!hasPenicillinAllergy) {
+      recommendation.primaryRecommendation = {
+        name: "Amoxicillin-Clavulanate",
+        dosage: isPediatric ? "45mg/kg/day divided q12h" : "875/125mg",
+        frequency: "q12h",
+        duration: "7-10 days",
+        route: "oral",
+        reason: "Beta-lactam alternative for fluoroquinolone-allergic patients"
+      };
+      recommendation.reasoning = "Extended-spectrum beta-lactam for complicated UTI";
+    }
+  } else if (data.severity === "severe") {
+    if (data.resistances.esbl) {
+      recommendation.primaryRecommendation = {
+        name: "Meropenem",
+        dosage: isPediatric ? "20mg/kg q8h" : "1g q8h",
+        frequency: "q8h",
+        duration: "10-14 days",
+        route: "IV",
+        reason: "Carbapenem therapy for ESBL-producing organisms"
+      };
+      recommendation.reasoning = "Carbapenem therapy for multidrug-resistant uropathogens";
+      
+      if (typeof recommendation.rationale === 'object') {
+        recommendation.rationale.reasons = [
+          "Stable against ESBL enzymes",
+          "Broad-spectrum coverage for resistant pathogens",
+          "Appropriate for severe sepsis/septic shock"
         ];
       }
     } else {
       recommendation.primaryRecommendation = {
-        name: "Ceftriaxone", 
-        dosage: isPediatric ? "50-75mg/kg/day" : "1-2g",
-        frequency: isPediatric ? "q24h" : "q12-24h",
-        duration: "7-10 days",
+        name: "Ceftriaxone",
+        dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+        frequency: "daily",
+        duration: "10-14 days",
         route: "IV",
-        reason: "Alternative for fluoroquinolone-allergic patients or pediatric cases"
+        reason: "Third-generation cephalosporin for severe pyelonephritis"
       };
-      recommendation.reasoning = "Cephalosporin alternative for complicated UTI";
-      
-      if (typeof recommendation.rationale === 'object' && recommendation.rationale) {
-        recommendation.rationale.reasons = [
-          "Broad spectrum beta-lactam coverage",
-          "Appropriate for severe infections"
-        ];
-        if (hasFluoroquinoloneAllergy) {
-          recommendation.rationale.allergyConsiderations = ["Selected due to fluoroquinolone allergy"];
-        }
-      }
+      recommendation.reasoning = "Parenteral therapy for severe urinary tract infections";
     }
-  }
 
-  // Add alternatives
-  if (data.severity === "mild" && !hasESBL) {
     recommendation.alternatives.push({
-      name: "Fosfomycin",
-      dosage: "3g",
-      frequency: "Single dose",
-      duration: "1 day",
-      route: "PO", 
-      reason: "Single-dose alternative for uncomplicated UTI"
+      name: "Piperacillin-Tazobactam",
+      dosage: isPediatric ? "100mg/kg q8h" : "4.5g q8h",
+      frequency: "q8h",
+      duration: "10-14 days",
+      route: "IV",
+      reason: "Alternative broad-spectrum therapy"
     });
   }
 
-  recommendation.precautions.push(
-    "Ensure adequate hydration",
-    "Monitor for symptom resolution"
-  );
-
-  if (hasRenalImpairment) {
-    recommendation.precautions.push("Adjust doses based on renal function");
-    recommendation.calculations = {
-      renalAdjustment: `GFR ${Math.round(gfr)} mL/min - requires dose adjustment`
-    };
+  // UTI-specific precautions
+  if (data.kidneyDisease || gfr < 60) {
+    recommendation.precautions.push(
+      "Avoid nitrofurantoin if GFR < 30 mL/min",
+      "Adjust doses based on renal function",
+      "Consider nephrotoxicity with aminoglycosides"
+    );
   }
 
   if (data.diabetes) {
-    recommendation.precautions.push("Diabetic patient - monitor for complications");
+    recommendation.precautions.push(
+      "Diabetic patients at higher risk for complicated UTI",
+      "Consider extended duration of therapy",
+      "Monitor for ascending infection"
+    );
   }
+
+  recommendation.precautions.push(
+    "Obtain urine culture before starting therapy",
+    "Ensure adequate hydration",
+    "Consider imaging for recurrent or complicated infections"
+  );
 
   return recommendation;
 };
