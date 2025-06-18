@@ -1,9 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FilterPanel } from './database/FilterPanel';
 import { ResultsPanel } from './database/ResultsPanel';
-import { interactionDatabase } from '../data/interactionsData';
+import { interactionDatabase, getDatabaseStats } from '../data/interactionsData';
 import { antibioticsList, commonMedications } from '../data/medicationsData';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info, TrendingUp } from 'lucide-react';
 
 interface InteractionDatabaseProps {
   searchTerm: string;
@@ -14,10 +16,13 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
   searchTerm,
   onSearchChange
 }) => {
-  const [filterSeverity, setFilterSeverity] = useState<'all' | 'severe' | 'moderate' | 'mild'>('all');
-  const [sortBy, setSortBy] = useState<'drug1' | 'drug2' | 'severity'>('drug1');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [filterSeverity, setFilterSeverity] = useState<'all' | 'contraindicated' | 'major' | 'moderate' | 'minor'>('all');
+  const [sortBy, setSortBy] = useState<'drug1' | 'drug2' | 'severity'>('severity');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedDrug, setSelectedDrug] = useState<string | null>(null);
+  
+  // Get database statistics
+  const dbStats = useMemo(() => getDatabaseStats(), []);
   
   // Get drug names for display
   const getDisplayName = (drugId: string) => {
@@ -26,37 +31,44 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
            drugId;
   };
   
-  // Filter and sort database entries
-  const filteredInteractions = interactionDatabase
-    .filter(entry => {
-      // Filter by selected drug if any
-      if (selectedDrug) {
-        if (entry.drug1 !== selectedDrug && entry.drug2 !== selectedDrug) {
-          return false;
-        }
-      }
-      
-      // Filter by severity
-      if (filterSeverity !== 'all' && entry.severity !== filterSeverity) {
-        return false;
-      }
-      
-      // Filter by search term
-      if (searchTerm) {
+  // Filter and sort database entries with optimized performance
+  const filteredInteractions = useMemo(() => {
+    let filtered = interactionDatabase;
+    
+    // Apply filters
+    if (selectedDrug) {
+      filtered = filtered.filter(entry => 
+        entry.drug1 === selectedDrug || entry.drug2 === selectedDrug
+      );
+    }
+    
+    if (filterSeverity !== 'all') {
+      filtered = filtered.filter(entry => entry.severity === filterSeverity);
+    }
+    
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(entry => {
         const drug1Name = getDisplayName(entry.drug1).toLowerCase();
         const drug2Name = getDisplayName(entry.drug2).toLowerCase();
-        const searchLower = searchTerm.toLowerCase();
         
         return drug1Name.includes(searchLower) || 
                drug2Name.includes(searchLower) || 
-               entry.description.toLowerCase().includes(searchLower);
-      }
-      
-      return true;
-    })
-    .sort((a, b) => {
+               entry.description.toLowerCase().includes(searchLower) ||
+               entry.mechanism?.toLowerCase().includes(searchLower) ||
+               entry.clinicalManagement?.toLowerCase().includes(searchLower);
+      });
+    }
+    
+    // Sort results
+    return filtered.sort((a, b) => {
       if (sortBy === 'severity') {
-        const severityMap = { severe: 3, moderate: 2, mild: 1 };
+        const severityMap = { 
+          contraindicated: 4, 
+          major: 3, 
+          moderate: 2, 
+          minor: 1 
+        };
         const aValue = severityMap[a.severity];
         const bValue = severityMap[b.severity];
         return sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
@@ -68,6 +80,7 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
           : aValue.localeCompare(bValue);
       }
     });
+  }, [searchTerm, filterSeverity, selectedDrug, sortBy, sortOrder]);
   
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -78,7 +91,7 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
       toggleSortOrder();
     } else {
       setSortBy(column);
-      setSortOrder('asc');
+      setSortOrder(column === 'severity' ? 'desc' : 'asc');
     }
   };
   
@@ -94,6 +107,20 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
   
   return (
     <div className="space-y-4">
+      {/* Database Statistics Alert */}
+      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800">
+        <TrendingUp className="h-4 w-4 text-blue-600" />
+        <AlertDescription className="text-blue-800 dark:text-blue-300">
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <span><strong>{dbStats.totalInteractions}</strong> total interactions</span>
+            <span><strong>{dbStats.severityBreakdown.contraindicated}</strong> contraindicated</span>
+            <span><strong>{dbStats.severityBreakdown.major}</strong> major</span>
+            <span><strong>{dbStats.evidenceLevels.high}</strong> high-evidence</span>
+            <span><strong>{dbStats.withClinicalManagement}</strong> with management guidance</span>
+          </div>
+        </AlertDescription>
+      </Alert>
+
       <div className="flex flex-col md:flex-row gap-4">
         <FilterPanel 
           searchTerm={searchTerm}
@@ -115,6 +142,16 @@ export const InteractionDatabase: React.FC<InteractionDatabaseProps> = ({
           resetFilters={resetFilters}
         />
       </div>
+
+      {/* Performance and data quality notice */}
+      {filteredInteractions.length > 100 && (
+        <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+          <Info className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 dark:text-amber-300">
+            Showing {filteredInteractions.length} interactions. Consider using filters to narrow results for better performance.
+          </AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };
