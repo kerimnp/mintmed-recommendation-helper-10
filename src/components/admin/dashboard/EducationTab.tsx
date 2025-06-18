@@ -1,40 +1,117 @@
 
 import React, { useState, useEffect } from "react";
 import { EducationArticles } from "@/components/admin/education/EducationArticles";
+import { EnhancedQuizComponent } from "@/components/admin/education/EnhancedQuizComponent";
+import { LearningPathsComponent } from "@/components/admin/education/LearningPathsComponent";
 import { Card } from "@/components/ui/card";
-import { Book, School, Award, Brain } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { 
+  Book, 
+  School, 
+  Award, 
+  Brain, 
+  Users, 
+  TrendingUp, 
+  Clock, 
+  Target, 
+  PlayCircle,
+  BookOpen,
+  GraduationCap,
+  Zap
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EducationTabProps {
   searchTerm?: string;
 }
 
+// Sample quiz questions for demonstration
+const sampleQuizQuestions = [
+  {
+    id: 'q1',
+    question: 'A 65-year-old patient with COPD presents with pneumonia. Which empiric antibiotic regimen provides the most appropriate coverage?',
+    options: [
+      'Amoxicillin alone',
+      'Ceftriaxone + Azithromycin',
+      'Levofloxacin alone',
+      'Vancomycin + Piperacillin-tazobactam'
+    ],
+    correctAnswer: 1,
+    explanation: 'COPD patients with pneumonia require coverage for both typical and atypical pathogens. Ceftriaxone + Azithromycin provides comprehensive coverage for S. pneumoniae, H. influenzae, and atypical organisms.',
+    category: 'Respiratory Infections',
+    difficulty: 'intermediate' as const,
+    timeLimit: 90,
+    clinicalPearl: 'COPD patients have increased risk for H. influenzae and P. aeruginosa, especially with frequent exacerbations.'
+  },
+  {
+    id: 'q2',
+    question: 'Which of the following best describes the mechanism of action of vancomycin?',
+    options: [
+      'Inhibits cell wall synthesis by binding to D-Ala-D-Ala precursors',
+      'Disrupts bacterial cell membrane integrity',
+      'Inhibits protein synthesis at the 30S ribosomal subunit',
+      'Interferes with DNA replication'
+    ],
+    correctAnswer: 0,
+    explanation: 'Vancomycin inhibits bacterial cell wall synthesis by binding to the D-Ala-D-Ala terminus of peptidoglycan precursors, preventing cross-linking.',
+    category: 'Mechanisms of Action',
+    difficulty: 'beginner' as const,
+    timeLimit: 60
+  }
+];
+
 export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) => {
   const isMobile = useIsMobile();
   const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
+  const [activeEducationTab, setActiveEducationTab] = useState("articles");
   
   useEffect(() => {
     setFilteredSearchTerm(searchTerm);
   }, [searchTerm]);
+
+  const handleQuizComplete = (score: number, results: any[]) => {
+    console.log('Quiz completed with score:', score);
+    console.log('Detailed results:', results);
+    // Here you could save results to a database or show additional feedback
+  };
   
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Educational Resources</h2>
-        <p className="text-gray-500 dark:text-gray-400 max-w-3xl">
-          Access evidence-based clinical resources for antimicrobial stewardship. Our curated 
-          content provides up-to-date guidance on optimal antimicrobial therapy, resistance mechanisms, 
-          and specialized clinical scenarios.
-        </p>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Educational Resources</h2>
+            <p className="text-gray-500 dark:text-gray-400 max-w-3xl">
+              Comprehensive learning platform for evidence-based antimicrobial therapy. 
+              Access curated content, interactive cases, and certification programs.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              150+ Articles
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Target className="h-3 w-3" />
+              50+ Cases
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Award className="h-3 w-3" />
+              CME Available
+            </Badge>
+          </div>
+        </div>
         
-        <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-3'} gap-4 mt-4`}>
+        <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-4'} gap-4`}>
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl">
             <div className="flex gap-3 items-start mb-2">
               <Book className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-medium text-blue-700 dark:text-blue-300 mb-2">Clinical Guidelines</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Consensus recommendations from leading organizations on optimal antimicrobial therapy practices.
+                  Evidence-based recommendations from leading medical organizations and expert consensus.
                 </p>
               </div>
             </div>
@@ -42,11 +119,11 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
           
           <Card className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl">
             <div className="flex gap-3 items-start mb-2">
-              <School className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+              <Users className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-medium text-green-700 dark:text-green-300 mb-2">Case-Based Learning</h3>
+                <h3 className="font-medium text-green-700 dark:text-green-300 mb-2">Interactive Cases</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Interactive clinical scenarios to develop practical skills in antimicrobial prescribing.
+                  Real-world clinical scenarios to develop practical antimicrobial decision-making skills.
                 </p>
               </div>
             </div>
@@ -56,17 +133,230 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
             <div className="flex gap-3 items-start mb-2">
               <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-medium text-purple-700 dark:text-purple-300 mb-2">Research Insights</h3>
+                <h3 className="font-medium text-purple-700 dark:text-purple-300 mb-2">Assessment Tools</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Latest findings on resistance mechanisms, novel therapeutics, and emerging pathogens.
+                  Quizzes and competency assessments to validate your clinical knowledge and skills.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-red-100 dark:from-gray-800 dark:to-gray-700 p-4 rounded-xl">
+            <div className="flex gap-3 items-start mb-2">
+              <GraduationCap className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-orange-700 dark:text-orange-300 mb-2">Learning Paths</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Structured curricula with certificates and CME credits for continuous education.
                 </p>
               </div>
             </div>
           </Card>
         </div>
       </div>
-      
-      <EducationArticles searchTerm={filteredSearchTerm} />
+
+      <Tabs value={activeEducationTab} onValueChange={setActiveEducationTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="articles" className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4" />
+            <span className={isMobile ? "sr-only" : ""}>Articles</span>
+          </TabsTrigger>
+          <TabsTrigger value="paths" className="flex items-center gap-2">
+            <School className="h-4 w-4" />
+            <span className={isMobile ? "sr-only" : ""}>Learning Paths</span>
+          </TabsTrigger>
+          <TabsTrigger value="assessments" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            <span className={isMobile ? "sr-only" : ""}>Assessments</span>
+          </TabsTrigger>
+          <TabsTrigger value="simulations" className="flex items-center gap-2">
+            <PlayCircle className="h-4 w-4" />
+            <span className={isMobile ? "sr-only" : ""}>Simulations</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="articles" className="mt-6">
+          <EducationArticles searchTerm={filteredSearchTerm} />
+        </TabsContent>
+
+        <TabsContent value="paths" className="mt-6">
+          <LearningPathsComponent />
+        </TabsContent>
+
+        <TabsContent value="assessments" className="mt-6">
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-semibold">Knowledge Assessments</h3>
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Test your antimicrobial knowledge with our comprehensive assessment tools. 
+                Track your progress and identify areas for improvement.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                      Fundamentals
+                    </Badge>
+                    <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Antibiotic Basics Quick Quiz</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      Test your understanding of basic antibiotic mechanisms and selection principles.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      5-10 min
+                    </span>
+                    <span>10 questions</span>
+                  </div>
+                  <Button className="w-full">Start Quiz</Button>
+                </div>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                      Clinical
+                    </Badge>
+                    <Users className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Pneumonia Management Assessment</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      Advanced scenarios testing pneumonia diagnosis and antibiotic selection skills.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      15-20 min
+                    </span>
+                    <span>15 questions</span>
+                  </div>
+                  <Button className="w-full">Start Assessment</Button>
+                </div>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                      Advanced
+                    </Badge>
+                    <TrendingUp className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Resistance & Stewardship Exam</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      Comprehensive assessment of antimicrobial resistance and stewardship principles.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      30-45 min
+                    </span>
+                    <span>25 questions</span>
+                  </div>
+                  <Button className="w-full">Start Exam</Button>
+                </div>
+              </Card>
+            </div>
+
+            <Card className="p-6">
+              <h4 className="text-lg font-semibold mb-4">Sample Assessment</h4>
+              <EnhancedQuizComponent 
+                questions={sampleQuizQuestions}
+                title="Clinical Decision Making Sample"
+                onComplete={handleQuizComplete}
+              />
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="simulations" className="mt-6">
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-semibold">Clinical Simulations</h3>
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Immersive clinical scenarios that simulate real hospital environments. 
+                Practice time-critical decisions in a safe learning environment.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
+                      <Zap className="h-5 w-5 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Emergency Sepsis Protocol</h4>
+                      <Badge variant="outline" className="mt-1">High Fidelity</Badge>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Time-critical antibiotic decisions in septic shock. Practice the hour-1 bundle 
+                    with realistic patient monitoring and escalation scenarios.
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span>45-60 minutes</span>
+                    <span>Multi-patient ICU</span>
+                  </div>
+                  <Button className="w-full">Enter Simulation</Button>
+                </div>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                      <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Antimicrobial Stewardship Rounds</h4>
+                      <Badge variant="outline" className="mt-1">Team-Based</Badge>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Participate in virtual stewardship rounds. Review real cases, make intervention 
+                    recommendations, and collaborate with ID specialists and pharmacists.
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span>30-40 minutes</span>
+                    <span>Team Collaboration</span>
+                  </div>
+                  <Button className="w-full">Join Rounds</Button>
+                </div>
+              </Card>
+            </div>
+
+            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-3 mb-4">
+                <PlayCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <h4 className="text-lg font-semibold text-green-700 dark:text-green-300">
+                  Coming Soon: VR Training Modules
+                </h4>
+              </div>
+              <p className="text-green-600 dark:text-green-400 mb-4">
+                Experience immersive virtual reality training scenarios including sterile technique, 
+                infection control procedures, and complex patient consultations.
+              </p>
+              <Button variant="outline" disabled>
+                Early Access Waitlist
+              </Button>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

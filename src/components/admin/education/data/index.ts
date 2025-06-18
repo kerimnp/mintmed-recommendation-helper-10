@@ -9,7 +9,14 @@ import { guidelinesArticles } from "./guidelinesArticles";
 import { researchArticles } from "./researchArticles";
 import { interactiveArticles } from "./interactiveArticles";
 
-// Combine all articles into one array
+// New expanded collections
+import { antibioticMechanismsArticles } from "./antibioticMechanismsArticles";
+import { clinicalCasesArticles } from "./clinicalCasesArticles";
+import { resistanceArticles } from "./resistanceArticles";
+import { practiceCasesArticles } from "./practiceCasesArticles";
+import { pediatricArticles } from "./pediatricArticles";
+
+// Combine all articles into one comprehensive array
 export const articles: Article[] = [
   ...fundamentalsArticles,
   ...advancedArticles,
@@ -17,7 +24,13 @@ export const articles: Article[] = [
   ...clinicalArticles,
   ...guidelinesArticles,
   ...researchArticles,
-  ...interactiveArticles
+  ...interactiveArticles,
+  // New expanded content
+  ...antibioticMechanismsArticles,
+  ...clinicalCasesArticles,
+  ...resistanceArticles,
+  ...practiceCasesArticles,
+  ...pediatricArticles
 ];
 
 export { categories };
@@ -30,3 +43,10 @@ export { clinicalArticles };
 export { guidelinesArticles };
 export { researchArticles };
 export { interactiveArticles };
+
+// Export new collections
+export { antibioticMechanismsArticles };
+export { clinicalCasesArticles };
+export { resistanceArticles };
+export { practiceCasesArticles };
+export { pediatricArticles };
