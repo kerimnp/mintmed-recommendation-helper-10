@@ -1,4 +1,3 @@
-
 export interface DrugInteraction {
   drug1: string;
   drug2: string;
@@ -230,7 +229,7 @@ export const phase1Interactions: DrugInteraction[] = [
     clinicalManagement: 'Avoid combination, monitor for headache and vision changes',
     onsetTime: '1-4 weeks',
     evidenceLevel: 'High',
-    frequency: 'Uncommon but serious',
+    frequency: 'Uncommon',
     riskFactors: ['Young females', 'High doses', 'Obesity'],
     alternativeOptions: ['Azithromycin', 'Clindamycin'],
     reference: 'Dermatology 2016;232:732-738'
@@ -575,7 +574,21 @@ export const phase2Interactions: DrugInteraction[] = [
     riskFactors: ['Immunocompromised patients', 'High doses'],
     alternativeOptions: ['Doxycycline', 'Azithromycin'],
     reference: 'Clin Pharmacol Ther 2016;99:521-528'
-  }
+  },
+  {
+    drug1: 'minocycline',
+    drug2: 'isotretinoin',
+    severity: 'major',
+    description: 'Increased intracranial pressure (pseudotumor cerebri) risk.',
+    mechanism: 'Additive effects on intracranial pressure',
+    clinicalManagement: 'Avoid combination, monitor for headache and vision changes',
+    onsetTime: '1-4 weeks',
+    evidenceLevel: 'High',
+    frequency: 'Uncommon',
+    riskFactors: ['Young females', 'High doses', 'Obesity'],
+    alternativeOptions: ['Azithromycin', 'Clindamycin'],
+    reference: 'Dermatology 2016;232:732-738'
+  },
 ];
 
 // Combine all expanded interactions

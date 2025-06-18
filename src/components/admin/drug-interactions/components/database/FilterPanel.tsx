@@ -62,7 +62,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           <label className="text-sm font-medium mb-2 block">Drug Filter</label>
           <SearchableDrugSelector
             onSelectDrug={handleSelectDrug}
-            placeholder="Filter by specific drug..."
+            selectedDrugs={selectedDrug ? [selectedDrug] : []}
+            initialSearchValue="Filter by specific drug..."
           />
           {selectedDrug && (
             <div className="mt-2 flex items-center gap-2">
