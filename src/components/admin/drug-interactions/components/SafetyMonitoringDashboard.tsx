@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -245,7 +244,7 @@ export const SafetyMonitoringDashboard: React.FC<SafetyMonitoringDashboardProps>
     }, 10000); // Update every 10 seconds
 
     return () => clearInterval(interval);
-  }, [monitoringActive, onAlert Triggered]);
+  }, [monitoringActive, onAlertTriggered]);
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel) {
@@ -260,7 +259,7 @@ export const SafetyMonitoringDashboard: React.FC<SafetyMonitoringDashboardProps>
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'improving': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'worsening': return <TrendingDown className="h-4 w-4 text-red-500" />;
+      case 'worsening': return <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />;
       default: return <Activity className="h-4 w-4 text-gray-500" />;
     }
   };
