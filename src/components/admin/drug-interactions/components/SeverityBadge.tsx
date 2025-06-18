@@ -1,28 +1,33 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Shield, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SeverityBadgeProps {
-  severity: 'severe' | 'moderate' | 'mild';
+  severity: 'contraindicated' | 'major' | 'moderate' | 'minor';
 }
 
 export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity }) => {
   const config = {
-    severe: {
-      icon: AlertTriangle,
-      label: 'Severe',
+    contraindicated: {
+      icon: Shield,
+      label: 'Contraindicated',
       classes: 'bg-red-100 text-red-700 border border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900/40'
+    },
+    major: {
+      icon: AlertTriangle,
+      label: 'Major',
+      classes: 'bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-900/40'
     },
     moderate: {
       icon: AlertCircle,
       label: 'Moderate',
       classes: 'bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900/40'
     },
-    mild: {
+    minor: {
       icon: Info,
-      label: 'Mild',
+      label: 'Minor',
       classes: 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900/40'
     }
   };

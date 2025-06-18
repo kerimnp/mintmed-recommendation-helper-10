@@ -23,6 +23,21 @@ export const InteractionTable: React.FC<InteractionTableProps> = ({
   sortOrder,
   resetFilters
 }) => {
+  const getRowClassName = (severity: 'contraindicated' | 'major' | 'moderate' | 'minor') => {
+    switch (severity) {
+      case 'contraindicated':
+        return 'bg-red-50 dark:bg-red-950/20';
+      case 'major':
+        return 'bg-orange-50 dark:bg-orange-950/20';
+      case 'moderate':
+        return 'bg-amber-50 dark:bg-amber-950/20';
+      case 'minor':
+        return 'bg-blue-50 dark:bg-blue-950/20';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -58,11 +73,7 @@ export const InteractionTable: React.FC<InteractionTableProps> = ({
         <TableBody>
           {filteredInteractions.length > 0 ? (
             filteredInteractions.map((interaction, index) => (
-              <TableRow key={index} className={
-                interaction.severity === 'severe' ? 'bg-red-50 dark:bg-red-950/20' :
-                interaction.severity === 'moderate' ? 'bg-amber-50 dark:bg-amber-950/20' : 
-                'bg-blue-50 dark:bg-blue-950/20'
-              }>
+              <TableRow key={index} className={getRowClassName(interaction.severity)}>
                 <TableCell className="font-medium">{getDisplayName(interaction.drug1)}</TableCell>
                 <TableCell className="font-medium">{getDisplayName(interaction.drug2)}</TableCell>
                 <TableCell><SeverityBadge severity={interaction.severity} /></TableCell>

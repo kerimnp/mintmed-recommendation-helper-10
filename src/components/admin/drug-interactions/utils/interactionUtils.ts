@@ -5,7 +5,7 @@ import { interactionDatabase, DrugInteraction } from '../data/interactionsData';
 export interface InteractionResult {
   drug1: string;
   drug2: string;
-  severity: 'severe' | 'moderate' | 'mild';
+  severity: 'contraindicated' | 'major' | 'moderate' | 'minor';
   description: string;
   mechanism?: string;
   reference?: string;
