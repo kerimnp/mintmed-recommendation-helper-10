@@ -1,6 +1,6 @@
-
 import React, { useState, useRef } from "react";
 import { Card } from "./ui/card";
+import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { generateAdvancedRecommendation } from "@/utils/antibioticRecommendations/index";
 import { AntibioticRecommendation } from "./AntibioticRecommendation";
@@ -11,6 +11,7 @@ import { ComorbiditySection } from "./ComorbiditySection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { LabResultsSection } from "./LabResultsSection";
 import { FreeCreditsDisplay } from "./FreeCreditsDisplay";
+import { HealthCardScanner } from "./HealthCardScanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
@@ -20,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Progress } from "./ui/progress";
+import { Scan } from "lucide-react";
 
 interface SectionHeaderProps {
   number: number;
@@ -53,6 +55,7 @@ export const PatientForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdPatientId, setCreatedPatientId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [showScanner, setShowScanner] = useState(false);
   
   const sectionRefs = {
     demographics: useRef<HTMLDivElement>(null),
@@ -100,6 +103,47 @@ export const PatientForm = () => {
     address: "",
     nationality: ""
   });
+
+  const handleScannerData = (scannedData: any) => {
+    console.log('Received scanned data:', scannedData);
+    
+    // Map scanned data to form fields
+    const updates: any = {};
+    
+    if (scannedData.firstName) updates.firstName = scannedData.firstName;
+    if (scannedData.lastName) updates.lastName = scannedData.lastName;
+    if (scannedData.dateOfBirth) {
+      // Calculate age from date of birth
+      const today = new Date();
+      const birthDate = new Date(scannedData.dateOfBirth);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      updates.age = age.toString();
+    }
+    if (scannedData.gender) {
+      // Normalize gender values
+      const gender = scannedData.gender.toLowerCase();
+      if (gender === 'male' || gender === 'm') updates.gender = 'male';
+      if (gender === 'female' || gender === 'f') updates.gender = 'female';
+    }
+    if (scannedData.address) updates.address = scannedData.address;
+    if (scannedData.healthCardNumber) {
+      // Store health card number in notes or a custom field
+      updates.notes = `Health Card: ${scannedData.healthCardNumber}`;
+    }
+
+    // Update form data
+    setFormData(prev => ({
+      ...prev,
+      ...updates
+    }));
+
+    toast({
+      title: language === "en" ? "Scan Complete" : "Skeniranje Završeno",
+      description: language === "en" 
+        ? "Patient information has been automatically filled"
+        : "Informacije o pacijentu su automatski popunjene"
+    });
+  };
 
   const calculateProgress = () => {
     let completedFields = 0;
@@ -443,6 +487,30 @@ export const PatientForm = () => {
       {profile && (
         <FreeCreditsDisplay creditsLeft={profile.free_credits_left} />
       )}
+
+      {/* Health Card Scanner Button */}
+      <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200/50 dark:border-blue-700/50">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+              {language === "en" ? "Quick Patient Entry" : "Brz Unos Pacijenta"}
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              {language === "en" 
+                ? "Scan health card or ID to automatically fill patient information"
+                : "Skenirajte zdravstvenu kartu ili ID da automatski popunite informacije o pacijentu"}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowScanner(true)}
+            className="bg-white/80 hover:bg-white border-blue-300 text-blue-700 hover:text-blue-800"
+          >
+            <Scan className="h-4 w-4 mr-2" />
+            {language === "en" ? "Scan Card" : "Skeniraj Kartu"}
+          </Button>
+        </div>
+      </Card>
       
       {/* Sticky Progress Bar */}
       <div className="sticky top-16 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 py-3">
@@ -628,6 +696,13 @@ export const PatientForm = () => {
           patientId={createdPatientId}
         />
       )}
+
+      {/* Health Card Scanner Modal */}
+      <HealthCardScanner
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onPatientDataExtracted={handleScannerData}
+      />
     </div>
   );
 };
