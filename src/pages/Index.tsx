@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -9,7 +8,7 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { ProfileDropdown } from "@/components/admin/dashboard/layout/ProfileDropdown";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap } from "lucide-react";
+import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap, Euro } from "lucide-react";
 import { translations } from "@/translations";
 
 const Index = () => {
@@ -108,6 +107,18 @@ const Index = () => {
                     <Moon className="h-5 w-5 text-gray-700" />
                   )}
                 </Button>
+                
+                <Link to="/pricing">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-2 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
+                  >
+                    <Euro className="h-4 w-4" />
+                    <span className="hidden sm:inline">{language === "en" ? "Pricing" : "Cijene"}</span>
+                  </Button>
+                </Link>
+                
                 <LanguageToggle />
                 
                 {user ? (
