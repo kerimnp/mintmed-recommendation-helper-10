@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface SimulationScenario {
+export interface SimulationScenario {
   id: string;
   title: string;
   description: string;
@@ -43,7 +43,7 @@ interface SimulationScenario {
   decisions: SimulationDecision[];
 }
 
-interface SimulationDecision {
+export interface SimulationDecision {
   id: string;
   scenario: string;
   question: string;

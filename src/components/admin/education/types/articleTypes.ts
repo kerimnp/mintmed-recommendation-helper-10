@@ -1,7 +1,7 @@
 
 import { LucideIcon } from "lucide-react";
 
-export type ArticleCategory = "fundamentals" | "clinical" | "advanced" | "specialized" | "guidelines" | "research" | "interactive";
+export type ArticleCategory = "fundamentals" | "clinical" | "advanced" | "specialized" | "guidelines" | "research" | "interactive" | "pharmacology";
 
 export interface CategoryOption {
   id: string;

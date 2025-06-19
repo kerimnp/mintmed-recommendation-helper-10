@@ -1,14 +1,14 @@
 
 import { CategoryOption } from "../types/articleTypes";
 
-// Article categories for filtering
 export const categories: CategoryOption[] = [
-  { id: "all", label: "All Resources" },
+  { id: "all", label: "All Articles" },
   { id: "fundamentals", label: "Fundamentals" },
-  { id: "clinical", label: "Clinical Guidelines" },
+  { id: "clinical", label: "Clinical Practice" },
   { id: "advanced", label: "Advanced Topics" },
   { id: "specialized", label: "Specialized Care" },
-  { id: "guidelines", label: "Practice Standards" },
-  { id: "research", label: "Latest Research" },
-  { id: "interactive", label: "Interactive Learning" }
+  { id: "guidelines", label: "Guidelines" },
+  { id: "research", label: "Research & Evidence" },
+  { id: "interactive", label: "Interactive Content" },
+  { id: "pharmacology", label: "Pharmacology" }
 ];
