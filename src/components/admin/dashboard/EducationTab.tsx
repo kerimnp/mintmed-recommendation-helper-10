@@ -116,7 +116,7 @@ const pneumoniaQuizQuestions = [
 export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const scrollToTop = useScrollToTop();
+  const { scrollToTop, scrollToTopWithFeedback } = useScrollToTop();
   const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
   const [activeEducationTab, setActiveEducationTab] = useState("articles");
   const [activeSimulation, setActiveSimulation] = useState<string | null>(null);
@@ -142,12 +142,12 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
       description: `Final score: ${score} points. Excellent clinical decision making!`,
     });
     setActiveSimulation(null);
-    scrollToTop();
+    scrollToTopWithFeedback(true, 100);
   };
 
   const handleStartSimulation = (simulationId: string) => {
     setActiveSimulation(simulationId);
-    scrollToTop();
+    scrollToTopWithFeedback(true, 100);
     toast({
       title: "Simulation Started",
       description: "Make clinical decisions quickly and accurately!",
@@ -156,7 +156,14 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
 
   const handleTabChange = (newTab: string) => {
     setActiveEducationTab(newTab);
-    scrollToTop();
+    // Enhanced scroll to top with visual feedback and slight delay to allow DOM updates
+    scrollToTopWithFeedback(true, 50);
+    
+    toast({
+      title: `Switched to ${newTab.charAt(0).toUpperCase() + newTab.slice(1)}`,
+      description: "Loading educational content...",
+      duration: 1500,
+    });
   };
 
   // If a simulation is active, show it
@@ -170,7 +177,7 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
               variant="outline" 
               onClick={() => {
                 setActiveSimulation(null);
-                scrollToTop();
+                scrollToTopWithFeedback(true, 100);
               }}
               className="flex items-center gap-2"
             >

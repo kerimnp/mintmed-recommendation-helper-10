@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArticleCard } from './ArticleCard';
 import { ArticleDetail } from './ArticleDetail';
@@ -22,7 +21,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   const [localSearchTerm, setLocalSearchTerm] = useState('');
   const [showCategories, setShowCategories] = useState(false);
   const isMobile = useIsMobile();
-  const scrollToTop = useScrollToTop();
+  const { scrollToTop, scrollToTopWithFeedback } = useScrollToTop();
   
   // Sync external search term to local search
   useEffect(() => {
@@ -35,12 +34,12 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   
   const handleArticleSelect = (id: string) => {
     setSelectedArticleId(id);
-    scrollToTop();
+    scrollToTopWithFeedback(true, 100);
   };
   
   const handleBackToArticles = () => {
     setSelectedArticleId(null);
-    scrollToTop();
+    scrollToTopWithFeedback(true, 100);
   };
   
   const toggleCategories = () => {
@@ -49,7 +48,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    scrollToTop();
+    scrollToTopWithFeedback(true, 50);
   };
   
   const filteredArticles = articles.filter(article => {
@@ -152,6 +151,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
           <Button onClick={() => {
             setLocalSearchTerm('');
             setSelectedCategory('all');
+            scrollToTop(true, 50);
           }}>
             Reset Filters
           </Button>
