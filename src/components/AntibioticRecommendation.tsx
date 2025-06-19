@@ -9,26 +9,36 @@ import { Precautions } from "./AntibioticRecommendationSections/Precautions";
 import { AlternativeRecommendation } from "./AntibioticRecommendationSections/AlternativeRecommendation";
 import { PrescriptionModal } from "./PrescriptionModal";
 import { AvailableDrugs } from "./AvailableDrugs";
+import { AdvancedClinicalDashboard } from "./clinical/AdvancedClinicalDashboard";
 import { DrugProduct, getAvailableProducts } from "@/utils/availableDrugsDatabase";
 import { EnhancedAntibioticRecommendation } from "@/utils/types/recommendationTypes";
+import { PatientData } from "@/utils/types/patientTypes";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import { useToast } from "./ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Award, BookOpen, Clock } from "lucide-react";
+import { Shield, Award, BookOpen, Clock, Brain } from "lucide-react";
+import { Button } from "./ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface AntibioticRecommendationProps {
   recommendation: EnhancedAntibioticRecommendation;
+  patientData?: PatientData;
   patientId?: string | null;
 }
 
-export const AntibioticRecommendation = ({ recommendation, patientId }: AntibioticRecommendationProps) => {
+export const AntibioticRecommendation = ({ 
+  recommendation, 
+  patientData,
+  patientId 
+}: AntibioticRecommendationProps) => {
   const { language } = useLanguage();
   const t = translations[language];
   const { toast } = useToast();
   const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<DrugProduct>();
   const [availableProducts, setAvailableProducts] = useState<DrugProduct[]>([]);
+  const [showAdvancedDashboard, setShowAdvancedDashboard] = useState(false);
 
   useEffect(() => {
     if (recommendation.primaryRecommendation.name) {
@@ -105,18 +115,30 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
   const metadata = recommendation.metadata;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
+      {/* Enhanced Header with Advanced Dashboard Toggle */}
       <div className="bg-gradient-to-r from-medical-primary/10 to-medical-accent/10 p-6 rounded-xl border border-medical-primary/20">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold text-medical-deep">
             {language === "en" ? "Clinical Antibiotic Recommendation" : "Klinička Preporuka Antibiotika"}
           </h2>
-          {metadata?.confidenceScore && (
-            <div className="flex items-center gap-2 bg-white/80 px-3 py-1 rounded-full">
-              <Award className="h-4 w-4 text-medical-primary" />
-              <span className="text-sm font-medium">{metadata.confidenceScore}% Confidence</span>
-            </div>
-          )}
+          <div className="flex items-center gap-4">
+            {metadata?.confidenceScore && (
+              <div className="flex items-center gap-2 bg-white/80 px-3 py-1 rounded-full">
+                <Award className="h-4 w-4 text-medical-primary" />
+                <span className="text-sm font-medium">{metadata.confidenceScore}% Confidence</span>
+              </div>
+            )}
+            <Button 
+              variant={showAdvancedDashboard ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setShowAdvancedDashboard(!showAdvancedDashboard)}
+              className="flex items-center gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              {showAdvancedDashboard ? 'Hide' : 'Show'} Advanced Analytics
+            </Button>
+          </div>
         </div>
         
         <p className="text-medical-text mb-4">
@@ -177,81 +199,105 @@ export const AntibioticRecommendation = ({ recommendation, patientId }: Antibiot
         )}
       </div>
 
-      <PrimaryRecommendation 
-        recommendation={enhancedPrimaryRecommendation}
-        selectedProduct={selectedProduct}
-        isActive={true}
-        onPrescriptionClick={handlePrescriptionClick}
-      />
+      {/* Advanced Clinical Dashboard */}
+      {showAdvancedDashboard && patientData && (
+        <AdvancedClinicalDashboard
+          patientData={patientData}
+          patientId={patientId || undefined}
+          className="mb-6"
+        />
+      )}
 
-      {availableProducts.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold text-medical-deep mb-4">
-            {language === "en" ? "Available Products" : "Dostupni Proizvodi"}
-          </h3>
-          <AvailableDrugs 
-            drugName={recommendation.primaryRecommendation.name}
-            products={availableProducts}
+      {/* Main Content in Tabs */}
+      <Tabs defaultValue="recommendation" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="recommendation">Primary Recommendation</TabsTrigger>
+          <TabsTrigger value="alternatives">Alternatives & Analysis</TabsTrigger>
+          <TabsTrigger value="clinical">Clinical Details</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="recommendation" className="space-y-6">
+          <PrimaryRecommendation 
+            recommendation={enhancedPrimaryRecommendation}
             selectedProduct={selectedProduct}
-            onProductSelect={handleProductSelect}
+            isActive={true}
+            onPrescriptionClick={handlePrescriptionClick}
           />
-        </Card>
-      )}
 
-      {enhancedAlternatives && enhancedAlternatives.length > 0 && (
-        <AlternativesList 
-          alternatives={enhancedAlternatives} 
-          onSelectAlternative={() => {}} 
-        />
-      )}
+          {availableProducts.length > 0 && (
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold text-medical-deep mb-4">
+                {language === "en" ? "Available Products" : "Dostupni Proizvodi"}
+              </h3>
+              <AvailableDrugs 
+                drugName={recommendation.primaryRecommendation.name}
+                products={availableProducts}
+                selectedProduct={selectedProduct}
+                onProductSelect={handleProductSelect}
+              />
+            </Card>
+          )}
+        </TabsContent>
 
-      {enhancedAlternatives && enhancedAlternatives.map((alt, index) => (
-        <AlternativeRecommendation 
-          key={index} 
-          recommendation={alt} 
-          index={index}
-          isActive={false}
-        />
-      ))}
+        <TabsContent value="alternatives" className="space-y-6">
+          {enhancedAlternatives && enhancedAlternatives.length > 0 && (
+            <AlternativesList 
+              alternatives={enhancedAlternatives} 
+              onSelectAlternative={() => {}} 
+            />
+          )}
 
-      {recommendation.rationale && (
-        <ClinicalRationale rationale={recommendation.rationale} />
-      )}
+          {enhancedAlternatives && enhancedAlternatives.map((alt, index) => (
+            <AlternativeRecommendation 
+              key={index} 
+              recommendation={alt} 
+              index={index}
+              isActive={false}
+            />
+          ))}
+        </TabsContent>
 
-      {recommendation.calculations && (
-        <DoseCalculations calculations={recommendation.calculations} />
-      )}
+        <TabsContent value="clinical" className="space-y-6">
+          {recommendation.rationale && (
+            <ClinicalRationale rationale={recommendation.rationale} />
+          )}
 
-      {recommendation.precautions && (
-        <Precautions precautions={recommendation.precautions} />
-      )}
+          {recommendation.calculations && (
+            <DoseCalculations calculations={recommendation.calculations} />
+          )}
 
-      {metadata?.auditTrail && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-medical-deep mb-4 flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            {language === "en" ? "Clinical Decision Audit" : "Audit Kliničke Odluke"}
-          </h3>
-          <div className="space-y-3 text-sm">
-            <div>
-              <span className="font-medium">Data Quality Score: </span>
-              <span className="text-medical-primary">{metadata.auditTrail.inputValidation?.dataQualityScore || 'N/A'}%</span>
-            </div>
-            <div>
-              <span className="font-medium">Decision Algorithm: </span>
-              <span>{metadata.decisionAlgorithm}</span>
-            </div>
-            <div>
-              <span className="font-medium">Safety Validated: </span>
-              <span className="text-green-600">✓ Yes</span>
-            </div>
-            <div>
-              <span className="font-medium">Guideline Compliance: </span>
-              <span className="text-green-600">✓ Verified</span>
-            </div>
-          </div>
-        </Card>
-      )}
+          {recommendation.precautions && (
+            <Precautions precautions={recommendation.precautions} />
+          )}
+
+          {metadata?.auditTrail && (
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold text-medical-deep mb-4 flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                {language === "en" ? "Clinical Decision Audit" : "Audit Kliničke Odluke"}
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="font-medium">Data Quality Score: </span>
+                  <span className="text-medical-primary">{metadata.auditTrail.inputValidation?.dataQualityScore || 'N/A'}%</span>
+                </div>
+                <div>
+                  <span className="font-medium">Decision Algorithm: </span>
+                  <span>{metadata.decisionAlgorithm}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Safety Validated: </span>
+                  <span className="text-green-600">✓ Yes</span>
+                </div>
+                <div>
+                  <span className="font-medium">Guideline Compliance: </span>
+                  <span className="text-green-600">✓ Verified</span>
+                </div>
+              </div>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <PrescriptionModal
         open={isPrescriptionModalOpen}
