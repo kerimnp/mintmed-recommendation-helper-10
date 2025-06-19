@@ -57,6 +57,7 @@ export interface PatientData {
   weight: string;
   height: string;
   region: string; // Keep region instead of nationality
+  nationality?: string; // Add nationality as optional
   pregnancy?: string; // Added pregnancy property
   creatinine?: string;
   
@@ -65,7 +66,7 @@ export interface PatientData {
   symptoms: string;
   duration: string;
   severity: 'mild' | 'moderate' | 'severe';
-  isHospitalAcquired?: boolean;
+  isHospitalAcquired?: boolean; // Make this required for InfectionDetailsSection
   
   // Allergies
   allergies: AllergiesProfile;
@@ -81,6 +82,7 @@ export interface PatientData {
 
   // Additional form fields
   recentAntibiotics?: boolean;
+  otherAllergies?: string; // Add missing otherAllergies property
   labResults?: any;
   firstName?: string;
   lastName?: string;

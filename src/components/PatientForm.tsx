@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
@@ -55,6 +56,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
       age: scannedData.age || patientData.age,
       gender: scannedData.gender || patientData.gender,
       region: scannedData.region || patientData.region,
+      nationality: scannedData.nationality || patientData.nationality,
       
       // Contact information (stored but not used in recommendations)
       firstName: scannedData.firstName,
@@ -68,6 +70,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
       symptoms: patientData.symptoms,
       duration: patientData.duration,
       severity: patientData.severity,
+      isHospitalAcquired: patientData.isHospitalAcquired || false,
       allergies: patientData.allergies,
       resistances: patientData.resistances,
       kidneyDisease: patientData.kidneyDisease,  
@@ -113,6 +116,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({
         return newErrors;
       });
     }
+  };
+
+  const handleAllergyChange = (allergy: string, checked: boolean) => {
+    const updatedAllergies = {
+      ...patientData.allergies,
+      [allergy]: checked
+    };
+    updateField('allergies', updatedAllergies);
   };
 
   return (
@@ -173,7 +184,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                       gender: patientData.gender || "",
                       weight: patientData.weight?.toString() || "",
                       height: patientData.height?.toString() || "",
-                      region: patientData.region || "",
+                      nationality: patientData.nationality || patientData.region || "",
                       pregnancy: patientData.pregnancy || "",
                       firstName: patientData.firstName || "",
                       lastName: patientData.lastName || "",
@@ -181,22 +192,36 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                       contactEmail: patientData.contactEmail || "",
                       address: patientData.address || ""
                     }}
-                    onInputChange={(field, value) => updateField(field as keyof PatientData, value)}
+                    onInputChange={(field, value) => {
+                      // Handle nationality mapping to region for backwards compatibility
+                      if (field === 'nationality') {
+                        updateField('region', value);
+                        updateField('nationality', value);
+                      } else {
+                        updateField(field as keyof PatientData, value);
+                      }
+                    }}
                     errors={errors}
                   />
                 </div>
 
                 <div ref={sectionRefs.infection}>
                   <InfectionDetailsSection
-                    formData={patientData}
+                    formData={{
+                      infectionSites: patientData.infectionSites,
+                      symptoms: patientData.symptoms,
+                      duration: patientData.duration,
+                      severity: patientData.severity,
+                      isHospitalAcquired: patientData.isHospitalAcquired || false
+                    }}
                     onInputChange={updateField}
                     errors={errors}
                   />
                 </div>
 
                 <AllergySection
-                  formData={patientData}
-                  onInputChange={updateField}
+                  allergies={patientData.allergies}
+                  onAllergyChange={handleAllergyChange}
                 />
 
                 <ComorbiditySection
@@ -205,18 +230,29 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                 />
 
                 <RenalFunctionSection
-                  formData={patientData}
+                  formData={{
+                    creatinine: patientData.creatinine,
+                    age: patientData.age,
+                    gender: patientData.gender,
+                    weight: patientData.weight
+                  }}
                   onInputChange={updateField}
                   errors={errors}
                 />
 
                 <MedicationHistorySection
-                  formData={patientData}
+                  formData={{
+                    recentAntibiotics: patientData.recentAntibiotics || false,
+                    allergies: patientData.allergies,
+                    otherAllergies: patientData.otherAllergies || ""
+                  }}
                   onInputChange={updateField}
                 />
 
                 <LabResultsSection
-                  formData={patientData}
+                  formData={{
+                    labResults: patientData.labResults
+                  }}
                   onInputChange={updateField}
                 />
 

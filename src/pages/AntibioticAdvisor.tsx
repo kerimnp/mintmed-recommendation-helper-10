@@ -23,10 +23,12 @@ const AntibioticAdvisor = () => {
     weight: "",
     height: "",
     region: "",
+    nationality: "",
     infectionSites: [],
     symptoms: "",
     duration: "",
     severity: "mild",
+    isHospitalAcquired: false,
     allergies: {
       penicillin: false,
       cephalosporin: false,
@@ -45,6 +47,8 @@ const AntibioticAdvisor = () => {
     liverDisease: false,
     diabetes: false,
     immunosuppressed: false,
+    recentAntibiotics: false,
+    otherAllergies: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
