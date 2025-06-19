@@ -7,24 +7,18 @@ export class OCRProcessor {
     try {
       console.log('Starting OCR processing for:', imageFile.name);
       
-      // Create a worker for Tesseract with proper API usage
-      const worker = await Tesseract.createWorker({
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
+      // Use the correct Tesseract.js API for recognition
+      const { data: { text } } = await Tesseract.recognize(
+        imageFile,
+        'eng+bos+hrv+srp',
+        {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
+            }
           }
         }
-      });
-
-      // Load the languages
-      await worker.loadLanguage('eng+bos+hrv+srp');
-      await worker.initialize('eng+bos+hrv+srp');
-
-      // Recognize text from the image
-      const { data: { text } } = await worker.recognize(imageFile);
-      
-      // Terminate the worker to free memory
-      await worker.terminate();
+      );
       
       console.log('OCR completed. Extracted text:', text);
       return text.trim();
