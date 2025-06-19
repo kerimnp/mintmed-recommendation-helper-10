@@ -239,6 +239,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
 
           {scanMode === 'camera' && (
             <CameraScanner
+              onImageCapture={handleScanSuccess}
               onScanSuccess={handleScanSuccess}
               onError={setError}
               isProcessing={isProcessing}

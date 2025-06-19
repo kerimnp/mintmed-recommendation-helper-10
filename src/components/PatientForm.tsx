@@ -5,7 +5,7 @@ import { AllergySection } from "./AllergySection";
 import { ComorbiditySection } from "./ComorbiditySection";
 import { FormActions } from "./PatientFormSections/FormActions";
 import { FormHeader } from "./PatientFormSections/FormHeader";
-import { FormValidation } from "./PatientFormSections/FormValidation";
+import { useFormValidation } from "./PatientFormSections/FormValidation";
 import { RenalFunctionSection } from "./RenalFunctionSection";
 import { MedicationHistorySection } from "./MedicationHistorySection";
 import { LabResultsSection } from "./LabResultsSection";
@@ -35,6 +35,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({
   const [showErrors, setShowErrors] = useState(false);
   const [activeTab, setActiveTab] = useState("manual");
   const [scannerDataAvailable, setScannerDataAvailable] = useState(false);
+
+  // Create section refs for validation
+  const sectionRefs = {
+    demographics: React.useRef<HTMLDivElement>(null),
+    infection: React.useRef<HTMLDivElement>(null)
+  };
+
+  const { validateForm } = useFormValidation(patientData, setErrors, setShowErrors, sectionRefs);
 
   // Handle patient data from scanner integration
   const handlePatientDataFromScanner = (scannedData: any) => {
@@ -87,18 +95,11 @@ export const PatientForm: React.FC<PatientFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    const validation = FormValidation.validateForm(patientData);
-    
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      setShowErrors(true);
-      return;
+    if (validateForm()) {
+      setErrors({});
+      setShowErrors(false);
+      onSubmit(patientData);
     }
-    
-    setErrors({});
-    setShowErrors(false);
-    onSubmit(patientData);
   };
 
   const updateField = (field: keyof PatientData, value: any) => {
@@ -165,60 +166,63 @@ export const PatientForm: React.FC<PatientFormProps> = ({
               )}
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                <PatientDemographicsSection
-                  formData={{
-                    age: patientData.age?.toString() || "",
-                    gender: patientData.gender || "",
-                    weight: patientData.weight?.toString() || "",
-                    height: patientData.height?.toString() || "",
-                    nationality: patientData.nationality || "",
-                    pregnancy: patientData.pregnancy || "",
-                    firstName: patientData.firstName || "",
-                    lastName: patientData.lastName || "",
-                    contactPhone: patientData.contactPhone || "",
-                    contactEmail: patientData.contactEmail || "",
-                    address: patientData.address || ""
-                  }}
-                  onInputChange={(field, value) => updateField(field as keyof PatientData, value)}
-                  errors={errors}
-                />
+                <div ref={sectionRefs.demographics}>
+                  <PatientDemographicsSection
+                    formData={{
+                      age: patientData.age?.toString() || "",
+                      gender: patientData.gender || "",
+                      weight: patientData.weight?.toString() || "",
+                      height: patientData.height?.toString() || "",
+                      region: patientData.region || "",
+                      pregnancy: patientData.pregnancy || "",
+                      firstName: patientData.firstName || "",
+                      lastName: patientData.lastName || "",
+                      contactPhone: patientData.contactPhone || "",
+                      contactEmail: patientData.contactEmail || "",
+                      address: patientData.address || ""
+                    }}
+                    onInputChange={(field, value) => updateField(field as keyof PatientData, value)}
+                    errors={errors}
+                  />
+                </div>
 
-                <InfectionDetailsSection
-                  patientData={patientData}
-                  updateField={updateField}
-                  errors={errors}
-                />
+                <div ref={sectionRefs.infection}>
+                  <InfectionDetailsSection
+                    formData={patientData}
+                    onInputChange={updateField}
+                    errors={errors}
+                  />
+                </div>
 
                 <AllergySection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={patientData}
+                  onInputChange={updateField}
                 />
 
                 <ComorbiditySection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={patientData}
+                  onInputChange={updateField}
                 />
 
                 <RenalFunctionSection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={patientData}
+                  onInputChange={updateField}
                   errors={errors}
                 />
 
                 <MedicationHistorySection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={patientData}
+                  onInputChange={updateField}
                 />
 
                 <LabResultsSection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={patientData}
+                  onInputChange={updateField}
                 />
 
                 <FormActions
-                  onSubmit={handleSubmit}
-                  isLoading={isLoading}
-                  hasErrors={Object.keys(errors).length > 0}
+                  isSubmitting={isLoading}
+                  disabled={Object.keys(errors).length > 0}
                 />
               </form>
             </TabsContent>

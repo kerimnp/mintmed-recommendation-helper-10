@@ -9,11 +9,58 @@ import { motion } from "framer-motion";
 import { Shield, Zap, Award } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ProfileDropdown } from "@/components/admin/dashboard/layout/ProfileDropdown";
+import { PatientData } from "@/utils/types/patientTypes";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+
+  // Initialize patient form state
+  const [patientData, setPatientData] = useState<PatientData>({
+    age: "",
+    gender: "male",
+    weight: "",
+    height: "",
+    region: "",
+    infectionSites: [],
+    symptoms: "",
+    duration: "",
+    severity: "mild",
+    allergies: {
+      penicillin: false,
+      cephalosporin: false,
+      sulfa: false,
+      macrolide: false,
+      fluoroquinolone: false,
+    },
+    resistances: {
+      mrsa: false,
+      vre: false,
+      esbl: false,
+      cre: false,
+      pseudomonas: false,
+    },
+    kidneyDisease: false,
+    liverDisease: false,
+    diabetes: false,
+    immunosuppressed: false,
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePatientFormSubmit = async (data: PatientData) => {
+    setIsLoading(true);
+    try {
+      // Handle form submission logic here
+      console.log('Patient form submitted:', data);
+      // Add your submission logic here
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950/20">
@@ -132,7 +179,12 @@ const AntibioticAdvisor = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="relative"
           >
-            <PatientForm />
+            <PatientForm 
+              patientData={patientData}
+              setPatientData={setPatientData}
+              onSubmit={handlePatientFormSubmit}
+              isLoading={isLoading}
+            />
           </motion.div>
         </div>
       </main>

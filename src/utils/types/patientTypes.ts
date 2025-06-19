@@ -56,7 +56,7 @@ export interface PatientData {
   gender: 'male' | 'female';
   weight: string;
   height: string;
-  region: string; // Changed from nationality to region to match interface
+  region: string; // Keep region instead of nationality
   pregnancy?: string; // Added pregnancy property
   creatinine?: string;
   
