@@ -42,6 +42,18 @@ export interface EnhancedAntibioticRecommendation {
     confidenceScore: number;
     decisionAlgorithm: string;
     reviewRequired: boolean;
+    enhancedAnalysis?: boolean;
+    qualityMetrics?: {
+      safetyScore: number;
+      appropriatenessScore: number;
+      overallQuality: number;
+      guidelineAdherence: number;
+    };
+    clinicalContext?: {
+      safetyScore: number;
+      riskLevel: string;
+      dataQuality: number;
+    };
     auditTrail?: {
       inputValidation?: {
         dataQualityScore: number;

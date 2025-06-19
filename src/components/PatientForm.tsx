@@ -373,12 +373,12 @@ export const PatientForm = () => {
       };
       
       console.log('Generating recommendation...');
-      const recommendation = generateAdvancedRecommendation(patientDataForRecommendation);
-      setRecommendation(recommendation);
+      const generatedRecommendation = await generateAdvancedRecommendation(patientDataForRecommendation);
+      setRecommendation(generatedRecommendation);
 
       // Save recommendation record
       console.log('Saving recommendation record...');
-      await saveRecommendationRecord(patient.id, recommendation);
+      await saveRecommendationRecord(patient.id, generatedRecommendation);
 
       // Decrement credits after successful recommendation
       const creditDecremented = await decrementCredits();

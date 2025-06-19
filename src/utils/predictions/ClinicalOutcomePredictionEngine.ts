@@ -63,7 +63,7 @@ export class ClinicalOutcomePredictionEngine {
 
     // Generate interventions and monitoring plan
     const recommendedInterventions = this.generateInterventions(predictions, patientData);
-    const monitoringPlan = this.generateMonitor‌ingPlan(predictions, patientData);
+    const monitoringPlan = this.generateMonitoringPlan(predictions, patientData);
 
     return {
       generatedAt: new Date(),

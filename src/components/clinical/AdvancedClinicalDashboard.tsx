@@ -40,7 +40,7 @@ export const AdvancedClinicalDashboard: React.FC<AdvancedClinicalDashboardProps>
   const [clinicalMetrics, setClinicalMetrics] = useState({
     safetyScore: 85,
     efficacyPrediction: 92,
-    riskLevel: 'low' as const,
+    riskLevel: 'low' as 'low' | 'moderate' | 'high' | 'critical',
     monitoringAlerts: 2,
     interactionAlerts: 1,
     lastUpdate: new Date()
@@ -68,7 +68,7 @@ export const AdvancedClinicalDashboard: React.FC<AdvancedClinicalDashboardProps>
         ...prev,
         safetyScore: result.qualityMetrics.safetyScore,
         efficacyPrediction: result.qualityMetrics.appropriatenessScore,
-        riskLevel: result.decisionContext.validationReport.overallRiskLevel,
+        riskLevel: result.decisionContext.validationReport.overallRiskLevel as 'low' | 'moderate' | 'high' | 'critical',
         lastUpdate: new Date()
       }));
     } catch (error) {
