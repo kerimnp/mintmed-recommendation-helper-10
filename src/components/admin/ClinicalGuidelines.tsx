@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollText, BookOpen, Bookmark, Search, ExternalLink, Star, Clock, FileText, Info } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, Search, ExternalLink, Star, Clock, FileText, Info, Download, Print, AlertTriangle, CheckCircle } from "lucide-react";
 import { DrugInteractionChecker } from "./drug-interactions/DrugInteractionChecker";
 
 interface ClinicalGuidelinesProps {
@@ -34,7 +33,10 @@ const mockGuidelines = [
       'CURB-65 score helps determine outpatient vs inpatient treatment',
       'Procalcitonin can guide antibiotic duration',
       'Macrolide resistance is increasing in many regions'
-    ]
+    ],
+    pdfUrl: '#',
+    isImplemented: false,
+    implementationNotes: ''
   },
   {
     id: 'idsa-uti',
@@ -56,7 +58,10 @@ const mockGuidelines = [
       'Local resistance patterns should guide empirical therapy',
       'Fosfomycin is an alternative for resistant organisms',
       'Cranberry products have limited evidence for prevention'
-    ]
+    ],
+    pdfUrl: '#',
+    isImplemented: true,
+    implementationNotes: 'Fully integrated into EMR protocols'
   },
   {
     id: 'surviving-sepsis',
@@ -78,7 +83,10 @@ const mockGuidelines = [
       'Early recognition saves lives - use qSOFA or SOFA scores',
       'Source control should be achieved as soon as possible',
       'Vasopressors preferred over inotropes for shock'
-    ]
+    ],
+    pdfUrl: '#',
+    isImplemented: false,
+    implementationNotes: ''
   },
   {
     id: 'cdc-surgical-prophylaxis',
@@ -100,7 +108,10 @@ const mockGuidelines = [
       'Hair removal should be done with clippers, not razors',
       'Antiseptic prophylaxis reduces infection risk',
       'Weight-based dosing ensures adequate tissue levels'
-    ]
+    ],
+    pdfUrl: '#',
+    isImplemented: false,
+    implementationNotes: ''
   }
 ];
 
@@ -110,6 +121,12 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
   const [favorites, setFavorites] = useState<string[]>(['idsa-uti']);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedGuideline, setSelectedGuideline] = useState<string | null>(null);
+  const [implementationStatus, setImplementationStatus] = useState<{[key: string]: boolean}>({
+    'idsa-uti': true
+  });
+  const [implementationNotes, setImplementationNotes] = useState<{[key: string]: string}>({
+    'idsa-uti': 'Fully integrated into EMR protocols'
+  });
   const { toast } = useToast();
   
   // Sync external search term to internal state
@@ -160,10 +177,28 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
 
   const handleLearnMore = (guidelineId: string, title: string, url: string) => {
     toast({
-      title: "Opening Guideline",
-      description: `Opening "${title}" in a new tab...`,
+      title: "Opening External Guideline",
+      description: `Opening "${title}" in a new tab. Please ensure your popup blocker allows this.`,
     });
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleDownloadPDF = (guidelineId: string, title: string) => {
+    toast({
+      title: "PDF Download Started",
+      description: `Downloading "${title}" guideline PDF...`,
+    });
+    // Simulate PDF download
+    console.log(`Downloading PDF for guideline: ${guidelineId}`);
+  };
+
+  const handlePrintGuideline = (guidelineId: string, title: string) => {
+    toast({
+      title: "Preparing Print",
+      description: `Preparing "${title}" for printing...`,
+    });
+    // Simulate print functionality
+    window.print();
   };
 
   const handleImplementationGuide = (guidelineId: string) => {
@@ -174,6 +209,33 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
         description: "Showing key implementation points and recommendations.",
       });
     }
+  };
+
+  const handleMarkImplemented = (guidelineId: string) => {
+    setImplementationStatus(prev => ({
+      ...prev,
+      [guidelineId]: !prev[guidelineId]
+    }));
+    
+    const isNowImplemented = !implementationStatus[guidelineId];
+    toast({
+      title: isNowImplemented ? "Marked as Implemented" : "Marked as Not Implemented",
+      description: isNowImplemented 
+        ? "This guideline has been marked as implemented in your facility."
+        : "This guideline has been marked as not yet implemented.",
+    });
+  };
+
+  const handleUpdateNotes = (guidelineId: string, notes: string) => {
+    setImplementationNotes(prev => ({
+      ...prev,
+      [guidelineId]: notes
+    }));
+    
+    toast({
+      title: "Implementation Notes Updated",
+      description: "Your implementation notes have been saved.",
+    });
   };
 
   const categories = ['all', 'respiratory', 'urinary', 'critical care', 'surgical', 'dermatology'];
@@ -280,6 +342,11 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                           >
                             <Star className={`h-4 w-4 ${favorites.includes(guideline.id) ? 'fill-current' : ''}`} />
                           </Button>
+                          {implementationStatus[guideline.id] ? (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                          )}
                         </div>
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline">{guideline.organization}</Badge>
@@ -289,6 +356,12 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                             className={guideline.evidenceLevel === 'A' ? 'bg-green-600' : ''}
                           >
                             Level {guideline.evidenceLevel}
+                          </Badge>
+                          <Badge 
+                            variant={implementationStatus[guideline.id] ? 'default' : 'destructive'}
+                            className={implementationStatus[guideline.id] ? 'bg-green-600' : ''}
+                          >
+                            {implementationStatus[guideline.id] ? 'Implemented' : 'Not Implemented'}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -319,7 +392,7 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                           <Info className="h-4 w-4" />
                           Implementation Key Points:
                         </h5>
-                        <ul className="space-y-1">
+                        <ul className="space-y-1 mb-4">
                           {guideline.keyPoints.map((point, index) => (
                             <li key={index} className="text-sm text-blue-700 dark:text-blue-300 flex items-start gap-2">
                               <span className="text-blue-500 mt-1">→</span>
@@ -327,10 +400,31 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                             </li>
                           ))}
                         </ul>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-sm font-medium">Implementation Notes:</label>
+                            <textarea
+                              className="w-full mt-1 p-2 border rounded text-sm"
+                              placeholder="Add implementation notes for your facility..."
+                              value={implementationNotes[guideline.id] || ''}
+                              onChange={(e) => handleUpdateNotes(guideline.id, e.target.value)}
+                              rows={3}
+                            />
+                          </div>
+                          
+                          <Button
+                            onClick={() => handleMarkImplemented(guideline.id)}
+                            variant={implementationStatus[guideline.id] ? "destructive" : "default"}
+                            size="sm"
+                          >
+                            {implementationStatus[guideline.id] ? "Mark as Not Implemented" : "Mark as Implemented"}
+                          </Button>
+                        </div>
                       </div>
                     )}
                     
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Button 
                         size="sm" 
                         variant="outline"
@@ -346,6 +440,22 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                       >
                         <FileText className="h-4 w-4 mr-1" />
                         {selectedGuideline === guideline.id ? "Hide Guide" : "Implementation Guide"}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleDownloadPDF(guideline.id, guideline.title)}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Download PDF
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handlePrintGuideline(guideline.id, guideline.title)}
+                      >
+                        <Print className="h-4 w-4 mr-1" />
+                        Print
                       </Button>
                     </div>
                   </CardContent>
