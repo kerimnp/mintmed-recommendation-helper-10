@@ -16,6 +16,7 @@ import {
 import { UltraRealisticSimulation } from './UltraRealisticSimulation';
 import { AdvancedPharmaceuticalQuiz } from './AdvancedPharmaceuticalQuiz';
 import { InteractiveSimulation } from './InteractiveSimulation';
+import { clinicalSimulations } from './data/clinicalSimulations';
 
 export const EducationHub: React.FC = () => {
   const [activeSimulation, setActiveSimulation] = useState<string | null>(null);
@@ -63,6 +64,8 @@ export const EducationHub: React.FC = () => {
   }
 
   if (activeSimulation === 'interactive-simulation') {
+    const sepsisScenario = clinicalSimulations.find(scenario => scenario.id === 'sepsis-icu');
+    
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -71,10 +74,14 @@ export const EducationHub: React.FC = () => {
             Back to Education Hub
           </Button>
         </div>
-        <InteractiveSimulation 
-          scenario="sepsis-management"
-          onComplete={(score, decisions) => handleSimulationComplete('interactive-simulation', { score, decisions })}
-        />
+        {sepsisScenario ? (
+          <InteractiveSimulation 
+            scenario={sepsisScenario}
+            onComplete={(score, decisions) => handleSimulationComplete('interactive-simulation', { score, decisions })}
+          />
+        ) : (
+          <div>Scenario not found</div>
+        )}
       </div>
     );
   }
