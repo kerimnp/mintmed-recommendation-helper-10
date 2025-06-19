@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollText, BookOpen, Bookmark, Search, Download, ExternalLink, Star, Clock } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, Search, ExternalLink, Star, Clock, FileText, Info } from "lucide-react";
 import { DrugInteractionChecker } from "./drug-interactions/DrugInteractionChecker";
-import { GuidelineContent } from "./clinical-guidelines/GuidelineContent";
 
 interface ClinicalGuidelinesProps {
   searchTerm?: string;
@@ -18,55 +17,99 @@ const mockGuidelines = [
   {
     id: 'idsa-cap',
     title: 'IDSA Guidelines for Community-Acquired Pneumonia',
-    organization: 'IDSA',
-    lastUpdated: '2023-10-15',
+    organization: 'IDSA/ATS',
+    lastUpdated: '2019-10-01',
     category: 'Respiratory',
-    summary: 'Comprehensive guidelines for diagnosis and treatment of community-acquired pneumonia in adults.',
+    summary: 'Diagnosis and treatment of adults with community-acquired pneumonia. Updated guidelines focusing on severity assessment, pathogen identification, and antimicrobial selection.',
     recommendations: [
-      'Empirical therapy should be based on local resistance patterns',
-      'Blood cultures recommended for hospitalized patients',
-      'Duration of therapy typically 5-7 days for most patients'
-    ],
-    evidenceLevel: 'A',
-    isFavorite: false
-  },
-  {
-    id: 'cdc-uti',
-    title: 'CDC Guidelines for Urinary Tract Infections',
-    organization: 'CDC',
-    lastUpdated: '2023-08-22',
-    category: 'Urinary',
-    summary: 'Evidence-based recommendations for uncomplicated and complicated UTI management.',
-    recommendations: [
-      'Nitrofurantoin or TMP-SMX for uncomplicated cystitis',
-      'Fluoroquinolones reserved for complicated cases',
+      'Use severity assessment tools (CURB-65, PSI) for treatment decisions',
+      'Obtain blood cultures and sputum for hospitalized patients',
+      'Standard therapy duration is 5 days for uncomplicated cases',
       'Consider local resistance patterns when selecting empirical therapy'
     ],
     evidenceLevel: 'A',
-    isFavorite: true
+    isFavorite: false,
+    externalUrl: 'https://www.idsociety.org/practice-guideline/community-acquired-pneumonia-cap-in-adults/',
+    keyPoints: [
+      'CURB-65 score helps determine outpatient vs inpatient treatment',
+      'Procalcitonin can guide antibiotic duration',
+      'Macrolide resistance is increasing in many regions'
+    ]
   },
   {
-    id: 'who-sepsis',
-    title: 'WHO Guidelines for Sepsis Management',
-    organization: 'WHO',
-    lastUpdated: '2023-12-01',
-    category: 'Critical Care',
-    summary: 'Global recommendations for early recognition and management of sepsis.',
+    id: 'idsa-uti',
+    title: 'IDSA Guidelines for Urinary Tract Infections',
+    organization: 'IDSA',
+    lastUpdated: '2010-03-01',
+    category: 'Urinary',
+    summary: 'Evidence-based approach to diagnosis and treatment of uncomplicated urinary tract infections in women.',
     recommendations: [
-      'Hour-1 bundle implementation for sepsis care',
-      'Broad-spectrum antibiotics within 1 hour',
-      'Source control as soon as medically appropriate'
+      'Nitrofurantoin or TMP-SMX for uncomplicated cystitis (if local resistance <20%)',
+      'Avoid fluoroquinolones for uncomplicated infections',
+      'Three-day therapy sufficient for uncomplicated cystitis',
+      'Urine culture not routinely needed for uncomplicated cases'
     ],
     evidenceLevel: 'A',
-    isFavorite: false
+    isFavorite: true,
+    externalUrl: 'https://www.idsociety.org/practice-guideline/urinary-tract-infection/',
+    keyPoints: [
+      'Local resistance patterns should guide empirical therapy',
+      'Fosfomycin is an alternative for resistant organisms',
+      'Cranberry products have limited evidence for prevention'
+    ]
+  },
+  {
+    id: 'surviving-sepsis',
+    title: 'Surviving Sepsis Campaign Guidelines',
+    organization: 'SSC/SCCM',
+    lastUpdated: '2021-10-01',
+    category: 'Critical Care',
+    summary: 'International guidelines for management of sepsis and septic shock, emphasizing early recognition and intervention.',
+    recommendations: [
+      'Implement the Hour-1 Bundle for sepsis management',
+      'Administer broad-spectrum antibiotics within 1 hour',
+      'Obtain blood cultures before antibiotics when feasible',
+      'Reassess antibiotic therapy daily for de-escalation'
+    ],
+    evidenceLevel: 'A',
+    isFavorite: false,
+    externalUrl: 'https://www.sccm.org/SurvivingSepsisCampaign/Guidelines',
+    keyPoints: [
+      'Early recognition saves lives - use qSOFA or SOFA scores',
+      'Source control should be achieved as soon as possible',
+      'Vasopressors preferred over inotropes for shock'
+    ]
+  },
+  {
+    id: 'cdc-surgical-prophylaxis',
+    title: 'CDC Guidelines for Surgical Site Infection Prevention',
+    organization: 'CDC/HICPAC',
+    lastUpdated: '2017-05-01',
+    category: 'Surgical',
+    summary: 'Comprehensive recommendations for preventing surgical site infections through perioperative care optimization.',
+    recommendations: [
+      'Administer prophylactic antibiotics within 60 minutes before incision',
+      'Discontinue prophylaxis within 24 hours of surgery',
+      'Use cefazolin for most procedures (clindamycin or vancomycin for allergies)',
+      'Maintain normothermia and appropriate glucose control'
+    ],
+    evidenceLevel: 'B',
+    isFavorite: false,
+    externalUrl: 'https://www.cdc.gov/hai/ssi/ssi.html',
+    keyPoints: [
+      'Hair removal should be done with clippers, not razors',
+      'Antiseptic prophylaxis reduces infection risk',
+      'Weight-based dosing ensures adequate tissue levels'
+    ]
   }
 ];
 
 export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTerm: externalSearchTerm = "" }) => {
   const [internalSearchTerm, setInternalSearchTerm] = useState("");
   const [filteredGuidelines, setFilteredGuidelines] = useState(mockGuidelines);
-  const [favorites, setFavorites] = useState<string[]>(['cdc-uti']);
+  const [favorites, setFavorites] = useState<string[]>(['idsa-uti']);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedGuideline, setSelectedGuideline] = useState<string | null>(null);
   const { toast } = useToast();
   
   // Sync external search term to internal state
@@ -115,31 +158,58 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
     });
   };
 
-  const handleDownloadGuideline = (guidelineId: string, title: string) => {
+  const handleLearnMore = (guidelineId: string, title: string, url: string) => {
     toast({
-      title: "Downloading Guideline",
-      description: `Preparing download for "${title}"...`,
-    });
-    
-    // Simulate download
-    setTimeout(() => {
-      toast({
-        title: "Download Complete",
-        description: "The guideline has been downloaded to your device.",
-      });
-    }, 2000);
-  };
-
-  const handleOpenExternal = (guidelineId: string, title: string) => {
-    toast({
-      title: "Opening External Link",
+      title: "Opening Guideline",
       description: `Opening "${title}" in a new tab...`,
     });
-    // In a real app, this would open the actual guideline URL
-    window.open('#', '_blank');
+    window.open(url, '_blank');
+  };
+
+  const handleImplementationGuide = (guidelineId: string) => {
+    setSelectedGuideline(selectedGuideline === guidelineId ? null : guidelineId);
+    if (selectedGuideline !== guidelineId) {
+      toast({
+        title: "Implementation Guide",
+        description: "Showing key implementation points and recommendations.",
+      });
+    }
   };
 
   const categories = ['all', 'respiratory', 'urinary', 'critical care', 'surgical', 'dermatology'];
+  
+  const quickAccessItems = [
+    {
+      title: 'Antibiotic Stewardship Principles',
+      description: 'Core principles for responsible antibiotic use',
+      action: () => {
+        toast({
+          title: "Stewardship Principles",
+          description: "Key principles: Right drug, right dose, right duration, right patient.",
+        });
+      }
+    },
+    {
+      title: 'Sepsis Recognition & Management',
+      description: 'Hour-1 bundle and early intervention strategies',
+      action: () => {
+        toast({
+          title: "Sepsis Management",
+          description: "Remember the Hour-1 Bundle: cultures, antibiotics, lactate, fluids.",
+        });
+      }
+    },
+    {
+      title: 'Resistance Prevention Strategies',
+      description: 'Evidence-based approaches to combat resistance',
+      action: () => {
+        toast({
+          title: "Resistance Prevention",
+          description: "Focus on appropriate use, infection control, and surveillance.",
+        });
+      }
+    }
+  ];
   
   return (
     <div className="space-y-6">
@@ -234,7 +304,7 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                     <div className="space-y-2 mb-4">
                       <h4 className="font-semibold text-sm">Key Recommendations:</h4>
                       <ul className="space-y-1">
-                        {guideline.recommendations.map((rec, index) => (
+                        {guideline.recommendations.slice(0, 3).map((rec, index) => (
                           <li key={index} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2">
                             <span className="text-medical-primary mt-1">•</span>
                             {rec}
@@ -243,22 +313,39 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                       </ul>
                     </div>
                     
+                    {selectedGuideline === guideline.id && (
+                      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
+                        <h5 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <Info className="h-4 w-4" />
+                          Implementation Key Points:
+                        </h5>
+                        <ul className="space-y-1">
+                          {guideline.keyPoints.map((point, index) => (
+                            <li key={index} className="text-sm text-blue-700 dark:text-blue-300 flex items-start gap-2">
+                              <span className="text-blue-500 mt-1">→</span>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => handleDownloadGuideline(guideline.id, guideline.title)}
+                        onClick={() => handleLearnMore(guideline.id, guideline.title, guideline.externalUrl)}
                       >
-                        <Download className="h-4 w-4 mr-1" />
-                        Download
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        Learn More
                       </Button>
                       <Button 
                         size="sm" 
-                        variant="outline"
-                        onClick={() => handleOpenExternal(guideline.id, guideline.title)}
+                        variant={selectedGuideline === guideline.id ? "default" : "outline"}
+                        onClick={() => handleImplementationGuide(guideline.id)}
                       >
-                        <ExternalLink className="h-4 w-4 mr-1" />
-                        View Full
+                        <FileText className="h-4 w-4 mr-1" />
+                        {selectedGuideline === guideline.id ? "Hide Guide" : "Implementation Guide"}
                       </Button>
                     </div>
                   </CardContent>
@@ -272,29 +359,24 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-500" />
-                Quick Access
+                Quick Access - Essential Principles
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button variant="outline" className="justify-start h-auto p-4">
-                  <div className="text-left">
-                    <div className="font-semibold">Sepsis Hour-1 Bundle</div>
-                    <div className="text-sm text-gray-600">Critical care protocols</div>
-                  </div>
-                </Button>
-                <Button variant="outline" className="justify-start h-auto p-4">
-                  <div className="text-left">
-                    <div className="font-semibold">Antibiotic Stewardship</div>
-                    <div className="text-sm text-gray-600">Best practices guide</div>
-                  </div>
-                </Button>
-                <Button variant="outline" className="justify-start h-auto p-4">
-                  <div className="text-left">
-                    <div className="font-semibold">Resistance Prevention</div>
-                    <div className="text-sm text-gray-600">CDC recommendations</div>
-                  </div>
-                </Button>
+                {quickAccessItems.map((item, index) => (
+                  <Button 
+                    key={index}
+                    variant="outline" 
+                    className="justify-start h-auto p-4"
+                    onClick={item.action}
+                  >
+                    <div className="text-left">
+                      <div className="font-semibold">{item.title}</div>
+                      <div className="text-sm text-gray-600">{item.description}</div>
+                    </div>
+                  </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
