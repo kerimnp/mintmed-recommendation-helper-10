@@ -300,7 +300,7 @@ export const RealisticSimulationEngine: React.FC<RealisticSimulationEngineProps>
     return 'poor';
   };
 
-  const getVitalStatus = (vital: keyof PatientVitals, value: number) => {
+  const getVitalStatus = (vital: keyof PatientVitals, value: number | { systolic: number; diastolic: number }) => {
     const ranges = {
       heartRate: { normal: [60, 100], concerning: [100, 120], critical: [120, 200] },
       temperature: { normal: [36.1, 37.2], concerning: [37.3, 38.5], critical: [38.6, 42] },
@@ -310,7 +310,7 @@ export const RealisticSimulationEngine: React.FC<RealisticSimulationEngineProps>
     };
 
     if (vital === 'bloodPressure') {
-      const systolic = (value as any).systolic;
+      const systolic = (value as { systolic: number; diastolic: number }).systolic;
       if (systolic >= 90 && systolic <= 140) return 'normal';
       if (systolic >= 80 && systolic < 90) return 'concerning';
       return 'critical';
@@ -319,8 +319,9 @@ export const RealisticSimulationEngine: React.FC<RealisticSimulationEngineProps>
     const range = ranges[vital as keyof typeof ranges];
     if (!range) return 'normal';
 
-    if (value >= range.normal[0] && value <= range.normal[1]) return 'normal';
-    if (value >= range.concerning[0] && value <= range.concerning[1]) return 'concerning';
+    const numericValue = value as number;
+    if (numericValue >= range.normal[0] && numericValue <= range.normal[1]) return 'normal';
+    if (numericValue >= range.concerning[0] && numericValue <= range.concerning[1]) return 'concerning';
     return 'critical';
   };
 
