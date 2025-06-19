@@ -4,6 +4,8 @@ import { EducationArticles } from "@/components/admin/education/EducationArticle
 import { EnhancedQuizComponent } from "@/components/admin/education/EnhancedQuizComponent";
 import { LearningPathsComponent } from "@/components/admin/education/LearningPathsComponent";
 import { QuickQuizComponent } from "@/components/admin/education/QuickQuizComponent";
+import { InteractiveSimulation } from "@/components/admin/education/InteractiveSimulation";
+import { clinicalSimulations } from "@/components/admin/education/data/clinicalSimulations";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +23,8 @@ import {
   PlayCircle,
   BookOpen,
   GraduationCap,
-  Zap
+  Zap,
+  ArrowLeft
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -114,6 +117,7 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
   const { toast } = useToast();
   const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
   const [activeEducationTab, setActiveEducationTab] = useState("articles");
+  const [activeSimulation, setActiveSimulation] = useState<string | null>(null);
   
   useEffect(() => {
     setFilteredSearchTerm(searchTerm);
@@ -128,19 +132,49 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
     });
   };
 
-  const handleEnterSimulation = (simulationType: string) => {
+  const handleSimulationComplete = (score: number, decisions: any[]) => {
+    console.log('Simulation completed with score:', score);
+    console.log('Decisions made:', decisions);
     toast({
-      title: "Launching Simulation",
-      description: `Starting ${simulationType} simulation environment...`,
+      title: "Simulation Complete!",
+      description: `Final score: ${score} points. Excellent clinical decision making!`,
     });
-    // Simulate loading time
-    setTimeout(() => {
-      toast({
-        title: "Simulation Ready",
-        description: "You can now begin the clinical scenario. Follow the prompts to make decisions.",
-      });
-    }, 2000);
+    setActiveSimulation(null);
   };
+
+  const handleStartSimulation = (simulationId: string) => {
+    setActiveSimulation(simulationId);
+    toast({
+      title: "Simulation Started",
+      description: "Make clinical decisions quickly and accurately!",
+    });
+  };
+
+  // If a simulation is active, show it
+  if (activeSimulation) {
+    const simulation = clinicalSimulations.find(s => s.id === activeSimulation);
+    if (simulation) {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 mb-6">
+            <Button 
+              variant="outline" 
+              onClick={() => setActiveSimulation(null)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Simulations
+            </Button>
+            <h2 className="text-xl font-semibold">Clinical Simulation</h2>
+          </div>
+          <InteractiveSimulation 
+            scenario={simulation} 
+            onComplete={handleSimulationComplete}
+          />
+        </div>
+      );
+    }
+  }
   
   return (
     <div className="space-y-6">
@@ -334,61 +368,44 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
-                      <Zap className="h-5 w-5 text-red-600 dark:text-red-400" />
+              {clinicalSimulations.map((simulation) => (
+                <Card key={simulation.id} className="p-6 hover:shadow-lg transition-shadow">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${
+                        simulation.difficulty === 'advanced' ? 'bg-red-100 dark:bg-red-900/30' : 
+                        simulation.difficulty === 'intermediate' ? 'bg-yellow-100 dark:bg-yellow-900/30' : 
+                        'bg-green-100 dark:bg-green-900/30'
+                      }`}>
+                        <PlayCircle className={`h-5 w-5 ${
+                          simulation.difficulty === 'advanced' ? 'text-red-600 dark:text-red-400' : 
+                          simulation.difficulty === 'intermediate' ? 'text-yellow-600 dark:text-yellow-400' : 
+                          'text-green-600 dark:text-green-400'
+                        }`} />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">{simulation.title}</h4>
+                        <Badge variant="outline" className="mt-1 capitalize">
+                          {simulation.difficulty}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium">Emergency Sepsis Protocol</h4>
-                      <Badge variant="outline" className="mt-1">High Fidelity</Badge>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {simulation.description}
+                    </p>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>{simulation.duration}</span>
+                      <span>{simulation.department}</span>
                     </div>
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleStartSimulation(simulation.id)}
+                    >
+                      Start Simulation
+                    </Button>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Time-critical antibiotic decisions in septic shock. Practice the hour-1 bundle 
-                    with realistic patient monitoring and escalation scenarios.
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>45-60 minutes</span>
-                    <span>Multi-patient ICU</span>
-                  </div>
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleEnterSimulation("Emergency Sepsis Protocol")}
-                  >
-                    Enter Simulation
-                  </Button>
-                </div>
-              </Card>
-
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                      <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Antimicrobial Stewardship Rounds</h4>
-                      <Badge variant="outline" className="mt-1">Team-Based</Badge>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Participate in virtual stewardship rounds. Review real cases, make intervention 
-                    recommendations, and collaborate with ID specialists and pharmacists.
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>30-40 minutes</span>
-                    <span>Team Collaboration</span>
-                  </div>
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleEnterSimulation("Antimicrobial Stewardship Rounds")}
-                  >
-                    Join Rounds
-                  </Button>
-                </div>
-              </Card>
+                </Card>
+              ))}
             </div>
 
             <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
