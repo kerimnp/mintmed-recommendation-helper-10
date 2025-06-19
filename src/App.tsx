@@ -14,6 +14,7 @@ import ClinicalDashboard from "@/pages/ClinicalDashboard";
 import Auth from "@/pages/Auth";
 import About from "@/pages/About";
 import Profile from "@/pages/Profile";
+import Pricing from "@/pages/Pricing";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/pricing" element={<Pricing />} />
                     <Route path="*" element={<Index />} />
                   </Routes>
                   <Toaster />

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,8 @@ import {
   Shield, 
   User, 
   LogOut,
-  Pill
+  Pill,
+  Euro
 } from 'lucide-react';
 
 export const MainNavigation: React.FC = () => {
@@ -34,6 +34,11 @@ export const MainNavigation: React.FC = () => {
       href: '/advisor',
       label: language === 'en' ? 'Antibiotic Advisor' : 'Antibiotski Savjetnik',
       icon: Pill,
+    },
+    {
+      href: '/pricing',
+      label: language === 'en' ? 'Pricing' : 'Cijene',
+      icon: Euro,
     },
     ...(user ? [{
       href: '/admin',
