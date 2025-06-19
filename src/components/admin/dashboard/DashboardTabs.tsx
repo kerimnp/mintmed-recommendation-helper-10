@@ -1,65 +1,83 @@
-
-import React from "react";
-import { 
-  Shield, 
-  PieChart, 
-  Microscope, 
-  MapPin, 
-  BookOpen,
-  PillIcon 
-} from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OverviewDashboard } from './OverviewDashboard';
+import { PatientsDashboard } from './patient/PatientsDashboard';
+import { ResistanceDashboard } from './resistance/ResistanceDashboard';
+import { RegionalDashboard } from './regional/RegionalDashboard';
+import { GuidelinesDashboard } from './guidelines/GuidelinesDashboard';
+import { EducationDashboard } from './education/EducationDashboard';
+import { AntibioticEffectiveness } from '../resistance/AntibioticEffectiveness';
+import { UsersDashboard } from './users/UsersDashboard';
+import { EnhancedAnalysisDashboard } from './enhanced/EnhancedAnalysisDashboard';
+import { PricingDashboard } from './pricing/PricingDashboard';
+import { FeedbackDashboard } from './feedback/FeedbackDashboard';
+import { EHRIntegrationDashboard } from '../ehr/EHRIntegrationDashboard';
 
 interface DashboardTabsProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  onTabChange: (tab: string) => void;
+  currentUser: any;
 }
 
-export const DashboardTabs = ({ activeTab, setActiveTab }: DashboardTabsProps) => {
-  const tabs = [
-    { id: "antibiotics", icon: Shield, label: "Antibiotics" },
-    { id: "effectiveness", icon: PieChart, label: "Effectiveness" },
-    { id: "resistance", icon: Microscope, label: "Resistance" },
-    { id: "regional", icon: MapPin, label: "Regional" },
-    { id: "education", icon: BookOpen, label: "Education" },
-    { id: "guidelines", icon: PillIcon, label: "Guidelines" }
-  ];
-
+export const DashboardTabs: React.FC<DashboardTabsProps> = ({ 
+  activeTab, 
+  onTabChange, 
+  currentUser 
+}) => {
   return (
-    <div className="px-1 py-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 mb-6">
-      <div className="flex overflow-x-auto no-scrollbar scrollbar-none">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "relative flex flex-1 items-center justify-center px-4 py-3 min-w-[120px] rounded-lg transition-all",
-              activeTab === tab.id 
-                ? "text-white font-medium" 
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50"
-            )}
-          >
-            {activeTab === tab.id && (
-              <motion.div
-                layoutId="activeTabs"
-                className="absolute inset-0 bg-gradient-to-r from-medical-primary/90 to-medical-accent rounded-lg shadow-md"
-                initial={false}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            )}
-            <span className="relative flex items-center gap-2 z-10">
-              <tab.icon className={`h-5 w-5 ${activeTab === tab.id ? "" : "opacity-70"}`} />
-              <span className={cn(
-                activeTab === tab.id ? "opacity-100" : "opacity-70", 
-                "hidden sm:block text-sm font-medium"
-              )}>
-                {tab.label}
-              </span>
-            </span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+      <TabsList className="grid w-full grid-cols-12">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="patients">Patients</TabsTrigger>
+        <TabsTrigger value="resistance">Resistance</TabsTrigger>
+        <TabsTrigger value="regional">Regional</TabsTrigger>
+        <TabsTrigger value="guidelines">Guidelines</TabsTrigger>
+        <TabsTrigger value="education">Education</TabsTrigger>
+        <TabsTrigger value="effectiveness">Effectiveness</TabsTrigger>
+        <TabsTrigger value="users">Users</TabsTrigger>
+        <TabsTrigger value="enhanced">Enhanced</TabsTrigger>
+        <TabsTrigger value="pricing">Pricing</TabsTrigger>
+        <TabsTrigger value="feedback">Feedback</TabsTrigger>
+        <TabsTrigger value="ehr">EHR</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="overview" className="space-y-4">
+        <OverviewDashboard />
+      </TabsContent>
+      <TabsContent value="patients" className="space-y-4">
+        <PatientsDashboard />
+      </TabsContent>
+      <TabsContent value="resistance" className="space-y-4">
+        <ResistanceDashboard />
+      </TabsContent>
+      <TabsContent value="regional" className="space-y-4">
+        <RegionalDashboard />
+      </TabsContent>
+      <TabsContent value="guidelines" className="space-y-4">
+        <GuidelinesDashboard />
+      </TabsContent>
+      <TabsContent value="education" className="space-y-4">
+        <EducationDashboard />
+      </TabsContent>
+      <TabsContent value="effectiveness" className="space-y-4">
+        <AntibioticEffectiveness />
+      </TabsContent>
+      <TabsContent value="users" className="space-y-4">
+        <UsersDashboard />
+      </TabsContent>
+      <TabsContent value="enhanced" className="space-y-4">
+        <EnhancedAnalysisDashboard />
+      </TabsContent>
+      <TabsContent value="pricing" className="space-y-4">
+        <PricingDashboard />
+      </TabsContent>
+       <TabsContent value="feedback" className="space-y-4">
+        <FeedbackDashboard />
+      </TabsContent>
+      
+      <TabsContent value="ehr" className="space-y-4">
+        <EHRIntegrationDashboard />
+      </TabsContent>
+    </Tabs>
   );
 };

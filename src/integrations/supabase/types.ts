@@ -345,6 +345,139 @@ export type Database = {
           },
         ]
       }
+      ehr_integration_logs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          ehr_system_id: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          operation_type: string
+          resource_count: number | null
+          resource_type: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          ehr_system_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          operation_type: string
+          resource_count?: number | null
+          resource_type?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          ehr_system_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          operation_type?: string
+          resource_count?: number | null
+          resource_type?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ehr_integration_logs_ehr_system_id_fkey"
+            columns: ["ehr_system_id"]
+            isOneToOne: false
+            referencedRelation: "ehr_systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ehr_systems: {
+        Row: {
+          api_version: string | null
+          authentication_type: string | null
+          base_url: string | null
+          configuration: Json | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_sync: string | null
+          name: string
+          system_type: string
+          updated_at: string
+        }
+        Insert: {
+          api_version?: string | null
+          authentication_type?: string | null
+          base_url?: string | null
+          configuration?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name: string
+          system_type: string
+          updated_at?: string
+        }
+        Update: {
+          api_version?: string | null
+          authentication_type?: string | null
+          base_url?: string | null
+          configuration?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name?: string
+          system_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fhir_resources: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          last_updated: string
+          patient_id: string | null
+          resource_id: string
+          resource_type: string
+          updated_at: string
+          version_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          id?: string
+          last_updated?: string
+          patient_id?: string | null
+          resource_id: string
+          resource_type: string
+          updated_at?: string
+          version_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          last_updated?: string
+          patient_id?: string | null
+          resource_id?: string
+          resource_type?: string
+          updated_at?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fhir_resources_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           billing_address: string | null
@@ -370,6 +503,57 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_ehr_mappings: {
+        Row: {
+          created_at: string
+          ehr_system_id: string
+          external_mrn: string | null
+          external_patient_id: string
+          id: string
+          last_sync: string | null
+          patient_id: string
+          sync_status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ehr_system_id: string
+          external_mrn?: string | null
+          external_patient_id: string
+          id?: string
+          last_sync?: string | null
+          patient_id: string
+          sync_status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ehr_system_id?: string
+          external_mrn?: string | null
+          external_patient_id?: string
+          id?: string
+          last_sync?: string | null
+          patient_id?: string
+          sync_status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_ehr_mappings_ehr_system_id_fkey"
+            columns: ["ehr_system_id"]
+            isOneToOne: false
+            referencedRelation: "ehr_systems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_ehr_mappings_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
