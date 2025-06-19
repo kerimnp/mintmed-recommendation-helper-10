@@ -14,7 +14,7 @@ export class PatientDataProcessor {
         patientData = this.parseCroatianHealthCard(data);
       }
       // Serbian Health Card Format
-      else if (this isSerbianHealthCard(data)) {
+      else if (this.isSerbianHealthCard(data)) {
         patientData = this.parseSerbianHealthCard(data);
       }
       // European Health Insurance Card (EHIC)
