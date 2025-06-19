@@ -1,55 +1,48 @@
 
-import { Article } from "../types/articleTypes";
-import { categories } from "./categories";
-import { fundamentalsArticles } from "./fundamentalsArticles";
-import { advancedArticles } from "./advancedArticles";
-import { specializedArticles } from "./specializedArticles";
-import { clinicalArticles } from "./clinicalArticles";
-import { guidelinesArticles } from "./guidelinesArticles";
-import { researchArticles } from "./researchArticles";
-import { interactiveArticles } from "./interactiveArticles";
+import { fundamentalsArticles } from './fundamentalsArticles';
+import { guidelinesArticles } from './guidelinesArticles';
+import { clinicalArticles } from './clinicalArticles';
+import { clinicalCasesArticles } from './clinicalCasesArticles';
+import { interactiveArticles } from './interactiveArticles';
+import { antibioticMechanismsArticles } from './antibioticMechanismsArticles';
+import { resistanceArticles } from './resistanceArticles';
+import { infectionControlArticles } from './infectionControlArticles';
+import { pharmacologyArticles } from './pharmacologyArticles';
+import { pediatricArticles } from './pediatricArticles';
+import { geriatricArticles } from './geriatricArticles';
+import { surgicalArticles } from './surgicalArticles';
+import { emergencyArticles } from './emergencyArticles';
 
-// New expanded collections
-import { antibioticMechanismsArticles } from "./antibioticMechanismsArticles";
-import { clinicalCasesArticles } from "./clinicalCasesArticles";
-import { resistanceArticles } from "./resistanceArticles";
-import { practiceCasesArticles } from "./practiceCasesArticles";
-import { pediatricArticles } from "./pediatricArticles";
-import { pharmacologyArticles } from "./pharmacologyArticles";
-
-// Combine all articles into one comprehensive array
-export const articles: Article[] = [
+// Combine all article collections
+export const articles = [
   ...fundamentalsArticles,
-  ...advancedArticles,
-  ...specializedArticles,
-  ...clinicalArticles,
   ...guidelinesArticles,
-  ...researchArticles,
-  ...interactiveArticles,
-  // New expanded content
-  ...antibioticMechanismsArticles,
+  ...clinicalArticles,
   ...clinicalCasesArticles,
+  ...interactiveArticles,
+  ...antibioticMechanismsArticles,
   ...resistanceArticles,
-  ...practiceCasesArticles,
+  ...infectionControlArticles,
+  ...pharmacologyArticles,
   ...pediatricArticles,
-  ...pharmacologyArticles
+  ...geriatricArticles,
+  ...surgicalArticles,
+  ...emergencyArticles
 ];
 
-export { categories };
-
-// Re-export all article collections for direct access
-export { fundamentalsArticles };
-export { advancedArticles };
-export { specializedArticles };
-export { clinicalArticles };
-export { guidelinesArticles };
-export { researchArticles };
-export { interactiveArticles };
-
-// Export new collections
-export { antibioticMechanismsArticles };
-export { clinicalCasesArticles };
-export { resistanceArticles };
-export { practiceCasesArticles };
-export { pediatricArticles };
-export { pharmacologyArticles };
+// Export individual collections for specific use cases
+export {
+  fundamentalsArticles,
+  guidelinesArticles,
+  clinicalArticles,
+  clinicalCasesArticles,
+  interactiveArticles,
+  antibioticMechanismsArticles,
+  resistanceArticles,
+  infectionControlArticles,
+  pharmacologyArticles,
+  pediatricArticles,
+  geriatricArticles,
+  surgicalArticles,
+  emergencyArticles
+};

@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { 
   Book, 
   School, 
@@ -115,6 +116,7 @@ const pneumoniaQuizQuestions = [
 export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const scrollToTop = useScrollToTop();
   const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
   const [activeEducationTab, setActiveEducationTab] = useState("articles");
   const [activeSimulation, setActiveSimulation] = useState<string | null>(null);
@@ -140,14 +142,21 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
       description: `Final score: ${score} points. Excellent clinical decision making!`,
     });
     setActiveSimulation(null);
+    scrollToTop();
   };
 
   const handleStartSimulation = (simulationId: string) => {
     setActiveSimulation(simulationId);
+    scrollToTop();
     toast({
       title: "Simulation Started",
       description: "Make clinical decisions quickly and accurately!",
     });
+  };
+
+  const handleTabChange = (newTab: string) => {
+    setActiveEducationTab(newTab);
+    scrollToTop();
   };
 
   // If a simulation is active, show it
@@ -159,7 +168,10 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
           <div className="flex items-center gap-4 mb-6">
             <Button 
               variant="outline" 
-              onClick={() => setActiveSimulation(null)}
+              onClick={() => {
+                setActiveSimulation(null);
+                scrollToTop();
+              }}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -190,7 +202,7 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              150+ Articles
+              170+ Articles
             </Badge>
             <Badge variant="outline" className="flex items-center gap-1">
               <Target className="h-3 w-3" />
@@ -254,7 +266,7 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
         </div>
       </div>
 
-      <Tabs value={activeEducationTab} onValueChange={setActiveEducationTab} className="w-full">
+      <Tabs value={activeEducationTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="articles" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />

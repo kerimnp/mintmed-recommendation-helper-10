@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface EducationArticlesProps {
   searchTerm?: string;
@@ -21,6 +22,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   const [localSearchTerm, setLocalSearchTerm] = useState('');
   const [showCategories, setShowCategories] = useState(false);
   const isMobile = useIsMobile();
+  const scrollToTop = useScrollToTop();
   
   // Sync external search term to local search
   useEffect(() => {
@@ -33,14 +35,21 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   
   const handleArticleSelect = (id: string) => {
     setSelectedArticleId(id);
+    scrollToTop();
   };
   
   const handleBackToArticles = () => {
     setSelectedArticleId(null);
+    scrollToTop();
   };
   
   const toggleCategories = () => {
     setShowCategories(!showCategories);
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    scrollToTop();
   };
   
   const filteredArticles = articles.filter(article => {
@@ -81,7 +90,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
         <div className="flex-1">
           <h2 className="text-xl font-semibold mb-2">Education Articles</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
-            Browse through our curated collection of evidence-based articles and educational resources
+            Browse through our curated collection of evidence-based articles and educational resources ({articles.length} articles available)
           </p>
         </div>
         
@@ -107,7 +116,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
           <Badge 
             variant={selectedCategory === 'all' ? "default" : "outline"}
             className="cursor-pointer hover:bg-primary/90 transition-colors"
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => handleCategoryChange('all')}
           >
             All Categories
           </Badge>
@@ -116,7 +125,7 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
               key={category.id} 
               variant={selectedCategory === category.id ? "default" : "outline"}
               className="cursor-pointer hover:bg-primary/90 transition-colors"
-              onClick={() => setSelectedCategory(category.id)}
+              onClick={() => handleCategoryChange(category.id)}
             >
               {category.label}
             </Badge>
