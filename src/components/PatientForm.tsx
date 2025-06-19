@@ -126,6 +126,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({
     updateField('allergies', updatedAllergies);
   };
 
+  const handleCreatinineChange = (value: string) => {
+    updateField('creatinine', value);
+  };
+
+  const handleLabResultsChange = (results: any) => {
+    updateField('labResults', results);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <FormHeader errors={errors} showErrors={showErrors} />
@@ -230,14 +238,12 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                 />
 
                 <RenalFunctionSection
-                  formData={{
-                    creatinine: patientData.creatinine,
-                    age: patientData.age,
-                    gender: patientData.gender,
-                    weight: patientData.weight
-                  }}
-                  onInputChange={updateField}
-                  errors={errors}
+                  creatinine={patientData.creatinine || ""}
+                  onCreatinineChange={handleCreatinineChange}
+                  age={patientData.age}
+                  weight={patientData.weight}
+                  gender={patientData.gender}
+                  height={patientData.height}
                 />
 
                 <MedicationHistorySection
@@ -250,10 +256,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                 />
 
                 <LabResultsSection
-                  formData={{
-                    labResults: patientData.labResults
-                  }}
-                  onInputChange={updateField}
+                  onLabResultsChange={handleLabResultsChange}
                 />
 
                 <FormActions
