@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollText, BookOpen, Bookmark, Search, ExternalLink, Star, Clock, FileText, Info, Download, Print, AlertTriangle, CheckCircle } from "lucide-react";
+import { ScrollText, BookOpen, Bookmark, Search, ExternalLink, Star, Clock, FileText, Info, Download, Printer, AlertTriangle, CheckCircle } from "lucide-react";
 import { DrugInteractionChecker } from "./drug-interactions/DrugInteractionChecker";
 
 interface ClinicalGuidelinesProps {
@@ -454,7 +454,7 @@ export const ClinicalGuidelines: React.FC<ClinicalGuidelinesProps> = ({ searchTe
                         variant="outline"
                         onClick={() => handlePrintGuideline(guideline.id, guideline.title)}
                       >
-                        <Print className="h-4 w-4 mr-1" />
+                        <Printer className="h-4 w-4 mr-1" />
                         Print
                       </Button>
                     </div>
