@@ -40,28 +40,44 @@ const Pricing = () => {
 
   const hospitalCreditBundles = [
     {
-      name: 'Starter Bundle',
+      name: 'Starter',
       credits: 100,
-      price: 70,
-      costPerCredit: 0.70,
+      price: 51,
+      costPerCredit: 1.00,
       popular: false,
       bestValue: false
     },
     {
-      name: 'Pro Bundle',
+      name: 'Basic',
+      credits: 500,
+      price: 204,
+      costPerCredit: 0.80,
+      popular: false,
+      bestValue: false
+    },
+    {
+      name: 'Pro',
       credits: 1000,
-      price: 600,
-      costPerCredit: 0.60,
+      price: 357,
+      costPerCredit: 0.70,
       popular: true,
       bestValue: false
     },
     {
-      name: 'Scale Bundle',
-      credits: 5000,
-      price: 2500,
-      costPerCredit: 0.50,
+      name: 'Growth',
+      credits: 2500,
+      price: 765,
+      costPerCredit: 0.60,
       popular: false,
       bestValue: true
+    },
+    {
+      name: 'Scale',
+      credits: 5000,
+      price: 1403,
+      costPerCredit: 0.55,
+      popular: false,
+      bestValue: false
     }
   ];
 
@@ -70,10 +86,12 @@ const Pricing = () => {
       name: 'Basic',
       price: 51,
       credits: 200,
+      extraCreditCost: 1.00,
       features: [
         'Roll over unused credits',
         'Basic support',
-        'Standard guidelines access'
+        'Standard guidelines access',
+        'Extra credits at €1.00 each'
       ],
       popular: false
     },
@@ -102,21 +120,6 @@ const Pricing = () => {
         'Advanced analytics'
       ],
       popular: false
-    }
-  ];
-
-  const standaloneBundles = [
-    {
-      name: 'Starter',
-      credits: 50,
-      price: 40,
-      costPerCredit: 0.80
-    },
-    {
-      name: 'Basic',
-      credits: 200,
-      price: 140,
-      costPerCredit: 0.70
     }
   ];
 
@@ -188,7 +191,7 @@ const Pricing = () => {
               <h2 className="text-2xl font-bold text-center mb-8">
                 {language === 'en' ? 'Credit Bundles (Optional Add-ons)' : 'Paketi Kredita (Dodatni)'}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {hospitalCreditBundles.map((bundle, index) => (
                   <Card key={index} className="relative">
                     {bundle.popular && (
@@ -206,7 +209,7 @@ const Pricing = () => {
                     <CardHeader className="text-center">
                       <CardTitle>{bundle.name}</CardTitle>
                       <div className="text-3xl font-bold">€{bundle.price}</div>
-                      <div className="text-sm text-gray-600">€{bundle.costPerCredit}/credit</div>
+                      <div className="text-sm text-gray-600">€{bundle.costPerCredit.toFixed(2)}/credit</div>
                     </CardHeader>
                     <CardContent>
                       <div className="text-center mb-4">
@@ -246,7 +249,7 @@ const Pricing = () => {
               <h2 className="text-2xl font-bold text-center mb-8">
                 {language === 'en' ? 'Subscription Plans' : 'Pretplatnički Planovi'}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {individualPlans.map((plan, index) => (
                   <Card key={index} className={`relative ${plan.name === 'Elite' ? 'ring-2 ring-medical-primary scale-105' : ''}`}>
                     {plan.popular && (
@@ -273,11 +276,6 @@ const Pricing = () => {
                         ) : (
                           <div className="text-lg font-semibold">{plan.credits} credits/month</div>
                         )}
-                        {plan.extraCreditCost && (
-                          <div className="text-sm text-gray-600 mt-1">
-                            + €{plan.extraCreditCost}/extra credit
-                          </div>
-                        )}
                       </div>
                       <ul className="space-y-2 mb-6">
                         {plan.features.map((feature, featureIndex) => (
@@ -289,35 +287,6 @@ const Pricing = () => {
                       </ul>
                       <Button className="w-full" variant={plan.name === 'Elite' ? 'default' : 'outline'}>
                         {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Standalone Credit Bundles */}
-            <div>
-              <h2 className="text-2xl font-bold text-center mb-4">
-                {language === 'en' ? 'Need more flexibility?' : 'Trebate više fleksibilnosti?'}
-              </h2>
-              <p className="text-center text-gray-600 mb-8">
-                {language === 'en' ? 'Purchase standalone credits:' : 'Kupite samostalne kredite:'}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                {standaloneBundles.map((bundle, index) => (
-                  <Card key={index}>
-                    <CardHeader className="text-center">
-                      <CardTitle>{bundle.name}</CardTitle>
-                      <div className="text-2xl font-bold">€{bundle.price}</div>
-                      <div className="text-sm text-gray-600">€{bundle.costPerCredit}/credit</div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center mb-4">
-                        <div className="text-lg font-semibold">{bundle.credits} credits</div>
-                      </div>
-                      <Button className="w-full">
-                        {language === 'en' ? 'Buy Now' : 'Kupite Sada'}
                       </Button>
                     </CardContent>
                   </Card>
@@ -337,8 +306,8 @@ const Pricing = () => {
                   </AccordionTrigger>
                   <AccordionContent>
                     {language === 'en' 
-                      ? 'Yes! Hospitals can combine seat fees with credit bundles. Individual doctors can supplement their subscription with standalone credit bundles for extra flexibility.'
-                      : 'Da! Bolnice mogu kombinirati naknade po sjedištu s paketima kredita. Individualni liječnici mogu dopuniti svoju pretplatu samostalnim paketima kredita za dodatnu fleksibilnost.'}
+                      ? 'Yes! Hospitals can combine seat fees with credit bundles. Individual doctors can supplement their subscription with additional credit purchases for extra flexibility.'
+                      : 'Da! Bolnice mogu kombinirati naknade po sjedištu s paketima kredita. Individualni liječnici mogu dopuniti svoju pretplatu dodatnim kupnjama kredita za dodatnu fleksibilnost.'}
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
@@ -357,8 +326,8 @@ const Pricing = () => {
                   </AccordionTrigger>
                   <AccordionContent>
                     {language === 'en' 
-                      ? 'Subscription credits roll over to the next month (except Elite unlimited plan). Purchased credit bundles never expire.'
-                      : 'Krediti iz pretplate se prenose u sljedeći mjesec (osim Elite neograničenog plana). Kupljeni paketi kredita nikad ne istječu.'}
+                      ? 'Subscription credits roll over to the next month (except Elite unlimited plan). Hospital credit bundles never expire.'
+                      : 'Krediti iz pretplate se prenose u sljedeći mjesec (osim Elite neograničenog plana). Bolnički paketi kredita nikad ne istječu.'}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
