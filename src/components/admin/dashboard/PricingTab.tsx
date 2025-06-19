@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,15 +28,19 @@ import {
   Crown,
   Infinity,
   Calculator,
-  Info
+  Info,
+  CreditCard,
+  Mail
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const PricingTab = () => {
   const { user } = useAuth();
   const { language } = useLanguage();
+  const { toast } = useToast();
   const [doctorCount, setDoctorCount] = useState(5);
   const [activeTab, setActiveTab] = useState('hospitals');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const seatFeePerMonth = 25;
   const totalSeatFee = doctorCount * seatFeePerMonth;
@@ -122,6 +127,88 @@ export const PricingTab = () => {
       popular: false
     }
   ];
+
+  const handleAddToHospitalPlan = async (bundle: typeof hospitalCreditBundles[0]) => {
+    setIsProcessing(true);
+    try {
+      toast({
+        title: "Processing Hospital Plan",
+        description: `Adding ${bundle.name} bundle (${bundle.credits.toLocaleString()} credits) to your hospital plan...`,
+      });
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      toast({
+        title: "Bundle Added Successfully",
+        description: `${bundle.name} bundle has been added to your hospital plan. You'll be charged €${bundle.price} for ${bundle.credits.toLocaleString()} credits.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add bundle to hospital plan. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSelectIndividualPlan = async (plan: typeof individualPlans[0]) => {
+    setIsProcessing(true);
+    try {
+      toast({
+        title: "Processing Subscription",
+        description: `Setting up your ${plan.name} subscription...`,
+      });
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      toast({
+        title: "Subscription Activated",
+        description: `Your ${plan.name} plan has been activated. ${plan.unlimited ? 'You now have unlimited usage.' : `You have ${plan.credits} credits per month.`}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to activate subscription. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleGetCustomQuote = () => {
+    const subject = encodeURIComponent('Enterprise Volume Discount Inquiry');
+    const body = encodeURIComponent(`Hello,
+
+I'm interested in enterprise volume discounts for our organization. We need 10,000+ credits and would like to discuss custom pricing options.
+
+Current requirements:
+- Estimated monthly credit usage: 10,000+
+- Number of doctors: ${doctorCount}
+- Organization: ${user?.email || 'Not specified'}
+
+Please contact me to discuss volume pricing options.
+
+Best regards`);
+    
+    window.open(`mailto:sales@horalix.com?subject=${subject}&body=${body}`, '_blank');
+    
+    toast({
+      title: "Email Client Opened",
+      description: "We've opened your email client with a pre-filled inquiry. Our sales team will respond within 24 hours.",
+    });
+  };
+
+  const handleEarlyAccessWaitlist = () => {
+    toast({
+      title: "Added to Waitlist",
+      description: "You've been added to the VR Training early access waitlist. We'll notify you when it's available!",
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 pt-6">
@@ -223,7 +310,13 @@ export const PricingTab = () => {
                       <div className="text-center mb-4">
                         <div className="text-lg font-semibold">{bundle.credits.toLocaleString()} credits</div>
                       </div>
-                      <Button className="w-full" variant="outline">
+                      <Button 
+                        className="w-full" 
+                        variant="outline"
+                        onClick={() => handleAddToHospitalPlan(bundle)}
+                        disabled={isProcessing}
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
                         {language === 'en' ? 'Add to Hospital Plan' : 'Dodaj u Bolnički Plan'}
                       </Button>
                       <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
@@ -246,7 +339,8 @@ export const PricingTab = () => {
                     ? 'Contact us for volume discounts (up to 20% off)' 
                     : 'Kontaktirajte nas za popuste na količinu (do 20% popusta)'}
                 </p>
-                <Button size="lg" variant="secondary">
+                <Button size="lg" variant="secondary" onClick={handleGetCustomQuote}>
+                  <Mail className="h-4 w-4 mr-2" />
                   {language === 'en' ? 'Get Custom Quote' : 'Dobijte Prilagođenu Ponudu'}
                 </Button>
               </CardContent>
@@ -295,7 +389,13 @@ export const PricingTab = () => {
                           </li>
                         ))}
                       </ul>
-                      <Button className="w-full" variant={plan.name === 'Elite' ? 'default' : 'outline'}>
+                      <Button 
+                        className="w-full" 
+                        variant={plan.name === 'Elite' ? 'default' : 'outline'}
+                        onClick={() => handleSelectIndividualPlan(plan)}
+                        disabled={isProcessing}
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
                         {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
                       </Button>
                     </CardContent>
@@ -345,6 +445,22 @@ export const PricingTab = () => {
                   </AccordionItem>
                 </Accordion>
               </CardContent>
+            </Card>
+
+            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-3 mb-4">
+                <Info className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <h4 className="text-lg font-semibold text-green-700 dark:text-green-300">
+                  Coming Soon: VR Training Modules
+                </h4>
+              </div>
+              <p className="text-green-600 dark:text-green-400 mb-4">
+                Experience immersive virtual reality training scenarios including sterile technique, 
+                infection control procedures, and complex patient consultations.
+              </p>
+              <Button variant="outline" onClick={handleEarlyAccessWaitlist}>
+                Early Access Waitlist
+              </Button>
             </Card>
           </TabsContent>
         </Tabs>

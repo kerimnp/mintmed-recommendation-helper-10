@@ -649,6 +649,7 @@ export type Database = {
         | "approve"
         | "reject"
         | "override"
+      currency: "BAM" | "EUR" | "USD"
       department_type:
         | "emergency"
         | "icu"
@@ -797,6 +798,7 @@ export const Constants = {
         "reject",
         "override",
       ],
+      currency: ["BAM", "EUR", "USD"],
       department_type: [
         "emergency",
         "icu",

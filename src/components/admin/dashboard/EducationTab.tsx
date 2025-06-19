@@ -3,10 +3,12 @@ import React, { useState, useEffect } from "react";
 import { EducationArticles } from "@/components/admin/education/EducationArticles";
 import { EnhancedQuizComponent } from "@/components/admin/education/EnhancedQuizComponent";
 import { LearningPathsComponent } from "@/components/admin/education/LearningPathsComponent";
+import { QuickQuizComponent } from "@/components/admin/education/QuickQuizComponent";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Book, 
   School, 
@@ -62,8 +64,54 @@ const sampleQuizQuestions = [
   }
 ];
 
+const basicQuizQuestions = [
+  {
+    id: 'basic1',
+    question: 'What is the primary mechanism of action of penicillins?',
+    options: [
+      'Protein synthesis inhibition',
+      'Cell wall synthesis inhibition', 
+      'DNA replication interference',
+      'Cell membrane disruption'
+    ],
+    correctAnswer: 1,
+    explanation: 'Penicillins inhibit bacterial cell wall synthesis by interfering with peptidoglycan cross-linking.',
+    difficulty: 'beginner' as const
+  },
+  {
+    id: 'basic2',
+    question: 'Which antibiotic class is most associated with C. difficile infections?',
+    options: [
+      'Penicillins',
+      'Macrolides',
+      'Fluoroquinolones',
+      'Aminoglycosides'
+    ],
+    correctAnswer: 2,
+    explanation: 'Fluoroquinolones are strongly associated with C. difficile infections due to their broad spectrum activity.',
+    difficulty: 'beginner' as const
+  }
+];
+
+const pneumoniaQuizQuestions = [
+  {
+    id: 'pna1',
+    question: 'For community-acquired pneumonia in a healthy adult, what is the first-line oral antibiotic?',
+    options: [
+      'Azithromycin',
+      'Amoxicillin',
+      'Levofloxacin',
+      'Ceftriaxone'
+    ],
+    correctAnswer: 1,
+    explanation: 'Amoxicillin is the first-line oral antibiotic for CAP in healthy adults without comorbidities.',
+    difficulty: 'intermediate' as const
+  }
+];
+
 export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) => {
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   const [filteredSearchTerm, setFilteredSearchTerm] = useState("");
   const [activeEducationTab, setActiveEducationTab] = useState("articles");
   
@@ -74,7 +122,24 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
   const handleQuizComplete = (score: number, results: any[]) => {
     console.log('Quiz completed with score:', score);
     console.log('Detailed results:', results);
-    // Here you could save results to a database or show additional feedback
+    toast({
+      title: "Quiz Completed!",
+      description: `Great job! You scored ${score}% on the assessment.`,
+    });
+  };
+
+  const handleEnterSimulation = (simulationType: string) => {
+    toast({
+      title: "Launching Simulation",
+      description: `Starting ${simulationType} simulation environment...`,
+    });
+    // Simulate loading time
+    setTimeout(() => {
+      toast({
+        title: "Simulation Ready",
+        description: "You can now begin the clinical scenario. Follow the prompts to make decisions.",
+      });
+    }, 2000);
   };
   
   return (
@@ -194,60 +259,30 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                      Fundamentals
-                    </Badge>
-                    <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Antibiotic Basics Quick Quiz</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      Test your understanding of basic antibiotic mechanisms and selection principles.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      5-10 min
-                    </span>
-                    <span>10 questions</span>
-                  </div>
-                  <Button className="w-full">Start Quiz</Button>
-                </div>
-              </Card>
+              <QuickQuizComponent
+                title="Antibiotic Basics Quick Quiz"
+                badge="Fundamentals"
+                badgeColor="bg-blue-600"
+                timeEstimate="5-10 min"
+                questionCount={basicQuizQuestions.length}
+                questions={basicQuizQuestions}
+                icon={<Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+              />
+
+              <QuickQuizComponent
+                title="Pneumonia Management Assessment"
+                badge="Clinical"
+                badgeColor="bg-yellow-600"
+                timeEstimate="15-20 min"
+                questionCount={pneumoniaQuizQuestions.length}
+                questions={pneumoniaQuizQuestions}
+                icon={<Users className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />}
+              />
 
               <Card className="p-6 hover:shadow-lg transition-shadow">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                      Clinical
-                    </Badge>
-                    <Users className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Pneumonia Management Assessment</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      Advanced scenarios testing pneumonia diagnosis and antibiotic selection skills.
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      15-20 min
-                    </span>
-                    <span>15 questions</span>
-                  </div>
-                  <Button className="w-full">Start Assessment</Button>
-                </div>
-              </Card>
-
-              <Card className="p-6 hover:shadow-lg transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                    <Badge className="bg-red-600 text-white">
                       Advanced
                     </Badge>
                     <TrendingUp className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -265,7 +300,14 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
                     </span>
                     <span>25 questions</span>
                   </div>
-                  <Button className="w-full">Start Exam</Button>
+                  <Button className="w-full" onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "This advanced assessment is currently being developed.",
+                    });
+                  }}>
+                    Start Exam
+                  </Button>
                 </div>
               </Card>
             </div>
@@ -311,7 +353,12 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
                     <span>45-60 minutes</span>
                     <span>Multi-patient ICU</span>
                   </div>
-                  <Button className="w-full">Enter Simulation</Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => handleEnterSimulation("Emergency Sepsis Protocol")}
+                  >
+                    Enter Simulation
+                  </Button>
                 </div>
               </Card>
 
@@ -334,7 +381,12 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
                     <span>30-40 minutes</span>
                     <span>Team Collaboration</span>
                   </div>
-                  <Button className="w-full">Join Rounds</Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => handleEnterSimulation("Antimicrobial Stewardship Rounds")}
+                  >
+                    Join Rounds
+                  </Button>
                 </div>
               </Card>
             </div>
@@ -350,7 +402,15 @@ export const EducationTab: React.FC<EducationTabProps> = ({ searchTerm = "" }) =
                 Experience immersive virtual reality training scenarios including sterile technique, 
                 infection control procedures, and complex patient consultations.
               </p>
-              <Button variant="outline" disabled>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  toast({
+                    title: "Added to Waitlist",
+                    description: "You've been added to the VR Training early access waitlist!",
+                  });
+                }}
+              >
                 Early Access Waitlist
               </Button>
             </Card>
