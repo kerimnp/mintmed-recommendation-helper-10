@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,12 +72,14 @@ export const EducationHub: React.FC = () => {
           </Button>
         </div>
         <InteractiveSimulation 
+          scenario="sepsis-management"
           onComplete={(score, decisions) => handleSimulationComplete('interactive-simulation', { score, decisions })}
         />
       </div>
     );
   }
 
+  
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="text-center space-y-4">
