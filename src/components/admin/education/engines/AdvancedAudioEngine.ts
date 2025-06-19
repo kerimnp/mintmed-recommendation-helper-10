@@ -1,3 +1,4 @@
+
 export interface AudioAlert {
   type: 'alarm' | 'beep' | 'voice' | 'ambient' | 'equipment';
   frequency?: number;
@@ -10,7 +11,7 @@ export interface AudioAlert {
 
 export class AdvancedAudioEngine {
   private audioContext: AudioContext | null = null;
-  private activeAlarms: Map<string, OscillatorNode | number> = new Map();
+  private activeAlarms: Map<string, OscillatorNode | NodeJS.Timeout> = new Map();
   private voiceSynthesis: SpeechSynthesis | null = null;
   private ambientSounds: Map<string, AudioBufferSourceNode> = new Map();
   private masterVolume: number = 0.7;
@@ -196,7 +197,7 @@ export class AdvancedAudioEngine {
 
   private playTripleBeepPattern(alert: AudioAlert) {
     const playBeep = (delay: number) => {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         const oscillator = this.audioContext!.createOscillator();
         const gainNode = this.audioContext!.createGain();
         
@@ -210,6 +211,7 @@ export class AdvancedAudioEngine {
         oscillator.start();
         oscillator.stop(this.audioContext!.currentTime + 0.15);
       }, delay);
+      return timeoutId;
     };
 
     // Triple beep: beep-beep-beep with short intervals
@@ -269,7 +271,8 @@ export class AdvancedAudioEngine {
         gainNode.gain.setValueAtTime((alert.volume || 0.3) * this.masterVolume, this.audioContext!.currentTime + 0.1);
       }, 500);
       
-      setTimeout(() => clearInterval(pulseInterval), alert.duration || 5000);
+      const stopTimer = setTimeout(() => clearInterval(pulseInterval), alert.duration || 5000);
+      this.activeAlarms.set(`${type}-pulse`, stopTimer);
     }
     
     oscillator.start();
@@ -289,10 +292,10 @@ export class AdvancedAudioEngine {
   stopAlarm(type: string) {
     const alarm = this.activeAlarms.get(type);
     if (alarm) {
-      if (typeof alarm === 'number') {
-        clearInterval(alarm);
-      } else {
+      if (alarm instanceof OscillatorNode) {
         alarm.stop();
+      } else {
+        clearInterval(alarm as NodeJS.Timeout);
       }
       this.activeAlarms.delete(type);
     }
