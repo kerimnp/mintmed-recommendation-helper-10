@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ export const MainNavigation: React.FC = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const navigationItems = [
+  const publicNavigationItems = [
     {
       href: '/',
       label: language === 'en' ? 'Home' : 'Početna',
@@ -40,12 +41,19 @@ export const MainNavigation: React.FC = () => {
       label: language === 'en' ? 'Pricing' : 'Cijene',
       icon: Euro,
     },
-    ...(user ? [{
+  ];
+
+  const privateNavigationItems = [
+    {
       href: '/admin',
       label: language === 'en' ? 'Dashboard' : 'Nadzorna Ploča',
       icon: Shield,
-    }] : []),
+    },
   ];
+
+  const navigationItems = user 
+    ? [...publicNavigationItems, ...privateNavigationItems]
+    : publicNavigationItems;
 
   const handleSignOut = async () => {
     await signOut();
