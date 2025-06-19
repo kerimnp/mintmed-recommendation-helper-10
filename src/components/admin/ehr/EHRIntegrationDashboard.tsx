@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import {
   AlertTriangle, 
   Settings,
   Plus,
-  Sync,
+  RefreshCw,
   Database,
   Activity
 } from 'lucide-react';
