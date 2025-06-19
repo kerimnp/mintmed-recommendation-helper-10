@@ -1,94 +1,78 @@
 
-// This is a utility class for OCR processing
-// In a production environment, you would integrate with services like:
-// - Google Cloud Vision API
-// - Amazon Textract
-// - Microsoft Computer Vision
-// - Tesseract.js for client-side OCR
+import Tesseract from 'tesseract.js';
 
+// Real OCR processing using Tesseract.js
 export class OCRProcessor {
   static async extractTextFromImage(imageFile: File): Promise<string | null> {
     try {
-      // For demo purposes, we'll simulate OCR processing
-      // In production, you would send the image to an OCR service
+      console.log('Starting OCR processing for:', imageFile.name);
       
-      console.log('Processing image for OCR:', imageFile.name);
+      // Create a worker for Tesseract
+      const worker = await Tesseract.createWorker('eng+bos+hrv+srp', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
+          }
+        }
+      });
+
+      // Recognize text from the image
+      const { data: { text } } = await worker.recognize(imageFile);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Terminate the worker to free memory
+      await worker.terminate();
       
-      // Simulate extracted text from a health card
-      const simulatedOCRText = `
-        HEALTH CARD
-        Province of Ontario
-        
-        JOHN DOE
-        Date of Birth: January 1, 1990
-        Health Card Number: 1234-567-890-XX
-        Version Code: AB
-        Gender: Male
-        Address: 123 Main Street, Toronto, ON M5V 3A8
-        
-        Valid until: December 31, 2025
-      `;
-      
-      return simulatedOCRText.trim();
+      console.log('OCR completed. Extracted text:', text);
+      return text.trim();
     } catch (error) {
       console.error('OCR processing error:', error);
-      throw new Error('Failed to extract text from image');
+      throw new Error('Failed to extract text from image. Please ensure the image is clear and readable.');
     }
   }
 
-  static async processWithTesseract(imageFile: File): Promise<string | null> {
-    // This method would use Tesseract.js for client-side OCR
-    // Implementation would require installing tesseract.js package
-    
-    try {
-      // Example implementation:
-      // const { createWorker } = await import('tesseract.js');
-      // const worker = await createWorker();
-      // await worker.loadLanguage('eng');
-      // await worker.initialize('eng');
-      // const { data: { text } } = await worker.recognize(imageFile);
-      // await worker.terminate();
-      // return text;
-      
-      // For now, return simulated result
+  static async processWithCloudAPI(imageFile: File, apiKey?: string): Promise<string | null> {
+    if (!apiKey) {
+      console.warn('No API key provided for cloud OCR, falling back to local processing');
       return this.extractTextFromImage(imageFile);
-    } catch (error) {
-      console.error('Tesseract OCR error:', error);
-      return null;
     }
-  }
 
-  static async processWithCloudAPI(imageFile: File): Promise<string | null> {
-    // This method would integrate with cloud OCR services
-    // Example: Google Cloud Vision, AWS Textract, etc.
-    
     try {
-      // Convert file to base64 for API calls
       const base64Image = await this.fileToBase64(imageFile);
       
-      // Example Google Cloud Vision API call:
-      // const response = await fetch('https://vision.googleapis.com/v1/images:annotate', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${apiKey}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     requests: [{
-      //       image: { content: base64Image },
-      //       features: [{ type: 'TEXT_DETECTION' }]
-      //     }]
-      //   })
-      // });
+      // Google Cloud Vision API implementation
+      const response = await fetch('https://vision.googleapis.com/v1/images:annotate?key=' + apiKey, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: [{
+            image: { content: base64Image },
+            features: [
+              { type: 'TEXT_DETECTION', maxResults: 1 },
+              { type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 }
+            ]
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Cloud OCR API error: ${response.status}`);
+      }
+
+      const result = await response.json();
       
-      // For now, return simulated result
-      return this.extractTextFromImage(imageFile);
+      if (result.responses && result.responses[0] && result.responses[0].fullTextAnnotation) {
+        return result.responses[0].fullTextAnnotation.text;
+      } else if (result.responses && result.responses[0] && result.responses[0].textAnnotations) {
+        return result.responses[0].textAnnotations[0]?.description || null;
+      }
+      
+      throw new Error('No text detected in image');
     } catch (error) {
       console.error('Cloud OCR API error:', error);
-      return null;
+      // Fallback to local OCR
+      return this.extractTextFromImage(imageFile);
     }
   }
 
@@ -98,7 +82,6 @@ export class OCRProcessor {
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        // Remove data URL prefix to get just the base64 data
         const base64 = result.split(',')[1];
         resolve(base64);
       };

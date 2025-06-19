@@ -13,10 +13,13 @@ import {
   AlertTriangle,
   RefreshCw,
   X,
-  FileText
+  FileText,
+  Settings
 } from 'lucide-react';
 import { CameraScanner } from './scanner/CameraScanner';
 import { QRBarcodeInput } from './scanner/QRBarcodeInput';
+import { QRBarcodeScanner } from './scanner/QRBarcodeScanner';
+import { OfficeScanner } from './scanner/OfficeScanner';
 import { OCRProcessor } from './scanner/OCRProcessor';
 import { PatientDataProcessor } from './scanner/PatientDataProcessor';
 
@@ -26,7 +29,7 @@ interface HealthCardScannerProps {
   onClose: () => void;
 }
 
-type ScanMode = 'camera' | 'upload' | 'manual' | null;
+type ScanMode = 'camera' | 'upload' | 'manual' | 'qr-scanner' | 'office' | null;
 
 export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
   onPatientDataExtracted,
@@ -37,29 +40,37 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleScanSuccess = useCallback(async (data: string | File) => {
     setIsProcessing(true);
     setError(null);
+    setProgress('Processing scan data...');
     
     try {
       let extractedData;
       
       if (typeof data === 'string') {
         // QR/Barcode data
+        setProgress('Analyzing QR/Barcode data...');
         extractedData = await PatientDataProcessor.processQRBarcode(data);
       } else {
         // Image file for OCR
-        extractedData = await OCRProcessor.extractTextFromImage(data);
-        if (extractedData) {
-          extractedData = await PatientDataProcessor.processOCRText(extractedData);
+        setProgress('Extracting text from image...');
+        const ocrText = await OCRProcessor.extractTextFromImage(data);
+        if (ocrText) {
+          setProgress('Processing extracted text...');
+          extractedData = await PatientDataProcessor.processOCRText(ocrText);
+        } else {
+          throw new Error('No text could be extracted from the image');
         }
       }
       
       if (extractedData) {
         setScanResult(extractedData);
+        setProgress('');
         toast({
           title: "Scan Successful",
           description: "Patient data extracted successfully"
@@ -70,6 +81,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
     } catch (err: any) {
       console.error('Scan processing error:', err);
       setError(err.message || 'Failed to process scan data');
+      setProgress('');
       toast({
         title: "Scan Error",
         description: err.message || 'Failed to process scan data',
@@ -83,7 +95,16 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      handleScanSuccess(file);
+      if (file.type.startsWith('image/')) {
+        handleScanSuccess(file);
+      } else {
+        setError('Please select an image file');
+        toast({
+          title: "Invalid File",
+          description: "Please select an image file (JPG, PNG, etc.)",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -100,6 +121,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
     setScanResult(null);
     setError(null);
     setIsProcessing(false);
+    setProgress('');
   };
 
   const handleClose = () => {
@@ -111,11 +133,12 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-auto">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Scan className="h-5 w-5" />
             Health Card Scanner
+            <Badge variant="outline">Bosnia & Herzegovina Ready</Badge>
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={handleClose}>
             <X className="h-4 w-4" />
@@ -129,14 +152,35 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
                 Choose your preferred scanning method:
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-24 flex flex-col gap-2"
+                  onClick={() => setScanMode('office')}
+                >
+                  <Settings className="h-6 w-6" />
+                  <span className="text-sm">Office Scanner</span>
+                  <span className="text-xs text-gray-500">USB/Network</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-24 flex flex-col gap-2"
+                  onClick={() => setScanMode('qr-scanner')}
+                >
+                  <Scan className="h-6 w-6" />
+                  <span className="text-sm">QR/Barcode</span>
+                  <span className="text-xs text-gray-500">Real-time detection</span>
+                </Button>
+                
                 <Button
                   variant="outline"
                   className="h-24 flex flex-col gap-2"
                   onClick={() => setScanMode('camera')}
                 >
                   <Camera className="h-6 w-6" />
-                  <span className="text-sm">Camera Scan</span>
+                  <span className="text-sm">Camera OCR</span>
+                  <span className="text-xs text-gray-500">Text extraction</span>
                 </Button>
                 
                 <Button
@@ -146,6 +190,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
                 >
                   <Upload className="h-6 w-6" />
                   <span className="text-sm">Upload Image</span>
+                  <span className="text-xs text-gray-500">OCR processing</span>
                 </Button>
                 
                 <Button
@@ -155,6 +200,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
                 >
                   <FileText className="h-6 w-6" />
                   <span className="text-sm">Manual Entry</span>
+                  <span className="text-xs text-gray-500">Type or paste</span>
                 </Button>
               </div>
               
@@ -165,7 +211,30 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
                 onChange={handleFileUpload}
                 className="hidden"
               />
+              
+              <div className="text-xs text-gray-500 text-center space-y-1">
+                <p>✓ Supports Bosnia & Herzegovina health cards (JMBG)</p>
+                <p>✓ Compatible with Croatian, Serbian, and EHIC cards</p>
+                <p>✓ Real-time QR/barcode detection</p>
+                <p>✓ Professional OCR with multiple languages</p>
+              </div>
             </div>
+          )}
+
+          {scanMode === 'office' && (
+            <OfficeScanner
+              onScanSuccess={handleScanSuccess}
+              onError={setError}
+              isProcessing={isProcessing}
+            />
+          )}
+
+          {scanMode === 'qr-scanner' && (
+            <QRBarcodeScanner
+              onScanSuccess={handleScanSuccess}
+              onError={setError}
+              isProcessing={isProcessing}
+            />
           )}
 
           {scanMode === 'camera' && (
@@ -193,7 +262,7 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
           {isProcessing && (
             <div className="flex items-center justify-center gap-2 p-4">
               <RefreshCw className="h-4 w-4 animate-spin" />
-              <span>Processing scan data...</span>
+              <span>{progress || 'Processing scan data...'}</span>
             </div>
           )}
 
@@ -216,14 +285,23 @@ export const HealthCardScanner: React.FC<HealthCardScannerProps> = ({
                   {scanResult.dateOfBirth && (
                     <div><strong>Date of Birth:</strong> {scanResult.dateOfBirth}</div>
                   )}
+                  {scanResult.age && (
+                    <div><strong>Age:</strong> {scanResult.age}</div>
+                  )}
                   {scanResult.healthCardNumber && (
                     <div><strong>Health Card:</strong> {scanResult.healthCardNumber}</div>
                   )}
                   {scanResult.gender && (
                     <div><strong>Gender:</strong> {scanResult.gender}</div>
                   )}
+                  {scanResult.region && (
+                    <div><strong>Region:</strong> {scanResult.region}</div>
+                  )}
                   {scanResult.address && (
                     <div className="col-span-2"><strong>Address:</strong> {scanResult.address}</div>
+                  )}
+                  {scanResult.insuranceProvider && (
+                    <div className="col-span-2"><strong>Insurance:</strong> {scanResult.insuranceProvider}</div>
                   )}
                 </div>
               </div>
