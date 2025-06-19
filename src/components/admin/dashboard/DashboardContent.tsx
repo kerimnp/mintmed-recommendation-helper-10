@@ -6,6 +6,7 @@ import { RegionalTab } from "./RegionalTab";
 import { EffectivenessTab } from "./EffectivenessTab";
 import { GuidelinesTab } from "./GuidelinesTab";
 import { EducationTab } from "./EducationTab";
+import { PricingTab } from "./PricingTab";
 import { ClinicalGuidelines } from "../ClinicalGuidelines";
 import { MainDashboardTab } from "./MainDashboardTab";
 import { PatientHistoryTab } from "./PatientHistoryTab";
@@ -56,6 +57,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {activeTab === "clinical-guidelines" && <ClinicalGuidelines searchTerm={searchTerm} />}
       {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />}
       {activeTab === "user-management" && renderUserManagementTab()}
+      {activeTab === "pricing" && <PricingTab />}
     </div>
   );
 };

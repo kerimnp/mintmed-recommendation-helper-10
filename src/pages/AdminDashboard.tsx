@@ -30,7 +30,7 @@ const AdminDashboard = () => {
 
   const isUserManagementAuthorized = user?.email === 'kerim@horalix.com';
 
-  const baseValidTabs = ["dashboard", "history", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines"];
+  const baseValidTabs = ["dashboard", "history", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines", "pricing"];
   const validTabs = isUserManagementAuthorized ? [...baseValidTabs, "user-management"] : baseValidTabs;
 
   useEffect(() => {
@@ -96,6 +96,7 @@ const AdminDashboard = () => {
       else if (lowerSearchTerm.includes("effect") || lowerSearchTerm.includes("outcome")) handleSetActiveTab("effectiveness");
       else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) handleSetActiveTab("education");
       else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) handleSetActiveTab("history");
+      else if (lowerSearchTerm.includes("pricing") || lowerSearchTerm.includes("plan") || lowerSearchTerm.includes("billing")) handleSetActiveTab("pricing");
       else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && !isUserManagementAuthorized) {
         toast({ title: "Access Denied", description: "User management search is restricted.", variant: "destructive" });
       }
@@ -150,15 +151,15 @@ const AdminDashboard = () => {
         />
         
         <div className="flex-1 overflow-auto">
-          <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized)) ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
+          <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing') ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
             <motion.div 
               key={currentDisplayTab} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className={((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) ? '' : 'space-y-6'}
+              className={((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) ? '' : 'space-y-6'}
             >
-              {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) && (
+              {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) && (
                 <PageHeaderSection
                   activeTab={currentDisplayTab}
                   searchTerm={searchTerm}
@@ -170,7 +171,7 @@ const AdminDashboard = () => {
               
               <DashboardContent activeTab={currentDisplayTab} searchTerm={searchTerm} />
             </motion.div>
-            {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized))) && <AdminFooter />}
+            {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) && <AdminFooter />}
           </div>
         </div>
       </main>
