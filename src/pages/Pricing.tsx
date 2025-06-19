@@ -90,8 +90,7 @@ const Pricing = () => {
       features: [
         'Roll over unused credits',
         'Basic support',
-        'Standard guidelines access',
-        'Extra credits at €1.00 each'
+        'Standard guidelines access'
       ],
       popular: false
     },
@@ -103,8 +102,7 @@ const Pricing = () => {
       features: [
         'Roll over unused credits',
         'Priority support',
-        'Advanced guidelines access',
-        'Extra credits at €0.80 each'
+        'Advanced guidelines access'
       ],
       popular: true
     },
