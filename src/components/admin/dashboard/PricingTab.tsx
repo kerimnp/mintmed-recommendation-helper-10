@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,9 +29,13 @@ import {
   Calculator,
   Info,
   CreditCard,
-  Mail
+  Mail,
+  Sparkles,
+  Shield,
+  Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { MetricCard, EnhancedBadge, designSystem } from './enhanced/DesignSystem';
 
 export const PricingTab = () => {
   const { user } = useAuth();
@@ -52,7 +55,8 @@ export const PricingTab = () => {
       price: 51,
       costPerCredit: 1.00,
       popular: false,
-      bestValue: false
+      bestValue: false,
+      gradient: designSystem.gradients.primary
     },
     {
       name: 'Basic',
@@ -60,7 +64,8 @@ export const PricingTab = () => {
       price: 204,
       costPerCredit: 0.80,
       popular: false,
-      bestValue: false
+      bestValue: false,
+      gradient: designSystem.gradients.success
     },
     {
       name: 'Pro',
@@ -68,7 +73,8 @@ export const PricingTab = () => {
       price: 357,
       costPerCredit: 0.70,
       popular: true,
-      bestValue: false
+      bestValue: false,
+      gradient: designSystem.gradients.warning
     },
     {
       name: 'Growth',
@@ -76,7 +82,8 @@ export const PricingTab = () => {
       price: 765,
       costPerCredit: 0.60,
       popular: false,
-      bestValue: true
+      bestValue: true,
+      gradient: designSystem.gradients.medical
     },
     {
       name: 'Scale',
@@ -84,7 +91,8 @@ export const PricingTab = () => {
       price: 1403,
       costPerCredit: 0.55,
       popular: false,
-      bestValue: false
+      bestValue: false,
+      gradient: designSystem.gradients.danger
     }
   ];
 
@@ -99,7 +107,8 @@ export const PricingTab = () => {
         'Basic support',
         'Standard guidelines access'
       ],
-      popular: false
+      popular: false,
+      gradient: designSystem.gradients.primary
     },
     {
       name: 'Pro',
@@ -111,7 +120,8 @@ export const PricingTab = () => {
         'Priority support',
         'Advanced guidelines access'
       ],
-      popular: true
+      popular: true,
+      gradient: designSystem.gradients.success
     },
     {
       name: 'Elite',
@@ -124,7 +134,8 @@ export const PricingTab = () => {
         'Real-time updates',
         'Advanced analytics'
       ],
-      popular: false
+      popular: false,
+      gradient: designSystem.gradients.medical
     }
   ];
 
@@ -218,250 +229,433 @@ Best regards`);
         transition={{ duration: 0.5 }}
         className="space-y-8"
       >
-        {/* Header Section */}
+        {/* Enhanced Header Section */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {language === 'en' ? 'Choose Your Plan' : 'Odaberite Svoj Plan'}
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            {language === 'en' 
-              ? 'Hospital-grade pricing designed for healthcare professionals and institutions'
-              : 'Bolničke cijene dizajnirane za zdravstvene stručnjake i ustanove'}
-          </p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
+              {language === 'en' ? 'Choose Your Plan' : 'Odaberite Svoj Plan'}
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              {language === 'en' 
+                ? 'Hospital-grade pricing designed for healthcare professionals and institutions with enterprise-level security and compliance'
+                : 'Bolničke cijene dizajnirane za zdravstvene stručnjake i ustanove s enterprise sigurnošću i usklađenošću'}
+            </p>
+          </motion.div>
         </div>
 
+        {/* Enhanced Metrics Overview */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          <MetricCard
+            title="Active Subscribers"
+            value="2,847"
+            subtitle="Across all plans"
+            trend="up"
+            trendValue="+18%"
+            icon={<Users className="h-6 w-6" />}
+            gradient={designSystem.gradients.primary}
+          />
+          <MetricCard
+            title="Customer Satisfaction"
+            value="98.7%"
+            subtitle="Based on 1,200+ reviews"
+            trend="up"
+            trendValue="+0.3%"
+            icon={<Star className="h-6 w-6" />}
+            gradient={designSystem.gradients.success}
+          />
+          <MetricCard
+            title="Uptime Guarantee"
+            value="99.9%"
+            subtitle="Enterprise SLA"
+            trend="stable"
+            trendValue="0%"
+            icon={<Shield className="h-6 w-6" />}
+            gradient={designSystem.gradients.medical}
+          />
+        </motion.div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-12">
-            <TabsTrigger value="hospitals" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-12 h-12">
+            <TabsTrigger value="hospitals" className="flex items-center gap-2 text-base">
               <Building2 className="h-4 w-4" />
               {language === 'en' ? 'Hospitals & Clinics' : 'Bolnice i Klinike'}
             </TabsTrigger>
-            <TabsTrigger value="individual" className="flex items-center gap-2">
+            <TabsTrigger value="individual" className="flex items-center gap-2 text-base">
               <User className="h-4 w-4" />
               {language === 'en' ? 'Individual Doctors' : 'Individualni Liječnici'}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="hospitals" className="space-y-12">
-            {/* Hospital Seat Fees */}
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center">
-                  {language === 'en' ? 'Seat Fees (Required)' : 'Naknade po Sjedištu (Obavezno)'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-medical-primary mb-2">€25/month per doctor</div>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {language === 'en' ? 'Billed monthly. Required for all hospital accounts.' : 'Naplaćuje se mjesečno. Obavezno za sve bolničke račune.'}
-                  </p>
-                </div>
-                
-                <div className="max-w-md mx-auto">
-                  <div className="flex items-center gap-4 mb-4">
-                    <Select value={doctorCount.toString()} onValueChange={(value) => setDoctorCount(parseInt(value))}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100].map(num => (
-                          <SelectItem key={num} value={num.toString()}>
-                            {num} {language === 'en' ? 'doctors' : 'liječnika'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <span className="text-2xl">×</span>
-                    <span className="text-2xl font-bold">€25</span>
-                    <span className="text-2xl">=</span>
-                    <div className="text-2xl font-bold text-medical-primary">€{totalSeatFee}/month</div>
+            {/* Enhanced Hospital Seat Fees */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className={`${designSystem.shadows.medium} border-0 bg-gradient-to-br from-white via-blue-50/30 to-white dark:from-gray-800 dark:via-blue-900/10 dark:to-gray-800`}>
+                <CardHeader className="text-center pb-4">
+                  <CardTitle className="text-3xl font-bold mb-2">
+                    {language === 'en' ? 'Seat Fees (Required)' : 'Naknade po Sjedištu (Obavezno)'}
+                  </CardTitle>
+                  <div className="flex items-center justify-center gap-2 text-lg text-gray-600 dark:text-gray-300">
+                    <Shield className="h-5 w-5" />
+                    <span>Enterprise Security & Compliance Included</span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="pb-8">
+                  <div className="text-center mb-8">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                      €25/month per doctor
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg">
+                      {language === 'en' ? 'Billed monthly. Required for all hospital accounts.' : 'Naplaćuje se mjesečno. Obavezno za sve bolničke račune.'}
+                    </p>
+                  </div>
+                  
+                  <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-inner">
+                    <div className="flex items-center gap-4 mb-6">
+                      <Select value={doctorCount.toString()} onValueChange={(value) => setDoctorCount(parseInt(value))}>
+                        <SelectTrigger className="flex-1 h-12 text-lg">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100].map(num => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num} {language === 'en' ? 'doctors' : 'liječnika'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <span className="text-3xl font-light text-gray-400">×</span>
+                      <span className="text-3xl font-bold text-gray-700 dark:text-gray-300">€25</span>
+                      <span className="text-3xl font-light text-gray-400">=</span>
+                      <div className="text-3xl font-bold text-blue-600">€{totalSeatFee}/month</div>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                      <Calculator className="h-4 w-4" />
+                      <span>Annual savings available with yearly billing</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            {/* Hospital Credit Bundles */}
-            <div>
-              <h3 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-                {language === 'en' ? 'Credit Bundles (Optional Add-ons)' : 'Paketi Kredita (Dodatni)'}
-              </h3>
+            {/* Enhanced Hospital Credit Bundles */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  {language === 'en' ? 'Credit Bundles (Optional Add-ons)' : 'Paketi Kredita (Dodatni)'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  {language === 'en' ?
+                    'Flexible credit packages that scale with your organization\'s needs' :
+                    'Fleksibilni paketi kredita koji se prilagođavaju potrebama vaše organizacije'}
+                </p>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {hospitalCreditBundles.map((bundle, index) => (
-                  <Card key={index} className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
-                    {bundle.popular && (
-                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500">
-                        <Star className="h-3 w-3 mr-1" />
-                        Popular
-                      </Badge>
-                    )}
-                    {bundle.bestValue && (
-                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-green-500">
-                        <Crown className="h-3 w-3 mr-1" />
-                        Best Value
-                      </Badge>
-                    )}
-                    <CardHeader className="text-center">
-                      <CardTitle>{bundle.name}</CardTitle>
-                      <div className="text-3xl font-bold">€{bundle.price}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">€{bundle.costPerCredit.toFixed(2)}/credit</div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center mb-4">
-                        <div className="text-lg font-semibold">{bundle.credits.toLocaleString()} credits</div>
-                      </div>
-                      <Button 
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => handleAddToHospitalPlan(bundle)}
-                        disabled={isProcessing}
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        {language === 'en' ? 'Add to Hospital Plan' : 'Dodaj u Bolnički Plan'}
-                      </Button>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                        {language === 'en' ? 'Credits never expire. Shared across all doctors.' : 'Krediti nikad ne istječu. Dijeli se među svim liječnicima.'}
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                  >
+                    <Card className={`relative ${designSystem.shadows.soft} hover:${designSystem.shadows.strong} transition-all duration-300 border-0 overflow-hidden h-full`}>
+                      {bundle.popular && (
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 to-pink-500"></div>
+                      )}
+                      {bundle.bestValue && (
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+                      )}
+                      
+                      {(bundle.popular || bundle.bestValue) && (
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                          <EnhancedBadge 
+                            variant={bundle.popular ? 'warning' : 'success'}
+                            size="sm"
+                          >
+                            {bundle.popular && <><Star className="h-3 w-3 mr-1" />Popular</>}
+                            {bundle.bestValue && <><Crown className="h-3 w-3 mr-1" />Best Value</>}
+                          </EnhancedBadge>
+                        </div>
+                      )}
+                      
+                      <CardHeader className="text-center pb-4">
+                        <div className={`w-16 h-16 rounded-2xl ${bundle.gradient} flex items-center justify-center text-white shadow-lg mx-auto mb-4`}>
+                          <Sparkles className="h-8 w-8" />
+                        </div>
+                        <CardTitle className="text-xl">{bundle.name}</CardTitle>
+                        <div className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                          €{bundle.price}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          €{bundle.costPerCredit.toFixed(2)}/credit
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="text-center mb-6">
+                          <div className="text-2xl font-semibold text-blue-600 mb-2">
+                            {bundle.credits.toLocaleString()} credits
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Never expire • Shared access
+                          </div>
+                        </div>
+                        <Button 
+                          className="w-full h-12 text-base font-medium" 
+                          variant="outline"
+                          onClick={() => handleAddToHospitalPlan(bundle)}
+                          disabled={isProcessing}
+                        >
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          {language === 'en' ? 'Add to Plan' : 'Dodaj u Plan'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            {/* Enterprise CTA */}
-            <Card className="bg-gradient-to-r from-medical-primary to-blue-700 text-white">
-              <CardContent className="p-8 text-center">
-                <h3 className="text-2xl font-bold mb-4">
-                  {language === 'en' ? 'Need 10,000+ credits?' : 'Trebate 10,000+ kredita?'}
-                </h3>
-                <p className="text-lg mb-6">
-                  {language === 'en' 
-                    ? 'Contact us for volume discounts (up to 20% off)' 
-                    : 'Kontaktirajte nas za popuste na količinu (do 20% popusta)'}
-                </p>
-                <Button size="lg" variant="secondary" onClick={handleGetCustomQuote}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  {language === 'en' ? 'Get Custom Quote' : 'Dobijte Prilagođenu Ponudu'}
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Enhanced Enterprise CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white border-0 overflow-hidden relative">
+                <div className="absolute inset-0 bg-black/20"></div>
+                <CardContent className="relative p-12 text-center">
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-4xl font-bold mb-6">
+                      {language === 'en' ? 'Enterprise Solutions' : 'Enterprise Rješenja'}
+                    </h3>
+                    <p className="text-xl mb-8 text-blue-100">
+                      {language === 'en' 
+                        ? 'Custom integrations, dedicated support, and volume discounts for large healthcare organizations'
+                        : 'Prilagođene integracije, dedicirana podrška i popusti na količinu za velike zdravstvene organizacije'}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                      <Button size="lg" variant="secondary" onClick={handleGetCustomQuote} className="text-lg px-8 py-4">
+                        <Mail className="h-5 w-5 mr-2" />
+                        {language === 'en' ? 'Get Custom Quote' : 'Dobijte Prilagođenu Ponudu'}
+                      </Button>
+                      <div className="flex items-center gap-2 text-blue-100">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-sm">SOC 2 Type II Certified</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="individual" className="space-y-12">
-            {/* Individual Subscription Plans */}
-            <div>
-              <h3 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-                {language === 'en' ? 'Subscription Plans' : 'Pretplatnički Planovi'}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Enhanced Individual Subscription Plans */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  {language === 'en' ? 'Individual Subscription Plans' : 'Individualni Pretplatnički Planovi'}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  {language === 'en' ?
+                    'Professional-grade tools for individual healthcare practitioners' :
+                    'Profesionalni alati za individualne zdravstvene stručnjake'}
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 {individualPlans.map((plan, index) => (
-                  <Card key={index} className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700 ${plan.name === 'Elite' ? 'ring-2 ring-medical-primary scale-105' : ''}`}>
-                    {plan.popular && (
-                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500">
-                        <Star className="h-3 w-3 mr-1" />
-                        Popular
-                      </Badge>
-                    )}
-                    <CardHeader className="text-center">
-                      <CardTitle className="flex items-center justify-center gap-2">
-                        {plan.name}
-                        {plan.name === 'Elite' && <Crown className="h-5 w-5 text-yellow-500" />}
-                      </CardTitle>
-                      <div className="text-3xl font-bold">€{plan.price}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">/month</div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center mb-6">
-                        {plan.unlimited ? (
-                          <div className="flex items-center justify-center gap-2 text-lg font-semibold">
-                            <Infinity className="h-5 w-5" />
-                            Unlimited usage
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                  >
+                    <Card className={`relative ${designSystem.shadows.soft} hover:${designSystem.shadows.strong} transition-all duration-300 border-0 overflow-hidden h-full ${plan.name === 'Elite' ? 'ring-2 ring-blue-500 scale-105' : ''}`}>
+                      {plan.popular && (
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 to-pink-500"></div>
+                      )}
+                      {plan.name === 'Elite' && (
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-pink-500"></div>
+                      )}
+                      
+                      {(plan.popular || plan.name === 'Elite') && (
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                          <EnhancedBadge 
+                            variant={plan.popular ? 'warning' : 'medical'}
+                            size="sm"
+                          >
+                            {plan.popular && <><Star className="h-3 w-3 mr-1" />Popular</>}
+                            {plan.name === 'Elite' && <><Crown className="h-3 w-3 mr-1" />Premium</>}
+                          </EnhancedBadge>
+                        </div>
+                      )}
+                      
+                      <CardHeader className="text-center pb-4">
+                        <div className={`w-16 h-16 rounded-2xl ${plan.gradient} flex items-center justify-center text-white shadow-lg mx-auto mb-4`}>
+                          {plan.name === 'Elite' ? <Crown className="h-8 w-8" /> : 
+                           plan.name === 'Pro' ? <Zap className="h-8 w-8" /> : 
+                           <User className="h-8 w-8" />}
+                        </div>
+                        <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                          {plan.name}
+                        </CardTitle>
+                        <div className="text-5xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                          €{plan.price}
+                        </div>
+                        <div className="text-base text-gray-600 dark:text-gray-400">/month</div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="text-center mb-8">
+                          {plan.unlimited ? (
+                            <div className="flex items-center justify-center gap-2 text-2xl font-semibold text-blue-600 mb-2">
+                              <Infinity className="h-6 w-6" />
+                              Unlimited usage
+                            </div>
+                          ) : (
+                            <div className="text-2xl font-semibold text-blue-600 mb-2">
+                              {plan.credits} credits/month
+                            </div>
+                          )}
+                          <div className="text-sm text-gray-500">
+                            {plan.unlimited ? '24/7 Premium Support' : 'Roll over unused credits'}
                           </div>
-                        ) : (
-                          <div className="text-lg font-semibold">{plan.credits} credits/month</div>
-                        )}
-                      </div>
-                      <ul className="space-y-2 mb-6">
-                        {plan.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-green-500" />
-                            <span className="text-sm">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <Button 
-                        className="w-full" 
-                        variant={plan.name === 'Elite' ? 'default' : 'outline'}
-                        onClick={() => handleSelectIndividualPlan(plan)}
-                        disabled={isProcessing}
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
-                      </Button>
-                    </CardContent>
-                  </Card>
+                        </div>
+                        <ul className="space-y-3 mb-8">
+                          {plan.features.map((feature, featureIndex) => (
+                            <li key={featureIndex} className="flex items-center gap-3 text-sm">
+                              <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                <Check className="h-3 w-3 text-green-600" />
+                              </div>
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <Button 
+                          className={`w-full h-12 text-base font-medium ${plan.name === 'Elite' ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' : ''}`}
+                          variant={plan.name === 'Elite' ? 'default' : 'outline'}
+                          onClick={() => handleSelectIndividualPlan(plan)}
+                          disabled={isProcessing}
+                        >
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            {/* FAQ */}
-            <Card className="max-w-3xl mx-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center">
-                  {language === 'en' ? 'Frequently Asked Questions' : 'Često Postavljana Pitanja'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>
-                      {language === 'en' ? 'Can I mix subscriptions and bundles?' : 'Mogu li kombinirati pretplate i pakete?'}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {language === 'en' 
-                        ? 'Yes! Hospitals can combine seat fees with credit bundles. Individual doctors can supplement their subscription with additional credit purchases for extra flexibility.'
-                        : 'Da! Bolnice mogu kombinirati naknade po sjedištu s paketima kredita. Individualni liječnici mogu dopuniti svoju pretplatu dodatnim kupnjama kredita za dodatnu fleksibilnost.'}
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
-                    <AccordionTrigger>
-                      {language === 'en' ? 'How are credits tracked?' : 'Kako se prate krediti?'}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {language === 'en' 
-                        ? 'Real-time dashboard shows your credit balance, usage history, and renewal dates. Hospital administrators can view usage across all doctors.'
-                        : 'Dashboard u realnom vremenu prikazuje stanje kredita, povijest korištenja i datume obnove. Administratori bolnica mogu vidjeti korištenje svih liječnika.'}
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-3">
-                    <AccordionTrigger>
-                      {language === 'en' ? 'What happens to unused credits?' : 'Što se događa s nekorištenim kreditima?'}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {language === 'en' 
-                        ? 'Subscription credits roll over to the next month (except Elite unlimited plan). Hospital credit bundles never expire.'
-                        : 'Krediti iz pretplate se prenose u sljedeći mjesec (osim Elite neograničenog plana). Bolnički paketi kredita nikad ne istječu.'}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
+            {/* Enhanced FAQ Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card className={`max-w-4xl mx-auto ${designSystem.shadows.soft} border-0`}>
+                <CardHeader className="text-center">
+                  <CardTitle className="text-3xl font-bold mb-2">
+                    {language === 'en' ? 'Frequently Asked Questions' : 'Često Postavljana Pitanja'}
+                  </CardTitle>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {language === 'en' ? 'Everything you need to know about our pricing' : 'Sve što trebate znati o našim cijenama'}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="space-y-4">
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger>
+                        {language === 'en' ? 'Can I mix subscriptions and bundles?' : 'Mogu li kombinirati pretplate i pakete?'}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {language === 'en' 
+                          ? 'Yes! Hospitals can combine seat fees with credit bundles. Individual doctors can supplement their subscription with additional credit purchases for extra flexibility.'
+                          : 'Da! Bolnice mogu kombinirati naknade po sjedištu s paketima kredita. Individualni liječnici mogu dopuniti svoju pretplatu dodatnim kupnjama kredita za dodatnu fleksibilnost.'}
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                      <AccordionTrigger>
+                        {language === 'en' ? 'How are credits tracked?' : 'Kako se prate krediti?'}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {language === 'en' 
+                          ? 'Real-time dashboard shows your credit balance, usage history, and renewal dates. Hospital administrators can view usage across all doctors.'
+                          : 'Dashboard u realnom vremenu prikazuje stanje kredita, povijest korištenja i datume obnove. Administratori bolnica mogu vidjeti korištenje svih liječnika.'}
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                      <AccordionTrigger>
+                        {language === 'en' ? 'What happens to unused credits?' : 'Što se događa s nekorištenim kreditima?'}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        {language === 'en' 
+                          ? 'Subscription credits roll over to the next month (except Elite unlimited plan). Hospital credit bundles never expire.'
+                          : 'Krediti iz pretplate se prenose u sljedeći mjesec (osim Elite neograničenog plana). Bolnički paketi kredita nikad ne istječu.'}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-3 mb-4">
-                <Info className="h-6 w-6 text-green-600 dark:text-green-400" />
-                <h4 className="text-lg font-semibold text-green-700 dark:text-green-300">
-                  Coming Soon: VR Training Modules
-                </h4>
-              </div>
-              <p className="text-green-600 dark:text-green-400 mb-4">
-                Experience immersive virtual reality training scenarios including sterile technique, 
-                infection control procedures, and complex patient consultations.
-              </p>
-              <Button variant="outline" onClick={handleEarlyAccessWaitlist}>
-                Early Access Waitlist
-              </Button>
-            </Card>
+            {/* Enhanced Coming Soon Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card className={`p-8 bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800 ${designSystem.shadows.soft}`}>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center text-white shadow-lg">
+                    <Info className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-bold text-green-700 dark:text-green-300">
+                      Coming Soon: VR Training Modules
+                    </h4>
+                    <p className="text-green-600 dark:text-green-400">
+                      Revolutionary medical training experience
+                    </p>
+                  </div>
+                </div>
+                <p className="text-green-600 dark:text-green-400 mb-6 text-lg leading-relaxed">
+                  Experience immersive virtual reality training scenarios including sterile technique, 
+                  infection control procedures, and complex patient consultations with haptic feedback and AI coaching.
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={handleEarlyAccessWaitlist}
+                  className="border-green-300 text-green-700 hover:bg-green-100 dark:border-green-600 dark:text-green-300 dark:hover:bg-green-900/30"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Join Early Access Waitlist
+                </Button>
+              </Card>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </motion.div>
