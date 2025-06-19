@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PatientDemographicsSection } from "./PatientFormSections/PatientDemographicsSection";
+import { PatientDemographicsSection } from "./PatientDemographicsSection";
 import { InfectionDetailsSection } from "./InfectionDetailsSection";
 import { AllergySection } from "./AllergySection";
 import { ComorbiditySection } from "./ComorbiditySection";
@@ -166,8 +166,20 @@ export const PatientForm: React.FC<PatientFormProps> = ({
 
               <form onSubmit={handleSubmit} className="space-y-8">
                 <PatientDemographicsSection
-                  patientData={patientData}
-                  updateField={updateField}
+                  formData={{
+                    age: patientData.age?.toString() || "",
+                    gender: patientData.gender || "",
+                    weight: patientData.weight?.toString() || "",
+                    height: patientData.height?.toString() || "",
+                    nationality: patientData.nationality || "",
+                    pregnancy: patientData.pregnancy || "",
+                    firstName: patientData.firstName || "",
+                    lastName: patientData.lastName || "",
+                    contactPhone: patientData.contactPhone || "",
+                    contactEmail: patientData.contactEmail || "",
+                    address: patientData.address || ""
+                  }}
+                  onInputChange={(field, value) => updateField(field as keyof PatientData, value)}
                   errors={errors}
                 />
 
