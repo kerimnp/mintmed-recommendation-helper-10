@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ProfileDropdown } from '@/components/admin/dashboard/layout/ProfileDropdown';
+import { useTheme } from 'next-themes';
 import { 
   Menu, 
   Home, 
@@ -21,6 +22,7 @@ import {
 export const MainNavigation: React.FC = () => {
   const { user, signOut } = useAuth();
   const { language } = useLanguage();
+  const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -141,10 +143,14 @@ export const MainNavigation: React.FC = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Stethoscope className="h-8 w-8 text-medical-primary" />
-            <span className="font-bold text-xl text-medical-primary">
-              MediAid
-            </span>
+            <img 
+              src={theme === 'dark' 
+                ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png"
+                : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"
+              } 
+              alt="Horalix Logo" 
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}

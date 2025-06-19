@@ -11,12 +11,12 @@ import {
   Users, 
   PillIcon,
   LayoutDashboard,
-  History
+  History,
+  Euro
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AdminSidebarProps {
@@ -25,8 +25,6 @@ interface AdminSidebarProps {
 }
 
 // Export navItems so MobileMenuSheet (if modified) can use it
-// This original navItems array is still exported for potential use by other components like MobileMenuSheet.
-// The filtering specifically for AdminSidebar will happen within the component.
 export const navItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Overview and key metrics" },
   { id: "history", label: "Patient History", icon: History, description: "View patient medical history" },
@@ -37,6 +35,7 @@ export const navItems = [
   { id: "regional", label: "Regional", icon: MapPin, description: "Regional adaptation" },
   { id: "education", label: "Education", icon: BookOpen, description: "Educational resources" },
   { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
+  { id: "pricing", label: "Pricing", icon: Euro, description: "Pricing plans and billing", external: true, href: "/pricing" },
 ];
 
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
@@ -76,46 +75,87 @@ export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => 
           <p className="px-3 text-xs text-gray-500 dark:text-gray-400 font-medium uppercase mb-1">Main Navigation</p>
           
           <div className="space-y-1">
-            {displayedNavItems.map((item) => (
-              <Button 
-                key={item.id}
-                variant="ghost"
-                className={cn(
-                  "justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors",
-                  activeTab === item.id 
-                    ? "bg-medical-primary/10 text-medical-primary font-medium" 
-                    : ""
-                )}
-                onClick={() => setActiveTab(item.id)}
-                title={item.description}
-              >
-                <item.icon className="h-4 w-4 mr-3" />
-                {item.label}
-              </Button>
-            ))}
+            {displayedNavItems.map((item) => {
+              if (item.external && item.href) {
+                return (
+                  <Link key={item.id} to={item.href} className="w-full">
+                    <Button 
+                      variant="ghost"
+                      className={cn(
+                        "justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors",
+                        activeTab === item.id 
+                          ? "bg-medical-primary/10 text-medical-primary font-medium" 
+                          : ""
+                      )}
+                      title={item.description}
+                    >
+                      <item.icon className="h-4 w-4 mr-3" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              }
+              
+              return (
+                <Button 
+                  key={item.id}
+                  variant="ghost"
+                  className={cn(
+                    "justify-start w-full rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors",
+                    activeTab === item.id 
+                      ? "bg-medical-primary/10 text-medical-primary font-medium" 
+                      : ""
+                  )}
+                  onClick={() => setActiveTab(item.id)}
+                  title={item.description}
+                >
+                  <item.icon className="h-4 w-4 mr-3" />
+                  {item.label}
+                </Button>
+              );
+            })}
           </div>
         </div>
         
         <div className="lg:hidden flex justify-around overflow-x-auto no-scrollbar py-2">
-          {displayedNavItems.map((item) => ( 
-            <Button 
-              key={item.id}
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "flex flex-col items-center h-auto p-2 rounded-lg",
-                activeTab === item.id ? "bg-medical-primary/10 text-medical-primary" : "text-gray-600 dark:text-gray-400"
-              )}
-              onClick={() => setActiveTab(item.id)}
-              title={item.label}
-            >
-              <item.icon className="h-5 w-5" />
-            </Button>
-          ))}
+          {displayedNavItems.map((item) => {
+            if (item.external && item.href) {
+              return (
+                <Link key={item.id} to={item.href}>
+                  <Button 
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "flex flex-col items-center h-auto p-2 rounded-lg",
+                      activeTab === item.id ? "bg-medical-primary/10 text-medical-primary" : "text-gray-600 dark:text-gray-400"
+                    )}
+                    title={item.label}
+                  >
+                    <item.icon className="h-5 w-5" />
+                  </Button>
+                </Link>
+              );
+            }
+            
+            return (
+              <Button 
+                key={item.id}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "flex flex-col items-center h-auto p-2 rounded-lg",
+                  activeTab === item.id ? "bg-medical-primary/10 text-medical-primary" : "text-gray-600 dark:text-gray-400"
+                )}
+                onClick={() => setActiveTab(item.id)}
+                title={item.label}
+              >
+                <item.icon className="h-5 w-5" />
+              </Button>
+            );
+          })}
         </div>
         
         <div className="mt-auto hidden lg:block pt-4">
-          
           <div className="border-t border-gray-200 dark:border-gray-800 mt-4 pt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Horalix © 2025

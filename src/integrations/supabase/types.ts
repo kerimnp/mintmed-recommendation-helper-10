@@ -345,6 +345,35 @@ export type Database = {
           },
         ]
       }
+      organizations: {
+        Row: {
+          billing_address: string | null
+          created_by: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          billing_address?: string | null
+          created_by?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          billing_address?: string | null
+          created_by?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null
@@ -549,9 +578,8 @@ export type Database = {
       }
       profiles: {
         Row: {
-          certification_expiry: string | null
+          account_type: Database["public"]["Enums"]["account_type"]
           created_at: string
-          department_id: string | null
           email: string | null
           first_name: string | null
           free_credits_left: number
@@ -565,9 +593,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          certification_expiry?: string | null
+          account_type?: Database["public"]["Enums"]["account_type"]
           created_at?: string
-          department_id?: string | null
           email?: string | null
           first_name?: string | null
           free_credits_left?: number
@@ -581,9 +608,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          certification_expiry?: string | null
+          account_type?: Database["public"]["Enums"]["account_type"]
           created_at?: string
-          department_id?: string | null
           email?: string | null
           first_name?: string | null
           free_credits_left?: number
@@ -609,6 +635,11 @@ export type Database = {
       }
     }
     Enums: {
+      account_type:
+        | "individual"
+        | "hospital_admin"
+        | "hospital_doctor"
+        | "system_admin"
       app_role: "doctor" | "admin" | "pharmacist"
       audit_action:
         | "create"
@@ -750,6 +781,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_type: [
+        "individual",
+        "hospital_admin",
+        "hospital_doctor",
+        "system_admin",
+      ],
       app_role: ["doctor", "admin", "pharmacist"],
       audit_action: [
         "create",
