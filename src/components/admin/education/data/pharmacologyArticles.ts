@@ -1,6 +1,6 @@
 
 import { Article } from "../types/articleTypes";
-import { Pill, Activity, Heart, Brain, Kidney, Liver } from "lucide-react";
+import { Pill, Activity, Heart, Brain, Zap, FlaskConical } from "lucide-react";
 
 export const pharmacologyArticles: Article[] = [
   {
@@ -52,7 +52,7 @@ export const pharmacologyArticles: Article[] = [
     id: 'renal-dosing',
     title: 'Antibiotic Dosing in Renal Impairment',
     description: 'Dose adjustments for patients with kidney disease',
-    icon: Kidney,
+    icon: Zap,
     category: 'pharmacology',
     readTime: '17 min',
     lastUpdated: 'April 10, 2025',
@@ -75,7 +75,7 @@ export const pharmacologyArticles: Article[] = [
     id: 'hepatic-dosing',
     title: 'Antibiotic Use in Liver Disease',
     description: 'Considerations for patients with hepatic impairment',
-    icon: Liver,
+    icon: FlaskConical,
     category: 'pharmacology',
     readTime: '15 min',
     lastUpdated: 'April 10, 2025',
