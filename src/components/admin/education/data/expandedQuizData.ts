@@ -301,8 +301,264 @@ export const pediatricSafetyQuiz: AdvancedQuiz = {
   ]
 };
 
+// Antibiotic Stewardship Quiz
+export const stewardshipQuiz: AdvancedQuiz = {
+  id: "stewardship-principles",
+  title: "Antimicrobial Stewardship Principles",
+  description: "Core concepts and implementation of antimicrobial stewardship programs",
+  category: "stewardship",
+  difficulty: "intermediate",
+  timeEstimate: "20-25 min",
+  questionCount: 8,
+  cmeCreditHours: 1.0,
+  learningObjectives: [
+    "Understand core stewardship principles",
+    "Implement stewardship interventions",
+    "Measure stewardship program effectiveness"
+  ],
+  questions: [
+    {
+      id: "as1",
+      question: "Which is the most effective core strategy for antimicrobial stewardship programs?",
+      options: [
+        "Formulary restriction only",
+        "Prospective audit with feedback",
+        "Educational programs alone",
+        "Automatic stop orders"
+      ],
+      correctAnswer: 1,
+      explanation: "Prospective audit with feedback is one of the most effective core strategies, allowing real-time intervention while maintaining prescriber autonomy and providing educational opportunities."
+    },
+    {
+      id: "as2",
+      question: "What is the optimal timing for antimicrobial stewardship intervention?",
+      options: [
+        "At initiation of therapy",
+        "48-72 hours after initiation",
+        "At completion of therapy",
+        "Only when complications arise"
+      ],
+      correctAnswer: 1,
+      explanation: "The optimal timing is 48-72 hours after initiation, allowing time for culture results and clinical assessment while still enabling meaningful intervention."
+    },
+    {
+      id: "as3",
+      question: "Which metric is most important for measuring stewardship program success?",
+      options: [
+        "Days of therapy (DOT) per 1000 patient-days",
+        "Cost savings alone",
+        "Number of interventions made",
+        "Prescriber satisfaction scores"
+      ],
+      correctAnswer: 0,
+      explanation: "DOT per 1000 patient-days is a standardized, risk-adjusted metric that accurately reflects antimicrobial use intensity and allows for meaningful comparisons."
+    },
+    {
+      id: "as4",
+      question: "What is the recommended approach for carbapenem stewardship?",
+      options: [
+        "Complete restriction with pre-authorization",
+        "Post-prescription review within 48 hours",
+        "Educational interventions only",
+        "Automatic substitution protocols"
+      ],
+      correctAnswer: 1,
+      explanation: "Post-prescription review within 48 hours balances the need for timely broad-spectrum therapy in critically ill patients with effective stewardship oversight."
+    },
+    {
+      id: "as5",
+      question: "Which patient population benefits most from antimicrobial stewardship interventions?",
+      options: [
+        "Outpatients only",
+        "ICU patients exclusively",
+        "All hospitalized patients",
+        "Immunocompromised patients only"
+      ],
+      correctAnswer: 2,
+      explanation: "All hospitalized patients benefit from stewardship interventions, though the approach may vary by patient acuity and clinical setting."
+    },
+    {
+      id: "as6",
+      question: "What is the primary goal of rapid diagnostic testing in stewardship?",
+      options: [
+        "Reduce laboratory costs",
+        "Enable faster targeted therapy",
+        "Decrease specimen collection",
+        "Eliminate culture requirements"
+      ],
+      correctAnswer: 1,
+      explanation: "Rapid diagnostics enable faster identification of pathogens and resistance patterns, allowing for earlier targeted therapy and reduced broad-spectrum antibiotic use."
+    },
+    {
+      id: "as7",
+      question: "Which intervention has the greatest impact on reducing C. difficile infections?",
+      options: [
+        "Hand hygiene improvement alone",
+        "Isolation precautions only",
+        "Antimicrobial stewardship combined with infection control",
+        "Environmental cleaning enhancement"
+      ],
+      correctAnswer: 2,
+      explanation: "The combination of antimicrobial stewardship (reducing high-risk antibiotic use) with infection control measures provides the greatest impact on C. difficile reduction."
+    },
+    {
+      id: "as8",
+      question: "What is the recommended duration for most uncomplicated infections to promote stewardship?",
+      options: [
+        "Until cultures are negative",
+        "Shortest effective duration based on evidence",
+        "Standard 10-14 day courses",
+        "Until patient is asymptomatic"
+      ],
+      correctAnswer: 1,
+      explanation: "Using the shortest effective duration based on current evidence reduces unnecessary exposure, resistance development, and adverse effects while maintaining clinical efficacy."
+    }
+  ]
+};
+
+// Resistance Mechanisms Quiz
+export const resistanceMechanismsQuiz: AdvancedQuiz = {
+  id: "resistance-mechanisms",
+  title: "Antibiotic Resistance Mechanisms",
+  description: "Understanding bacterial resistance mechanisms and clinical implications",
+  category: "microbiology",
+  difficulty: "advanced",
+  timeEstimate: "30-35 min",
+  questionCount: 10,
+  cmeCreditHours: 1.25,
+  learningObjectives: [
+    "Identify major resistance mechanisms",
+    "Understand clinical implications of resistance",
+    "Apply knowledge to antibiotic selection"
+  ],
+  questions: [
+    {
+      id: "rm1",
+      question: "Extended-spectrum beta-lactamases (ESBLs) primarily confer resistance to which antibiotics?",
+      options: [
+        "Penicillins only",
+        "Cephalosporins and aztreonam",
+        "Carbapenems and fluoroquinolones",
+        "Aminoglycosides and macrolides"
+      ],
+      correctAnswer: 1,
+      explanation: "ESBLs hydrolyze penicillins, cephalosporins, and aztreonam but are typically inhibited by beta-lactamase inhibitors and do not affect carbapenems (though this is changing with newer ESBLs)."
+    },
+    {
+      id: "rm2",
+      question: "Which mechanism is primarily responsible for vancomycin resistance in enterococci?",
+      options: [
+        "Target modification (D-Ala-D-Lac substitution)",
+        "Drug efflux pumps",
+        "Enzymatic inactivation",
+        "Reduced permeability"
+      ],
+      correctAnswer: 0,
+      explanation: "VanA and VanB type resistance involves substitution of D-Ala-D-Ala with D-Ala-D-Lac in peptidoglycan precursors, reducing vancomycin binding affinity by ~1000-fold."
+    },
+    {
+      id: "rm3",
+      question: "Carbapenemase-producing Enterobacteriaceae (CPE) are most concerning because:",
+      options: [
+        "They cause more severe infections",
+        "Limited therapeutic options remain",
+        "They spread faster than other organisms",
+        "They only infect immunocompromised patients"
+      ],
+      correctAnswer: 1,
+      explanation: "CPE resistance to carbapenems (last-resort beta-lactams) leaves very limited therapeutic options, often requiring toxic or less effective alternatives like colistin or tigecycline."
+    },
+    {
+      id: "rm4",
+      question: "The primary mechanism of fluoroquinolone resistance is:",
+      options: [
+        "Efflux pump overexpression only",
+        "Target modification (DNA gyrase/topoisomerase IV)",
+        "Drug inactivation enzymes",
+        "Reduced outer membrane permeability"
+      ],
+      correctAnswer: 1,
+      explanation: "Primary fluoroquinolone resistance occurs through mutations in DNA gyrase (gyrA/gyrB) and topoisomerase IV (parC/parE), though efflux pumps and permeability also contribute."
+    },
+    {
+      id: "rm5",
+      question: "Methicillin resistance in S. aureus (MRSA) is mediated by:",
+      options: [
+        "Beta-lactamase production",
+        "Acquisition of mecA gene (PBP2a)",
+        "Efflux pump upregulation",
+        "Cell wall thickening"
+      ],
+      correctAnswer: 1,
+      explanation: "MRSA resistance is mediated by the mecA gene encoding PBP2a, an alternative penicillin-binding protein with low affinity for beta-lactam antibiotics."
+    },
+    {
+      id: "rm6",
+      question: "Which resistance mechanism is most commonly associated with multidrug-resistant Pseudomonas aeruginosa?",
+      options: [
+        "Single enzyme production",
+        "Combination of efflux pumps, beta-lactamases, and porin loss",
+        "Plasmid-mediated resistance only",
+        "Target site modification alone"
+      ],
+      correctAnswer: 1,
+      explanation: "MDR P. aeruginosa typically involves multiple mechanisms: upregulated efflux pumps (MexAB-OprM), AmpC beta-lactamase, porin loss, and sometimes acquired carbapenemases."
+    },
+    {
+      id: "rm7",
+      question: "Colistin resistance in gram-negative bacteria primarily occurs through:",
+      options: [
+        "Enzymatic drug inactivation",
+        "LPS modification reducing drug binding",
+        "Active efflux mechanisms",
+        "Target protein alterations"
+      ],
+      correctAnswer: 1,
+      explanation: "Colistin resistance primarily involves modification of lipopolysaccharide (LPS) structure, reducing the negative charge that colistin targets, often mediated by mcr genes or chromosomal mutations."
+    },
+    {
+      id: "rm8",
+      question: "High-level aminoglycoside resistance in enterococci is clinically significant because:",
+      options: [
+        "It makes infections more virulent",
+        "It eliminates synergy with cell wall-active agents",
+        "It requires higher dosing only",
+        "It indicates multidrug resistance"
+      ],
+      correctAnswer: 1,
+      explanation: "High-level aminoglycoside resistance eliminates the synergistic bactericidal effect when combined with cell wall-active agents like ampicillin or vancomycin, reducing treatment options."
+    },
+    {
+      id: "rm9",
+      question: "The most concerning aspect of New Delhi metallo-beta-lactamase (NDM) is:",
+      options: [
+        "Resistance to all antibiotics",
+        "Extreme clinical virulence",
+        "Rapid global spread and limited treatment options",
+        "Exclusive hospital transmission"
+      ],
+      correctAnswer: 2,
+      explanation: "NDM-producing organisms have spread globally, often carry multiple resistance genes, and leave very few treatment options, representing a major public health threat."
+    },
+    {
+      id: "rm10",
+      question: "Heteroresistance is clinically important because:",
+      options: [
+        "It affects all bacterial cells equally",
+        "Subpopulations may emerge during therapy",
+        "It only occurs in laboratory settings",
+        "It makes infections less severe"
+      ],
+      correctAnswer: 1,
+      explanation: "Heteroresistance involves resistant subpopulations within a mainly susceptible bacterial population that can emerge and predominate during antibiotic therapy, leading to treatment failure."
+    }
+  ]
+};
+
 export const expandedQuizzes: AdvancedQuiz[] = [
   pharmacokineticsQuiz,
   icuAntibioticsQuiz,
-  pediatricSafetyQuiz
+  pediatricSafetyQuiz,
+  stewardshipQuiz,
+  resistanceMechanismsQuiz
 ];

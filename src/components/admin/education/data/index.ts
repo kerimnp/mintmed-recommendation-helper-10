@@ -15,6 +15,7 @@ import { clinicalCasesArticles } from "./clinicalCasesArticles";
 import { resistanceArticles } from "./resistanceArticles";
 import { practiceCasesArticles } from "./practiceCasesArticles";
 import { pediatricArticles } from "./pediatricArticles";
+import { pharmacologyArticles } from "./pharmacologyArticles";
 
 // Combine all articles into one comprehensive array
 export const articles: Article[] = [
@@ -30,7 +31,8 @@ export const articles: Article[] = [
   ...clinicalCasesArticles,
   ...resistanceArticles,
   ...practiceCasesArticles,
-  ...pediatricArticles
+  ...pediatricArticles,
+  ...pharmacologyArticles
 ];
 
 export { categories };
@@ -50,3 +52,4 @@ export { clinicalCasesArticles };
 export { resistanceArticles };
 export { practiceCasesArticles };
 export { pediatricArticles };
+export { pharmacologyArticles };
