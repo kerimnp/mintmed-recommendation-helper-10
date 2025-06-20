@@ -5,13 +5,15 @@ import { penicillinDosing } from './penicillins';
 import { cephalosporinDosing } from './cephalosporins';
 import { fluoroquinoloneDosing } from './fluoroquinolones';
 import { macrolideDosing } from './macrolides';
+import { enhancedAntibiotics } from './enhancedAntibiotics';
 
 export const antibioticDatabase: AntibioticDosing[] = [
   ...tetracyclineDosing,
   ...penicillinDosing,
   ...cephalosporinDosing,
   ...fluoroquinoloneDosing,
-  ...macrolideDosing
+  ...macrolideDosing,
+  ...enhancedAntibiotics
 ];
 
 export {
@@ -19,5 +21,6 @@ export {
   penicillinDosing,
   cephalosporinDosing,
   fluoroquinoloneDosing,
-  macrolideDosing
+  macrolideDosing,
+  enhancedAntibiotics
 };

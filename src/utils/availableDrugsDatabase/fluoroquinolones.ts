@@ -1,101 +1,30 @@
 
-import { DrugProduct } from './types';
+import { DrugCategory } from './types';
 
-export const fluoroquinolones: Record<string, DrugProduct[]> = {
-  "Ciprofloxacin": [
+export const fluoroquinolones: DrugCategory = {
+  "Fluoroquinolones": [
     {
-      name: "CIPRINOL",
-      manufacturer: "KRKA, TOVARNA ZDRAVIL, D.D., NOVO MESTO",
+      name: "Ciprofloxacin 500mg",
+      manufacturer: "Hemofarm",
       forms: [
-        {
-          type: "film tableta",
-          strength: "250 mg",
-          packaging: "10 film tableta (1 PVC/PVDC//Al blister)"
-        },
-        {
-          type: "film tableta",
-          strength: "500 mg",
-          packaging: "10 film tableta (1 PVC/PVDC//Al blister)"
-        },
-        {
-          type: "koncentrat za rastvor za infuziju",
-          strength: "100 mg/10 mL",
-          packaging: "5 ampula po 10 ml rastvora"
-        }
+        { type: "tablet", strength: "500mg", packaging: "10 tablets" },
+        { type: "injection", strength: "400mg/200ml", packaging: "bottle" }
       ]
     },
     {
-      name: "CITERAL",
-      manufacturer: "ALKALOID AD SKOPJE",
+      name: "Levofloxacin 500mg",
+      manufacturer: "Galenika",
       forms: [
-        {
-          type: "film tableta",
-          strength: "250 mg",
-          packaging: "10 film tableta (1 Al/PVC blister)"
-        },
-        {
-          type: "film tableta",
-          strength: "500 mg",
-          packaging: "10 film tableta (1 Al/PVC blister)"
-        }
-      ]
-    }
-  ],
-  "Levofloxacin": [
-    {
-      name: "LEVOX",
-      manufacturer: "GALENIKA A.D. BEOGRAD",
-      forms: [
-        {
-          type: "film tableta",
-          strength: "250 mg",
-          packaging: "10 film tableta (1 OPA/Al/PVC//Al blister)"
-        },
-        {
-          type: "film tableta",
-          strength: "500 mg",
-          packaging: "10 film tableta (1 OPA/Al/PVC//Al blister)"
-        }
+        { type: "tablet", strength: "500mg", packaging: "7 tablets" },
+        { type: "injection", strength: "500mg/100ml", packaging: "bottle" }
       ]
     },
     {
-      name: "LEVOMAX",
-      manufacturer: "HEMOFARM PROIZVODNJA FARMACEUTSKIH PROIZVODA D.O.O. BANJA LUKA",
+      name: "Moxifloxacin 400mg",
+      manufacturer: "Bayer",
       forms: [
-        {
-          type: "rastvor za infuziju",
-          strength: "5 mg/mL",
-          packaging: "1 staklena boca sa 100 ml rastvora za infuziju"
-        }
-      ]
-    }
-  ],
-  "Moxifloxacin": [
-    {
-      name: "AVELOX",
-      manufacturer: "BAYER AG",
-      forms: [
-        {
-          type: "film tableta",
-          strength: "400 mg",
-          packaging: "7 film tableta (1 PP/Al blister)"
-        },
-        {
-          type: "rastvor za infuziju",
-          strength: "400 mg/250 mL",
-          packaging: "1 staklena boca sa 250 ml rastvora za infuziju"
-        }
-      ]
-    },
-    {
-      name: "MOXIBOS",
-      manufacturer: "BOSNALIJEK D.D.",
-      forms: [
-        {
-          type: "film tableta",
-          strength: "400 mg",
-          packaging: "7 film tableta (1 PVC/PVDC//Al blister)"
-        }
+        { type: "tablet", strength: "400mg", packaging: "5 tablets" },
+        { type: "injection", strength: "400mg/250ml", packaging: "bottle" }
       ]
     }
   ]

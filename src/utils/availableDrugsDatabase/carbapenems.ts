@@ -2,80 +2,26 @@
 import { DrugCategory } from './types';
 
 export const carbapenems: DrugCategory = {
-  "Meropenem": [
+  "Carbapenems": [
     {
-      name: "MEROPENEM PANPHARMA",
-      manufacturer: "PANPHARMA S.A.",
+      name: "Meropenem 1g",
+      manufacturer: "Galenika",
       forms: [
-        {
-          type: "prašak za rastvor za injekciju/infuziju",
-          strength: "500 mg",
-          packaging: "10 bočica sa praškom za rastvor za injekciju/infuziju"
-        },
-        {
-          type: "prašak za rastvor za injekciju/infuziju",
-          strength: "1000 mg",
-          packaging: "10 bočica sa praškom za rastvor za injekciju/infuziju"
-        }
+        { type: "injection", strength: "1000mg", packaging: "vial" }
       ]
     },
     {
-      name: "MEROCID",
-      manufacturer: "ANFARM HELLAS S.A",
+      name: "Imipenem/Cilastatin 500mg",
+      manufacturer: "MSD",
       forms: [
-        {
-          type: "prašak za rastvor za injekciju ili infuziju",
-          strength: "1 g",
-          packaging: "10 bočica sa praškom za rastvor za injekciju ili infuziju"
-        }
-      ]
-    }
-  ],
-  "Imipenem + Cilastatin": [
-    {
-      name: "CONET",
-      manufacturer: "PHARMATHEN S.A.",
-      forms: [
-        {
-          type: "prašak za rastvor za infuziju",
-          strength: "500 mg + 500 mg",
-          packaging: "10 bočica sa praškom za rastvor za infuziju"
-        }
+        { type: "injection", strength: "500mg", packaging: "vial" }
       ]
     },
     {
-      name: "IMIPENEM/CILASTATIN KABI",
-      manufacturer: "FRESENIUS KABI DEUTSCHLAND GMBH",
+      name: "Ertapenem 1g",
+      manufacturer: "MSD",
       forms: [
-        {
-          type: "prašak za rastvor za infuziju",
-          strength: "500 mg + 500 mg",
-          packaging: "10 staklenih bočica sa praškom za rastvor za infuziju"
-        }
-      ]
-    }
-  ],
-  "Ertapenem": [
-    {
-      name: "INVANZ",
-      manufacturer: "MERCK SHARP & DOHME B.V.",
-      forms: [
-        {
-          type: "prašak za koncentrat za rastvor za infuziju",
-          strength: "1 g",
-          packaging: "1 staklena bočica sa praškom za koncentrat za rastvor za infuziju"
-        }
-      ]
-    },
-    {
-      name: "ERTAPENEM PHARMATHEN",
-      manufacturer: "PHARMATHEN S.A.",
-      forms: [
-        {
-          type: "prašak za koncentrat za rastvor za infuziju",
-          strength: "1 g",
-          packaging: "1 staklena bočica sa praškom za koncentrat za rastvor za infuziju"
-        }
+        { type: "injection", strength: "1000mg", packaging: "vial" }
       ]
     }
   ]
