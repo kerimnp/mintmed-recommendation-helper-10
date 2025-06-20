@@ -53,6 +53,13 @@ const Subscription = () => {
     // TODO: Implement Stripe customer portal
   };
 
+  const handleUpgrade = () => {
+    const plansTab = document.querySelector('[value="plans"]') as HTMLElement;
+    if (plansTab) {
+      plansTab.click();
+    }
+  };
+
   const filteredPlans = plans?.filter(plan => plan.plan_type === selectedPlanType) || [];
 
   return (
@@ -105,7 +112,7 @@ const Subscription = () => {
             <SubscriptionStatus
               subscription={currentSubscription}
               onManageSubscription={handleManageSubscription}
-              onUpgrade={() => document.querySelector('[data-state="inactive"][value="plans"]')?.click()}
+              onUpgrade={handleUpgrade}
             />
           </TabsContent>
 
@@ -190,7 +197,7 @@ const Subscription = () => {
                         plan={plan}
                         isCurrentPlan={currentSubscription?.plan_id === plan.id}
                         billingCycle={billingCycle}
-                        onSelect={() => handleSelectPlan(plan.id, billingCycle)}
+                        onSelectPlan={handleSelectPlan}
                       />
                     ))}
                   </div>
