@@ -1,7 +1,7 @@
 
 import React from "react";
-import { AntibioticIntelligenceHub } from "./AntibioticIntelligenceHub";
+import { ClinicalIntelligenceHub } from "./ClinicalIntelligenceHub";
 
 export const ModernAntibioticsTab: React.FC = () => {
-  return <AntibioticIntelligenceHub />;
+  return <ClinicalIntelligenceHub />;
 };
