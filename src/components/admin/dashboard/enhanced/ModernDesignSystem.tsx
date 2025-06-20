@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { motion, AnimatePresence, Easing } from 'framer-motion';
+import { motion, AnimatePresence, easeInOut, easeOut } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export const modernDesignSystem = {
@@ -95,17 +96,17 @@ export const modernDesignSystem = {
     fadeIn: {
       initial: { opacity: 0, y: 20 },
       animate: { opacity: 1, y: 0 },
-      transition: { duration: 0.6, ease: [0.4, 0.0, 0.2, 1] }
+      transition: { duration: 0.6, ease: easeOut }
     },
     scaleIn: {
       initial: { opacity: 0, scale: 0.9 },
       animate: { opacity: 1, scale: 1 },
-      transition: { duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }
+      transition: { duration: 0.4, ease: easeOut }
     },
     slideIn: {
       initial: { opacity: 0, x: -30 },
       animate: { opacity: 1, x: 0 },
-      transition: { duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }
+      transition: { duration: 0.5, ease: easeOut }
     },
     spring: {
       type: "spring" as const,
@@ -188,7 +189,7 @@ export const ModernMetricCard: React.FC<{
       whileHover={{ 
         y: -4, 
         scale: 1.02,
-        transition: { duration: 0.2, ease: [0.4, 0.0, 0.2, 1] } 
+        transition: { duration: 0.2, ease: easeOut } 
       }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
@@ -340,7 +341,7 @@ export const ModernGlassCard: React.FC<{
       whileHover={hover ? { 
         y: -4, 
         scale: 1.02,
-        transition: { duration: 0.2, ease: [0.4, 0.0, 0.2, 1] } 
+        transition: { duration: 0.2, ease: easeOut } 
       } : {}}
       className={cn(
         modernDesignSystem.shadows.glass,
@@ -441,7 +442,7 @@ export const ModernProgressBar: React.FC<{
           animate={{ width: `${percentage}%` }}
           transition={{ 
             duration: animated ? 1 : 0,
-            ease: [0.4, 0.0, 0.2, 1]
+            ease: easeOut
           }}
         />
       </div>
