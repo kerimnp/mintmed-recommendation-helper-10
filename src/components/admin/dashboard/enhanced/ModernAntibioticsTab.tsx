@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,7 @@ import {
   BookOpen,
   Download,
   Eye,
+  EyeOff,
   Heart,
   Brain,
   Pill,
@@ -42,6 +42,16 @@ import {
 const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ drug, index }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log(`DrugCard ${drug.name}: isExpanded = ${isExpanded}`);
+  }, [isExpanded, drug.name]);
+
+  const handleToggleExpanded = () => {
+    console.log(`Toggling expanded state for ${drug.name} from ${isExpanded} to ${!isExpanded}`);
+    setIsExpanded(!isExpanded);
+  };
 
   const getEffectivenessColor = (value: number) => {
     if (value >= 90) return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
@@ -186,7 +196,7 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
           </div>
 
           {/* Common indications */}
-          {drug.commonIndications.length > 0 && (
+          {drug.commonIndications && drug.commonIndications.length > 0 && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <div className="flex items-center mb-1">
                 <Beaker className="w-4 h-4 text-blue-600 mr-2" />
@@ -210,7 +220,7 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
           )}
 
           {/* Warnings */}
-          {drug.warnings.length > 0 && (
+          {drug.warnings && drug.warnings.length > 0 && (
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
               <div className="flex items-center mb-1">
                 <AlertTriangle className="w-4 h-4 text-amber-600 mr-2" />
@@ -238,10 +248,10 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
             <Button 
               size="sm" 
               className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg transition-all duration-300"
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={handleToggleExpanded}
             >
-              <Eye className="w-4 h-4 mr-2" />
-              {isExpanded ? 'Less Info' : 'View Details'}
+              {isExpanded ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+              {isExpanded ? 'Hide Details' : 'View Details'}
             </Button>
             <Button 
               size="sm" 
@@ -252,55 +262,155 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
             </Button>
           </div>
 
-          {/* Expanded details */}
-          <AnimatePresence>
+          {/* Enhanced Expanded details with better animation and fallback content */}
+          <AnimatePresence mode="wait">
             {isExpanded && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3"
+                key="expanded-content"
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ 
+                  opacity: 1, 
+                  height: 'auto', 
+                  y: 0,
+                  transition: {
+                    duration: 0.4,
+                    ease: "easeOut",
+                    opacity: { delay: 0.1 }
+                  }
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  height: 0, 
+                  y: -10,
+                  transition: {
+                    duration: 0.3,
+                    ease: "easeIn"
+                  }
+                }}
+                className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4 overflow-hidden"
+                style={{ minHeight: '200px' }}
               >
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Side Effects</div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">{drug.sideEffects}%</div>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Interactions</div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">{drug.interactions}</div>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Studies</div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white">{drug.studies}</div>
-                  </div>
+                {/* Enhanced metrics grid */}
+                <div className="grid grid-cols-3 gap-3">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
+                  >
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Side Effects</div>
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.sideEffects || 'N/A'}%</div>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
+                  >
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Interactions</div>
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.interactions || 0}</div>
+                  </motion.div>
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
+                  >
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Studies</div>
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.studies || 0}</div>
+                  </motion.div>
                 </div>
                 
-                {/* Available products info */}
-                {drug.availableProducts.length > 0 && (
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Available Products ({drug.availableProducts.length})
+                {/* Enhanced clinical details */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="space-y-3"
+                >
+                  {/* Mechanism detail */}
+                  {drug.mechanismDetail && (
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-3">
+                      <div className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
+                        <Zap className="w-3 h-3 mr-1" />
+                        Mechanism of Action
+                      </div>
+                      <div className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                        {drug.mechanismDetail}
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      {drug.availableProducts.slice(0, 2).map((product, idx) => (
-                        <div key={idx} className="text-xs text-gray-600 dark:text-gray-400">
-                          {product.name} - {product.manufacturer}
-                        </div>
-                      ))}
-                      {drug.availableProducts.length > 2 && (
-                        <div className="text-xs text-gray-500">
-                          +{drug.availableProducts.length - 2} more products
-                        </div>
-                      )}
+                  )}
+
+                  {/* Clinical pearls */}
+                  {drug.clinicalPearls && drug.clinicalPearls.length > 0 && (
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-3">
+                      <div className="text-xs font-medium text-emerald-800 dark:text-emerald-200 mb-2 flex items-center">
+                        <Award className="w-3 h-3 mr-1" />
+                        Clinical Pearls
+                      </div>
+                      <div className="space-y-1">
+                        {drug.clinicalPearls.slice(0, 2).map((pearl, idx) => (
+                          <div key={idx} className="text-xs text-emerald-700 dark:text-emerald-300">
+                            • {pearl}
+                          </div>
+                        ))}
+                        {drug.clinicalPearls.length > 2 && (
+                          <div className="text-xs text-emerald-600 dark:text-emerald-400">
+                            +{drug.clinicalPearls.length - 2} more pearls
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </motion.div>
                 
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  Last updated: {drug.lastUpdated}
-                </div>
+                {/* Available products info with fallback */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  {drug.availableProducts && drug.availableProducts.length > 0 ? (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                        <Pill className="w-3 h-3 mr-1" />
+                        Available Products ({drug.availableProducts.length})
+                      </div>
+                      <div className="space-y-1">
+                        {drug.availableProducts.slice(0, 3).map((product, idx) => (
+                          <div key={idx} className="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
+                            <span>{product.name}</span>
+                            <span className="text-gray-500">{product.manufacturer}</span>
+                          </div>
+                        ))}
+                        {drug.availableProducts.length > 3 && (
+                          <div className="text-xs text-gray-500">
+                            +{drug.availableProducts.length - 3} more products
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                        <Pill className="w-3 h-3 mr-1" />
+                        Available Products
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Product information being updated...
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-xs text-gray-500 dark:text-gray-400 text-center pt-2 border-t border-gray-200 dark:border-gray-700"
+                >
+                  Last updated: {drug.lastUpdated || 'Recently'}
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
