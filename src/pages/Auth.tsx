@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle, User as UserIcon } from "lucide-react"; // Added UserIcon
+import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle, User as UserIcon, Building2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -17,13 +17,15 @@ const Auth = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user: authUser, signIn, signUp, signInWithGoogle } = useAuth(); // Renamed user to authUser to avoid conflict
+  const { user: authUser, signIn, signUp, signInWithGoogle } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState(""); // New state for first name
-  const [lastName, setLastName] = useState(""); // New state for last name
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [accountType, setAccountType] = useState<"individual" | "hospital_admin">("individual");
+  const [hospitalName, setHospitalName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
@@ -34,17 +36,17 @@ const Auth = () => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
-    setFirstName(""); // Clear first name on tab switch
-    setLastName(""); // Clear last name on tab switch
+    setFirstName("");
+    setLastName("");
+    setAccountType("individual");
+    setHospitalName("");
   }, [activeTab]);
 
   useEffect(() => {
-    // If user is already authenticated (e.g. from a previous session), redirect to home.
     if (authUser) {
       navigate("/");
     }
   }, [authUser, navigate]);
-
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +60,6 @@ const Auth = () => {
     setIsLoading(true);
     try {
       await signIn(email, password);
-      // Successful login is handled by the auth state change listener in AuthContext
-      // which will update authUser and trigger the useEffect above to navigate.
     } catch (error: any) {
       console.error("Sign in error:", error);
       setError(error.message || (language === "en" 
@@ -74,8 +74,13 @@ const Auth = () => {
     e.preventDefault();
     setError(null);
     
-    if (!email || !password || !firstName || !lastName) { // Check for first and last name
+    if (!email || !password || !firstName || !lastName) {
       setError(language === "en" ? "Please fill in all fields" : "Molimo popunite sva polja");
+      return;
+    }
+
+    if (accountType === "hospital_admin" && !hospitalName.trim()) {
+      setError(language === "en" ? "Please enter hospital/clinic name" : "Molimo unesite naziv bolnice/klinike");
       return;
     }
 
@@ -91,10 +96,14 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      await signUp(email, password, { first_name: firstName, last_name: lastName }); // Pass metadata
-      // Toast for success/email verification is handled in AuthContext
-      // If "Confirm email" is off, onAuthStateChange will trigger SIGNED_IN and navigate
-      // If "Confirm email" is on, user stays on page, sees toast from AuthContext.
+      const metadata = { 
+        first_name: firstName, 
+        last_name: lastName,
+        account_type: accountType,
+        ...(accountType === "hospital_admin" && { hospital_name: hospitalName })
+      };
+      
+      await signUp(email, password, metadata);
     } catch (error: any) {
       console.error("Sign up error:", error);
       setError(error.message || (language === "en" 
@@ -111,20 +120,14 @@ const Auth = () => {
       setError(null);
       
       await signInWithGoogle();
-      // Success is handled by the auth state change listener in AuthContext.
       
     } catch (error: any) {
       console.error("Google sign in error:", error);
       setError(error.message || (language === "en" 
         ? "Failed to sign in with Google. Please try again." 
         : "Prijava putem Googlea nije uspjela. Molimo pokušajte ponovno."));
-      setIsLoading(false); // Ensure loading is set to false on error
+      setIsLoading(false);
     }
-    // No finally setIsLoading(false) here, as navigation might occur before it runs.
-    // AuthContext handles loading state for async auth operations.
-    // This local isLoading is more for the button's visual state.
-    // If Google sign-in pops a new window and returns, onAuthStateChange handles it.
-    // If it fails before redirect, error is caught.
   };
 
   return (
@@ -252,6 +255,90 @@ const Auth = () => {
 
               <TabsContent value="register">
                 <form onSubmit={handleEmailSignUp} className="space-y-4">
+                  {/* Account Type Selection */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">
+                      {language === "en" ? "Account Type" : "Tip Računa"}
+                    </Label>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div 
+                        className={`border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                          accountType === "individual" 
+                            ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                        onClick={() => setAccountType("individual")}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            accountType === "individual" 
+                              ? "bg-medical-primary text-white" 
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          }`}>
+                            <UserIcon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">
+                              {language === "en" ? "Individual Doctor" : "Individualni Liječnik"}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {language === "en" ? "Personal practice account" : "Račun za osobnu praksu"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div 
+                        className={`border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                          accountType === "hospital_admin" 
+                            ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                        onClick={() => setAccountType("hospital_admin")}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            accountType === "hospital_admin" 
+                              ? "bg-medical-primary text-white" 
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                          }`}>
+                            <Building2 className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">
+                              {language === "en" ? "Hospital Administrator" : "Bolnički Administrator"}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {language === "en" ? "Manage hospital account & doctors" : "Upravljanje bolničkim računom i liječnicima"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hospital Name Field - only show for hospital admin */}
+                  {accountType === "hospital_admin" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="hospital-name" className="text-sm font-medium">
+                        {language === "en" ? "Hospital/Clinic Name" : "Naziv Bolnice/Klinike"}
+                      </Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="hospital-name"
+                          type="text"
+                          placeholder={language === "en" ? "Enter hospital or clinic name" : "Unesite naziv bolnice ili klinike"}
+                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={hospitalName}
+                          onChange={(e) => setHospitalName(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Name Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="first-name" className="text-sm font-medium">{language === "en" ? "First Name" : "Ime"}</Label>
@@ -285,6 +372,7 @@ const Auth = () => {
                     </div>
                   </div>
 
+                  {/* Email and Password Fields */}
                   <div className="space-y-2">
                     <Label htmlFor="register-email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
                     <div className="relative">
