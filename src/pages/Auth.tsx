@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -260,56 +261,56 @@ const Auth = () => {
                     <Label className="text-sm font-medium">
                       {language === "en" ? "Account Type" : "Tip Računa"}
                     </Label>
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div 
-                        className={`border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                        className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
                           accountType === "individual" 
                             ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
                             : "border-gray-200 dark:border-gray-700"
                         }`}
                         onClick={() => setAccountType("individual")}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center gap-2 text-center">
                           <div className={`p-2 rounded-lg ${
                             accountType === "individual" 
                               ? "bg-medical-primary text-white" 
                               : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
                           }`}>
-                            <UserIcon className="h-5 w-5" />
+                            <UserIcon className="h-4 w-4" />
                           </div>
                           <div>
-                            <div className="font-medium text-sm">
+                            <div className="font-medium text-xs">
                               {language === "en" ? "Individual Doctor" : "Individualni Liječnik"}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {language === "en" ? "Personal practice account" : "Račun za osobnu praksu"}
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {language === "en" ? "Personal practice" : "Osobna praksa"}
                             </div>
                           </div>
                         </div>
                       </div>
                       
                       <div 
-                        className={`border rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                        className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
                           accountType === "hospital_admin" 
                             ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
                             : "border-gray-200 dark:border-gray-700"
                         }`}
                         onClick={() => setAccountType("hospital_admin")}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center gap-2 text-center">
                           <div className={`p-2 rounded-lg ${
                             accountType === "hospital_admin" 
                               ? "bg-medical-primary text-white" 
                               : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
                           }`}>
-                            <Building2 className="h-5 w-5" />
+                            <Building2 className="h-4 w-4" />
                           </div>
                           <div>
-                            <div className="font-medium text-sm">
-                              {language === "en" ? "Hospital Administrator" : "Bolnički Administrator"}
+                            <div className="font-medium text-xs">
+                              {language === "en" ? "Hospital Admin" : "Bolnički Admin"}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {language === "en" ? "Manage hospital account & doctors" : "Upravljanje bolničkim računom i liječnicima"}
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {language === "en" ? "Manage hospital" : "Upravljanje bolnicom"}
                             </div>
                           </div>
                         </div>
