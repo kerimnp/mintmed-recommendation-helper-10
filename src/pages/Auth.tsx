@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle, User as UserIcon, Building2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ChevronLeft, AlertCircle, User as UserIcon, Building2, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
@@ -30,6 +30,8 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [error, setError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
 
   useEffect(() => {
     setError(null);
@@ -40,6 +42,8 @@ const Auth = () => {
     setLastName("");
     setAccountType("individual");
     setHospitalName("");
+    setShowForgotPassword(false);
+    setForgotPasswordEmail("");
   }, [activeTab]);
 
   useEffect(() => {
@@ -114,6 +118,44 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (!forgotPasswordEmail) {
+      setError(language === "en" ? "Please enter your email address" : "Molimo unesite vašu email adresu");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/auth?reset=true`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: language === "en" ? "Password reset email sent" : "Email za resetiranje lozinke je poslat",
+        description: language === "en" 
+          ? "Please check your email for password reset instructions."
+          : "Molimo provjerite svoj email za upute o resetiranju lozinke.",
+      });
+
+      setShowForgotPassword(false);
+      setForgotPasswordEmail("");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      setError(error.message || (language === "en" 
+        ? "Failed to send password reset email. Please try again." 
+        : "Neuspjelo slanje email-a za resetiranje lozinke. Molimo pokušajte ponovno."));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
@@ -150,14 +192,18 @@ const Auth = () => {
         <Card className="ios-card-shadow bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-2xl font-bold text-medical-primary">
-              {activeTab === "login" 
-                ? (language === "en" ? "Welcome Back" : "Dobrodošli Natrag") 
-                : (language === "en" ? "Create Account" : "Stvorite Račun")}
+              {showForgotPassword 
+                ? (language === "en" ? "Reset Password" : "Resetiranje Lozinke")
+                : activeTab === "login" 
+                  ? (language === "en" ? "Welcome Back" : "Dobrodošli Natrag") 
+                  : (language === "en" ? "Create Account" : "Stvorite Račun")}
             </CardTitle>
             <CardDescription>
-              {activeTab === "login" 
-                ? (language === "en" ? "Sign in to your account" : "Prijavite se u svoj račun") 
-                : (language === "en" ? "Sign up for a new account" : "Registrirajte se za novi račun")}
+              {showForgotPassword 
+                ? (language === "en" ? "Enter your email to reset your password" : "Unesite svoj email za resetiranje lozinke")
+                : activeTab === "login" 
+                  ? (language === "en" ? "Sign in to your account" : "Prijavite se u svoj račun") 
+                  : (language === "en" ? "Sign up for a new account" : "Registrirajte se za novi račun")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -167,94 +213,138 @@ const Auth = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
-            <Tabs 
-              defaultValue="login" 
-              value={activeTab} 
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="grid grid-cols-2 mb-6 w-full rounded-full p-1 bg-gray-100 dark:bg-gray-800">
-                <TabsTrigger value="login" className="text-sm font-medium rounded-full px-0 py-2.5">
-                  {language === "en" ? "Sign In" : "Prijava"}
-                </TabsTrigger>
-                <TabsTrigger value="register" className="text-sm font-medium rounded-full px-0 py-2.5">
-                  {language === "en" ? "Sign Up" : "Registracija"}
-                </TabsTrigger>
-              </TabsList>
 
-              <TabsContent value="login">
-                <form onSubmit={handleEmailSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </div>
+            {showForgotPassword ? (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email" className="text-sm font-medium">
+                    {language === "en" ? "Email" : "Email"}
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
+                      className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                      value={forgotPasswordEmail}
+                      onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                      disabled={isLoading}
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
-                      <Button 
-                        variant="link" 
-                        className="px-0 h-auto font-normal text-xs text-medical-primary"
-                        type="button"
-                      >
-                        {language === "en" ? "Forgot password?" : "Zaboravili ste lozinku?"}
-                      </Button>
-                    </div>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={isLoading}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {language === "en" ? "Signing In..." : "Prijava..."}
-                      </>
-                    ) : (
-                      language === "en" ? "Sign In" : "Prijava"
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {language === "en" ? "Sending..." : "Slanje..."}
+                    </>
+                  ) : (
+                    language === "en" ? "Send Reset Email" : "Pošaljite Email za Resetiranje"
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full flex items-center justify-center gap-2"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  {language === "en" ? "Back to Sign In" : "Natrag na Prijavu"}
+                </Button>
+              </form>
+            ) : (
+              <Tabs 
+                defaultValue="login" 
+                value={activeTab} 
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
+                <TabsList className="grid grid-cols-2 mb-6 w-full rounded-full p-1 bg-gray-100 dark:bg-gray-800">
+                  <TabsTrigger value="login" className="text-sm font-medium rounded-full px-0 py-2.5">
+                    {language === "en" ? "Sign In" : "Prijava"}
+                  </TabsTrigger>
+                  <TabsTrigger value="register" className="text-sm font-medium rounded-full px-0 py-2.5">
+                    {language === "en" ? "Sign Up" : "Registracija"}
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="register">
-                <form onSubmit={handleEmailSignUp} className="space-y-4">
+                <TabsContent value="login">
+                  <form onSubmit={handleEmailSignIn} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
+                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
+                        <Button 
+                          variant="link" 
+                          className="px-0 h-auto font-normal text-xs text-medical-primary"
+                          type="button"
+                          onClick={() => setShowForgotPassword(true)}
+                        >
+                          {language === "en" ? "Forgot password?" : "Zaboravili ste lozinku?"}
+                        </Button>
+                      </div>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder={language === "en" ? "••••••••" : "••••••••"}
+                          className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={isLoading}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {language === "en" ? "Signing In..." : "Prijava..."}
+                        </>
+                      ) : (
+                        language === "en" ? "Sign In" : "Prijava"
+                      )}
+                    </Button>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="register">
                   {/* Account Type Selection */}
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">
@@ -451,12 +541,12 @@ const Auth = () => {
                       language === "en" ? "Create Account" : "Stvori Račun"
                     )}
                   </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+              </Tabs>
+            )}
 
-            {/* Google Sign In - Only show for login OR register with individual account type */}
-            {(activeTab === "login" || (activeTab === "register" && accountType === "individual")) && (
+            {/* Google Sign In - Only show for login OR register with individual account type AND not in forgot password mode */}
+            {!showForgotPassword && (activeTab === "login" || (activeTab === "register" && accountType === "individual")) && (
               <>
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
@@ -512,20 +602,22 @@ const Auth = () => {
                 ? "By continuing, you agree to our Terms of Service and Privacy Policy"
                 : "Nastavljanjem, pristajete na naše Uvjete korištenja i Politiku privatnosti"}
             </p>
-            <p className="text-xs text-medical-primary mt-2">
-              {activeTab === "login" 
-                ? (language === "en" ? "Don't have an account? " : "Nemate račun? ") 
-                : (language === "en" ? "Already have an account? " : "Već imate račun? ")}
-              <Button 
-                variant="link" 
-                className="p-0 h-auto text-xs font-medium" 
-                onClick={() => setActiveTab(activeTab === "login" ? "register" : "login")}
-              >
+            {!showForgotPassword && (
+              <p className="text-xs text-medical-primary mt-2">
                 {activeTab === "login" 
-                  ? (language === "en" ? "Sign up" : "Registrirajte se") 
-                  : (language === "en" ? "Sign in" : "Prijavite se")}
-              </Button>
-            </p>
+                  ? (language === "en" ? "Don't have an account? " : "Nemate račun? ") 
+                  : (language === "en" ? "Already have an account? " : "Već imate račun? ")}
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto text-xs font-medium" 
+                  onClick={() => setActiveTab(activeTab === "login" ? "register" : "login")}
+                >
+                  {activeTab === "login" 
+                    ? (language === "en" ? "Sign up" : "Registrirajte se") 
+                    : (language === "en" ? "Sign in" : "Prijavite se")}
+                </Button>
+              </p>
+            )}
           </CardFooter>
         </Card>
       </motion.div>
