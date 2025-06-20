@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Building2, User, Check, Star, Crown, Infinity, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+
 const Pricing = () => {
   const {
     user
@@ -89,10 +90,12 @@ const Pricing = () => {
           <div className="flex items-center gap-4">
             
             <div className="flex items-center gap-3">
-              <img src={theme === 'dark' ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} alt="Horalix Logo" className="h-8 w-auto" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {language === 'en' ? 'Pricing Plans' : 'Cjenovni Planovi'}
-              </h1>
+              <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src={theme === 'dark' ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} alt="Horalix Logo" className="h-8 w-auto" />
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {language === 'en' ? 'Pricing Plans' : 'Cjenovni Planovi'}
+                </h1>
+              </Link>
             </div>
           </div>
         </div>
@@ -301,4 +304,5 @@ const Pricing = () => {
       </div>
     </div>;
 };
+
 export default Pricing;

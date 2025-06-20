@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      affiliations: {
+        Row: {
+          credits_allocated: number | null
+          doctor_id: string | null
+          id: number
+          joined_at: string | null
+          org_id: number | null
+          status: Database["public"]["Enums"]["invitation_status"]
+        }
+        Insert: {
+          credits_allocated?: number | null
+          doctor_id?: string | null
+          id?: number
+          joined_at?: string | null
+          org_id?: number | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+        }
+        Update: {
+          credits_allocated?: number | null
+          doctor_id?: string | null
+          id?: number
+          joined_at?: string | null
+          org_id?: number | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliations_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       antibiotic_recommendations: {
         Row: {
           created_at: string
@@ -844,6 +886,7 @@ export type Database = {
         | "infectious_disease"
         | "pharmacy"
         | "laboratory"
+      invitation_status: "pending" | "active" | "rejected"
       user_role:
         | "admin"
         | "doctor"
@@ -994,6 +1037,7 @@ export const Constants = {
         "pharmacy",
         "laboratory",
       ],
+      invitation_status: ["pending", "active", "rejected"],
       user_role: [
         "admin",
         "doctor",
