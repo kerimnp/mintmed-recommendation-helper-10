@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDoctorProfile, useUpdateDoctorProfile } from '@/hooks/useDoctorProfile';
 import { DoctorProfileForm } from '@/components/doctor/DoctorProfileForm';
+import { PasswordChangeForm } from '@/components/profile/PasswordChangeForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Loader2, User, Lock } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 const Profile = () => {
@@ -64,7 +66,7 @@ const Profile = () => {
                   Profile Settings
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Manage your profile information
+                  Manage your profile information and security
                 </p>
               </div>
             </div>
@@ -87,7 +89,7 @@ const Profile = () => {
             User Profile
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Update your personal and professional information
+            Update your personal information and security settings
           </p>
         </div>
 
@@ -112,12 +114,31 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Profile Form */}
-        <DoctorProfileForm
-          doctor={profile}
-          onSubmit={handleProfileUpdate}
-          isLoading={updateProfile.isPending}
-        />
+        {/* Profile Tabs */}
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile Information
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              Security Settings
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="profile">
+            <DoctorProfileForm
+              doctor={profile}
+              onSubmit={handleProfileUpdate}
+              isLoading={updateProfile.isPending}
+            />
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <PasswordChangeForm />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
