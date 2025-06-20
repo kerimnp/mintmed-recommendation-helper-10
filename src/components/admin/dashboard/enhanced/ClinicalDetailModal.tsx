@@ -25,7 +25,7 @@ import {
   ExternalLink,
   Heart,
   Brain,
-  Kidney
+  Droplet
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -297,7 +297,7 @@ export const ClinicalDetailModal: React.FC<ClinicalDetailModalProps> = ({
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                      <Kidney className="h-5 w-5 text-yellow-600" />
+                      <Droplet className="h-5 w-5 text-yellow-600" />
                       <div>
                         <span className="font-medium">Renal Adjustment</span>
                         <p className="text-sm text-gray-600">
