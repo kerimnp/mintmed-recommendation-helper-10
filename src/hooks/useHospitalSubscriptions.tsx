@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +31,12 @@ export interface CreditUsageHistory {
   operation_type: string;
   operation_details: Record<string, any>;
   created_at: string;
+  profiles?: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 // Hook to fetch hospital doctors (doctors affiliated with the hospital)
@@ -88,27 +95,40 @@ export const useDoctorSeatAllocations = (subscriptionId: string | null) => {
     queryFn: async () => {
       if (!subscriptionId) return [];
 
-      const { data, error } = await supabase
+      // First get the allocations
+      const { data: allocations, error: allocationsError } = await supabase
         .from('doctor_seat_allocations')
-        .select(`
-          *,
-          profiles!doctor_id(
-            id,
-            email,
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('subscription_id', subscriptionId)
         .eq('is_active', true)
         .order('allocated_at', { ascending: false });
 
-      if (error) throw error;
-      
-      return data.map(allocation => ({
-        ...allocation,
-        doctor: allocation.profiles
-      })) as DoctorSeatAllocation[];
+      if (allocationsError) throw allocationsError;
+
+      if (!allocations || allocations.length === 0) return [];
+
+      // Get the doctor profile information for each allocation
+      const doctorIds = allocations.map(allocation => allocation.doctor_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name')
+        .in('id', doctorIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      return allocations.map(allocation => {
+        const doctorProfile = profiles?.find(profile => profile.id === allocation.doctor_id);
+        return {
+          ...allocation,
+          doctor: doctorProfile ? {
+            id: doctorProfile.id,
+            email: doctorProfile.email || '',
+            first_name: doctorProfile.first_name || '',
+            last_name: doctorProfile.last_name || ''
+          } : undefined
+        };
+      }) as DoctorSeatAllocation[];
     },
     enabled: !!subscriptionId,
   });
@@ -169,23 +189,40 @@ export const useCreditUsageHistory = (subscriptionId: string | null) => {
     queryFn: async () => {
       if (!subscriptionId) return [];
 
-      const { data, error } = await supabase
+      // First get the usage history
+      const { data: usageHistory, error: usageError } = await supabase
         .from('credit_usage_history')
-        .select(`
-          *,
-          profiles!doctor_id(
-            id,
-            email,
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('subscription_id', subscriptionId)
         .order('created_at', { ascending: false })
         .limit(100);
 
-      if (error) throw error;
-      return data as (CreditUsageHistory & { profiles: any })[];
+      if (usageError) throw usageError;
+
+      if (!usageHistory || usageHistory.length === 0) return [];
+
+      // Get the doctor profile information for each usage record
+      const doctorIds = [...new Set(usageHistory.map(usage => usage.doctor_id))];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name')
+        .in('id', doctorIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      return usageHistory.map(usage => {
+        const doctorProfile = profiles?.find(profile => profile.id === usage.doctor_id);
+        return {
+          ...usage,
+          profiles: doctorProfile ? {
+            id: doctorProfile.id,
+            email: doctorProfile.email || '',
+            first_name: doctorProfile.first_name || '',
+            last_name: doctorProfile.last_name || ''
+          } : undefined
+        };
+      }) as CreditUsageHistory[];
     },
     enabled: !!subscriptionId,
   });
