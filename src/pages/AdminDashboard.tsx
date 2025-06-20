@@ -29,9 +29,18 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const isUserManagementAuthorized = user?.email === 'kerim@horalix.com';
+  const isHospitalAdmin = user?.user_metadata?.account_type === 'hospital_admin';
 
-  const baseValidTabs = ["dashboard", "history", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines", "pricing"];
-  const validTabs = isUserManagementAuthorized ? [...baseValidTabs, "user-management"] : baseValidTabs;
+  const baseValidTabs = ["dashboard", "history", "antibiotics", "resistance", "regional", "guidelines", "effectiveness", "education", "clinical-guidelines"];
+  
+  // Add subscription tab for hospital admins and pricing for all users
+  let validTabs = [...baseValidTabs, "pricing"];
+  if (isHospitalAdmin) {
+    validTabs.push("subscription");
+  }
+  if (isUserManagementAuthorized) {
+    validTabs.push("user-management");
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -53,6 +62,10 @@ const AdminDashboard = () => {
         toast({ title: "Access Denied", description: "You are not authorized to view User Management.", variant: "destructive" });
         tabParam = "dashboard"; // Fallback to dashboard
         navigate(`/admin?tab=dashboard`, { replace: true });
+      } else if (tabParam === "subscription" && !isHospitalAdmin) {
+        toast({ title: "Access Denied", description: "Subscription management is only available for hospital admins.", variant: "destructive" });
+        tabParam = "dashboard"; // Fallback to dashboard
+        navigate(`/admin?tab=dashboard`, { replace: true });
       } else if (!tabParam || !validTabs.includes(tabParam)) {
         tabParam = "dashboard"; // Default to dashboard if tab is invalid or missing
         navigate(`/admin?tab=dashboard`, { replace: true });
@@ -62,22 +75,27 @@ const AdminDashboard = () => {
         setActiveTab(tabParam);
       }
     }
-  }, [session, location.search, navigate, activeTab, isUserManagementAuthorized, validTabs, toast]);
+  }, [session, location.search, navigate, activeTab, isUserManagementAuthorized, isHospitalAdmin, validTabs, toast]);
 
   // Callback to handle tab changes from UI (e.g., sidebar)
   const handleSetActiveTab = useCallback((newTab: string) => {
     if (newTab === "user-management" && !isUserManagementAuthorized) {
       toast({ title: "Access Denied", description: "You are not authorized to view User Management.", variant: "destructive" });
-      // Optionally navigate to dashboard or do nothing to prevent URL change
       navigate(`/admin?tab=dashboard`, { replace: true });
-      setActiveTab("dashboard"); // Ensure state matches
+      setActiveTab("dashboard");
+      return;
+    }
+    if (newTab === "subscription" && !isHospitalAdmin) {
+      toast({ title: "Access Denied", description: "Subscription management is only available for hospital admins.", variant: "destructive" });
+      navigate(`/admin?tab=dashboard`, { replace: true });
+      setActiveTab("dashboard");
       return;
     }
     if (validTabs.includes(newTab)) {
       setActiveTab(newTab);
       navigate(`/admin?tab=${newTab}`, { replace: true });
     }
-  }, [navigate, isUserManagementAuthorized, validTabs, toast]);
+  }, [navigate, isUserManagementAuthorized, isHospitalAdmin, validTabs, toast]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -97,6 +115,7 @@ const AdminDashboard = () => {
       else if (lowerSearchTerm.includes("educat") || lowerSearchTerm.includes("learn") || lowerSearchTerm.includes("quiz")) handleSetActiveTab("education");
       else if (lowerSearchTerm.includes("history") || lowerSearchTerm.includes("patient record")) handleSetActiveTab("history");
       else if (lowerSearchTerm.includes("pricing") || lowerSearchTerm.includes("plan") || lowerSearchTerm.includes("billing")) handleSetActiveTab("pricing");
+      else if (lowerSearchTerm.includes("subscription") && isHospitalAdmin) handleSetActiveTab("subscription");
       else if ((lowerSearchTerm.includes("user") || lowerSearchTerm.includes("member")) && !isUserManagementAuthorized) {
         toast({ title: "Access Denied", description: "User management search is restricted.", variant: "destructive" });
       }
@@ -116,7 +135,8 @@ const AdminDashboard = () => {
   }
   
   // Ensure DashboardContent receives a safe tab, especially if redirection is pending
-  const currentDisplayTab = (activeTab === "user-management" && !isUserManagementAuthorized) ? "dashboard" : activeTab;
+  const currentDisplayTab = (activeTab === "user-management" && !isUserManagementAuthorized) || 
+                           (activeTab === "subscription" && !isHospitalAdmin) ? "dashboard" : activeTab;
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800 overflow-hidden">
@@ -151,15 +171,15 @@ const AdminDashboard = () => {
         />
         
         <div className="flex-1 overflow-auto">
-          <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing') ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
+          <div className={`max-w-full mx-auto ${(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing' || currentDisplayTab === 'subscription') ? 'p-0' : 'p-4 md:p-6 pt-6'}`}>
             <motion.div 
               key={currentDisplayTab} 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className={((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) ? '' : 'space-y-6'}
+              className={((currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing' || currentDisplayTab === 'subscription')) ? '' : 'space-y-6'}
             >
-              {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) && (
+              {(!(['history', 'user-management', 'pricing', 'subscription'].includes(currentDisplayTab) && (currentDisplayTab !== 'user-management' || isUserManagementAuthorized))) && (
                 <PageHeaderSection
                   activeTab={currentDisplayTab}
                   searchTerm={searchTerm}
@@ -171,7 +191,7 @@ const AdminDashboard = () => {
               
               <DashboardContent activeTab={currentDisplayTab} searchTerm={searchTerm} />
             </motion.div>
-            {(!(currentDisplayTab === 'history' || (currentDisplayTab === 'user-management' && isUserManagementAuthorized) || currentDisplayTab === 'pricing')) && <AdminFooter />}
+            {(!(['history', 'user-management', 'pricing', 'subscription'].includes(currentDisplayTab) && (currentDisplayTab !== 'user-management' || isUserManagementAuthorized))) && <AdminFooter />}
           </div>
         </div>
       </main>

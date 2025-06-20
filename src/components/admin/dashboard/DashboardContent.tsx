@@ -11,9 +11,10 @@ import { ClinicalGuidelines } from "../ClinicalGuidelines";
 import { MainDashboardTab } from "./MainDashboardTab";
 import { PatientHistoryTab } from "./PatientHistoryTab";
 import { UserManagementTab } from "./UserManagementTab";
-import { useAuth } from "@/contexts/AuthContext"; // Import useAuth
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
+import Subscription from "@/pages/Subscription";
 
 interface DashboardContentProps {
   activeTab: string;
@@ -24,8 +25,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   activeTab,
   searchTerm = "" 
 }) => {
-  const { user } = useAuth(); // Get user from AuthContext
+  const { user } = useAuth();
   const isUserManagementAuthorized = user?.email === 'kerim@horalix.com';
+  const isHospitalAdmin = user?.user_metadata?.account_type === 'hospital_admin';
 
   const renderUserManagementTab = () => {
     if (isUserManagementAuthorized) {
@@ -45,6 +47,24 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     );
   };
 
+  const renderSubscriptionTab = () => {
+    if (isHospitalAdmin) {
+      return <Subscription />;
+    }
+    return (
+      <Card className="mt-4 border-destructive bg-destructive/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle size={24} /> Access Denied
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Subscription management is only available for hospital administrators.</p>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <div className="w-full">
       {activeTab === "dashboard" && <MainDashboardTab searchTerm={searchTerm} />}
@@ -58,6 +78,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />}
       {activeTab === "user-management" && renderUserManagementTab()}
       {activeTab === "pricing" && <PricingTab />}
+      {activeTab === "subscription" && renderSubscriptionTab()}
     </div>
   );
 };

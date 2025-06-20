@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,8 @@ import {
   User, 
   LogOut,
   Pill,
-  Euro
+  Euro,
+  CreditCard
 } from 'lucide-react';
 
 export const MainNavigation: React.FC = () => {
@@ -50,6 +50,11 @@ export const MainNavigation: React.FC = () => {
       href: '/admin',
       label: language === 'en' ? 'Dashboard' : 'Nadzorna Ploča',
       icon: Shield,
+    },
+    {
+      href: '/subscription',
+      label: language === 'en' ? 'Subscription' : 'Pretplata',
+      icon: CreditCard,
     },
   ];
 

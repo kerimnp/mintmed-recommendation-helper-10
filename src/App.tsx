@@ -15,6 +15,7 @@ import Auth from "@/pages/Auth";
 import About from "@/pages/About";
 import Profile from "@/pages/Profile";
 import Pricing from "@/pages/Pricing";
+import Subscription from "@/pages/Subscription";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
@@ -45,6 +46,7 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/subscription" element={<Subscription />} />
                     <Route path="*" element={<Index />} />
                   </Routes>
                   <Toaster />
