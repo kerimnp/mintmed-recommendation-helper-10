@@ -9,7 +9,7 @@ import { TransactionHistory } from '@/components/subscription/TransactionHistory
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ArrowLeft, CreditCard, Building2, User } from 'lucide-react';
+import { Loader2, ArrowLeft, CreditCard } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 const Subscription = () => {
@@ -18,10 +18,7 @@ const Subscription = () => {
   const { theme } = useTheme();
   
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [selectedPlanType, setSelectedPlanType] = useState<'individual' | 'hospital'>(() => {
-    // Default to hospital for hospital admins, individual for others
-    return user?.user_metadata?.account_type === 'hospital_admin' ? 'hospital' : 'individual';
-  });
+  const [selectedPlanType, setSelectedPlanType] = useState<'individual' | 'hospital'>('individual');
 
   const { data: plans, isLoading: plansLoading } = usePlans();
   const { data: currentSubscription, isLoading: subscriptionLoading } = useCurrentSubscription();
@@ -33,13 +30,6 @@ const Subscription = () => {
       navigate('/auth');
     }
   }, [authLoading, user, navigate]);
-
-  // Update selected plan type when user changes
-  React.useEffect(() => {
-    if (user?.user_metadata?.account_type === 'hospital_admin' && selectedPlanType !== 'hospital') {
-      setSelectedPlanType('hospital');
-    }
-  }, [user, selectedPlanType]);
 
   if (authLoading || subscriptionLoading) {
     return (
@@ -70,16 +60,7 @@ const Subscription = () => {
     }
   };
 
-  const handleGoToDashboard = () => {
-    if (user?.user_metadata?.account_type === 'hospital_admin') {
-      navigate('/admin');
-    } else {
-      navigate('/');
-    }
-  };
-
   const filteredPlans = plans?.filter(plan => plan.plan_type === selectedPlanType) || [];
-  const isHospitalAdmin = user?.user_metadata?.account_type === 'hospital_admin';
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800">
@@ -99,20 +80,20 @@ const Subscription = () => {
               <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {isHospitalAdmin ? 'Choose Your Hospital Plan' : 'Subscription Management'}
+                  Subscription Management
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {isHospitalAdmin ? 'Select a plan to get started' : 'Manage your subscription and billing'}
+                  Manage your subscription and billing
                 </p>
               </div>
             </div>
             <Button 
               variant="ghost" 
-              onClick={handleGoToDashboard}
+              onClick={() => navigate('/admin')}
               className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>{isHospitalAdmin ? 'Back to Dashboard' : 'Back to Home'}</span>
+              <span>Back to Dashboard</span>
             </Button>
           </div>
         </div>
@@ -120,7 +101,7 @@ const Subscription = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue={currentSubscription ? "overview" : "plans"} className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="plans">Plans</TabsTrigger>
@@ -140,44 +121,35 @@ const Subscription = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
-                  {isHospitalAdmin ? 'Choose Your Hospital Plan' : 'Choose Your Plan'}
+                  Choose Your Plan
                 </CardTitle>
-                {isHospitalAdmin && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    As a hospital administrator, you can select from our institutional plans designed for healthcare facilities.
-                  </p>
-                )}
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Plan Type Selection - Only show for non-hospital admins */}
-                {!isHospitalAdmin && (
-                  <div className="flex justify-center">
-                    <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-                      <button
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                          selectedPlanType === 'individual'
-                            ? 'bg-white dark:bg-gray-700 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                        onClick={() => setSelectedPlanType('individual')}
-                      >
-                        <User className="h-4 w-4" />
-                        Individual
-                      </button>
-                      <button
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                          selectedPlanType === 'hospital'
-                            ? 'bg-white dark:bg-gray-700 shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                        onClick={() => setSelectedPlanType('hospital')}
-                      >
-                        <Building2 className="h-4 w-4" />
-                        Hospital
-                      </button>
-                    </div>
+                {/* Plan Type Selection */}
+                <div className="flex justify-center">
+                  <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                    <button
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        selectedPlanType === 'individual'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                      onClick={() => setSelectedPlanType('individual')}
+                    >
+                      Individual
+                    </button>
+                    <button
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        selectedPlanType === 'hospital'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                      onClick={() => setSelectedPlanType('hospital')}
+                    >
+                      Hospital
+                    </button>
                   </div>
-                )}
+                </div>
 
                 {/* Billing Cycle Toggle */}
                 <div className="flex justify-center">
@@ -218,11 +190,7 @@ const Subscription = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className={`grid gap-6 ${
-                    selectedPlanType === 'hospital' 
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5' 
-                      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  }`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredPlans.map((plan) => (
                       <PlanCard
                         key={plan.id}

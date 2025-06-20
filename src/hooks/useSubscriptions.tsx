@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,13 +8,13 @@ export interface Plan {
   id: string;
   name: string;
   description: string | null;
-  plan_type: string;
+  plan_type: 'individual' | 'hospital';
   price_monthly: number | null;
-  price_yearly?: number | null;
-  credits_included: number | null;
-  doctor_seats?: number;
-  features?: string[];
-  is_active: boolean | null;
+  price_yearly: number | null;
+  credits_included: number;
+  doctor_seats: number;
+  features: string[];
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -72,14 +73,7 @@ export const usePlans = (planType?: 'individual' | 'hospital') => {
 
       const { data, error } = await query;
       if (error) throw error;
-      
-      // Transform the data to match our interface expectations
-      return data?.map(plan => ({
-        ...plan,
-        price_yearly: plan.price_monthly ? plan.price_monthly * 12 * 0.8 : null, // 20% discount for yearly
-        doctor_seats: 1, // Default for individual plans, will be overridden for hospital plans
-        features: [] // Default empty array since features don't exist in database yet
-      })) as Plan[];
+      return data as Plan[];
     },
   });
 };

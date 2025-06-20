@@ -692,33 +692,42 @@ export type Database = {
           created_at: string | null
           credits_included: number | null
           description: string | null
+          doctor_seats: number | null
+          features: Json | null
           id: string
           is_active: boolean | null
           name: string
           plan_type: string
           price_monthly: number | null
+          price_yearly: number | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           credits_included?: number | null
           description?: string | null
+          doctor_seats?: number | null
+          features?: Json | null
           id?: string
           is_active?: boolean | null
           name: string
           plan_type: string
           price_monthly?: number | null
+          price_yearly?: number | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           credits_included?: number | null
           description?: string | null
+          doctor_seats?: number | null
+          features?: Json | null
           id?: string
           is_active?: boolean | null
           name?: string
           plan_type?: string
           price_monthly?: number | null
+          price_yearly?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -894,7 +903,6 @@ export type Database = {
           credits_remaining: number | null
           current_period_end: string
           current_period_start: string
-          doctor_seats: number
           id: string
           metadata: Json | null
           org_id: number | null
@@ -913,7 +921,6 @@ export type Database = {
           credits_remaining?: number | null
           current_period_end: string
           current_period_start?: string
-          doctor_seats?: number
           id?: string
           metadata?: Json | null
           org_id?: number | null
@@ -932,7 +939,6 @@ export type Database = {
           credits_remaining?: number | null
           current_period_end?: string
           current_period_start?: string
-          doctor_seats?: number
           id?: string
           metadata?: Json | null
           org_id?: number | null

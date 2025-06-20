@@ -4,69 +4,101 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Star } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Check, Star, Crown, Infinity } from 'lucide-react';
 import { individualPlans } from './PricingData';
 
 export const IndividualPricingSection: React.FC = () => {
   const { language } = useLanguage();
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-          {language === 'en' ? 'Individual Doctor Plans' : 'Planovi za Individualne Liječnike'}
+    <div className="space-y-12">
+      {/* Individual Subscription Plans */}
+      <div>
+        <h3 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+          {language === 'en' ? 'Subscription Plans' : 'Pretplatnički Planovi'}
         </h3>
-        <p className="text-gray-600 dark:text-gray-300">
-          {language === 'en' ? 'Monthly subscription plans for individual healthcare providers' : 'Mjesečni planovi pretplate za individualne zdravstvene radnike'}
-        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {individualPlans.map((plan, index) => (
+            <Card key={index} className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700 ${plan.name === 'Elite' ? 'ring-2 ring-medical-primary scale-105' : ''}`}>
+              {plan.popular && (
+                <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500">
+                  <Star className="h-3 w-3 mr-1" />
+                  Popular
+                </Badge>
+              )}
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  {plan.name}
+                  {plan.name === 'Elite' && <Crown className="h-5 w-5 text-yellow-500" />}
+                </CardTitle>
+                <div className="text-3xl font-bold">€{plan.price}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">/month</div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center mb-6">
+                  {plan.unlimited ? (
+                    <div className="flex items-center justify-center gap-2 text-lg font-semibold">
+                      <Infinity className="h-5 w-5" />
+                      Unlimited usage
+                    </div>
+                  ) : (
+                    <div className="text-lg font-semibold">{plan.credits} credits/month</div>
+                  )}
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full" variant={plan.name === 'Elite' ? 'default' : 'outline'}>
+                  {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {individualPlans.map((plan, index) => (
-          <Card key={index} className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700 ${plan.popular ? 'ring-2 ring-medical-primary' : ''}`}>
-            {plan.popular && (
-              <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-medical-primary">
-                <Star className="h-3 w-3 mr-1" />
-                {language === 'en' ? 'Most Popular' : 'Najpopularniji'}
-              </Badge>
-            )}
-            
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">{plan.name}</CardTitle>
-              <div className="text-4xl font-bold text-medical-primary">
-                €{plan.price}
-                <span className="text-lg font-normal text-gray-500">/month</span>
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {plan.credits} credits per month
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <div className="space-y-3 mb-6">
-                {plan.features.map((feature, featureIndex) => (
-                  <div key={featureIndex} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <Button className="w-full bg-medical-primary hover:bg-medical-primary/90">
-                {language === 'en' ? `Choose ${plan.name}` : `Odaberite ${plan.name}`}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>
-          {language === 'en' 
-            ? 'All plans include automatic monthly renewals. Cancel anytime.' 
-            : 'Svi planovi uključuju automatsko mjesečno obnavljanje. Otkažite u bilo koje vrijeme.'}
-        </p>
-      </div>
+      {/* FAQ */}
+      <Card className="max-w-3xl mx-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">
+            {language === 'en' ? 'Frequently Asked Questions' : 'Često Postavljana Pitanja'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                {language === 'en' ? 'Can I mix subscriptions and bundles?' : 'Mogu li kombinirati pretplate i pakete?'}
+              </AccordionTrigger>
+              <AccordionContent>
+                {language === 'en' ? 'Yes! Hospitals can combine seat fees with credit bundles. Individual doctors can supplement their subscription with additional credit purchases for extra flexibility.' : 'Da! Bolnice mogu kombinirati naknade po sjedištu s paketima kredita. Individualni liječnici mogu dopuniti svoju pretplatu dodatnim kupnjama kredita za dodatnu fleksibilnost.'}
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>
+                {language === 'en' ? 'How are credits tracked?' : 'Kako se prate krediti?'}
+              </AccordionTrigger>
+              <AccordionContent>
+                {language === 'en' ? 'Real-time dashboard shows your credit balance, usage history, and renewal dates. Hospital administrators can view usage across all doctors.' : 'Dashboard u realnom vremenu prikazuje stanje kredita, povijest korištenja i datume obnove. Administratori bolnica mogu vidjeti korištenje svih liječnika.'}
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>
+                {language === 'en' ? 'What happens to unused credits?' : 'Što se događa s nekorištenim kreditima?'}
+              </AccordionTrigger>
+              <AccordionContent>
+                {language === 'en' ? 'Subscription credits roll over to the next month (except Elite unlimited plan). Hospital credit bundles never expire.' : 'Krediti iz pretplate se prenose u sljedeći mjesec (osim Elite neograničenog plana). Bolnički paketi kredita nikad ne istječu.'}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
     </div>
   );
 };
