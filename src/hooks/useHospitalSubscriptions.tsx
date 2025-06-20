@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -93,7 +92,7 @@ export const useDoctorSeatAllocations = (subscriptionId: string | null) => {
         .from('doctor_seat_allocations')
         .select(`
           *,
-          profiles!doctor_seat_allocations_doctor_id_fkey(
+          profiles!doctor_id(
             id,
             email,
             first_name,
@@ -174,7 +173,7 @@ export const useCreditUsageHistory = (subscriptionId: string | null) => {
         .from('credit_usage_history')
         .select(`
           *,
-          profiles!credit_usage_history_doctor_id_fkey(
+          profiles!doctor_id(
             id,
             email,
             first_name,

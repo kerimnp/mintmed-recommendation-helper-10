@@ -31,6 +31,7 @@ export interface Subscription {
   renewal_date: string | null;
   cancelled_at: string | null;
   credits_remaining: number;
+  doctor_seats: number;
   stripe_subscription_id: string | null;
   stripe_customer_id: string | null;
   metadata: Record<string, any>;
