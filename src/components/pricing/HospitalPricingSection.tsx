@@ -56,7 +56,7 @@ export const HospitalPricingSection: React.FC = () => {
       {/* Hospital Credit Bundles */}
       <div>
         <h3 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-          {language === 'en' ? 'Credit Bundles (Optional Add-ons)' : 'Paketi Kredita (Dodatni)'}
+          {language === 'en' ? 'Credit Bundles' : 'Paketi Kredita'}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {hospitalCreditBundles.map((bundle, index) => (
