@@ -49,9 +49,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // Redirect based on user account type
           const accountType = currentSession.user.user_metadata?.account_type;
+          console.log('Account type:', accountType);
+          
           if (accountType === 'hospital_admin') {
-            navigate('/admin');
+            // Redirect hospital admins to subscription page to choose a plan
+            navigate('/subscription');
           } else if (window.location.pathname === '/auth') {
+            // Redirect individual users to home page
             navigate('/');
           }
         }
