@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
@@ -46,7 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               : 'Dobrodošli u Antibiotic Advisor.',
           });
           
-          if (window.location.pathname === '/auth') {
+          // Redirect based on user account type
+          const accountType = currentSession.user.user_metadata?.account_type;
+          if (accountType === 'hospital_admin') {
+            navigate('/admin');
+          } else if (window.location.pathname === '/auth') {
             navigate('/');
           }
         }
