@@ -78,7 +78,7 @@ export const usePlans = (planType?: 'individual' | 'hospital') => {
         ...plan,
         price_yearly: plan.price_monthly ? plan.price_monthly * 12 * 0.8 : null, // 20% discount for yearly
         doctor_seats: 1, // Default for individual plans, will be overridden for hospital plans
-        features: plan.features ? (typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features) : []
+        features: [] // Default empty array since features don't exist in database yet
       })) as Plan[];
     },
   });
