@@ -1,11 +1,11 @@
 
 import React from "react";
-import { EnhancedAntibioticsTab } from "./enhanced/EnhancedAntibioticsTab";
+import { ModernAntibioticsTab } from "./enhanced/ModernAntibioticsTab";
 
 interface AntibioticsTabProps {
   searchTerm?: string;
 }
 
 export const AntibioticsTab: React.FC<AntibioticsTabProps> = ({ searchTerm = "" }) => {
-  return <EnhancedAntibioticsTab />;
+  return <ModernAntibioticsTab />;
 };
