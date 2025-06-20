@@ -43,14 +43,20 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Debug logging
+  // Enhanced debugging
   useEffect(() => {
     console.log(`DrugCard ${drug.name}: isExpanded = ${isExpanded}`);
   }, [isExpanded, drug.name]);
 
-  const handleToggleExpanded = () => {
-    console.log(`Toggling expanded state for ${drug.name} from ${isExpanded} to ${!isExpanded}`);
-    setIsExpanded(!isExpanded);
+  const handleToggleExpanded = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`Button clicked for ${drug.name}. Current state: ${isExpanded}, changing to: ${!isExpanded}`);
+    setIsExpanded(prev => {
+      const newState = !prev;
+      console.log(`State changed for ${drug.name}: ${prev} -> ${newState}`);
+      return newState;
+    });
   };
 
   const getEffectivenessColor = (value: number) => {
@@ -249,6 +255,7 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
               size="sm" 
               className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg transition-all duration-300"
               onClick={handleToggleExpanded}
+              type="button"
             >
               {isExpanded ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
               {isExpanded ? 'Hide Details' : 'View Details'}
@@ -257,12 +264,18 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
               size="sm" 
               variant="outline"
               className="border-blue-500/20 hover:bg-blue-500/5 transition-all duration-300"
+              type="button"
             >
               <BookOpen className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* Enhanced Expanded details with better animation and fallback content */}
+          {/* Debug info */}
+          <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded">
+            Debug: isExpanded = {isExpanded.toString()}
+          </div>
+
+          {/* Enhanced Expanded details */}
           <AnimatePresence mode="wait">
             {isExpanded && (
               <motion.div
@@ -288,8 +301,16 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
                   }
                 }}
                 className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4 overflow-hidden"
-                style={{ minHeight: '200px' }}
               >
+                <div className="bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                  <div className="text-sm font-bold text-green-800 dark:text-green-200">
+                    EXPANDED CONTENT IS NOW VISIBLE!
+                  </div>
+                  <div className="text-xs text-green-700 dark:text-green-300 mt-1">
+                    This confirms the animation is working properly.
+                  </div>
+                </div>
+
                 {/* Enhanced metrics grid */}
                 <div className="grid grid-cols-3 gap-3">
                   <motion.div 
