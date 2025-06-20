@@ -233,7 +233,6 @@ export const EnhancedEffectivenessTab: React.FC = () => {
                       <RadialBar
                         label={{ position: 'insideStart', fill: '#fff' }}
                         background
-                        clockWise
                         dataKey="value"
                       />
                       <Legend iconSize={10} layout="vertical" verticalAlign="bottom" />
