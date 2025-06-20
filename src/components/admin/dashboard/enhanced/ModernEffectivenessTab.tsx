@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -43,7 +42,6 @@ import {
   Zap,
   Star,
   Shield,
-  Pulse,
   BarChart3
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -304,7 +302,7 @@ export const ModernEffectivenessTab: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span className="flex items-center gap-2">
-                        <Pulse className="h-5 w-5" />
+                        <Zap className="h-5 w-5" />
                         Treatment Success Trends
                       </span>
                       <ModernBadge variant="success" glow>Improving</ModernBadge>
