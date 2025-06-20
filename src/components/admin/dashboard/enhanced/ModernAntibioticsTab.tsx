@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,103 +24,30 @@ import {
   Download,
   Eye,
   Heart,
-  Brain
+  Brain,
+  Pill,
+  Beaker,
+  Microscope
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  getAllAntibiotics, 
+  getAntibioticsByCategory, 
+  searchAntibiotics, 
+  getCategories, 
+  getAntibioticStats,
+  EnhancedAntibioticData 
+} from '@/services/antibioticService';
 
-interface DrugData {
-  id: string;
-  name: string;
-  category: string;
-  effectiveness: number;
-  resistance: number;
-  sideEffects: number;
-  cost: number;
-  availability: 'high' | 'medium' | 'low';
-  mechanism: string;
-  spectrum: string;
-  route: string[];
-  halfLife: string;
-  trending: boolean;
-  featured: boolean;
-  warnings: string[];
-  interactions: number;
-  studies: number;
-  lastUpdated: string;
-}
-
-const mockDrugs: DrugData[] = [
-  {
-    id: '1',
-    name: 'Amoxicillin',
-    category: 'Beta-lactam',
-    effectiveness: 85,
-    resistance: 15,
-    sideEffects: 12,
-    cost: 25,
-    availability: 'high',
-    mechanism: 'Cell wall synthesis inhibitor',
-    spectrum: 'Broad-spectrum',
-    route: ['Oral', 'IV'],
-    halfLife: '1-1.5 hours',
-    trending: true,
-    featured: true,
-    warnings: ['Penicillin allergy', 'C. diff risk'],
-    interactions: 8,
-    studies: 1250,
-    lastUpdated: '2024-12-19'
-  },
-  {
-    id: '2',
-    name: 'Vancomycin',
-    category: 'Glycopeptide',
-    effectiveness: 95,
-    resistance: 8,
-    sideEffects: 25,
-    cost: 180,
-    availability: 'medium',
-    mechanism: 'Cell wall synthesis inhibitor',
-    spectrum: 'Gram-positive',
-    route: ['IV', 'Oral'],
-    halfLife: '4-6 hours',
-    trending: false,
-    featured: true,
-    warnings: ['Nephrotoxicity', 'Ototoxicity', 'Red man syndrome'],
-    interactions: 15,
-    studies: 890,
-    lastUpdated: '2024-12-18'
-  },
-  {
-    id: '3',
-    name: 'Ciprofloxacin',
-    category: 'Fluoroquinolone',
-    effectiveness: 78,
-    resistance: 22,
-    sideEffects: 18,
-    cost: 45,
-    availability: 'high',
-    mechanism: 'DNA gyrase inhibitor',
-    spectrum: 'Broad-spectrum',
-    route: ['Oral', 'IV'],
-    halfLife: '3-5 hours',
-    trending: true,
-    featured: false,
-    warnings: ['Tendon rupture', 'QT prolongation'],
-    interactions: 12,
-    studies: 980,
-    lastUpdated: '2024-12-17'
-  }
-];
-
-const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) => {
+const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ drug, index }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getEffectivenessColor = (value: number) => {
-    if (value >= 90) return 'text-emerald-600 bg-emerald-50';
-    if (value >= 75) return 'text-blue-600 bg-blue-50';
-    if (value >= 60) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+    if (value >= 90) return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
+    if (value >= 75) return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20';
+    if (value >= 60) return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20';
+    return 'text-red-600 bg-red-50 dark:bg-red-900/20';
   };
 
   const getAvailabilityIcon = (availability: string) => {
@@ -132,11 +59,19 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
     }
   };
 
+  const getCostBadge = (cost: number) => {
+    if (cost < 50) return { label: 'Low Cost', variant: 'success' as const };
+    if (cost < 100) return { label: 'Medium Cost', variant: 'warning' as const };
+    return { label: 'High Cost', variant: 'danger' as const };
+  };
+
+  const costInfo = getCostBadge(drug.cost);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
       whileHover={{ y: -8, scale: 1.02 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -144,7 +79,7 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
     >
       <Card className="relative overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl hover:shadow-2xl transition-all duration-500 rounded-2xl">
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-medical-primary/5 via-transparent to-medical-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
         {/* Featured badge */}
         {drug.featured && (
@@ -168,13 +103,22 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
 
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-medical-primary transition-colors duration-300">
+            <div className="space-y-2 flex-1">
+              <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">
                 {drug.name}
               </CardTitle>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center flex-wrap gap-2">
                 <Badge variant="secondary" className="text-xs font-medium bg-gray-100 dark:bg-gray-800">
                   {drug.category}
+                </Badge>
+                <Badge 
+                  className={`text-xs ${
+                    costInfo.variant === 'success' ? 'bg-emerald-100 text-emerald-700' :
+                    costInfo.variant === 'warning' ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {costInfo.label}
                 </Badge>
                 <div className="flex items-center space-x-1">
                   {getAvailabilityIcon(drug.availability)}
@@ -198,7 +142,7 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
               <div className="text-lg font-bold mt-1">{drug.effectiveness}%</div>
             </div>
             
-            <div className="p-3 rounded-xl bg-red-50 text-red-600 transition-all duration-300">
+            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <Shield className="w-4 h-4" />
                 <span className="text-xs font-medium">Resistance</span>
@@ -210,14 +154,14 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
           {/* Mechanism and spectrum */}
           <div className="space-y-2">
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <Zap className="w-4 h-4 mr-2 text-medical-primary" />
+              <Zap className="w-4 h-4 mr-2 text-blue-500" />
               <span className="font-medium">Mechanism:</span>
-              <span className="ml-1">{drug.mechanism}</span>
+              <span className="ml-1 text-xs">{drug.mechanism}</span>
             </div>
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <Activity className="w-4 h-4 mr-2 text-medical-accent" />
+              <Activity className="w-4 h-4 mr-2 text-purple-500" />
               <span className="font-medium">Spectrum:</span>
-              <span className="ml-1">{drug.spectrum}</span>
+              <span className="ml-1 text-xs">{drug.spectrum}</span>
             </div>
           </div>
 
@@ -227,14 +171,43 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
               <Clock className="w-3 h-3 mr-1" />
               <span>t½: {drug.halfLife}</span>
             </div>
-            <div className="flex space-x-1">
-              {drug.route.map((route, idx) => (
+            <div className="flex flex-wrap gap-1">
+              {drug.route.slice(0, 2).map((route, idx) => (
                 <Badge key={idx} variant="outline" className="text-xs">
                   {route}
                 </Badge>
               ))}
+              {drug.route.length > 2 && (
+                <Badge variant="outline" className="text-xs">
+                  +{drug.route.length - 2}
+                </Badge>
+              )}
             </div>
           </div>
+
+          {/* Common indications */}
+          {drug.commonIndications.length > 0 && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+              <div className="flex items-center mb-1">
+                <Beaker className="w-4 h-4 text-blue-600 mr-2" />
+                <span className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                  Common Indications
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {drug.commonIndications.slice(0, 3).map((indication, idx) => (
+                  <Badge key={idx} variant="outline" className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                    {indication}
+                  </Badge>
+                ))}
+                {drug.commonIndications.length > 3 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{drug.commonIndications.length - 3} more
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Warnings */}
           {drug.warnings.length > 0 && (
@@ -251,6 +224,11 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
                     • {warning}
                   </div>
                 ))}
+                {drug.warnings.length > 2 && (
+                  <div className="text-xs text-amber-600 dark:text-amber-400">
+                    +{drug.warnings.length - 2} more warnings
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -259,7 +237,7 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
           <div className="flex space-x-2 pt-2">
             <Button 
               size="sm" 
-              className="flex-1 bg-gradient-to-r from-medical-primary to-medical-accent hover:from-medical-primary/90 hover:to-medical-accent/90 text-white border-0 shadow-lg transition-all duration-300"
+              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg transition-all duration-300"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               <Eye className="w-4 h-4 mr-2" />
@@ -268,7 +246,7 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
             <Button 
               size="sm" 
               variant="outline"
-              className="border-medical-primary/20 hover:bg-medical-primary/5 transition-all duration-300"
+              className="border-blue-500/20 hover:bg-blue-500/5 transition-all duration-300"
             >
               <BookOpen className="w-4 h-4" />
             </Button>
@@ -298,6 +276,28 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
                     <div className="text-sm font-bold text-gray-900 dark:text-white">{drug.studies}</div>
                   </div>
                 </div>
+                
+                {/* Available products info */}
+                {drug.availableProducts.length > 0 && (
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Available Products ({drug.availableProducts.length})
+                    </div>
+                    <div className="space-y-1">
+                      {drug.availableProducts.slice(0, 2).map((product, idx) => (
+                        <div key={idx} className="text-xs text-gray-600 dark:text-gray-400">
+                          {product.name} - {product.manufacturer}
+                        </div>
+                      ))}
+                      {drug.availableProducts.length > 2 && (
+                        <div className="text-xs text-gray-500">
+                          +{drug.availableProducts.length - 2} more products
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
                   Last updated: {drug.lastUpdated}
                 </div>
@@ -313,29 +313,49 @@ const DrugCard: React.FC<{ drug: DrugData; index: number }> = ({ drug, index }) 
 export const ModernAntibioticsTab: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('effectiveness');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredDrugs = mockDrugs.filter(drug => {
-    const matchesSearch = drug.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         drug.mechanism.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || drug.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  // Get real data using the service
+  const allAntibiotics = useMemo(() => getAllAntibiotics(), []);
+  const categories = useMemo(() => getCategories(), []);
+  const stats = useMemo(() => getAntibioticStats(), []);
 
-  const sortedDrugs = [...filteredDrugs].sort((a, b) => {
-    switch (sortBy) {
-      case 'effectiveness':
-        return b.effectiveness - a.effectiveness;
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'category':
-        return a.category.localeCompare(b.category);
-      default:
-        return 0;
+  const filteredDrugs = useMemo(() => {
+    let drugs = allAntibiotics;
+    
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      drugs = getAntibioticsByCategory(selectedCategory);
     }
-  });
+    
+    // Apply search filter
+    if (searchTerm) {
+      drugs = searchAntibiotics(searchTerm);
+      if (selectedCategory !== 'all') {
+        drugs = drugs.filter(drug => drug.category === selectedCategory);
+      }
+    }
+    
+    return drugs;
+  }, [allAntibiotics, selectedCategory, searchTerm]);
+
+  const sortedDrugs = useMemo(() => {
+    return [...filteredDrugs].sort((a, b) => {
+      switch (sortBy) {
+        case 'effectiveness':
+          return b.effectiveness - a.effectiveness;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'category':
+          return a.category.localeCompare(b.category);
+        case 'resistance':
+          return a.resistance - b.resistance;
+        default:
+          return 0;
+      }
+    });
+  }, [filteredDrugs, sortBy]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -358,20 +378,20 @@ export const ModernAntibioticsTab: React.FC = () => {
         transition={{ duration: 0.6 }}
         className="relative overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-gray-700/30 shadow-2xl"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-medical-primary/10 via-transparent to-medical-accent/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10" />
         <div className="relative p-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-medical-primary to-medical-accent bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
                 Antibiotic Intelligence
               </h1>
               <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Advanced therapeutic insights with real-time resistance monitoring
+                Comprehensive therapeutic insights with real-time resistance monitoring
               </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <Brain className="w-8 h-8 text-medical-primary" />
+                <Brain className="w-8 h-8 text-blue-600" />
               </div>
             </div>
           </div>
@@ -381,7 +401,7 @@ export const ModernAntibioticsTab: React.FC = () => {
             <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">247</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Total Antibiotics</div>
                 </div>
                 <Shield className="w-6 h-6 text-blue-500" />
@@ -390,7 +410,7 @@ export const ModernAntibioticsTab: React.FC = () => {
             <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">89%</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.avgEffectiveness}%</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Avg Effectiveness</div>
                 </div>
                 <Target className="w-6 h-6 text-emerald-500" />
@@ -399,7 +419,7 @@ export const ModernAntibioticsTab: React.FC = () => {
             <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">15</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.resistanceAlerts}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Resistance Alerts</div>
                 </div>
                 <AlertTriangle className="w-6 h-6 text-amber-500" />
@@ -408,10 +428,10 @@ export const ModernAntibioticsTab: React.FC = () => {
             <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">1.2K</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Recent Studies</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.round(stats.totalStudies / 1000)}K</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Clinical Studies</div>
                 </div>
-                <BookOpen className="w-6 h-6 text-purple-500" />
+                <Microscope className="w-6 h-6 text-purple-500" />
               </div>
             </div>
           </div>
@@ -433,7 +453,7 @@ export const ModernAntibioticsTab: React.FC = () => {
               placeholder="Search antibiotics... (⌘K)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-medical-primary/20 focus:border-medical-primary/40 transition-all duration-300"
+              className="pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
             />
           </div>
 
@@ -441,28 +461,30 @@ export const ModernAntibioticsTab: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-medical-primary/20 focus:border-medical-primary/40 transition-all duration-300"
+              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
             >
-              <option value="all">All Categories</option>
-              <option value="Beta-lactam">Beta-lactam</option>
-              <option value="Glycopeptide">Glycopeptide</option>
-              <option value="Fluoroquinolone">Fluoroquinolone</option>
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category === 'all' ? 'All Categories' : category}
+                </option>
+              ))}
             </select>
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-medical-primary/20 focus:border-medical-primary/40 transition-all duration-300"
+              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
             >
               <option value="effectiveness">Sort by Effectiveness</option>
               <option value="name">Sort by Name</option>
               <option value="category">Sort by Category</option>
+              <option value="resistance">Sort by Resistance (Low to High)</option>
             </select>
 
             <Button
               variant="outline"
               size="sm"
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-medical-primary/5 transition-all duration-300"
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-blue-500/5 transition-all duration-300"
             >
               <Filter className="w-4 h-4 mr-2" />
               Filters
@@ -471,12 +493,19 @@ export const ModernAntibioticsTab: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-medical-primary/5 transition-all duration-300"
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-blue-500/5 transition-all duration-300"
             >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
           </div>
+        </div>
+        
+        {/* Results summary */}
+        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+          Showing {sortedDrugs.length} of {allAntibiotics.length} antibiotics
+          {searchTerm && ` for "${searchTerm}"`}
+          {selectedCategory !== 'all' && ` in ${selectedCategory}`}
         </div>
       </motion.div>
 
@@ -508,6 +537,16 @@ export const ModernAntibioticsTab: React.FC = () => {
             <p className="text-gray-600 dark:text-gray-400">
               Try adjusting your search criteria or filters
             </p>
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+              }}
+            >
+              Clear Filters
+            </Button>
           </div>
         </motion.div>
       )}
