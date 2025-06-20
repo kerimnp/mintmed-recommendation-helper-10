@@ -1,552 +1,312 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area
-} from 'recharts';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  Users, 
-  CreditCard,
+  Building2, 
+  User, 
+  Check, 
+  Star, 
   Crown,
-  Zap,
+  Infinity,
   Shield,
-  Star,
-  Building,
-  Target,
-  Calendar,
-  ArrowUp,
-  ArrowDown,
-  Award,
-  Briefcase,
-  Globe
+  Zap,
+  Award
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ModernMetricCard, ModernBadge, ModernGlassCard, ModernFloatingButton, ModernProgressBar, modernDesignSystem } from './ModernDesignSystem';
+import { motion } from 'framer-motion';
+import { ModernGlassCard, ModernFloatingButton, modernDesignSystem } from './ModernDesignSystem';
 import { useToast } from '@/hooks/use-toast';
 
-// Enhanced real-time pricing data
-const generateRevenueData = () => {
-  const baseData = [
-    { month: 'Jan', revenue: 42580, subscriptions: 156, churn: 3.2, ltv: 2840 },
-    { month: 'Feb', revenue: 48720, subscriptions: 178, churn: 2.8, ltv: 2950 },
-    { month: 'Mar', revenue: 45360, subscriptions: 165, churn: 3.5, ltv: 2780 },
-    { month: 'Apr', revenue: 52180, subscriptions: 189, churn: 2.1, ltv: 3120 },
-    { month: 'May', revenue: 49630, subscriptions: 182, churn: 2.6, ltv: 3040 },
-    { month: 'Jun', revenue: 56890, subscriptions: 201, churn: 1.9, ltv: 3280 }
-  ];
-  
-  return baseData.map(item => ({
-    ...item,
-    revenue: Math.max(30000, Math.min(70000, item.revenue + (Math.random() - 0.5) * 3000)),
-    subscriptions: Math.max(120, Math.min(250, item.subscriptions + Math.round((Math.random() - 0.5) * 10))),
-    churn: Math.max(1, Math.min(5, item.churn + (Math.random() - 0.5) * 0.5)),
-    ltv: Math.max(2000, Math.min(4000, item.ltv + (Math.random() - 0.5) * 200))
-  }));
-};
-
-const subscriptionPlans = [
+const individualPlans = [
   {
-    name: 'Starter',
+    id: 'basic',
+    name: 'Basic',
     price: 29,
     period: 'month',
-    subscribers: 87,
-    growth: '+12%',
-    features: ['Basic Recommendations', '50 Queries/month', 'Email Support', 'Basic Analytics'],
-    color: '#10b981',
-    gradient: 'from-emerald-400 to-green-600',
+    credits: 200,
+    features: [
+      'Basic AI Recommendations',
+      '200 Credits per month',
+      'Email Support',
+      'Standard Guidelines Access',
+      'Roll over unused credits'
+    ],
+    popular: false,
     icon: <Zap className="h-6 w-6" />,
-    badge: 'Most Popular'
+    gradient: modernDesignSystem.gradients.success
   },
   {
+    id: 'professional',
     name: 'Professional',
     price: 89,
     period: 'month',
-    subscribers: 142,
-    growth: '+18%',
-    features: ['Advanced AI Analysis', 'Unlimited Queries', 'Priority Support', 'Advanced Analytics', 'API Access'],
-    color: '#3b82f6',
-    gradient: 'from-blue-400 to-indigo-600',
+    credits: 500,
+    features: [
+      'Advanced AI Analysis',
+      '500 Credits per month',
+      'Priority Support',
+      'Advanced Guidelines Access',
+      'API Access',
+      'Roll over unused credits'
+    ],
+    popular: true,
     icon: <Crown className="h-6 w-6" />,
-    badge: 'Recommended'
+    gradient: modernDesignSystem.gradients.primary
   },
   {
-    name: 'Enterprise',
-    price: 299,
+    id: 'elite',
+    name: 'Elite',
+    price: 179,
     period: 'month',
-    subscribers: 45,
-    growth: '+24%',
-    features: ['Custom Integration', 'Dedicated Support', 'Advanced Security', 'Custom Training', 'SLA Guarantee'],
-    color: '#8b5cf6',
-    gradient: 'from-purple-400 to-violet-600',
-    icon: <Building className="h-6 w-6" />,
-    badge: 'Enterprise'
-  },
-  {
-    name: 'Academic',
-    price: 19,
-    period: 'month',
-    subscribers: 28,
-    growth: '+8%',
-    features: ['Educational Discount', 'Research Tools', 'Academic Resources', 'Student Access'],
-    color: '#f59e0b',
-    gradient: 'from-amber-400 to-orange-600',
-    icon: <Award className="h-6 w-6" />,
-    badge: 'Education'
+    unlimited: true,
+    features: [
+      'Unlimited AI Recommendations',
+      'Premium Support',
+      'Full Guidelines Access',
+      'Real-time Updates',
+      'Advanced Analytics',
+      'Custom Integration Support'
+    ],
+    popular: false,
+    icon: <Star className="h-6 w-6" />,
+    gradient: modernDesignSystem.gradients.premium
   }
 ];
 
-const customerSegments = [
-  { name: 'Hospitals', value: 45, revenue: 180000, color: '#3b82f6' },
-  { name: 'Clinics', value: 32, revenue: 95000, color: '#10b981' },
-  { name: 'Research', value: 15, revenue: 42000, color: '#f59e0b' },
-  { name: 'Individual', value: 8, revenue: 18000, color: '#8b5cf6' }
-];
-
-const geographicData = [
-  { region: 'North America', revenue: 185000, growth: 15.2, customers: 127 },
-  { region: 'Europe', revenue: 142000, growth: 22.8, customers: 89 },
-  { region: 'Asia Pacific', revenue: 98000, growth: 31.5, customers: 56 },
-  { region: 'Latin America', revenue: 35000, growth: 18.7, customers: 23 },
-  { region: 'Middle East', revenue: 28000, growth: 25.1, customers: 18 }
+const hospitalPlans = [
+  {
+    id: 'starter',
+    name: 'Starter Hospital',
+    price: 299,
+    period: 'month',
+    seats: '5-10',
+    features: [
+      'Up to 10 healthcare providers',
+      '2,000 Credits per month',
+      'Basic Analytics Dashboard',
+      'Email Support',
+      'Standard Integration'
+    ],
+    popular: false,
+    icon: <Building2 className="h-6 w-6" />,
+    gradient: modernDesignSystem.gradients.success
+  },
+  {
+    id: 'growth',
+    name: 'Growth Hospital',
+    price: 599,
+    period: 'month',
+    seats: '11-50',
+    features: [
+      'Up to 50 healthcare providers',
+      '5,000 Credits per month',
+      'Advanced Analytics Dashboard',
+      'Priority Support',
+      'Advanced Integration',
+      'Training & Onboarding'
+    ],
+    popular: true,
+    icon: <Shield className="h-6 w-6" />,
+    gradient: modernDesignSystem.gradients.primary
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise Hospital',
+    price: 1299,
+    period: 'month',
+    seats: 'Unlimited',
+    features: [
+      'Unlimited healthcare providers',
+      'Unlimited Credits',
+      'Custom Analytics Dashboard',
+      'Dedicated Support Manager',
+      'Custom Integration',
+      'Advanced Training Program',
+      'SLA Guarantee'
+    ],
+    popular: false,
+    icon: <Award className="h-6 w-6" />,
+    gradient: modernDesignSystem.gradients.medical
+  }
 ];
 
 export const ModernPricingTab: React.FC = () => {
-  const [selectedTimeRange, setSelectedTimeRange] = useState('6m');
-  const [revenueData, setRevenueData] = useState(generateRevenueData());
-  const [realTimeMetrics, setRealTimeMetrics] = useState({
-    monthlyRevenue: 56890,
-    totalSubscribers: 274,
-    avgRevPerUser: 207.6,
-    churnRate: 1.9,
-    growthRate: 18.5
-  });
+  const [selectedTab, setSelectedTab] = useState('individual');
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Real-time data updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRevenueData(generateRevenueData());
-      setRealTimeMetrics(prev => ({
-        monthlyRevenue: Math.max(45000, Math.min(65000, prev.monthlyRevenue + (Math.random() - 0.5) * 1000)),
-        totalSubscribers: Math.max(250, Math.min(300, prev.totalSubscribers + Math.round((Math.random() - 0.5) * 2))),
-        avgRevPerUser: Math.max(180, Math.min(250, prev.avgRevPerUser + (Math.random() - 0.5) * 5)),
-        churnRate: Math.max(1, Math.min(4, prev.churnRate + (Math.random() - 0.5) * 0.2)),
-        growthRate: Math.max(10, Math.min(25, prev.growthRate + (Math.random() - 0.5) * 1))
-      }));
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleExportReport = () => {
+  const handleSelectPlan = (planId: string, planName: string, price: number) => {
+    setSelectedPlan(planId);
     toast({
-      title: "Exporting Revenue Report",
-      description: "Your comprehensive pricing analytics report is being generated...",
+      title: "Plan Selected",
+      description: `You've selected the ${planName} plan for $${price}/month. Redirecting to checkout...`,
     });
+    // Here you would integrate with your payment provider (Stripe, etc.)
+    console.log('Selected plan:', planId);
   };
+
+  const PlanCard = ({ plan, type }: { plan: any; type: 'individual' | 'hospital' }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <ModernGlassCard className={`h-full relative ${plan.popular ? 'ring-2 ring-blue-500 scale-105' : ''}`}>
+        {plan.popular && (
+          <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-blue-500">
+            <Star className="h-3 w-3 mr-1" />
+            Most Popular
+          </Badge>
+        )}
+        <CardHeader className="text-center pb-4">
+          <div className={`w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white ${plan.gradient}`}>
+            {plan.icon}
+          </div>
+          <CardTitle className="text-2xl">{plan.name}</CardTitle>
+          <div className="mt-4">
+            <div className="text-4xl font-bold">${plan.price}</div>
+            <div className="text-gray-600 dark:text-gray-400">/{plan.period}</div>
+            {type === 'individual' && !plan.unlimited && (
+              <div className="text-sm text-gray-500 mt-1">{plan.credits} credits/month</div>
+            )}
+            {type === 'hospital' && (
+              <div className="text-sm text-gray-500 mt-1">{plan.seats} providers</div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <ul className="space-y-3 mb-8">
+            {plan.features.map((feature: string, index: number) => (
+              <li key={index} className="flex items-start gap-3">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span className="text-sm">{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <ModernFloatingButton
+            onClick={() => handleSelectPlan(plan.id, plan.name, plan.price)}
+            variant={plan.popular ? 'primary' : 'secondary'}
+            className="w-full"
+            size="lg"
+          >
+            {selectedPlan === plan.id ? 'Processing...' : 'Choose Plan'}
+          </ModernFloatingButton>
+        </CardContent>
+      </ModernGlassCard>
+    </motion.div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-pink-50/50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* Enhanced Header */}
+        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+          className="text-center space-y-4"
         >
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
-              Revenue Analytics & Pricing Intelligence
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Real-time subscription metrics, customer insights, and revenue optimization
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
-              <SelectTrigger className="w-32 bg-white/50 border-white/20 backdrop-blur-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1m">1 Month</SelectItem>
-                <SelectItem value="3m">3 Months</SelectItem>
-                <SelectItem value="6m">6 Months</SelectItem>
-                <SelectItem value="1y">1 Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <ModernFloatingButton onClick={handleExportReport} variant="primary">
-              <DollarSign className="h-4 w-4" />
-              Export Report
-            </ModernFloatingButton>
-          </div>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 dark:from-blue-300 dark:via-purple-300 dark:to-pink-300 bg-clip-text text-transparent">
+            Choose Your Plan
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Select the perfect plan for your medical practice. All plans include our advanced AI-powered antibiotic recommendation system.
+          </p>
         </motion.div>
 
-        {/* Enhanced KPI Cards */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
-        >
-          <ModernMetricCard
-            title="Monthly Revenue"
-            value={`$${Math.round(realTimeMetrics.monthlyRevenue).toLocaleString()}`}
-            subtitle="Recurring subscription revenue"
-            trend="up"
-            trendValue="+18.5%"
-            icon={<DollarSign className="h-6 w-6" />}
-            gradient={modernDesignSystem.gradients.success}
-            realTime={true}
-          />
-          <ModernMetricCard
-            title="Total Subscribers"
-            value={realTimeMetrics.totalSubscribers}
-            subtitle="Active paying customers"
-            trend="up"
-            trendValue="+12"
-            icon={<Users className="h-6 w-6" />}
-            gradient={modernDesignSystem.gradients.primary}
-            realTime={true}
-          />
-          <ModernMetricCard
-            title="ARPU"
-            value={`$${realTimeMetrics.avgRevPerUser.toFixed(0)}`}
-            subtitle="Average Revenue Per User"
-            trend="up"
-            trendValue="+$8"
-            icon={<Target className="h-6 w-6" />}
-            gradient={modernDesignSystem.gradients.medical}
-            realTime={true}
-          />
-          <ModernMetricCard
-            title="Churn Rate"
-            value={`${realTimeMetrics.churnRate.toFixed(1)}%`}
-            subtitle="Monthly subscriber churn"
-            trend="down"
-            trendValue="-0.3%"
-            icon={<Shield className="h-6 w-6" />}
-            gradient={modernDesignSystem.gradients.warning}
-            realTime={true}
-          />
-          <ModernMetricCard
-            title="Growth Rate"
-            value={`${realTimeMetrics.growthRate.toFixed(1)}%`}
-            subtitle="Month-over-month growth"
-            trend="up"
-            trendValue="+2.1%"
-            icon={<TrendingUp className="h-6 w-6" />}
-            gradient={modernDesignSystem.gradients.premium}
-            realTime={true}
-          />
-        </motion.div>
-
-        {/* Enhanced Analytics Dashboard */}
+        {/* Plan Type Selector */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1 }}
         >
-          <Tabs defaultValue="revenue" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-white/50 backdrop-blur-sm p-1 rounded-2xl">
-              <TabsTrigger value="revenue" className="rounded-xl">Revenue Analytics</TabsTrigger>
-              <TabsTrigger value="plans" className="rounded-xl">Subscription Plans</TabsTrigger>
-              <TabsTrigger value="customers" className="rounded-xl">Customer Segments</TabsTrigger>
-              <TabsTrigger value="geographic" className="rounded-xl">Geographic Data</TabsTrigger>
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-12 bg-white/50 backdrop-blur-sm p-1 rounded-2xl">
+              <TabsTrigger value="individual" className="rounded-xl flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Individual Doctors
+              </TabsTrigger>
+              <TabsTrigger value="hospital" className="rounded-xl flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Hospitals & Clinics
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="revenue" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ModernGlassCard>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-blue-600" />
-                      Revenue Growth Trend
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={revenueData}>
-                        <defs>
-                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
-                        <XAxis dataKey="month" stroke="#6b7280" />
-                        <YAxis stroke="#6b7280" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                            border: 'none',
-                            borderRadius: '12px',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-                          }} 
-                          formatter={(value: any) => [`$${value.toLocaleString()}`, 'Revenue']}
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="revenue" 
-                          stroke="#3b82f6" 
-                          fillOpacity={1} 
-                          fill="url(#colorRevenue)"
-                          strokeWidth={3}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </ModernGlassCard>
-
-                <ModernGlassCard>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-emerald-600" />
-                      Subscription Growth
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={revenueData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
-                        <XAxis dataKey="month" stroke="#6b7280" />
-                        <YAxis stroke="#6b7280" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                            border: 'none',
-                            borderRadius: '12px',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-                          }} 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="subscriptions" 
-                          stroke="#10b981" 
-                          strokeWidth={3}
-                          dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
-                          activeDot={{ r: 8, stroke: '#10b981', strokeWidth: 2 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </ModernGlassCard>
-              </div>
-
-              {/* Revenue Metrics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <ModernGlassCard>
-                  <CardContent className="p-6 text-center">
-                    <Crown className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-                    <div className="text-4xl font-bold text-amber-600 mb-2">$2.8M</div>
-                    <div className="text-sm text-amber-700 mb-2">Annual Recurring Revenue</div>
-                    <ModernBadge variant="warning" size="sm">+22% YoY</ModernBadge>
-                  </CardContent>
-                </ModernGlassCard>
-                <ModernGlassCard>
-                  <CardContent className="p-6 text-center">
-                    <Star className="h-16 w-16 text-purple-500 mx-auto mb-4" />
-                    <div className="text-4xl font-bold text-purple-600 mb-2">$3,280</div>
-                    <div className="text-sm text-purple-700 mb-2">Customer Lifetime Value</div>
-                    <ModernBadge variant="medical" size="sm">+15% vs last month</ModernBadge>
-                  </CardContent>
-                </ModernGlassCard>
-                <ModernGlassCard>
-                  <CardContent className="p-6 text-center">
-                    <CreditCard className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                    <div className="text-4xl font-bold text-green-600 mb-2">92.1%</div>
-                    <div className="text-sm text-green-700 mb-2">Payment Success Rate</div>
-                    <ModernBadge variant="success" size="sm">Excellent</ModernBadge>
-                  </CardContent>
-                </ModernGlassCard>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="plans" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {subscriptionPlans.map((plan, index) => (
-                  <motion.div
-                    key={plan.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <ModernGlassCard className="h-full">
-                      <CardContent className="p-6 h-full flex flex-col">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center text-white`}>
-                            {plan.icon}
-                          </div>
-                          <ModernBadge variant="glass" size="sm">
-                            {plan.badge}
-                          </ModernBadge>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                        <div className="flex items-baseline gap-1 mb-4">
-                          <span className="text-3xl font-bold">${plan.price}</span>
-                          <span className="text-gray-500">/{plan.period}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mb-4">
-                          <Users className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{plan.subscribers} subscribers</span>
-                          <ModernBadge variant="success" size="sm">
-                            {plan.growth}
-                          </ModernBadge>
-                        </div>
-                        <ul className="space-y-2 text-sm text-gray-600 flex-1">
-                          {plan.features.map((feature, idx) => (
-                            <li key={idx} className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                        <ModernProgressBar 
-                          value={plan.subscribers} 
-                          max={200} 
-                          variant="primary"
-                          className="mt-4"
-                          showValue={true}
-                        />
-                      </CardContent>
-                    </ModernGlassCard>
-                  </motion.div>
+            <TabsContent value="individual" className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {individualPlans.map((plan) => (
+                  <PlanCard key={plan.id} plan={plan} type="individual" />
                 ))}
               </div>
             </TabsContent>
 
-            <TabsContent value="customers" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ModernGlassCard>
-                  <CardHeader>
-                    <CardTitle>Customer Distribution</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={customerSegments}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={120}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {customerSegments.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value: any) => [`${value}%`, 'Share']} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </ModernGlassCard>
-
-                <ModernGlassCard>
-                  <CardHeader>
-                    <CardTitle>Revenue by Segment</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {customerSegments.map((segment, index) => (
-                        <motion.div
-                          key={segment.name}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center justify-between p-4 bg-white/50 rounded-xl backdrop-blur-sm"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div 
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: segment.color }}
-                            />
-                            <div>
-                              <div className="font-medium">{segment.name}</div>
-                              <div className="text-sm text-gray-600">{segment.value}% of customers</div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-bold">${segment.revenue.toLocaleString()}</div>
-                            <div className="text-xs text-gray-500">Monthly Revenue</div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </ModernGlassCard>
+            <TabsContent value="hospital" className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {hospitalPlans.map((plan) => (
+                  <PlanCard key={plan.id} plan={plan} type="hospital" />
+                ))}
               </div>
             </TabsContent>
-
-            <TabsContent value="geographic" className="space-y-6">
-              <ModernGlassCard>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="h-5 w-5" />
-                    Geographic Revenue Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {geographicData.map((region, index) => (
-                      <motion.div
-                        key={region.region}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="p-6 bg-gradient-to-r from-white/60 to-white/30 rounded-2xl backdrop-blur-sm border border-white/20"
-                      >
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <h4 className="text-lg font-semibold">{region.region}</h4>
-                            <p className="text-sm text-gray-600">{region.customers} active customers</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold">${region.revenue.toLocaleString()}</div>
-                            <div className="flex items-center gap-1 text-green-600">
-                              <ArrowUp className="h-4 w-4" />
-                              <span className="text-sm">+{region.growth}%</span>
-                            </div>
-                          </div>
-                        </div>
-                        <ModernProgressBar 
-                          value={region.revenue} 
-                          max={200000} 
-                          variant="success"
-                          animated={true}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </ModernGlassCard>
-            </TabsContent>
           </Tabs>
+        </motion.div>
+
+        {/* Features Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-16"
+        >
+          <ModernGlassCard className="p-8">
+            <h3 className="text-3xl font-bold text-center mb-8">Why Choose Our AI System?</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white mx-auto">
+                  <Shield className="h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-semibold">Evidence-Based</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  All recommendations are based on the latest clinical guidelines and peer-reviewed research.
+                </p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white mx-auto">
+                  <Zap className="h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-semibold">Real-Time Analysis</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Get instant, personalized antibiotic recommendations based on patient-specific factors.
+                </p>
+              </div>
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white mx-auto">
+                  <Award className="h-8 w-8" />
+                </div>
+                <h4 className="text-xl font-semibold">Trusted by Professionals</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Used by thousands of healthcare providers worldwide for better patient outcomes.
+                </p>
+              </div>
+            </div>
+          </ModernGlassCard>
+        </motion.div>
+
+        {/* Contact Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <ModernGlassCard className="text-center p-8 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+            <h3 className="text-2xl font-bold mb-4">Need a Custom Solution?</h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              Contact our team for enterprise pricing and custom integrations tailored to your organization's needs.
+            </p>
+            <ModernFloatingButton variant="primary" size="lg">
+              Contact Sales Team
+            </ModernFloatingButton>
+          </ModernGlassCard>
         </motion.div>
       </div>
     </div>
