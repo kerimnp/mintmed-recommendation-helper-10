@@ -12,7 +12,8 @@ import {
   PillIcon,
   LayoutDashboard,
   History,
-  Euro
+  Euro,
+  CreditCard
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -36,16 +37,20 @@ export const navItems = [
   { id: "education", label: "Education", icon: BookOpen, description: "Educational resources" },
   { id: "guidelines", label: "Guidelines", icon: PillIcon, description: "Clinical guidelines" },
   { id: "pricing", label: "Pricing", icon: Euro, description: "Pricing plans and billing" },
+  { id: "subscription", label: "Subscription", icon: CreditCard, description: "Subscription management" },
 ];
 
 export const AdminSidebar = ({ activeTab, setActiveTab }: AdminSidebarProps) => {
   const { theme } = useTheme();
   const { user } = useAuth();
 
-  // Filter navItems based on user's email for display within this component
+  // Filter navItems based on user's email and account type
   const displayedNavItems = navItems.filter(item => {
     if (item.id === "user-management") {
       return user?.email === 'kerim@horalix.com';
+    }
+    if (item.id === "subscription") {
+      return user?.user_metadata?.account_type === 'hospital_admin';
     }
     return true;
   });

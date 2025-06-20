@@ -6,10 +6,11 @@ import { usePlans, useCurrentSubscription, useTransactions } from '@/hooks/useSu
 import { PlanCard } from '@/components/subscription/PlanCard';
 import { SubscriptionStatus } from '@/components/subscription/SubscriptionStatus';
 import { TransactionHistory } from '@/components/subscription/TransactionHistory';
+import { HospitalSubscriptionManager } from '@/components/subscription/HospitalSubscriptionManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ArrowLeft, CreditCard } from 'lucide-react';
+import { Loader2, ArrowLeft, CreditCard, Building } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 const Subscription = () => {
@@ -23,6 +24,9 @@ const Subscription = () => {
   const { data: plans, isLoading: plansLoading } = usePlans();
   const { data: currentSubscription, isLoading: subscriptionLoading } = useCurrentSubscription();
   const { data: transactions, isLoading: transactionsLoading } = useTransactions();
+
+  // Check if user is a hospital admin
+  const isHospitalAdmin = user?.user_metadata?.account_type === 'hospital_admin';
 
   // Redirect to auth if not authenticated
   React.useEffect(() => {
@@ -61,6 +65,14 @@ const Subscription = () => {
   };
 
   const filteredPlans = plans?.filter(plan => plan.plan_type === selectedPlanType) || [];
+
+  // Determine the default tab based on user type and subscription status
+  const getDefaultTab = () => {
+    if (isHospitalAdmin && currentSubscription?.plan?.plan_type === 'hospital') {
+      return 'hospital-management';
+    }
+    return 'overview';
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-100 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-800">
@@ -101,11 +113,17 @@ const Subscription = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue={getDefaultTab()} className="space-y-6">
+          <TabsList className={`grid w-full ${isHospitalAdmin && currentSubscription?.plan?.plan_type === 'hospital' ? 'grid-cols-4' : 'grid-cols-3'}`}>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="plans">Plans</TabsTrigger>
             <TabsTrigger value="history">Transaction History</TabsTrigger>
+            {isHospitalAdmin && currentSubscription?.plan?.plan_type === 'hospital' && (
+              <TabsTrigger value="hospital-management">
+                <Building className="h-4 w-4 mr-2" />
+                Hospital Management
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -141,7 +159,7 @@ const Subscription = () => {
                     <button
                       className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                         selectedPlanType === 'hospital'
-                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          ?'bg-white dark:bg-gray-700 shadow-sm'
                           : 'text-gray-600 dark:text-gray-400'
                       }`}
                       onClick={() => setSelectedPlanType('hospital')}
@@ -212,6 +230,12 @@ const Subscription = () => {
               isLoading={transactionsLoading}
             />
           </TabsContent>
+
+          {isHospitalAdmin && currentSubscription?.plan?.plan_type === 'hospital' && (
+            <TabsContent value="hospital-management">
+              <HospitalSubscriptionManager />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

@@ -245,6 +245,91 @@ export type Database = {
           },
         ]
       }
+      credit_usage_history: {
+        Row: {
+          created_at: string | null
+          credits_used: number
+          doctor_id: string
+          id: string
+          operation_details: Json | null
+          operation_type: string
+          subscription_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credits_used: number
+          doctor_id: string
+          id?: string
+          operation_details?: Json | null
+          operation_type: string
+          subscription_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credits_used?: number
+          doctor_id?: string
+          id?: string
+          operation_details?: Json | null
+          operation_type?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_usage_history_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctor_seat_allocations: {
+        Row: {
+          allocated_at: string | null
+          allocated_by: string | null
+          allocated_credits: number | null
+          created_at: string | null
+          credits_used: number | null
+          doctor_id: string
+          id: string
+          is_active: boolean | null
+          subscription_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          allocated_at?: string | null
+          allocated_by?: string | null
+          allocated_credits?: number | null
+          created_at?: string | null
+          credits_used?: number | null
+          doctor_id: string
+          id?: string
+          is_active?: boolean | null
+          subscription_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          allocated_at?: string | null
+          allocated_by?: string | null
+          allocated_credits?: number | null
+          created_at?: string | null
+          credits_used?: number | null
+          doctor_id?: string
+          id?: string
+          is_active?: boolean | null
+          subscription_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_seat_allocations_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drug_formulations: {
         Row: {
           availability_status: string | null
@@ -903,6 +988,7 @@ export type Database = {
           credits_remaining: number | null
           current_period_end: string
           current_period_start: string
+          doctor_seats: number
           id: string
           metadata: Json | null
           org_id: number | null
@@ -921,6 +1007,7 @@ export type Database = {
           credits_remaining?: number | null
           current_period_end: string
           current_period_start?: string
+          doctor_seats?: number
           id?: string
           metadata?: Json | null
           org_id?: number | null
@@ -939,6 +1026,7 @@ export type Database = {
           credits_remaining?: number | null
           current_period_end?: string
           current_period_start?: string
+          doctor_seats?: number
           id?: string
           metadata?: Json | null
           org_id?: number | null
