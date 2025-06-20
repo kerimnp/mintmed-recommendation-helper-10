@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Easing } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export const modernDesignSystem = {
@@ -96,25 +95,25 @@ export const modernDesignSystem = {
     fadeIn: {
       initial: { opacity: 0, y: 20 },
       animate: { opacity: 1, y: 0 },
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.6, ease: [0.4, 0.0, 0.2, 1] }
     },
     scaleIn: {
       initial: { opacity: 0, scale: 0.9 },
       animate: { opacity: 1, scale: 1 },
-      transition: { duration: 0.4, ease: "easeOut" }
+      transition: { duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }
     },
     slideIn: {
       initial: { opacity: 0, x: -30 },
       animate: { opacity: 1, x: 0 },
-      transition: { duration: 0.5, ease: "easeOut" }
+      transition: { duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }
     },
     spring: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 30
     },
     bounce: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 400,
       damping: 10
     }
@@ -189,7 +188,7 @@ export const ModernMetricCard: React.FC<{
       whileHover={{ 
         y: -4, 
         scale: 1.02,
-        transition: { duration: 0.2, ease: "easeOut" } 
+        transition: { duration: 0.2, ease: [0.4, 0.0, 0.2, 1] } 
       }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
@@ -341,7 +340,7 @@ export const ModernGlassCard: React.FC<{
       whileHover={hover ? { 
         y: -4, 
         scale: 1.02,
-        transition: { duration: 0.2, ease: "easeOut" } 
+        transition: { duration: 0.2, ease: [0.4, 0.0, 0.2, 1] } 
       } : {}}
       className={cn(
         modernDesignSystem.shadows.glass,
@@ -442,7 +441,7 @@ export const ModernProgressBar: React.FC<{
           animate={{ width: `${percentage}%` }}
           transition={{ 
             duration: animated ? 1 : 0,
-            ease: "easeOut"
+            ease: [0.4, 0.0, 0.2, 1]
           }}
         />
       </div>

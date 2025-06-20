@@ -90,7 +90,7 @@ export const ultraPremiumDesignSystem = {
         transition: {
           duration: 6,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: [0.4, 0.0, 0.6, 1]
         }
       },
       shimmer: {
@@ -106,7 +106,7 @@ export const ultraPremiumDesignSystem = {
         transition: {
           duration: 4,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: [0.4, 0.0, 0.6, 1]
         }
       },
       glow: {
@@ -118,7 +118,7 @@ export const ultraPremiumDesignSystem = {
         transition: {
           duration: 2,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: [0.4, 0.0, 0.6, 1]
         }
       }
     }
@@ -188,18 +188,32 @@ export const UltraLuxuryCard: React.FC<{
       style={{
         boxShadow: glow ? ultraPremiumDesignSystem.shadows.luxury.floating : ultraPremiumDesignSystem.shadows.luxury.elevated
       }}
-      animate={floating ? ultraPremiumDesignSystem.animations.luxury.float : {}}
+      animate={floating ? {
+        y: [-2, 2, -2],
+        transition: {
+          duration: 6,
+          repeat: Infinity,
+          ease: [0.4, 0.0, 0.6, 1]
+        }
+      } : {}}
       whileHover={{ 
         y: -8, 
         scale: 1.02,
-        transition: { duration: 0.4, ease: "easeOut" }
+        transition: { duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }
       }}
     >
       {/* Shimmer effect */}
       {shimmer && (
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          animate={ultraPremiumDesignSystem.animations.luxury.shimmer}
+          animate={{
+            x: [-100, 100],
+            transition: {
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear"
+            }
+          }}
         />
       )}
       
@@ -277,7 +291,7 @@ export const UltraPremiumButton: React.FC<{
       {/* Luxury shine effect */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full"
-        transition={{ duration: 0.6, ease: "easeInOut" }}
+        transition={{ duration: 0.6, ease: [0.4, 0.0, 0.6, 1] }}
       />
       
       <span className="relative z-10">{children}</span>
@@ -386,11 +400,11 @@ export const UltraPremiumMetricCard: React.FC<{
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.6, ease: [0.4, 0.0, 0.2, 1] }}
       whileHover={{ 
         y: -6, 
         scale: 1.02,
-        transition: { duration: 0.3, ease: "easeOut" } 
+        transition: { duration: 0.3, ease: [0.4, 0.0, 0.2, 1] } 
       }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
@@ -419,7 +433,7 @@ export const UltraPremiumMetricCard: React.FC<{
                 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+                transition={{ delay: 0.2, duration: 0.4, ease: [0.4, 0.0, 0.2, 1] }}
               >
                 {value}
               </motion.h3>
@@ -445,7 +459,7 @@ export const UltraPremiumMetricCard: React.FC<{
           </div>
           {icon && (
             <motion.div 
-              className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center text-white shadow-lg flex-shrink-0"
+              className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white shadow-lg flex-shrink-0"
               whileHover={{ 
                 scale: 1.1,
                 rotate: 5,
