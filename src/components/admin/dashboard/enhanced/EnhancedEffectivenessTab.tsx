@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -232,7 +231,6 @@ export const EnhancedEffectivenessTab: React.FC = () => {
                   <ResponsiveContainer width="100%" height={300}>
                     <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={patientOutcomes}>
                       <RadialBar
-                        minAngle={15}
                         label={{ position: 'insideStart', fill: '#fff' }}
                         background
                         clockWise

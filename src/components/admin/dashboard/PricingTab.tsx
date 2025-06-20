@@ -22,6 +22,7 @@ import {
 import { 
   Building2, 
   User, 
+  Users,
   Check, 
   Star, 
   Crown,
