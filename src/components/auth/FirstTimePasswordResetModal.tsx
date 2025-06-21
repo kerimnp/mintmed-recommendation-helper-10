@@ -124,7 +124,7 @@ export const FirstTimePasswordResetModal: React.FC<FirstTimePasswordResetModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md" hideClose>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5 text-blue-600" />

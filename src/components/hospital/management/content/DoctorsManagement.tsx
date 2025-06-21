@@ -36,7 +36,7 @@ interface DoctorAffiliation {
     first_name: string | null;
     last_name: string | null;
     email: string | null;
-  };
+  } | null;
 }
 
 export const DoctorsManagement: React.FC<DoctorsManagementProps> = ({ user }) => {
@@ -99,12 +99,20 @@ export const DoctorsManagement: React.FC<DoctorsManagementProps> = ({ user }) =>
         throw error;
       }
 
-      setDoctors(doctorAffiliations || []);
+      // Fix the type casting issue by properly handling the data
+      const formattedDoctors: DoctorAffiliation[] = (doctorAffiliations || []).map(affiliation => ({
+        ...affiliation,
+        inviter: affiliation.inviter && typeof affiliation.inviter === 'object' 
+          ? affiliation.inviter as { first_name: string | null; last_name: string | null; email: string | null; }
+          : null
+      }));
+
+      setDoctors(formattedDoctors);
       
       // Calculate stats
-      const total = doctorAffiliations?.length || 0;
-      const active = doctorAffiliations?.filter(d => d.status === 'active').length || 0;
-      const pending = doctorAffiliations?.filter(d => d.status === 'pending').length || 0;
+      const total = formattedDoctors.length;
+      const active = formattedDoctors.filter(d => d.status === 'active').length;
+      const pending = formattedDoctors.filter(d => d.status === 'pending').length;
       
       setStats({ total, active, pending });
 
