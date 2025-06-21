@@ -16,6 +16,7 @@ import About from "@/pages/About";
 import Profile from "@/pages/Profile";
 import Pricing from "@/pages/Pricing";
 import Subscription from "@/pages/Subscription";
+import HospitalDashboard from "@/pages/HospitalDashboard";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "./App.css";
 
@@ -42,6 +43,7 @@ function App() {
                     <Route path="/advisor" element={<AntibioticAdvisor />} />
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/clinical" element={<ClinicalDashboard />} />
+                    <Route path="/hospital-dashboard" element={<HospitalDashboard />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/profile" element={<Profile />} />

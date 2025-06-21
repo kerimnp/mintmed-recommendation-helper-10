@@ -46,8 +46,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               : 'Dobrodošli u Antibiotic Advisor.',
           });
           
+          // Check if user is hospital admin and redirect accordingly
+          const isHospitalAdmin = currentSession.user?.user_metadata?.account_type === 'hospital_admin';
+          
           if (window.location.pathname === '/auth') {
-            navigate('/');
+            if (isHospitalAdmin) {
+              navigate('/hospital-dashboard');
+            } else {
+              navigate('/');
+            }
           }
         }
         
@@ -61,12 +68,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ? 'You have been signed out successfully.'
               : 'Uspješno ste odjavljeni.',
           });
-          navigate('/auth'); // Navigate to auth page on sign out
+          navigate('/auth');
         }
         
         if (event === 'PASSWORD_RECOVERY') {
           console.log('Password recovery event');
-          // Handle password recovery flow, e.g., redirect to a password reset page
         }
 
         if (event === 'USER_UPDATED') {
@@ -76,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed:', currentSession);
-          setSession(currentSession); // Ensure session is updated with new token
+          setSession(currentSession);
         }
 
       }
