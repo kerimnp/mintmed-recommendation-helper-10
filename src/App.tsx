@@ -25,12 +25,12 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <LanguageProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+        <LanguageProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/profile" element={<Profile />} />
@@ -44,10 +44,10 @@ function App() {
                   <Route path="/clinical" element={<ClinicalDashboard />} />
                   <Route path="/auth" element={<Auth />} />
                 </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </LanguageProvider>
-        </AuthProvider>
+              </TooltipProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </LanguageProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
