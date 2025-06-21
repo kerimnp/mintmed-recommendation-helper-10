@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -345,202 +346,204 @@ const Auth = () => {
                 </TabsContent>
 
                 <TabsContent value="register">
-                  {/* Account Type Selection */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium">
-                      {language === "en" ? "Account Type" : "Tip Računa"}
-                    </Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div 
-                        className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                          accountType === "individual" 
-                            ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
-                            : "border-gray-200 dark:border-gray-700"
-                        }`}
-                        onClick={() => setAccountType("individual")}
-                      >
-                        <div className="flex flex-col items-center gap-2 text-center">
-                          <div className={`p-2 rounded-lg ${
+                  <form onSubmit={handleEmailSignUp} className="space-y-4">
+                    {/* Account Type Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        {language === "en" ? "Account Type" : "Tip Računa"}
+                      </Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div 
+                          className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
                             accountType === "individual" 
-                              ? "bg-medical-primary text-white" 
-                              : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                          }`}>
-                            <UserIcon className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-xs">
-                              {language === "en" ? "Individual Doctor" : "Individualni Liječnik"}
+                              ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
+                              : "border-gray-200 dark:border-gray-700"
+                          }`}
+                          onClick={() => setAccountType("individual")}
+                        >
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            <div className={`p-2 rounded-lg ${
+                              accountType === "individual" 
+                                ? "bg-medical-primary text-white" 
+                                : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                            }`}>
+                              <UserIcon className="h-4 w-4" />
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              {language === "en" ? "Personal practice" : "Osobna praksa"}
+                            <div>
+                              <div className="font-medium text-xs">
+                                {language === "en" ? "Individual Doctor" : "Individualni Liječnik"}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {language === "en" ? "Personal practice" : "Osobna praksa"}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div 
-                        className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                          accountType === "hospital_admin" 
-                            ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
-                            : "border-gray-200 dark:border-gray-700"
-                        }`}
-                        onClick={() => setAccountType("hospital_admin")}
-                      >
-                        <div className="flex flex-col items-center gap-2 text-center">
-                          <div className={`p-2 rounded-lg ${
+                        
+                        <div 
+                          className={`border rounded-xl p-3 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
                             accountType === "hospital_admin" 
-                              ? "bg-medical-primary text-white" 
-                              : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                          }`}>
-                            <Building2 className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-xs">
-                              {language === "en" ? "Hospital Admin" : "Bolnički Admin"}
+                              ? "border-medical-primary bg-medical-primary/5 dark:bg-medical-primary/10" 
+                              : "border-gray-200 dark:border-gray-700"
+                          }`}
+                          onClick={() => setAccountType("hospital_admin")}
+                        >
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            <div className={`p-2 rounded-lg ${
+                              accountType === "hospital_admin" 
+                                ? "bg-medical-primary text-white" 
+                                : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                            }`}>
+                              <Building2 className="h-4 w-4" />
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              {language === "en" ? "Manage hospital" : "Upravljanje bolnicom"}
+                            <div>
+                              <div className="font-medium text-xs">
+                                {language === "en" ? "Hospital Admin" : "Bolnički Admin"}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {language === "en" ? "Manage hospital" : "Upravljanje bolnicom"}
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Hospital Name Field - only show for hospital admin */}
-                  {accountType === "hospital_admin" && (
+                    {/* Hospital Name Field - only show for hospital admin */}
+                    {accountType === "hospital_admin" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="hospital-name" className="text-sm font-medium">
+                          {language === "en" ? "Hospital/Clinic Name" : "Naziv Bolnice/Klinike"}
+                        </Label>
+                        <div className="relative">
+                          <Building2 className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                          <Input
+                            id="hospital-name"
+                            type="text"
+                            placeholder={language === "en" ? "Enter hospital or clinic name" : "Unesite naziv bolnice ili klinike"}
+                            className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                            value={hospitalName}
+                            onChange={(e) => setHospitalName(e.target.value)}
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Name Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="first-name" className="text-sm font-medium">{language === "en" ? "First Name" : "Ime"}</Label>
+                        <div className="relative">
+                          <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                          <Input
+                            id="first-name"
+                            type="text"
+                            placeholder={language === "en" ? "Enter your first name" : "Unesite svoje ime"}
+                            className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="last-name" className="text-sm font-medium">{language === "en" ? "Last Name" : "Prezime"}</Label>
+                        <div className="relative">
+                          <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                          <Input
+                            id="last-name"
+                            type="text"
+                            placeholder={language === "en" ? "Enter your last name" : "Unesite svoje prezime"}
+                            className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Email and Password Fields */}
                     <div className="space-y-2">
-                      <Label htmlFor="hospital-name" className="text-sm font-medium">
-                        {language === "en" ? "Hospital/Clinic Name" : "Naziv Bolnice/Klinike"}
+                      <Label htmlFor="register-email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="register-email"
+                          type="email"
+                          placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
+                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Input
+                          id="register-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder={language === "en" ? "••••••••" : "••••••••"}
+                          className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={isLoading}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password" className="text-sm font-medium">
+                        {language === "en" ? "Confirm Password" : "Potvrdite Lozinku"}
                       </Label>
                       <div className="relative">
-                        <Building2 className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                         <Input
-                          id="hospital-name"
-                          type="text"
-                          placeholder={language === "en" ? "Enter hospital or clinic name" : "Unesite naziv bolnice ili klinike"}
-                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                          value={hospitalName}
-                          onChange={(e) => setHospitalName(e.target.value)}
+                          id="confirm-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder={language === "en" ? "••••••••" : "••••••••"}
+                          className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
                           disabled={isLoading}
                         />
                       </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {language === "en" 
+                          ? "Password must be at least 6 characters long"
+                          : "Lozinka mora imati najmanje 6 znakova"}
+                      </p>
                     </div>
-                  )}
-
-                  {/* Name Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first-name" className="text-sm font-medium">{language === "en" ? "First Name" : "Ime"}</Label>
-                      <div className="relative">
-                        <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                        <Input
-                          id="first-name"
-                          type="text"
-                          placeholder={language === "en" ? "Enter your first name" : "Unesite svoje ime"}
-                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          disabled={isLoading}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last-name" className="text-sm font-medium">{language === "en" ? "Last Name" : "Prezime"}</Label>
-                      <div className="relative">
-                        <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                        <Input
-                          id="last-name"
-                          type="text"
-                          placeholder={language === "en" ? "Enter your last name" : "Unesite svoje prezime"}
-                          className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          disabled={isLoading}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Email and Password Fields */}
-                  <div className="space-y-2">
-                    <Label htmlFor="register-email" className="text-sm font-medium">{language === "en" ? "Email" : "Email"}</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="register-email"
-                        type="email"
-                        placeholder={language === "en" ? "Enter your email" : "Unesite svoj email"}
-                        className="pl-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-password" className="text-sm font-medium">{language === "en" ? "Password" : "Lozinka"}</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="register-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={isLoading}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-sm font-medium">
-                      {language === "en" ? "Confirm Password" : "Potvrdite Lozinku"}
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        id="confirm-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder={language === "en" ? "••••••••" : "••••••••"}
-                        className="pl-10 pr-10 py-6 rounded-xl border-gray-200 dark:border-gray-700"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {language === "en" 
-                        ? "Password must be at least 6 characters long"
-                        : "Lozinka mora imati najmanje 6 znakova"}
-                    </p>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {language === "en" ? "Creating Account..." : "Stvaranje Računa..."}
-                      </>
-                    ) : (
-                      language === "en" ? "Create Account" : "Stvori Račun"
-                    )}
-                  </Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-medical-primary hover:bg-medical-primary-hover mt-4 py-6 rounded-xl h-12 text-sm font-medium transition-all" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {language === "en" ? "Creating Account..." : "Stvaranje Računa..."}
+                        </>
+                      ) : (
+                        language === "en" ? "Create Account" : "Stvori Račun"
+                      )}
+                    </Button>
+                  </form>
                 </TabsContent>
               </Tabs>
             )}
