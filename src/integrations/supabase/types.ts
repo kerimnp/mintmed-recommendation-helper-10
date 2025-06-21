@@ -937,48 +937,60 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_created_by: string
           account_type: Database["public"]["Enums"]["account_type"]
           created_at: string
+          created_by_admin: string | null
           email: string | null
           first_name: string | null
           free_credits_left: number
           hospital_affiliation: string | null
           id: string
           is_active: boolean | null
+          is_first_login: boolean
           last_name: string | null
           license_number: string | null
           role: Database["public"]["Enums"]["user_role"] | null
           specialization: string | null
+          temp_password: string | null
           updated_at: string
         }
         Insert: {
+          account_created_by?: string
           account_type?: Database["public"]["Enums"]["account_type"]
           created_at?: string
+          created_by_admin?: string | null
           email?: string | null
           first_name?: string | null
           free_credits_left?: number
           hospital_affiliation?: string | null
           id: string
           is_active?: boolean | null
+          is_first_login?: boolean
           last_name?: string | null
           license_number?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           specialization?: string | null
+          temp_password?: string | null
           updated_at?: string
         }
         Update: {
+          account_created_by?: string
           account_type?: Database["public"]["Enums"]["account_type"]
           created_at?: string
+          created_by_admin?: string | null
           email?: string | null
           first_name?: string | null
           free_credits_left?: number
           hospital_affiliation?: string | null
           id?: string
           is_active?: boolean | null
+          is_first_login?: boolean
           last_name?: string | null
           license_number?: string | null
           role?: Database["public"]["Enums"]["user_role"] | null
           specialization?: string | null
+          temp_password?: string | null
           updated_at?: string
         }
         Relationships: []
