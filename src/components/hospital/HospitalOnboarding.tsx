@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,9 @@ import {
   Crown,
   Star,
   Zap,
-  Loader2
+  Loader2,
+  Briefcase,
+  Building
 } from 'lucide-react';
 
 interface HospitalOnboardingProps {
@@ -34,6 +37,7 @@ interface PlanOption {
   creditsPerMonth: number;
   features: string[];
   popular?: boolean;
+  recommended?: boolean;
 }
 
 const plans: PlanOption[] = [
@@ -43,24 +47,38 @@ const plans: PlanOption[] = [
     description: 'Perfect for small clinics',
     priceMonthly: 199,
     priceYearly: 1990,
-    creditsPerMonth: 500,
+    creditsPerMonth: 1000,
     features: [
-      'Up to 10 doctors',
-      '500 monthly recommendations',
+      'Up to 5 doctors',
+      '1,000 monthly recommendations',
       'Basic analytics',
       'Email support'
+    ]
+  },
+  {
+    id: 'basic',
+    name: 'Basic',
+    description: 'For growing practices',
+    priceMonthly: 349,
+    priceYearly: 3490,
+    creditsPerMonth: 2000,
+    features: [
+      'Up to 10 doctors',
+      '2,000 monthly recommendations',
+      'Standard analytics',
+      'Priority email support'
     ]
   },
   {
     id: 'professional',
     name: 'Professional',
     description: 'Ideal for medium hospitals',
-    priceMonthly: 399,
-    priceYearly: 3990,
-    creditsPerMonth: 1200,
+    priceMonthly: 499,
+    priceYearly: 4990,
+    creditsPerMonth: 3000,
     features: [
-      'Up to 50 doctors',
-      '1,200 monthly recommendations',
+      'Up to 25 doctors',
+      '3,000 monthly recommendations',
       'Advanced analytics',
       'Priority support',
       'Custom branding'
@@ -68,19 +86,37 @@ const plans: PlanOption[] = [
     popular: true
   },
   {
+    id: 'advanced',
+    name: 'Advanced',
+    description: 'For large medical centers',
+    priceMonthly: 749,
+    priceYearly: 7490,
+    creditsPerMonth: 5000,
+    features: [
+      'Up to 50 doctors',
+      '5,000 monthly recommendations',
+      'Premium analytics',
+      'Phone & chat support',
+      'API access',
+      'Custom integrations'
+    ],
+    recommended: true
+  },
+  {
     id: 'enterprise',
     name: 'Enterprise',
     description: 'For large hospital systems',
-    priceMonthly: 799,
-    priceYearly: 7990,
-    creditsPerMonth: 3000,
+    priceMonthly: 999,
+    priceYearly: 9990,
+    creditsPerMonth: 8000,
     features: [
       'Unlimited doctors',
-      '3,000+ monthly recommendations',
-      'Premium analytics & reporting',
+      '8,000+ monthly recommendations',
+      'Enterprise analytics',
       '24/7 dedicated support',
-      'API access',
-      'Custom integrations'
+      'Full API access',
+      'Custom integrations',
+      'Dedicated account manager'
     ]
   }
 ];
@@ -132,7 +168,7 @@ export const HospitalOnboarding: React.FC<HospitalOnboardingProps> = ({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         {/* Header */}
         <div className="text-center mb-8">
           <motion.div
@@ -244,7 +280,7 @@ export const HospitalOnboarding: React.FC<HospitalOnboardingProps> = ({
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
                 {plans.map((plan) => (
                   <Card 
                     key={plan.id}
@@ -252,7 +288,7 @@ export const HospitalOnboarding: React.FC<HospitalOnboardingProps> = ({
                       selectedPlan === plan.id 
                         ? 'ring-2 ring-blue-500 shadow-lg scale-105'
                         : 'hover:shadow-md'
-                    } ${plan.popular ? 'border-blue-500' : ''}`}
+                    } ${plan.popular ? 'border-blue-500' : ''} ${plan.recommended ? 'border-green-500' : ''}`}
                     onClick={() => setSelectedPlan(plan.id)}
                   >
                     {plan.popular && (
@@ -263,36 +299,46 @@ export const HospitalOnboarding: React.FC<HospitalOnboardingProps> = ({
                         </Badge>
                       </div>
                     )}
-                    
-                    <CardHeader className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        {plan.id === 'enterprise' && <Crown className="h-6 w-6 text-yellow-500 mr-2" />}
-                        {plan.id === 'professional' && <Zap className="h-6 w-6 text-blue-500 mr-2" />}
-                        {plan.id === 'starter' && <Users className="h-6 w-6 text-green-500 mr-2" />}
-                        <CardTitle className="text-xl">{plan.name}</CardTitle>
+                    {plan.recommended && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <Badge className="bg-green-500 flex items-center gap-1">
+                          <Crown className="h-3 w-3" />
+                          Recommended
+                        </Badge>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    )}
+                    
+                    <CardHeader className="text-center pb-2">
+                      <div className="flex items-center justify-center mb-2">
+                        {plan.id === 'enterprise' && <Crown className="h-5 w-5 text-yellow-500 mr-2" />}
+                        {plan.id === 'advanced' && <Building className="h-5 w-5 text-green-500 mr-2" />}
+                        {plan.id === 'professional' && <Zap className="h-5 w-5 text-blue-500 mr-2" />}
+                        {plan.id === 'basic' && <Briefcase className="h-5 w-5 text-purple-500 mr-2" />}
+                        {plan.id === 'starter' && <Users className="h-5 w-5 text-green-500 mr-2" />}
+                        <CardTitle className="text-lg">{plan.name}</CardTitle>
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-400 text-xs">
                         {plan.description}
                       </p>
-                      <div className="mt-4">
-                        <div className="text-3xl font-bold">
+                      <div className="mt-3">
+                        <div className="text-2xl font-bold">
                           ${billingCycle === 'monthly' ? plan.priceMonthly : Math.round(plan.priceYearly / 12)}
-                          <span className="text-lg font-normal text-gray-500">/month</span>
+                          <span className="text-sm font-normal text-gray-500">/month</span>
                         </div>
                         {billingCycle === 'yearly' && (
-                          <div className="text-sm text-gray-500">
+                          <div className="text-xs text-gray-500">
                             ${plan.priceYearly}/year
                           </div>
                         )}
                       </div>
                     </CardHeader>
 
-                    <CardContent>
-                      <ul className="space-y-2">
+                    <CardContent className="pt-0">
+                      <ul className="space-y-1">
                         {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-center text-sm">
-                            <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                            {feature}
+                          <li key={index} className="flex items-start text-xs">
+                            <CheckCircle className="h-3 w-3 text-green-500 mr-1 flex-shrink-0 mt-0.5" />
+                            <span>{feature}</span>
                           </li>
                         ))}
                       </ul>
