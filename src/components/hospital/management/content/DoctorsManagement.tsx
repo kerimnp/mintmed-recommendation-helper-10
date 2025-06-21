@@ -2,11 +2,11 @@
 import React from 'react';
 import { User } from '@supabase/supabase-js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { InviteDoctorModal } from './InviteDoctorModal';
 import { 
   Users, 
-  UserPlus,
   Mail,
   MoreHorizontal,
   CheckCircle,
@@ -38,10 +38,7 @@ export const DoctorsManagement: React.FC<DoctorsManagementProps> = ({ user }) =>
             Manage your hospital's medical staff
           </p>
         </div>
-        <Button>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Invite Doctor
-        </Button>
+        <InviteDoctorModal user={user} />
       </div>
 
       {/* Stats Cards */}
