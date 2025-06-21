@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -52,6 +51,16 @@ const Auth = () => {
       navigate("/");
     }
   }, [authUser, navigate]);
+
+  const clearSignUpForms = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setFirstName("");
+    setLastName("");
+    setAccountType("individual");
+    setHospitalName("");
+  };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +118,19 @@ const Auth = () => {
       };
       
       await signUp(email, password, metadata);
+      
+      // Show success notification
+      toast({
+        title: language === "en" ? "Account created successfully!" : "Račun je uspješno stvoren!",
+        description: language === "en" 
+          ? "Please check your email to verify your account."
+          : "Molimo provjerite svoj email da biste potvrdili račun.",
+      });
+
+      // Clear forms and switch to sign-in tab
+      clearSignUpForms();
+      setActiveTab("login");
+      
     } catch (error: any) {
       console.error("Sign up error:", error);
       setError(error.message || (language === "en" 
