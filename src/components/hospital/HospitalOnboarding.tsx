@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +16,8 @@ import {
   ArrowLeft,
   Crown,
   Star,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 
 interface HospitalOnboardingProps {
