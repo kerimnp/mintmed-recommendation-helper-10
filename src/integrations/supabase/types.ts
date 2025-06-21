@@ -14,6 +14,7 @@ export type Database = {
           credits_allocated: number | null
           doctor_id: string | null
           id: number
+          invited_by: string | null
           joined_at: string | null
           org_id: number | null
           status: Database["public"]["Enums"]["invitation_status"]
@@ -22,6 +23,7 @@ export type Database = {
           credits_allocated?: number | null
           doctor_id?: string | null
           id?: number
+          invited_by?: string | null
           joined_at?: string | null
           org_id?: number | null
           status?: Database["public"]["Enums"]["invitation_status"]
@@ -30,6 +32,7 @@ export type Database = {
           credits_allocated?: number | null
           doctor_id?: string | null
           id?: number
+          invited_by?: string | null
           joined_at?: string | null
           org_id?: number | null
           status?: Database["public"]["Enums"]["invitation_status"]
@@ -1119,6 +1122,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_admin_doctor_account: {
+        Args: {
+          p_email: string
+          p_first_name: string
+          p_last_name: string
+          p_temp_password: string
+          p_hospital_id: number
+          p_created_by: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
