@@ -9,7 +9,6 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Pricing from "./pages/Pricing";
 import Subscription from "./pages/Subscription";
@@ -19,7 +18,7 @@ import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
+// Protected Route Component for Individual Doctors
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
@@ -33,6 +32,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Redirect hospital admins to their dashboard
+  if (user.user_metadata?.account_type === 'hospital_admin') {
+    return <Navigate to="/hospital-dashboard" replace />;
   }
   
   return <>{children}</>;
@@ -76,14 +80,6 @@ function App() {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
                   <Route path="/pricing" element={<Pricing />} />
-                  <Route 
-                    path="/admin" 
-                    element={
-                      <ProtectedRoute>
-                        <Admin />
-                      </ProtectedRoute>
-                    } 
-                  />
                   <Route 
                     path="/profile" 
                     element={
