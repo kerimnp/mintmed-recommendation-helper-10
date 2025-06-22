@@ -17,11 +17,13 @@ import {
   Share2
 } from 'lucide-react';
 import { UltraLuxuryCard, UltraPremiumButton } from '../enhanced/UltraPremiumDesignSystem';
-import { articles } from '../../education/data';
+import { ArticleViewer } from './ArticleViewer';
+import { articles, Article } from '../education/data';
+import { useEducationProgress } from '@/hooks/useEducationProgress';
 import { cn } from '@/lib/utils';
 
 interface PremiumContentLibraryProps {
-  onArticleSelect: (articleId: string) => void;
+  onArticleSelect?: (articleId: string) => void;
 }
 
 export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
@@ -30,7 +32,8 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
-  const [bookmarkedItems, setBookmarkedItems] = useState<string[]>([]);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const { progress } = useEducationProgress();
 
   const categories = [
     { id: 'all', label: 'All Content', count: articles.length },
@@ -48,7 +51,8 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
       filtered = filtered.filter(article =>
         article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.author.toLowerCase().includes(searchQuery.toLowerCase())
+        article.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -76,13 +80,21 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
     return filtered;
   }, [searchQuery, selectedCategory, sortBy]);
 
-  const toggleBookmark = (articleId: string) => {
-    setBookmarkedItems(prev => 
-      prev.includes(articleId) 
-        ? prev.filter(id => id !== articleId)
-        : [...prev, articleId]
-    );
+  const handleArticleOpen = (article: Article) => {
+    setSelectedArticle(article);
+    if (onArticleSelect) {
+      onArticleSelect(article.id);
+    }
   };
+
+  const handleBackToLibrary = () => {
+    setSelectedArticle(null);
+  };
+
+  // Show article viewer if an article is selected
+  if (selectedArticle) {
+    return <ArticleViewer article={selectedArticle} onBack={handleBackToLibrary} />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -161,120 +173,118 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
 
       {/* Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredArticles.map((article, index) => (
-          <motion.div
-            key={article.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
-            whileHover={{ y: -4, scale: 1.02 }}
-            onClick={() => onArticleSelect(article.id)}
-            className="cursor-pointer"
-          >
-            <UltraLuxuryCard 
-              variant="platinum" 
-              className="h-full flex flex-col group"
+        {filteredArticles.map((article, index) => {
+          const isCompleted = progress.completedArticles.includes(article.id);
+          
+          return (
+            <motion.div
+              key={article.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              onClick={() => handleArticleOpen(article)}
+              className="cursor-pointer"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                    <article.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleBookmark(article.id);
-                      }}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Bookmark 
-                        className={cn(
-                          "h-4 w-4",
-                          bookmarkedItems.includes(article.id) 
-                            ? "text-yellow-500 fill-current" 
-                            : "text-gray-400"
-                        )} 
-                      />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => e.stopPropagation()}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Share2 className="h-4 w-4 text-gray-400" />
-                    </Button>
-                  </div>
-                </div>
-
-                <CardTitle className="text-lg font-bold text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors">
-                  {article.title}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="flex-1 flex flex-col">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 flex-1">
-                  {article.description}
-                </p>
-
-                <div className="space-y-3">
-                  {/* Article Meta */}
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <Clock className="h-4 w-4" />
-                      {article.readTime}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      <span className="text-gray-600">4.8</span>
-                    </div>
-                  </div>
-
-                  {/* Author */}
-                  <div className="text-xs text-gray-500">
-                    By {article.author} • {article.authorCredentials}
-                  </div>
-
-                  {/* Category Badge */}
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {article.category}
-                    </Badge>
-                    <span className="text-xs text-gray-500">
-                      Updated {new Date(article.lastUpdated).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
-                    <UltraPremiumButton
-                      variant="primary"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => onArticleSelect(article.id)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
+              <UltraLuxuryCard 
+                variant="platinum" 
+                className="h-full flex flex-col group relative"
+              >
+                {/* Completion Badge */}
+                {isCompleted && (
+                  <div className="absolute top-4 right-4 z-10">
+                    <Badge className="bg-green-500 text-white">
+                      <BookOpen className="h-3 w-3 mr-1" />
                       Read
-                    </UltraPremiumButton>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </UltraLuxuryCard>
-          </motion.div>
-        ))}
+                )}
+
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                      <article.icon className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+
+                  <CardTitle className="text-lg font-bold text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 transition-colors">
+                    {article.title}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="flex-1 flex flex-col">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 flex-1">
+                    {article.description}
+                  </p>
+
+                  <div className="space-y-3">
+                    {/* Article Meta */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <Clock className="h-4 w-4" />
+                        {article.readTime}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        <span className="text-gray-600">4.8</span>
+                      </div>
+                    </div>
+
+                    {/* Author */}
+                    <div className="text-xs text-gray-500">
+                      By {article.author} • {article.authorCredentials}
+                    </div>
+
+                    {/* Category Badge */}
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {article.category}
+                      </Badge>
+                      <span className="text-xs text-gray-500">
+                        Updated {new Date(article.lastUpdated).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-1">
+                      {article.tags.slice(0, 3).map((tag, tagIndex) => (
+                        <Badge key={tagIndex} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2">
+                      <UltraPremiumButton
+                        variant="primary"
+                        size="sm"
+                        className="flex-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleArticleOpen(article);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {isCompleted ? 'Read Again' : 'Read'}
+                      </UltraPremiumButton>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </UltraLuxuryCard>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Load More */}
+      {/* No Results */}
       {filteredArticles.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />

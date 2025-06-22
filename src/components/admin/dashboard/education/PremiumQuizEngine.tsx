@@ -51,6 +51,7 @@ export const PremiumQuizEngine: React.FC<PremiumQuizEngineProps> = ({
   const [timeRemaining, setTimeRemaining] = useState(timeLimit);
   const [isCompleted, setIsCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [startTime] = useState(Date.now());
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -98,6 +99,8 @@ export const PremiumQuizEngine: React.FC<PremiumQuizEngineProps> = ({
     }, 0);
     
     const finalScore = Math.round((correctAnswers / questions.length) * 100);
+    const timeSpent = Math.round((Date.now() - startTime) / 1000);
+    
     setScore(finalScore);
     setIsCompleted(true);
     
@@ -105,10 +108,8 @@ export const PremiumQuizEngine: React.FC<PremiumQuizEngineProps> = ({
       correctAnswers,
       totalQuestions: questions.length,
       answers: selectedAnswers,
-      timeSp
-
-
-: timeLimit - timeRemaining
+      timeSpent: timeSpent,
+      passed: finalScore >= 70
     });
   };
 
@@ -136,6 +137,25 @@ export const PremiumQuizEngine: React.FC<PremiumQuizEngineProps> = ({
             </h2>
             <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
               {score}%
+            </div>
+            
+            {/* Performance Feedback */}
+            <div className="mb-6">
+              {score >= 90 && (
+                <Badge className="bg-green-500 text-white text-lg px-4 py-2">
+                  Excellent Performance! 🎉
+                </Badge>
+              )}
+              {score >= 70 && score < 90 && (
+                <Badge className="bg-blue-500 text-white text-lg px-4 py-2">
+                  Good Job! Passed 👍
+                </Badge>
+              )}
+              {score < 70 && (
+                <Badge className="bg-orange-500 text-white text-lg px-4 py-2">
+                  Keep Learning! 📚
+                </Badge>
+              )}
             </div>
           </motion.div>
 
