@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +21,8 @@ export const designSystem = {
   },
   shadows: {
     card: 'shadow-sm hover:shadow-lg transition-shadow duration-200',
-    modal: 'shadow-xl'
+    modal: 'shadow-xl',
+    soft: 'shadow-sm hover:shadow-md transition-shadow duration-200'
   }
 };
 
