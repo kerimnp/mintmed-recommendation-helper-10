@@ -24,7 +24,8 @@ import {
   Play,
   CheckCircle
 } from 'lucide-react';
-import { ModernGlassCard, ModernBadge, UltraLuxuryCard, UltraPremiumButton } from './ModernDesignSystem';
+import { ModernGlassCard, ModernBadge } from './ModernDesignSystem';
+import { UltraLuxuryCard, UltraPremiumButton } from './UltraPremiumDesignSystem';
 import { PremiumArticleGrid } from '../education/PremiumArticleGrid';
 import { PremiumSimulationCard } from '../education/PremiumSimulationCard';
 import { PremiumAssessmentCard } from '../education/PremiumAssessmentCard';

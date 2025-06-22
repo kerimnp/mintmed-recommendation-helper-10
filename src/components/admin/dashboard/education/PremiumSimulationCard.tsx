@@ -13,7 +13,7 @@ import {
   Target,
   TrendingUp
 } from 'lucide-react';
-import { UltraLuxuryCard, UltraPremiumButton } from '../enhanced/ModernDesignSystem';
+import { UltraLuxuryCard, UltraPremiumButton } from '../enhanced/UltraPremiumDesignSystem';
 import { cn } from '@/lib/utils';
 
 interface PremiumSimulationCardProps {
