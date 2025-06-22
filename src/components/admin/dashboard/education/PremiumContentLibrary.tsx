@@ -168,11 +168,12 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05, duration: 0.3 }}
             whileHover={{ y: -4, scale: 1.02 }}
+            onClick={() => onArticleSelect(article.id)}
+            className="cursor-pointer"
           >
             <UltraLuxuryCard 
               variant="platinum" 
-              className="h-full flex flex-col cursor-pointer group"
-              onClick={() => onArticleSelect(article.id)}
+              className="h-full flex flex-col group"
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between mb-2">
@@ -253,10 +254,7 @@ export const PremiumContentLibrary: React.FC<PremiumContentLibraryProps> = ({
                       variant="primary"
                       size="sm"
                       className="flex-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onArticleSelect(article.id);
-                      }}
+                      onClick={() => onArticleSelect(article.id)}
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       Read

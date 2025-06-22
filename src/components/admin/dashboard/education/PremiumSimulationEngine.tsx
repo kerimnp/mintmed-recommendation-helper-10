@@ -1,383 +1,328 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
   Activity, 
   Heart, 
-  Thermometer, 
-  Droplets,
-  Clock,
+  Zap, 
   AlertTriangle,
   CheckCircle,
+  Clock,
+  Award,
   TrendingUp,
-  TrendingDown,
-  Play,
-  Pause,
-  RotateCcw
+  Brain
 } from 'lucide-react';
 import { UltraLuxuryCard, UltraPremiumButton } from '../enhanced/UltraPremiumDesignSystem';
 import { cn } from '@/lib/utils';
 
-interface VitalSigns {
-  heartRate: number;
-  bloodPressureSystolic: number;
-  bloodPressureDiastolic: number;
-  temperature: number;
-  respiratoryRate: number;
-  oxygenSaturation: number;
-}
-
-interface SimulationEvent {
+interface SimulationStep {
   id: string;
-  timestamp: number;
-  type: 'decision' | 'observation' | 'intervention';
   title: string;
   description: string;
-  options?: string[];
-  correctOption?: number;
-  impact?: Partial<VitalSigns>;
-  clinicalNote?: string;
+  options: string[];
+  correctOption: number;
+  explanation: string;
+  consequence: string;
+  vitals?: {
+    heartRate: number;
+    bloodPressure: string;
+    temperature: number;
+    oxygenSat: number;
+  };
 }
 
 interface PremiumSimulationEngineProps {
-  scenario: {
-    id: string;
-    title: string;
-    description: string;
-    patientBackground: string;
-    initialVitals: VitalSigns;
-    events: SimulationEvent[];
-    learningObjectives: string[];
-  };
-  onComplete: (results: any) => void;
+  title: string;
+  scenario: string;
+  steps: SimulationStep[];
+  onComplete: (score: number, decisions: any[]) => void;
   onExit: () => void;
 }
 
 export const PremiumSimulationEngine: React.FC<PremiumSimulationEngineProps> = ({
+  title,
   scenario,
+  steps,
   onComplete,
   onExit
 }) => {
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [vitals, setVitals] = useState<VitalSigns>(scenario.initialVitals);
-  const [currentEvent, setCurrentEvent] = useState<SimulationEvent | null>(null);
-  const [eventHistory, setEventHistory] = useState<any[]>([]);
-  const [score, setScore] = useState(100);
-  const [decisions, setDecisions] = useState<{ [key: string]: number }>({});
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
+  const [showResult, setShowResult] = useState(false);
+  const [decisions, setDecisions] = useState<any[]>([]);
+  const [patientStatus, setPatientStatus] = useState('stable');
+  const [score, setScore] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isRunning) {
-      interval = setInterval(() => {
-        setCurrentTime(prev => prev + 1);
-        updateVitals();
-        checkForEvents();
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isRunning, currentTime]);
+  const currentStepData = steps[currentStep];
+  const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const updateVitals = () => {
-    // Simulate realistic vital sign fluctuations
-    setVitals(prev => ({
-      heartRate: Math.max(60, Math.min(150, prev.heartRate + (Math.random() - 0.5) * 2)),
-      bloodPressureSystolic: Math.max(80, Math.min(200, prev.bloodPressureSystolic + (Math.random() - 0.5) * 2)),
-      bloodPressureDiastolic: Math.max(50, Math.min(120, prev.bloodPressureDiastolic + (Math.random() - 0.5) * 1)),
-      temperature: Math.max(96, Math.min(104, prev.temperature + (Math.random() - 0.5) * 0.1)),
-      respiratoryRate: Math.max(12, Math.min(30, prev.respiratoryRate + (Math.random() - 0.5) * 1)),
-      oxygenSaturation: Math.max(85, Math.min(100, prev.oxygenSaturation + (Math.random() - 0.5) * 0.5))
-    }));
-  };
-
-  const checkForEvents = () => {
-    const upcomingEvent = scenario.events.find(event => 
-      event.timestamp === currentTime && !eventHistory.some(h => h.eventId === event.id)
-    );
-    
-    if (upcomingEvent) {
-      setCurrentEvent(upcomingEvent);
-      setIsRunning(false);
-    }
-  };
-
-  const handleDecision = (optionIndex: number) => {
-    if (!currentEvent) return;
-
-    const isCorrect = optionIndex === currentEvent.correctOption;
-    const impact = currentEvent.impact || {};
-    
-    // Apply impact to vitals
-    setVitals(prev => ({
-      heartRate: impact.heartRate ? prev.heartRate + impact.heartRate : prev.heartRate,
-      bloodPressureSystolic: impact.bloodPressureSystolic ? prev.bloodPressureSystolic + impact.bloodPressureSystolic : prev.bloodPressureSystolic,
-      bloodPressureDiastolic: impact.bloodPressureDiastolic ? prev.bloodPressureDiastolic + impact.bloodPressureDiastolic : prev.bloodPressureDiastolic,
-      temperature: impact.temperature ? prev.temperature + impact.temperature : prev.temperature,
-      respiratoryRate: impact.respiratoryRate ? prev.respiratoryRate + impact.respiratoryRate : prev.respiratoryRate,
-      oxygenSaturation: impact.oxygenSaturation ? prev.oxygenSaturation + impact.oxygenSaturation : prev.oxygenSaturation
-    }));
-
-    // Update score
-    if (!isCorrect) {
-      setScore(prev => Math.max(0, prev - 10));
-    }
-
-    // Record decision
-    setDecisions(prev => ({
+  const handleOptionSelect = (optionIndex: number) => {
+    setSelectedOptions(prev => ({
       ...prev,
-      [currentEvent.id]: optionIndex
+      [currentStep]: optionIndex
     }));
-
-    // Add to history
-    setEventHistory(prev => [...prev, {
-      eventId: currentEvent.id,
-      timestamp: currentTime,
-      decision: optionIndex,
-      correct: isCorrect,
-      clinicalNote: currentEvent.clinicalNote
-    }]);
-
-    setCurrentEvent(null);
-    setIsRunning(true);
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getVitalStatus = (vital: keyof VitalSigns, value: number) => {
-    const ranges = {
-      heartRate: { normal: [60, 100], warning: [50, 120] },
-      bloodPressureSystolic: { normal: [90, 140], warning: [80, 160] },
-      bloodPressureDiastolic: { normal: [60, 90], warning: [50, 100] },
-      temperature: { normal: [97.0, 99.5], warning: [96.0, 101.0] },
-      respiratoryRate: { normal: [12, 20], warning: [10, 25] },
-      oxygenSaturation: { normal: [95, 100], warning: [90, 94] }
-    };
-
-    const range = ranges[vital];
-    if (value >= range.normal[0] && value <= range.normal[1]) return 'normal';
-    if (value >= range.warning[0] && value <= range.warning[1]) return 'warning';
-    return 'critical';
+  const handleNext = () => {
+    if (showResult) {
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(prev => prev + 1);
+        setShowResult(false);
+      } else {
+        handleComplete();
+      }
+    } else {
+      const selectedOption = selectedOptions[currentStep];
+      const isCorrect = selectedOption === currentStepData.correctOption;
+      
+      const decision = {
+        step: currentStep,
+        option: selectedOption,
+        correct: isCorrect,
+        explanation: currentStepData.explanation
+      };
+      
+      setDecisions(prev => [...prev, decision]);
+      
+      // Update patient status based on decision
+      if (isCorrect) {
+        setPatientStatus('improving');
+      } else {
+        setPatientStatus('deteriorating');
+      }
+      
+      setShowResult(true);
+    }
   };
 
   const handleComplete = () => {
-    onComplete({
-      score,
-      decisions,
-      eventHistory,
-      finalVitals: vitals,
-      timeSpent: currentTime
-    });
+    const correctDecisions = decisions.filter(d => d.correct).length;
+    const finalScore = Math.round((correctDecisions / steps.length) * 100);
+    setScore(finalScore);
+    setIsCompleted(true);
+    onComplete(finalScore, decisions);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'stable': return 'text-blue-600 bg-blue-100';
+      case 'improving': return 'text-green-600 bg-green-100';
+      case 'deteriorating': return 'text-red-600 bg-red-100';
+      case 'critical': return 'text-red-800 bg-red-200';
+      default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  if (isCompleted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-4xl mx-auto p-6"
+      >
+        <UltraLuxuryCard variant="aurora" className="p-8 text-center">
+          <Award className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Simulation Complete!
+          </h2>
+          <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            {score}%
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="p-4 bg-white/50 rounded-xl">
+              <TrendingUp className="h-8 w-8 mx-auto text-green-500 mb-2" />
+              <div className="text-2xl font-bold text-gray-900">{decisions.filter(d => d.correct).length}</div>
+              <div className="text-sm text-gray-600">Correct Decisions</div>
+            </div>
+            <div className="p-4 bg-white/50 rounded-xl">
+              <Brain className="h-8 w-8 mx-auto text-purple-500 mb-2" />
+              <div className="text-2xl font-bold text-gray-900">{steps.length}</div>
+              <div className="text-sm text-gray-600">Total Steps</div>
+            </div>
+            <div className="p-4 bg-white/50 rounded-xl">
+              <Heart className="h-8 w-8 mx-auto text-red-500 mb-2" />
+              <div className="text-2xl font-bold text-gray-900 capitalize">{patientStatus}</div>
+              <div className="text-sm text-gray-600">Final Status</div>
+            </div>
+          </div>
+
+          <UltraPremiumButton variant="primary" onClick={onExit}>
+            Continue Learning
+          </UltraPremiumButton>
+        </UltraLuxuryCard>
+      </motion.div>
+    );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <UltraLuxuryCard variant="aurora" className="p-6">
-        <div className="flex items-center justify-between">
+      <UltraLuxuryCard variant="crystal" className="p-6">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {scenario.title}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {scenario.description}
+              Step {currentStep + 1} of {steps.length}
             </p>
           </div>
-          <div className="text-right space-y-2">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span className="text-lg font-mono font-bold">
-                {formatTime(currentTime)}
-              </span>
-            </div>
-            <Badge className="bg-green-600">
-              Score: {score}
+          <div className="text-right">
+            <Badge className={cn("mb-2", getStatusColor(patientStatus))}>
+              Patient: {patientStatus}
             </Badge>
           </div>
         </div>
+        <Progress value={progress} className="h-2" />
       </UltraLuxuryCard>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Vital Signs Monitor */}
-        <div className="lg:col-span-2">
-          <UltraLuxuryCard variant="crystal" className="p-6">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
-                Patient Vital Signs
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {[
-                  { key: 'heartRate', label: 'Heart Rate', value: vitals.heartRate, unit: 'bpm', icon: Heart },
-                  { key: 'bloodPressureSystolic', label: 'BP Systolic', value: vitals.bloodPressureSystolic, unit: 'mmHg', icon: Activity },
-                  { key: 'bloodPressureDiastolic', label: 'BP Diastolic', value: vitals.bloodPressureDiastolic, unit: 'mmHg', icon: Activity },
-                  { key: 'temperature', label: 'Temperature', value: vitals.temperature, unit: '°F', icon: Thermometer },
-                  { key: 'respiratoryRate', label: 'Resp. Rate', value: vitals.respiratoryRate, unit: '/min', icon: Activity },
-                  { key: 'oxygenSaturation', label: 'O2 Sat', value: vitals.oxygenSaturation, unit: '%', icon: Droplets }
-                ].map((vital) => {
-                  const status = getVitalStatus(vital.key as keyof VitalSigns, vital.value);
-                  return (
-                    <motion.div
-                      key={vital.key}
-                      className={cn(
-                        "p-4 rounded-xl border-2 transition-all duration-300",
-                        status === 'normal' ? "border-green-200 bg-green-50 dark:bg-green-900/20" :
-                        status === 'warning' ? "border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20" :
-                        "border-red-200 bg-red-50 dark:bg-red-900/20"
+      {/* Patient Vitals */}
+      {currentStepData.vitals && (
+        <UltraLuxuryCard variant="platinum" className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Current Vitals
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-white/50 rounded-lg">
+              <Heart className="h-6 w-6 mx-auto text-red-500 mb-2" />
+              <div className="text-lg font-bold text-gray-900">{currentStepData.vitals.heartRate}</div>
+              <div className="text-xs text-gray-600">HR (bpm)</div>
+            </div>
+            <div className="text-center p-3 bg-white/50 rounded-lg">
+              <Activity className="h-6 w-6 mx-auto text-blue-500 mb-2" />
+              <div className="text-lg font-bold text-gray-900">{currentStepData.vitals.bloodPressure}</div>
+              <div className="text-xs text-gray-600">BP (mmHg)</div>
+            </div>
+            <div className="text-center p-3 bg-white/50 rounded-lg">
+              <Zap className="h-6 w-6 mx-auto text-orange-500 mb-2" />
+              <div className="text-lg font-bold text-gray-900">{currentStepData.vitals.temperature}°F</div>
+              <div className="text-xs text-gray-600">Temperature</div>
+            </div>
+            <div className="text-center p-3 bg-white/50 rounded-lg">
+              <Activity className="h-6 w-6 mx-auto text-green-500 mb-2" />
+              <div className="text-lg font-bold text-gray-900">{currentStepData.vitals.oxygenSat}%</div>
+              <div className="text-xs text-gray-600">O2 Sat</div>
+            </div>
+          </div>
+        </UltraLuxuryCard>
+      )}
+
+      {/* Current Step */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <UltraLuxuryCard variant="platinum" className="p-8">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  {currentStepData.title}
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {currentStepData.description}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  What is your next action?
+                </h3>
+                {currentStepData.options.map((option, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleOptionSelect(index)}
+                    disabled={showResult}
+                    className={cn(
+                      "w-full p-4 text-left rounded-xl border-2 transition-all duration-300",
+                      selectedOptions[currentStep] === index
+                        ? showResult
+                          ? index === currentStepData.correctOption
+                            ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                            : "border-red-500 bg-red-50 dark:bg-red-900/20"
+                          : "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : showResult && index === currentStepData.correctOption
+                        ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                        : "border-gray-200 hover:border-gray-300 bg-white dark:bg-gray-800"
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {option}
+                      </span>
+                      {showResult && (
+                        <div>
+                          {index === currentStepData.correctOption && (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          )}
+                          {selectedOptions[currentStep] === index && index !== currentStepData.correctOption && (
+                            <AlertTriangle className="h-5 w-5 text-red-500" />
+                          )}
+                        </div>
                       )}
-                      animate={{
-                        scale: status === 'critical' ? [1, 1.05, 1] : 1
-                      }}
-                      transition={{
-                        duration: 1,
-                        repeat: status === 'critical' ? Infinity : 0
-                      }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <vital.icon className={cn(
-                          "h-5 w-5",
-                          status === 'normal' ? "text-green-600" :
-                          status === 'warning' ? "text-yellow-600" :
-                          "text-red-600"
-                        )} />
-                        {status === 'normal' ? <TrendingUp className="h-4 w-4 text-green-500" /> :
-                         status === 'critical' ? <TrendingDown className="h-4 w-4 text-red-500" /> :
-                         <AlertTriangle className="h-4 w-4 text-yellow-500" />}
-                      </div>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {typeof vital.value === 'number' ? vital.value.toFixed(1) : vital.value}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        {vital.label} ({vital.unit})
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </UltraLuxuryCard>
-        </div>
-
-        {/* Control Panel */}
-        <div className="space-y-6">
-          <UltraLuxuryCard variant="platinum" className="p-6">
-            <CardHeader className="pb-4">
-              <CardTitle>Simulation Control</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <UltraPremiumButton
-                  variant={isRunning ? "secondary" : "primary"}
-                  onClick={() => setIsRunning(!isRunning)}
-                  className="flex-1"
-                >
-                  {isRunning ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-                  {isRunning ? 'Pause' : 'Start'}
-                </UltraPremiumButton>
-                <Button variant="outline" onClick={() => setCurrentTime(0)}>
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Learning Objectives:
-                </div>
-                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  {scenario.learningObjectives.map((objective, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                      {objective}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </UltraLuxuryCard>
-
-          <UltraLuxuryCard variant="glass" className="p-6">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm">Patient Background</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                {scenario.patientBackground}
-              </p>
-            </CardContent>
-          </UltraLuxuryCard>
-        </div>
-      </div>
-
-      {/* Event Modal */}
-      <AnimatePresence>
-        {currentEvent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="max-w-2xl w-full"
-            >
-              <UltraLuxuryCard variant="gold" className="p-8">
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <Badge className="mb-4">
-                      {currentEvent.type.toUpperCase()}
-                    </Badge>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                      {currentEvent.title}
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {currentEvent.description}
-                    </p>
-                  </div>
-
-                  {currentEvent.options && (
-                    <div className="space-y-3">
-                      {currentEvent.options.map((option, index) => (
-                        <UltraPremiumButton
-                          key={index}
-                          variant="outline"
-                          onClick={() => handleDecision(index)}
-                          className="w-full text-left justify-start p-4 h-auto"
-                        >
-                          <span className="font-medium mr-3">
-                            {String.fromCharCode(65 + index)}.
-                          </span>
-                          {option}
-                        </UltraPremiumButton>
-                      ))}
                     </div>
-                  )}
-                </div>
-              </UltraLuxuryCard>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  </motion.button>
+                ))}
+              </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onExit}>
-          Exit Simulation
-        </Button>
-        <UltraPremiumButton variant="primary" onClick={handleComplete}>
-          Complete Simulation
-        </UltraPremiumButton>
-      </div>
+              {showResult && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-6 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    {selectedOptions[currentStep] === currentStepData.correctOption ? (
+                      <CheckCircle className="h-6 w-6 text-green-500 mt-1" />
+                    ) : (
+                      <AlertTriangle className="h-6 w-6 text-red-500 mt-1" />
+                    )}
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                        {selectedOptions[currentStep] === currentStepData.correctOption ? 'Excellent Decision!' : 'Consider This...'}
+                      </h4>
+                      <p className="text-gray-700 dark:text-gray-300 mb-4">
+                        {currentStepData.explanation}
+                      </p>
+                      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          <strong>Patient Response:</strong> {currentStepData.consequence}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="flex justify-between pt-6">
+                <Button variant="outline" onClick={onExit}>
+                  Exit Simulation
+                </Button>
+                <UltraPremiumButton
+                  variant="primary"
+                  onClick={handleNext}
+                  disabled={selectedOptions[currentStep] === undefined && !showResult}
+                >
+                  {showResult 
+                    ? currentStep === steps.length - 1 
+                      ? 'Complete Simulation' 
+                      : 'Next Step'
+                    : 'Submit Decision'
+                  }
+                </UltraPremiumButton>
+              </div>
+            </div>
+          </UltraLuxuryCard>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

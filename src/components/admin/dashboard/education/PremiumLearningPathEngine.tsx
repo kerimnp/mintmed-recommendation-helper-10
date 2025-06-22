@@ -200,16 +200,16 @@ export const PremiumLearningPathEngine: React.FC<PremiumLearningPathEngineProps>
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={!module.locked ? { y: -4, scale: 1.02 } : {}}
-                className="relative"
+                className="relative cursor-pointer"
+                onClick={() => handleModuleClick(module)}
               >
                 <UltraLuxuryCard 
                   variant={module.completed ? "crystal" : isNextModule ? "gold" : "platinum"}
                   className={cn(
-                    "p-6 cursor-pointer transition-all duration-300",
+                    "p-6 transition-all duration-300",
                     module.locked && "opacity-50 cursor-not-allowed",
                     isNextModule && "ring-2 ring-blue-500/20 shadow-lg shadow-blue-500/10"
                   )}
-                  onClick={() => handleModuleClick(module)}
                 >
                   {/* Status Indicator */}
                   <div className="absolute top-4 right-4">
@@ -273,10 +273,10 @@ export const PremiumLearningPathEngine: React.FC<PremiumLearningPathEngineProps>
                     {/* Action Button */}
                     <div className="pt-2">
                       <UltraPremiumButton
-                        variant={module.completed ? "outline" : isNextModule ? "primary" : "secondary"}
+                        variant={module.completed ? "crystal" : isNextModule ? "primary" : "obsidian"}
                         size="sm"
                         className="w-full"
-                        disabled={module.locked}
+                        onClick={() => handleModuleClick(module)}
                       >
                         {module.completed ? "Review" : 
                          module.locked ? "Locked" : 

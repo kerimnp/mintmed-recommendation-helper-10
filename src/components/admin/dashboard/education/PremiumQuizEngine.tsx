@@ -105,7 +105,10 @@ export const PremiumQuizEngine: React.FC<PremiumQuizEngineProps> = ({
       correctAnswers,
       totalQuestions: questions.length,
       answers: selectedAnswers,
-      timeSpent: timeLimit - timeRemaining
+      timeSp
+
+
+: timeLimit - timeRemaining
     });
   };
 
