@@ -1,685 +1,477 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Search, 
-  Filter, 
-  Star, 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line
+} from 'recharts';
+import { 
+  Activity, 
   TrendingUp, 
-  AlertTriangle, 
-  Clock, 
-  Target,
-  Zap,
-  Shield,
-  Activity,
-  BarChart3,
-  Globe,
-  Users,
-  Award,
-  BookOpen,
-  Download,
-  Eye,
-  EyeOff,
-  Heart,
-  Brain,
+  Users, 
   Pill,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Filter,
+  Download,
+  RefreshCw,
+  Search,
+  Star,
+  Shield,
   Beaker,
-  Microscope
+  DollarSign,
+  BookOpen,
+  Eye,
+  ChevronRight
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  getAllAntibiotics, 
-  getAntibioticsByCategory, 
-  searchAntibiotics, 
-  getCategories, 
-  getAntibioticStats,
-  EnhancedAntibioticData 
-} from '@/services/antibioticService';
+import { getAllAntibiotics, getCategories, getAntibioticStats, searchAntibiotics, getAntibioticsByCategory } from '@/services/antibioticService';
+import { AntibioticCard } from './components/AntibioticCard';
+import { AntibioticDetailModal } from './components/AntibioticDetailModal';
+import { ResistanceChart } from './components/ResistanceChart';
+import { EffectivenessChart } from './components/EffectivenessChart';
+import { type EnhancedAntibioticData } from '@/services/antibioticService';
 
-const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ drug, index }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  // Enhanced debugging
-  useEffect(() => {
-    console.log(`DrugCard ${drug.name}: isExpanded = ${isExpanded}`);
-  }, [isExpanded, drug.name]);
-
-  const handleToggleExpanded = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(`Button clicked for ${drug.name}. Current state: ${isExpanded}, changing to: ${!isExpanded}`);
-    setIsExpanded(prev => {
-      const newState = !prev;
-      console.log(`State changed for ${drug.name}: ${prev} -> ${newState}`);
-      return newState;
-    });
-  };
-
-  const getEffectivenessColor = (value: number) => {
-    if (value >= 90) return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
-    if (value >= 75) return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20';
-    if (value >= 60) return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20';
-    return 'text-red-600 bg-red-50 dark:bg-red-900/20';
-  };
-
-  const getAvailabilityIcon = (availability: string) => {
-    switch (availability) {
-      case 'high': return <div className="w-2 h-2 bg-emerald-500 rounded-full" />;
-      case 'medium': return <div className="w-2 h-2 bg-yellow-500 rounded-full" />;
-      case 'low': return <div className="w-2 h-2 bg-red-500 rounded-full" />;
-      default: return null;
-    }
-  };
-
-  const getCostBadge = (cost: number) => {
-    if (cost < 50) return { label: 'Low Cost', variant: 'success' as const };
-    if (cost < 100) return { label: 'Medium Cost', variant: 'warning' as const };
-    return { label: 'High Cost', variant: 'danger' as const };
-  };
-
-  const costInfo = getCostBadge(drug.cost);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="group"
-    >
-      <Card className="relative overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl hover:shadow-2xl transition-all duration-500 rounded-2xl">
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        
-        {/* Featured badge */}
-        {drug.featured && (
-          <div className="absolute top-4 right-4 z-10">
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
-              <Star className="w-3 h-3 mr-1" />
-              Featured
-            </Badge>
-          </div>
-        )}
-
-        {/* Trending indicator */}
-        {drug.trending && (
-          <div className="absolute top-4 left-4 z-10">
-            <div className="flex items-center space-x-1 bg-emerald-500/90 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-              <TrendingUp className="w-3 h-3" />
-              <span>Trending</span>
-            </div>
-          </div>
-        )}
-
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-2 flex-1">
-              <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">
-                {drug.name}
-              </CardTitle>
-              <div className="flex items-center flex-wrap gap-2">
-                <Badge variant="secondary" className="text-xs font-medium bg-gray-100 dark:bg-gray-800">
-                  {drug.category}
-                </Badge>
-                <Badge 
-                  className={`text-xs ${
-                    costInfo.variant === 'success' ? 'bg-emerald-100 text-emerald-700' :
-                    costInfo.variant === 'warning' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-red-100 text-red-700'
-                  }`}
-                >
-                  {costInfo.label}
-                </Badge>
-                <div className="flex items-center space-x-1">
-                  {getAvailabilityIcon(drug.availability)}
-                  <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">
-                    {drug.availability} availability
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          {/* Key metrics */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className={`p-3 rounded-xl ${getEffectivenessColor(drug.effectiveness)} transition-all duration-300`}>
-              <div className="flex items-center justify-between">
-                <Target className="w-4 h-4" />
-                <span className="text-xs font-medium">Effectiveness</span>
-              </div>
-              <div className="text-lg font-bold mt-1">{drug.effectiveness}%</div>
-            </div>
-            
-            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <Shield className="w-4 h-4" />
-                <span className="text-xs font-medium">Resistance</span>
-              </div>
-              <div className="text-lg font-bold mt-1">{drug.resistance}%</div>
-            </div>
-          </div>
-
-          {/* Mechanism and spectrum */}
-          <div className="space-y-2">
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <Zap className="w-4 h-4 mr-2 text-blue-500" />
-              <span className="font-medium">Mechanism:</span>
-              <span className="ml-1 text-xs">{drug.mechanism}</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-              <Activity className="w-4 h-4 mr-2 text-purple-500" />
-              <span className="font-medium">Spectrum:</span>
-              <span className="ml-1 text-xs">{drug.spectrum}</span>
-            </div>
-          </div>
-
-          {/* Route and half-life */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex items-center">
-              <Clock className="w-3 h-3 mr-1" />
-              <span>t½: {drug.halfLife}</span>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {drug.route.slice(0, 2).map((route, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs">
-                  {route}
-                </Badge>
-              ))}
-              {drug.route.length > 2 && (
-                <Badge variant="outline" className="text-xs">
-                  +{drug.route.length - 2}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Common indications */}
-          {drug.commonIndications && drug.commonIndications.length > 0 && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <div className="flex items-center mb-1">
-                <Beaker className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-xs font-medium text-blue-800 dark:text-blue-200">
-                  Common Indications
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {drug.commonIndications.slice(0, 3).map((indication, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
-                    {indication}
-                  </Badge>
-                ))}
-                {drug.commonIndications.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{drug.commonIndications.length - 3} more
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Warnings */}
-          {drug.warnings && drug.warnings.length > 0 && (
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-              <div className="flex items-center mb-1">
-                <AlertTriangle className="w-4 h-4 text-amber-600 mr-2" />
-                <span className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                  Key Warnings
-                </span>
-              </div>
-              <div className="space-y-1">
-                {drug.warnings.slice(0, 2).map((warning, idx) => (
-                  <div key={idx} className="text-xs text-amber-700 dark:text-amber-300">
-                    • {warning}
-                  </div>
-                ))}
-                {drug.warnings.length > 2 && (
-                  <div className="text-xs text-amber-600 dark:text-amber-400">
-                    +{drug.warnings.length - 2} more warnings
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Action buttons */}
-          <div className="flex space-x-2 pt-2">
-            <Button 
-              size="sm" 
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg transition-all duration-300"
-              onClick={handleToggleExpanded}
-              type="button"
-            >
-              {isExpanded ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-              {isExpanded ? 'Hide Details' : 'View Details'}
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              className="border-blue-500/20 hover:bg-blue-500/5 transition-all duration-300"
-              type="button"
-            >
-              <BookOpen className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Debug info */}
-          <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded">
-            Debug: isExpanded = {isExpanded.toString()}
-          </div>
-
-          {/* Enhanced Expanded details */}
-          <AnimatePresence mode="wait">
-            {isExpanded && (
-              <motion.div
-                key="expanded-content"
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ 
-                  opacity: 1, 
-                  height: 'auto', 
-                  y: 0,
-                  transition: {
-                    duration: 0.4,
-                    ease: "easeOut",
-                    opacity: { delay: 0.1 }
-                  }
-                }}
-                exit={{ 
-                  opacity: 0, 
-                  height: 0, 
-                  y: -10,
-                  transition: {
-                    duration: 0.3,
-                    ease: "easeIn"
-                  }
-                }}
-                className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4 overflow-hidden"
-              >
-                <div className="bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                  <div className="text-sm font-bold text-green-800 dark:text-green-200">
-                    EXPANDED CONTENT IS NOW VISIBLE!
-                  </div>
-                  <div className="text-xs text-green-700 dark:text-green-300 mt-1">
-                    This confirms the animation is working properly.
-                  </div>
-                </div>
-
-                {/* Enhanced metrics grid */}
-                <div className="grid grid-cols-3 gap-3">
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
-                  >
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Side Effects</div>
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.sideEffects || 'N/A'}%</div>
-                  </motion.div>
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
-                  >
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Interactions</div>
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.interactions || 0}</div>
-                  </motion.div>
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3 text-center"
-                  >
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Studies</div>
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">{drug.studies || 0}</div>
-                  </motion.div>
-                </div>
-                
-                {/* Enhanced clinical details */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-3"
-                >
-                  {/* Mechanism detail */}
-                  {drug.mechanismDetail && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-3">
-                      <div className="text-xs font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-                        <Zap className="w-3 h-3 mr-1" />
-                        Mechanism of Action
-                      </div>
-                      <div className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                        {drug.mechanismDetail}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Clinical pearls */}
-                  {drug.clinicalPearls && drug.clinicalPearls.length > 0 && (
-                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-3">
-                      <div className="text-xs font-medium text-emerald-800 dark:text-emerald-200 mb-2 flex items-center">
-                        <Award className="w-3 h-3 mr-1" />
-                        Clinical Pearls
-                      </div>
-                      <div className="space-y-1">
-                        {drug.clinicalPearls.slice(0, 2).map((pearl, idx) => (
-                          <div key={idx} className="text-xs text-emerald-700 dark:text-emerald-300">
-                            • {pearl}
-                          </div>
-                        ))}
-                        {drug.clinicalPearls.length > 2 && (
-                          <div className="text-xs text-emerald-600 dark:text-emerald-400">
-                            +{drug.clinicalPearls.length - 2} more pearls
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-                
-                {/* Available products info with fallback */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  {drug.availableProducts && drug.availableProducts.length > 0 ? (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                        <Pill className="w-3 h-3 mr-1" />
-                        Available Products ({drug.availableProducts.length})
-                      </div>
-                      <div className="space-y-1">
-                        {drug.availableProducts.slice(0, 3).map((product, idx) => (
-                          <div key={idx} className="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
-                            <span>{product.name}</span>
-                            <span className="text-gray-500">{product.manufacturer}</span>
-                          </div>
-                        ))}
-                        {drug.availableProducts.length > 3 && (
-                          <div className="text-xs text-gray-500">
-                            +{drug.availableProducts.length - 3} more products
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                        <Pill className="w-3 h-3 mr-1" />
-                        Available Products
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Product information being updated...
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-                
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-xs text-gray-500 dark:text-gray-400 text-center pt-2 border-t border-gray-200 dark:border-gray-700"
-                >
-                  Last updated: {drug.lastUpdated || 'Recently'}
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-};
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export const ModernAntibioticsTab: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('effectiveness');
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedTimeRange, setSelectedTimeRange] = useState('6m');
+  const [sortBy, setSortBy] = useState<'effectiveness' | 'resistance' | 'cost' | 'name'>('effectiveness');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedAntibiotic, setSelectedAntibiotic] = useState<EnhancedAntibioticData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  // Get real data using the service
-  const allAntibiotics = useMemo(() => getAllAntibiotics(), []);
-  const categories = useMemo(() => getCategories(), []);
-  const stats = useMemo(() => getAntibioticStats(), []);
+  // Get all data
+  const allAntibiotics = getAllAntibiotics();
+  const categories = getCategories();
+  const stats = getAntibioticStats();
 
-  const filteredDrugs = useMemo(() => {
-    let drugs = allAntibiotics;
+  // Filter and sort antibiotics
+  const filteredAntibiotics = useMemo(() => {
+    let filtered = searchTerm 
+      ? searchAntibiotics(searchTerm)
+      : getAntibioticsByCategory(selectedCategory);
     
-    // Apply category filter
-    if (selectedCategory !== 'all') {
-      drugs = getAntibioticsByCategory(selectedCategory);
-    }
-    
-    // Apply search filter
-    if (searchTerm) {
-      drugs = searchAntibiotics(searchTerm);
-      if (selectedCategory !== 'all') {
-        drugs = drugs.filter(drug => drug.category === selectedCategory);
-      }
-    }
-    
-    return drugs;
-  }, [allAntibiotics, selectedCategory, searchTerm]);
-
-  const sortedDrugs = useMemo(() => {
-    return [...filteredDrugs].sort((a, b) => {
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue: number | string;
+      let bValue: number | string;
+      
       switch (sortBy) {
         case 'effectiveness':
-          return b.effectiveness - a.effectiveness;
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'category':
-          return a.category.localeCompare(b.category);
+          aValue = a.effectiveness;
+          bValue = b.effectiveness;
+          break;
         case 'resistance':
-          return a.resistance - b.resistance;
+          aValue = a.resistance;
+          bValue = b.resistance;
+          break;
+        case 'cost':
+          aValue = a.cost;
+          bValue = b.cost;
+          break;
+        case 'name':
+          aValue = a.name;
+          bValue = b.name;
+          break;
         default:
-          return 0;
+          aValue = a.effectiveness;
+          bValue = b.effectiveness;
       }
+      
+      if (typeof aValue === 'string') {
+        return sortOrder === 'desc' 
+          ? bValue.toString().localeCompare(aValue.toString())
+          : aValue.toString().localeCompare(bValue.toString());
+      }
+      
+      return sortOrder === 'desc' ? (bValue as number) - (aValue as number) : (aValue as number) - (bValue as number);
     });
-  }, [filteredDrugs, sortBy]);
+    
+    return filtered;
+  }, [searchTerm, selectedCategory, sortBy, sortOrder]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    };
+  // Prepare chart data
+  const categoryData = useMemo(() => {
+    const categoryCounts = allAntibiotics.reduce((acc, antibiotic) => {
+      acc[antibiotic.category] = (acc[antibiotic.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(categoryCounts).map(([name, value]) => ({ name, value }));
+  }, [allAntibiotics]);
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  const resistanceData = useMemo(() => {
+    return allAntibiotics
+      .filter(a => a.resistance > 15)
+      .sort((a, b) => b.resistance - a.resistance)
+      .slice(0, 10)
+      .map(a => ({
+        name: a.name,
+        resistance: a.resistance,
+        effectiveness: a.effectiveness
+      }));
+  }, [allAntibiotics]);
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
+  const handleExport = () => {
+    const data = filteredAntibiotics.map(a => ({
+      name: a.name,
+      category: a.category,
+      effectiveness: a.effectiveness,
+      resistance: a.resistance,
+      cost: a.cost,
+      availability: a.availability
+    }));
+    
+    const csv = [
+      ['Name', 'Category', 'Effectiveness', 'Resistance', 'Cost', 'Availability'],
+      ...data.map(d => [d.name, d.category, d.effectiveness, d.resistance, d.cost, d.availability])
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'antibiotics-data.csv';
+    a.click();
+  };
 
   return (
-    <div className="space-y-8 p-6 min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-gray-700/30 shadow-2xl"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10" />
-        <div className="relative p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                Antibiotic Intelligence
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 text-lg">
-                Comprehensive therapeutic insights with real-time resistance monitoring
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <Brain className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Antibiotics</div>
-                </div>
-                <Shield className="w-6 h-6 text-blue-500" />
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.avgEffectiveness}%</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Avg Effectiveness</div>
-                </div>
-                <Target className="w-6 h-6 text-emerald-500" />
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.resistanceAlerts}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Resistance Alerts</div>
-                </div>
-                <AlertTriangle className="w-6 h-6 text-amber-500" />
-              </div>
-            </div>
-            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-4 border border-white/30 dark:border-gray-700/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.round(stats.totalStudies / 1000)}K</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Clinical Studies</div>
-                </div>
-                <Microscope className="w-6 h-6 text-purple-500" />
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6 p-6">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Enhanced Antibiotic Database
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Comprehensive clinical insights with {allAntibiotics.length} antibiotics and resistance data
+          </p>
         </div>
-      </motion.div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
+      </div>
 
-      {/* Enhanced Search and Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-xl p-6"
-      >
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              ref={searchInputRef}
-              placeholder="Search antibiotics... (⌘K)"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
-            />
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-100 text-sm font-medium">Total Antibiotics</p>
+                <p className="text-3xl font-bold">{stats.total}</p>
+                <p className="text-blue-100 text-xs mt-1">Across all categories</p>
+              </div>
+              <Pill className="h-8 w-8 text-blue-200" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-100 text-sm font-medium">Avg Effectiveness</p>
+                <p className="text-3xl font-bold">{stats.avgEffectiveness}%</p>
+                <p className="text-green-100 text-xs mt-1">Clinical success rate</p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-200" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-amber-100 text-sm font-medium">Resistance Alerts</p>
+                <p className="text-3xl font-bold">{stats.resistanceAlerts}</p>
+                <p className="text-amber-100 text-xs mt-1">High resistance rates</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-amber-200" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm font-medium">Research Studies</p>
+                <p className="text-3xl font-bold">{Math.floor(stats.totalStudies / 1000)}K+</p>
+                <p className="text-purple-100 text-xs mt-1">Evidence base</p>
+              </div>
+              <BookOpen className="h-8 w-8 text-purple-200" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex items-center gap-3 flex-1">
+              <Search className="h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search antibiotics by name, mechanism, or indication..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 max-w-lg"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category === 'all' ? 'All Categories' : category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="effectiveness">Effectiveness</SelectItem>
+                  <SelectItem value="resistance">Resistance</SelectItem>
+                  <SelectItem value="cost">Cost</SelectItem>
+                  <SelectItem value="name">Name</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              >
+                {sortOrder === 'desc' ? '↓' : '↑'}
+              </Button>
+              
+              <div className="flex items-center border border-gray-200 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                >
+                  Grid
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                >
+                  Table
+                </Button>
+              </div>
+            </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="flex items-center space-x-3">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category === 'all' ? 'All Categories' : category}
-                </option>
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Category Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              High Resistance Antibiotics
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={resistanceData} margin={{ left: 20, right: 20, top: 5, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="resistance" fill="#ef4444" name="Resistance %" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Antibiotic Grid/Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Antibiotic Database ({filteredAntibiotics.length} results)</span>
+            {searchTerm && (
+              <Badge variant="secondary">
+                Filtered by: {searchTerm}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredAntibiotics.map((antibiotic) => (
+                <AntibioticCard
+                  key={antibiotic.id}
+                  antibiotic={antibiotic}
+                  onClick={() => setSelectedAntibiotic(antibiotic)}
+                />
               ))}
-            </select>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3 font-medium">Name</th>
+                    <th className="text-left p-3 font-medium">Category</th>
+                    <th className="text-left p-3 font-medium">Effectiveness</th>
+                    <th className="text-left p-3 font-medium">Resistance</th>
+                    <th className="text-left p-3 font-medium">Cost</th>
+                    <th className="text-left p-3 font-medium">Availability</th>
+                    <th className="text-left p-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAntibiotics.map((antibiotic) => (
+                    <tr key={antibiotic.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{antibiotic.name}</span>
+                          {antibiotic.featured && <Star className="h-3 w-3 text-yellow-500 fill-current" />}
+                          {antibiotic.trending && <TrendingUp className="h-3 w-3 text-blue-500" />}
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <Badge variant="outline">{antibiotic.category}</Badge>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-green-500 h-2 rounded-full" 
+                              style={{ width: `${antibiotic.effectiveness}%` }}
+                            />
+                          </div>
+                          <span className="text-xs">{antibiotic.effectiveness}%</span>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <Badge 
+                          variant={antibiotic.resistance > 20 ? "destructive" : antibiotic.resistance > 10 ? "default" : "secondary"}
+                        >
+                          {antibiotic.resistance}%
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        <span className="text-sm">${antibiotic.cost}</span>
+                      </td>
+                      <td className="p-3">
+                        <Badge 
+                          variant={antibiotic.availability === 'high' ? "default" : antibiotic.availability === 'medium' ? "secondary" : "outline"}
+                        >
+                          {antibiotic.availability}
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedAntibiotic(antibiotic)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/30 dark:border-gray-700/30 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all duration-300"
-            >
-              <option value="effectiveness">Sort by Effectiveness</option>
-              <option value="name">Sort by Name</option>
-              <option value="category">Sort by Category</option>
-              <option value="resistance">Sort by Resistance (Low to High)</option>
-            </select>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-blue-500/5 transition-all duration-300"
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-blue-500/5 transition-all duration-300"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
-          </div>
-        </div>
-        
-        {/* Results summary */}
-        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-          Showing {sortedDrugs.length} of {allAntibiotics.length} antibiotics
-          {searchTerm && ` for "${searchTerm}"`}
-          {selectedCategory !== 'all' && ` in ${selectedCategory}`}
-        </div>
-      </motion.div>
-
-      {/* Drug Cards Grid */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-      >
-        {sortedDrugs.map((drug, index) => (
-          <DrugCard key={drug.id} drug={drug} index={index} />
-        ))}
-      </motion.div>
-
-      {/* Empty State */}
-      {sortedDrugs.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="text-center py-12"
-        >
-          <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-xl p-8 max-w-md mx-auto">
-            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No antibiotics found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Try adjusting your search criteria or filters
-            </p>
-            <Button 
-              variant="outline" 
-              className="mt-4"
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('all');
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        </motion.div>
+      {/* Detail Modal */}
+      {selectedAntibiotic && (
+        <AntibioticDetailModal
+          antibiotic={selectedAntibiotic}
+          isOpen={!!selectedAntibiotic}
+          onClose={() => setSelectedAntibiotic(null)}
+        />
       )}
     </div>
   );
