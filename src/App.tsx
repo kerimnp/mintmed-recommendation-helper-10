@@ -9,6 +9,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import Pricing from "./pages/Pricing";
 import Subscription from "./pages/Subscription";
@@ -34,7 +35,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect hospital admins to their dashboard
+  // Redirect hospital admins to their dashboard when accessing individual doctor routes
   if (user.user_metadata?.account_type === 'hospital_admin') {
     return <Navigate to="/hospital-dashboard" replace />;
   }
@@ -59,7 +60,31 @@ const HospitalAdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (user.user_metadata?.account_type !== 'hospital_admin') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Admin Dashboard Route Component (for individual doctors and authorized users)
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  // Redirect hospital admins to their specific dashboard
+  if (user.user_metadata?.account_type === 'hospital_admin') {
+    return <Navigate to="/hospital-dashboard" replace />;
   }
   
   return <>{children}</>;
@@ -80,6 +105,14 @@ function App() {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
                   <Route path="/pricing" element={<Pricing />} />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    } 
+                  />
                   <Route 
                     path="/profile" 
                     element={

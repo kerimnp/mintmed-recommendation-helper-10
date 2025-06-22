@@ -78,9 +78,7 @@ export const MainNavigation: React.FC = () => {
   };
 
   const navigationItems = user 
-    ? [...publicNavigationItems,
-
- ...getPrivateNavigationItems()]
+    ? [...publicNavigationItems, ...getPrivateNavigationItems()]
     : publicNavigationItems;
 
   const handleSignOut = async () => {
