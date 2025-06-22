@@ -11,6 +11,7 @@ import { ClinicalGuidelines } from "../ClinicalGuidelines";
 import { MainDashboardTab } from "./MainDashboardTab";
 import { PatientHistoryTab } from "./PatientHistoryTab";
 import { UserManagementTab } from "./UserManagementTab";
+import { PremiumEducationTab } from "./enhanced/PremiumEducationTab";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
@@ -73,7 +74,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {activeTab === "regional" && <RegionalTab searchTerm={searchTerm} />}
       {activeTab === "effectiveness" && <EffectivenessTab searchTerm={searchTerm} />}
       {activeTab === "guidelines" && <GuidelinesTab searchTerm={searchTerm} />}
-      {activeTab === "education" && <EducationTab searchTerm={searchTerm} />}
+      {activeTab === "education" && <PremiumEducationTab searchTerm={searchTerm} />}
       {activeTab === "clinical-guidelines" && <ClinicalGuidelines searchTerm={searchTerm} />}
       {activeTab === "history" && <PatientHistoryTab searchTerm={searchTerm} />}
       {activeTab === "user-management" && renderUserManagementTab()}
