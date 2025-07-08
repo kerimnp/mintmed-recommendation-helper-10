@@ -65,17 +65,17 @@ const AntibioticAdvisor = () => {
     setRecommendation(null);
 
     try {
-      // Import the AI recommendation service that uses comprehensive clinical algorithms + AI
-      const { generateAIRecommendation } = await import("@/utils/aiRecommendations");
+      // Import the comprehensive clinical rules engine for hardcoded recommendations
+      const { findBestClinicalScenario } = await import("@/utils/antibioticRecommendations/comprehensiveRulesEngine");
       
-      console.log('Generating AI-powered recommendation for patient data:', data);
+      console.log('Generating comprehensive hardcoded recommendation for patient data:', data);
 
-      // Generate comprehensive AI-enhanced recommendation
-      const aiRecommendation = await generateAIRecommendation(data);
+      // Generate comprehensive hardcoded recommendation covering all scenarios
+      const clinicalRecommendation = findBestClinicalScenario(data);
 
-      console.log('AI recommendation generated:', aiRecommendation);
+      console.log('Hardcoded clinical recommendation generated:', clinicalRecommendation);
 
-      setRecommendation(aiRecommendation);
+      setRecommendation(clinicalRecommendation);
       
       // Scroll to recommendation section
       setTimeout(() => {
