@@ -65,70 +65,17 @@ const AntibioticAdvisor = () => {
     setRecommendation(null);
 
     try {
-      // Import the AI recommendation service
-      const { supabase } = await import("@/integrations/supabase/client");
+      // Import the AI recommendation service that uses comprehensive clinical algorithms + AI
+      const { generateAIRecommendation } = await import("@/utils/aiRecommendations");
       
-      // Prepare patient data for AI analysis
-      const aiPatientData = {
-        ...data,
-        additionalContext: {
-          regionalConsiderations: data.region ? [`Regional resistance patterns for ${data.region}`] : [],
-          renalConsiderations: data.kidneyDisease || (data.creatinine && parseFloat(data.creatinine) > 1.5) 
-            ? ['Renal function impairment - dose adjustment required'] 
-            : [],
-          allergyConsiderations: Object.entries(data.allergies || {})
-            .filter(([_, hasAllergy]) => hasAllergy)
-            .map(([allergyType, _]) => `${allergyType} allergy confirmed`),
-          comorbidityConsiderations: [
-            ...(data.diabetes ? ['Diabetes mellitus'] : []),
-            ...(data.liverDisease ? ['Liver disease'] : []),
-            ...(data.immunosuppressed ? ['Immunocompromised status'] : [])
-          ]
-        }
-      };
+      console.log('Generating AI-powered recommendation for patient data:', data);
 
-      console.log('Sending patient data to AI recommendation service:', aiPatientData);
+      // Generate comprehensive AI-enhanced recommendation
+      const aiRecommendation = await generateAIRecommendation(data);
 
-      // Call the AI recommendation edge function
-      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('get-ai-recommendation', {
-        body: { patientData: aiPatientData }
-      });
+      console.log('AI recommendation generated:', aiRecommendation);
 
-      if (aiError) {
-        console.error('AI recommendation error:', aiError);
-        throw new Error(aiError.message || 'Failed to get AI recommendation');
-      }
-
-      if (!aiResponse || !aiResponse.recommendation) {
-        throw new Error('Invalid response from AI recommendation service');
-      }
-
-      console.log('AI recommendation received:', aiResponse.recommendation);
-
-      // Transform the AI response to match our expected format
-      const enhancedRecommendation = {
-        ...aiResponse.recommendation,
-        metadata: {
-          timestamp: new Date().toISOString(),
-          confidenceScore: 95,
-          evidenceLevel: 'High',
-          guidelineSource: 'IDSA/CDC/WHO Guidelines',
-          reviewRequired: data.severity === 'severe' || data.immunosuppressed,
-          decisionAlgorithm: 'AI-Enhanced Clinical Decision Support v2.0',
-          auditTrail: {
-            inputValidation: {
-              dataQualityScore: 92
-            }
-          }
-        },
-        calculations: {
-          renalDosing: data.kidneyDisease || (data.creatinine && parseFloat(data.creatinine) > 1.5),
-          pediatricDosing: data.age && parseInt(data.age) < 18,
-          weightBasedDosing: data.weight ? `Weight: ${data.weight}kg` : 'Weight not specified'
-        }
-      };
-
-      setRecommendation(enhancedRecommendation);
+      setRecommendation(aiRecommendation);
       
       // Scroll to recommendation section
       setTimeout(() => {
