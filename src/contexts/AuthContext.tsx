@@ -1,113 +1,235 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { FirstTimePasswordResetModal } from '@/components/auth/FirstTimePasswordResetModal';
+import { User, Session } from '@supabase/supabase-js';
+import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { useLanguage } from './LanguageContext';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, userData?: any) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, metadata: { first_name?: string, last_name?: string, [key: string]: any }) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showFirstTimeModal, setShowFirstTimeModal] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { language } = useLanguage();
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        console.log('Auth state changed:', event, currentSession);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         
-        // Check if this is a first-time login after authentication
-        if (session?.user && event === 'SIGNED_IN') {
-          setTimeout(async () => {
-            try {
-              const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('is_first_login')
-                .eq('id', session.user.id)
-                .single();
-
-              if (!error && profile?.is_first_login) {
-                setShowFirstTimeModal(true);
-              }
-            } catch (error) {
-              console.error('Error checking first login status:', error);
-            }
-          }, 0);
+        if (event === 'INITIAL_SESSION' && currentSession) {
+          console.log('Initial session established:', currentSession.user);
         }
         
-        setLoading(false);
+        if (event === 'SIGNED_IN' && currentSession) {
+          console.log('User signed in:', currentSession.user);
+          toast({
+            title: language === 'en' ? 'Signed in successfully!' : 'Uspješna prijava!',
+            description: language === 'en' 
+              ? 'Welcome to Antibiotic Advisor.'
+              : 'Dobrodošli u Antibiotic Advisor.',
+          });
+          
+          // Check if user is hospital admin and redirect accordingly
+          const isHospitalAdmin = currentSession.user?.user_metadata?.account_type === 'hospital_admin';
+          
+          if (window.location.pathname === '/auth') {
+            if (isHospitalAdmin) {
+              navigate('/hospital-dashboard');
+            } else {
+              navigate('/');
+            }
+          }
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+          setUser(null);
+          setSession(null);
+          toast({
+            title: language === 'en' ? 'Signed out' : 'Odjavljeni ste',
+            description: language === 'en' 
+              ? 'You have been signed out successfully.'
+              : 'Uspješno ste odjavljeni.',
+          });
+          navigate('/auth');
+        }
+        
+        if (event === 'PASSWORD_RECOVERY') {
+          console.log('Password recovery event');
+        }
+
+        if (event === 'USER_UPDATED') {
+            console.log('User details updated:', currentSession?.user);
+            setUser(currentSession?.user ?? null);
+        }
+
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed:', currentSession);
+          setSession(currentSession);
+        }
+
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log('getSession response:', currentSession);
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setLoading(false);
+    }).catch(error => {
+      console.error('Error getting session:', error);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast, language]);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Don't need to handle success here as the onAuthStateChange listener will do that
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Error signing in' : 'Greška pri prijavi',
+        description: error.message || (language === 'en' 
+          ? 'There was an error signing in. Please try again.'
+          : 'Došlo je do pogreške prilikom prijave. Molimo pokušajte ponovno.'),
+        variant: 'destructive',
+      });
+      console.error('Sign in error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const signUp = async (email: string, password: string, userData?: any) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: userData || {}
+  const signUp = async (email: string, password: string, metadata: { first_name?: string, last_name?: string, [key: string]: any }) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: metadata, // Pass metadata here
+          emailRedirectTo: `${window.location.origin}/`, // Redirect to home after email confirm
+        }
+      });
+      
+      if (error) {
+        console.error('Sign up Supabase error:', error);
+        throw error;
       }
-    });
-    return { error };
-  };
 
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        // This case can happen if "Confirm email" is turned on in Supabase settings
+        // and the email is already in use but not confirmed.
+        // Supabase might return a user object but it's not a "real" new user.
+        toast({
+            title: language === 'en' ? 'Email already registered' : 'Email je već registriran',
+            description: language === 'en'
+              ? 'This email address is already in use. If you haven\'t confirmed your email, please check your inbox. Otherwise, try signing in.'
+              : 'Ova email adresa je već u upotrebi. Ako niste potvrdili svoj email, molimo provjerite svoj inbox. U suprotnom, pokušajte se prijaviti.',
+            variant: 'default',
+        });
+        // No explicit error throw here, as it's not a system failure but a user input issue.
+        // The user is informed via toast.
+        return; // Exit early
       }
-    });
-    return { error };
+      
+      toast({
+        title: language === 'en' ? 'Account created successfully' : 'Račun uspješno kreiran',
+        description: language === 'en'
+          ? 'Please check your email for verification instructions.'
+          : 'Molimo provjerite svoj email za upute o verifikaciji.',
+      });
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Error signing up' : 'Greška pri registraciji',
+        description: error.message || (language === 'en'
+          ? 'There was an error creating your account. Please try again.'
+          : 'Došlo je do pogreške pri stvaranju vašeg računa. Molimo pokušajte ponovno.'),
+        variant: 'destructive',
+      });
+      console.error('Sign up error:', error);
+      throw error; // Re-throw to be caught by form handler if necessary
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+        throw error;
+      }
+      // State updates (setUser(null), setSession(null)) and navigation are handled by onAuthStateChange
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Error signing out' : 'Greška pri odjavi',
+        description: error.message || (language === 'en'
+          ? 'There was an error signing out. Please try again.'
+          : 'Došlo je do pogreške prilikom odjave. Molimo pokušajte ponovno.'),
+        variant: 'destructive',
+      });
+      console.error('Sign out error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePasswordReset = () => {
-    setShowFirstTimeModal(false);
+  const signInWithGoogle = async () => {
+    try {
+      // Fix: Use the current window location for the redirect URL
+      const currentUrl = window.location.origin;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${currentUrl}/` // Redirect to home after Google sign in
+        }
+      });
+      
+      if (error) throw error;
+      
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Google sign-in failed' : 'Google prijava nije uspjela',
+        description: error.message || (language === 'en'
+          ? 'There was an error signing in with Google.'
+          : 'Došlo je do pogreške prilikom prijave putem Googlea.'),
+        variant: 'destructive',
+      });
+      console.error('Google sign in error:', error);
+      throw error;
+    }
   };
 
   const value = {
@@ -115,18 +237,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     signIn,
     signUp,
-    signInWithGoogle,
     signOut,
     loading,
+    signInWithGoogle,
   };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
-      <FirstTimePasswordResetModal 
-        isOpen={showFirstTimeModal}
-        onPasswordReset={handlePasswordReset}
-      />
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

@@ -1,241 +1,235 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { User, Save, Loader2 } from 'lucide-react';
+import { CalendarIcon, Save } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
-interface DoctorProfile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  specialization: string | null;
-  hospital_affiliation: string | null;
-  license_number: string | null;
-  role: string | null;
-  account_type: string | null;
-  is_first_login: boolean;
-  account_created_by: string | null;
+const doctorProfileSchema = z.object({
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
+  specialization: z.string().optional(),
+  hospital_affiliation: z.string().optional(),
+  license_number: z.string().optional(),
+  certification_expiry: z.date().optional(),
+});
+
+type DoctorProfileFormData = z.infer<typeof doctorProfileSchema>;
+
+interface DoctorProfileFormProps {
+  doctor?: {
+    first_name?: string;
+    last_name?: string;
+    specialization?: string;
+    hospital_affiliation?: string;
+    license_number?: string;
+    certification_expiry?: string;
+  };
+  onSubmit: (data: DoctorProfileFormData) => void;
+  onCancel?: () => void;
+  isLoading?: boolean;
 }
 
-export const DoctorProfileForm: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState<DoctorProfile | null>(null);
+export const DoctorProfileForm: React.FC<DoctorProfileFormProps> = ({
+  doctor,
+  onSubmit,
+  onCancel,
+  isLoading = false
+}) => {
+  const form = useForm<DoctorProfileFormData>({
+    resolver: zodResolver(doctorProfileSchema),
+    defaultValues: {
+      first_name: doctor?.first_name || '',
+      last_name: doctor?.last_name || '',
+      specialization: doctor?.specialization || '',
+      hospital_affiliation: doctor?.hospital_affiliation || '',
+      license_number: doctor?.license_number || '',
+      certification_expiry: doctor?.certification_expiry ? new Date(doctor.certification_expiry) : undefined,
+    },
+  });
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      setProfile(data);
-    } catch (error: any) {
-      console.error('Error fetching profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load profile data.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    if (!profile) return;
-    setProfile(prev => prev ? { ...prev, [field]: value } : null);
-  };
-
-  const handleSave = async () => {
-    if (!profile || !user) return;
-
-    setSaving(true);
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          specialization: profile.specialization,
-          hospital_affiliation: profile.hospital_affiliation,
-          license_number: profile.license_number,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: 'Profile Updated',
-        description: 'Your profile has been successfully updated.',
-      });
-
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: 'Update Failed',
-        description: 'Failed to update profile. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">Failed to load profile data.</p>
-      </div>
-    );
-  }
+  const specializations = [
+    'Internal Medicine',
+    'Emergency Medicine',
+    'Infectious Disease',
+    'Critical Care',
+    'Pediatrics',
+    'Surgery',
+    'Cardiology',
+    'Pulmonology',
+    'Nephrology',
+    'Gastroenterology',
+    'Neurology',
+    'Oncology',
+    'Other'
+  ];
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Doctor Profile
-          </CardTitle>
-          <div className="flex gap-2">
-            {profile.account_created_by === 'admin' && (
-              <Badge variant="secondary">Admin Created</Badge>
-            )}
-            <Badge variant={profile.is_first_login ? 'destructive' : 'default'}>
-              {profile.is_first_login ? 'First Login Required' : 'Active'}
-            </Badge>
-          </div>
-        </div>
+        <CardTitle>Doctor Profile</CardTitle>
       </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              value={profile.first_name || ''}
-              onChange={(e) => handleInputChange('first_name', e.target.value)}
-              placeholder="Enter your first name"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              value={profile.last_name || ''}
-              onChange={(e) => handleInputChange('last_name', e.target.value)}
-              placeholder="Enter your last name"
-            />
-          </div>
-        </div>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter first name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
-          <Input
-            id="email"
-            value={profile.email || ''}
-            disabled
-            className="bg-gray-100 dark:bg-gray-800"
-          />
-          <p className="text-xs text-gray-500">Email cannot be changed</p>
-        </div>
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter last name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="specialization">Specialization</Label>
-          <Select 
-            value={profile.specialization || ''} 
-            onValueChange={(value) => handleInputChange('specialization', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your specialization" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="internal_medicine">Internal Medicine</SelectItem>
-              <SelectItem value="emergency_medicine">Emergency Medicine</SelectItem>
-              <SelectItem value="infectious_diseases">Infectious Diseases</SelectItem>
-              <SelectItem value="surgery">Surgery</SelectItem>
-              <SelectItem value="pediatrics">Pediatrics</SelectItem>
-              <SelectItem value="icu">Intensive Care</SelectItem>
-              <SelectItem value="family_medicine">Family Medicine</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="specialization"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Specialization</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select specialization" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {specializations.map((spec) => (
+                          <SelectItem key={spec} value={spec}>
+                            {spec}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="space-y-2">
-          <Label htmlFor="hospitalAffiliation">Hospital Affiliation</Label>
-          <Input
-            id="hospitalAffiliation"
-            value={profile.hospital_affiliation || ''}
-            onChange={(e) => handleInputChange('hospital_affiliation', e.target.value)}
-            placeholder="Enter your hospital or clinic name"
-          />
-        </div>
+              <FormField
+                control={form.control}
+                name="hospital_affiliation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hospital Affiliation</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter hospital name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="licenseNumber">Medical License Number</Label>
-          <Input
-            id="licenseNumber"
-            value={profile.license_number || ''}
-            onChange={(e) => handleInputChange('license_number', e.target.value)}
-            placeholder="Enter your medical license number"
-          />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="license_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>License Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter license number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Profile
-              </>
-            )}
-          </Button>
-        </div>
+              <FormField
+                control={form.control}
+                name="certification_expiry"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Certification Expiry Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <Button 
+                type="submit" 
+                className="flex-1"
+                disabled={isLoading}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {isLoading ? 'Saving...' : 'Save Profile'}
+              </Button>
+              {onCancel && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onCancel}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

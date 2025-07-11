@@ -20,36 +20,28 @@ const HospitalInvitation = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isValidInvitation, setIsValidInvitation] = useState(false);
 
   const token = searchParams.get('token');
   const hospitalName = searchParams.get('hospital');
   const adminId = searchParams.get('admin');
 
   useEffect(() => {
-    console.log('Invitation params:', { token, hospitalName, adminId });
-    
     if (!token || !hospitalName || !adminId) {
-      console.log('Invalid invitation parameters');
       toast({
         title: 'Invalid Invitation',
         description: 'This invitation link appears to be invalid or expired.',
         variant: 'destructive',
       });
       navigate('/auth');
-      return;
     }
-    
-    setIsValidInvitation(true);
   }, [token, hospitalName, adminId, navigate, toast]);
 
   const handleAcceptInvitation = async () => {
     if (!user) {
       // Redirect to auth with the invitation parameters
-      const authUrl = `/auth?invitation=true&token=${encodeURIComponent(token || '')}&hospital=${encodeURIComponent(hospitalName || '')}&admin=${encodeURIComponent(adminId || '')}`;
-      navigate(authUrl);
+      navigate(`/auth?invitation=true&token=${token}&hospital=${encodeURIComponent(hospitalName || '')}&admin=${adminId}`);
       return;
     }
 
@@ -81,12 +73,8 @@ const HospitalInvitation = () => {
     }
   };
 
-  if (!isValidInvitation) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-slate-800">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-      </div>
-    );
+  if (!token || !hospitalName) {
+    return null;
   }
 
   return (
