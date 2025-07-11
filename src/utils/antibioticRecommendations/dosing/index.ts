@@ -6,6 +6,15 @@ import { cephalosporinDosing } from './cephalosporins';
 import { fluoroquinoloneDosing } from './fluoroquinolones';
 import { macrolideDosing } from './macrolides';
 import { enhancedAntibiotics } from './enhancedAntibiotics';
+import { aminoglycosideDosing } from './aminoglycosides';
+import { carbapenemDosing } from './carbapenems';
+import { glycopeptideDosing } from './glycopeptides';
+import { lincosamideDosing } from './lincosamides';
+import { oxazolidinoneDosing } from './oxazolidinones';
+import { polypeptideDosing } from './polypeptides';
+import { nitroimidazoleDosing } from './nitroimidazoles';
+import { monobactamDosing } from './monobactams';
+import { sulfonamideDosing } from './sulfonamides';
 
 export const antibioticDatabase: AntibioticDosing[] = [
   ...tetracyclineDosing,
@@ -13,7 +22,16 @@ export const antibioticDatabase: AntibioticDosing[] = [
   ...cephalosporinDosing,
   ...fluoroquinoloneDosing,
   ...macrolideDosing,
-  ...enhancedAntibiotics
+  ...enhancedAntibiotics,
+  ...aminoglycosideDosing,
+  ...carbapenemDosing,
+  ...glycopeptideDosing,
+  ...lincosamideDosing,
+  ...oxazolidinoneDosing,
+  ...polypeptideDosing,
+  ...nitroimidazoleDosing,
+  ...monobactamDosing,
+  ...sulfonamideDosing
 ];
 
 export {
@@ -22,5 +40,14 @@ export {
   cephalosporinDosing,
   fluoroquinoloneDosing,
   macrolideDosing,
-  enhancedAntibiotics
+  enhancedAntibiotics,
+  aminoglycosideDosing,
+  carbapenemDosing,
+  glycopeptideDosing,
+  lincosamideDosing,
+  oxazolidinoneDosing,
+  polypeptideDosing,
+  nitroimidazoleDosing,
+  monobactamDosing,
+  sulfonamideDosing
 };

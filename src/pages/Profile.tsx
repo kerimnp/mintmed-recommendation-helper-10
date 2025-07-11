@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDoctorProfile, useUpdateDoctorProfile } from '@/hooks/useDoctorProfile';
 import { DoctorProfileForm } from '@/components/doctor/DoctorProfileForm';
 import { PasswordChangeForm } from '@/components/profile/PasswordChangeForm';
 import { Button } from '@/components/ui/button';
@@ -13,8 +12,6 @@ import { useTheme } from 'next-themes';
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
-  const { data: profile, isLoading: profileLoading } = useDoctorProfile();
-  const updateProfile = useUpdateDoctorProfile();
   const navigate = useNavigate();
   const { theme } = useTheme();
 
@@ -25,7 +22,7 @@ const Profile = () => {
     }
   }, [authLoading, user, navigate]);
 
-  if (authLoading || profileLoading) {
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
         <Loader2 className="h-12 w-12 animate-spin text-medical-primary" />
@@ -37,12 +34,14 @@ const Profile = () => {
     return null;
   }
 
-  const handleProfileUpdate = (data: any) => {
-    updateProfile.mutate(data);
-  };
-
   const handleGoBack = () => {
-    navigate('/admin');
+    // Check if user is hospital admin
+    const isHospitalAdmin = user.user_metadata?.account_type === 'hospital_admin';
+    if (isHospitalAdmin) {
+      navigate('/hospital-dashboard');
+    } else {
+      navigate('/admin');
+    }
   };
 
   return (
@@ -128,11 +127,7 @@ const Profile = () => {
           </TabsList>
           
           <TabsContent value="profile">
-            <DoctorProfileForm
-              doctor={profile}
-              onSubmit={handleProfileUpdate}
-              isLoading={updateProfile.isPending}
-            />
+            <DoctorProfileForm />
           </TabsContent>
           
           <TabsContent value="security">

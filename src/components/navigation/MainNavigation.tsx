@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,8 @@ import {
   LogOut,
   Pill,
   Euro,
-  CreditCard
+  CreditCard,
+  Building2
 } from 'lucide-react';
 
 export const MainNavigation: React.FC = () => {
@@ -45,21 +47,38 @@ export const MainNavigation: React.FC = () => {
     },
   ];
 
-  const privateNavigationItems = [
-    {
-      href: '/admin',
-      label: language === 'en' ? 'Dashboard' : 'Nadzorna Ploča',
-      icon: Shield,
-    },
-    {
-      href: '/subscription',
-      label: language === 'en' ? 'Subscription' : 'Pretplata',
-      icon: CreditCard,
-    },
-  ];
+  // Get private navigation items based on user type
+  const getPrivateNavigationItems = () => {
+    if (!user) return [];
+    
+    const isHospitalAdmin = user.user_metadata?.account_type === 'hospital_admin';
+    
+    if (isHospitalAdmin) {
+      return [
+        {
+          href: '/hospital-dashboard',
+          label: language === 'en' ? 'Hospital Dashboard' : 'Bolnička Nadzorna Ploča',
+          icon: Building2,
+        },
+        {
+          href: '/subscription',
+          label: language === 'en' ? 'Subscription' : 'Pretplata',
+          icon: CreditCard,
+        },
+      ];
+    } else {
+      return [
+        {
+          href: '/admin',
+          label: language === 'en' ? 'Dashboard' : 'Nadzorna Ploča',
+          icon: Shield,
+        },
+      ];
+    }
+  };
 
   const navigationItems = user 
-    ? [...publicNavigationItems, ...privateNavigationItems]
+    ? [...publicNavigationItems, ...getPrivateNavigationItems()]
     : publicNavigationItems;
 
   const handleSignOut = async () => {
