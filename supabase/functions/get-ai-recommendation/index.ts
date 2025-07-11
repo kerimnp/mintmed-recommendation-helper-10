@@ -29,13 +29,16 @@ serve(async (req) => {
       throw new Error('API service configuration is missing - please add OPENAI_API_KEY to your Supabase Edge Function Secrets');
     }
 
-    // Format our message with the importance of considering nationality/region
-    const systemMessage = `You are a medical AI assistant specializing in antibiotic recommendations. 
+    // Enhanced system message with comprehensive clinical guidelines
+    const systemMessage = `You are an advanced clinical AI assistant specializing in evidence-based antibiotic recommendations. 
+    You must provide comprehensive, clinically-sound recommendations following IDSA, CDC, and WHO guidelines.
+    
     Given the patient data, provide a detailed recommendation in JSON format with the following structure:
     {
       "primaryRecommendation": {
         "name": string,
-        "dose": string,
+        "dosage": string,
+        "frequency": string,
         "route": string,
         "duration": string
       },
@@ -43,7 +46,8 @@ serve(async (req) => {
       "alternatives": [
         {
           "name": string,
-          "dose": string,
+          "dosage": string,
+          "frequency": string,
           "route": string,
           "duration": string,
           "reason": string
@@ -60,11 +64,28 @@ serve(async (req) => {
       }
     }
     
-    IMPORTANT CONSIDERATIONS:
-    1. Consider regional antibiotic resistance patterns for the patient's nationality/region (${patientData.nationality || "unknown"}).
-    2. If renal function is impaired (provided in additionalContext.renalConsiderations), adjust dosing accordingly.
-    3. Provide specific rationales for why each drug was chosen or avoided based on patient factors.
-    4. Use evidence-based guidelines (IDSA, WHO, etc.) to inform your recommendations.
+    CRITICAL CLINICAL CONSIDERATIONS:
+    1. SAFETY FIRST: Always check for allergies and contraindications before recommending any antibiotic.
+    2. RESISTANCE PATTERNS: Consider regional resistance patterns for ${patientData.region || patientData.nationality || "the patient's region"}.
+    3. RENAL FUNCTION: If kidney disease or elevated creatinine, provide appropriate dose adjustments.
+    4. DRUG INTERACTIONS: Consider patient comorbidities and potential drug interactions.
+    5. INFECTION SITE: Match antibiotic spectrum to likely pathogens for the infection site.
+    6. SEVERITY: Severe infections may require IV therapy and broader spectrum coverage.
+    7. HOSPITAL VS COMMUNITY: Hospital-acquired infections require broader spectrum coverage.
+    
+    SPECIFIC GUIDELINES:
+    - Respiratory infections: Consider S. pneumoniae, H. influenzae, atypicals
+    - UTI: Consider E. coli, Klebsiella, Enterococcus
+    - Skin/soft tissue: Consider S. aureus, Streptococcus
+    - Intra-abdominal: Consider gram-negatives and anaerobes
+    - For penicillin allergies: Use macrolides, fluoroquinolones, or cephalosporins (if not severe allergy)
+    - For severe infections: Consider combination therapy or IV antibiotics
+    
+    DOSING PRINCIPLES:
+    - Provide specific mg/kg doses for pediatric patients (age < 18)
+    - Adjust for renal impairment (CrCl < 50 mL/min)
+    - Consider hepatic adjustment for liver disease
+    - Use weight-based dosing when appropriate
     
     Return ONLY valid JSON with NO markdown formatting or additional text.`;
 
