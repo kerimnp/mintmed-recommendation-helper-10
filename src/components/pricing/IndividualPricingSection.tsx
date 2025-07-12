@@ -7,9 +7,21 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Check, Star, Crown, Infinity } from 'lucide-react';
 import { individualPlans } from './PricingData';
+import { useToast } from '@/hooks/use-toast';
 
 export const IndividualPricingSection: React.FC = () => {
   const { language } = useLanguage();
+  const { toast } = useToast();
+
+  const handleSelectPlan = (planName: string, price: number) => {
+    toast({
+      title: language === 'en' ? 'Contact Support' : 'Kontaktirajte Podršku',
+      description: language === 'en' 
+        ? `Thank you for your interest in the ${planName} plan! Please contact our sales team at sales@medrecommend.com to set up your subscription.`
+        : `Hvala vam na zanimanju za ${planName} plan! Molimo kontaktirajte naš prodajni tim na sales@medrecommend.com da postavite vašu pretplatu.`,
+      duration: 6000,
+    });
+  };
 
   return (
     <div className="space-y-12">
@@ -54,7 +66,11 @@ export const IndividualPricingSection: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full" variant={plan.name === 'Elite' ? 'default' : 'outline'}>
+                <Button 
+                  className="w-full" 
+                  variant={plan.name === 'Elite' ? 'default' : 'outline'}
+                  onClick={() => handleSelectPlan(plan.name, plan.price)}
+                >
                   {language === 'en' ? 'Select Plan' : 'Odaberite Plan'}
                 </Button>
               </CardContent>

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Star, Crown, Zap, Users, Briefcase, Building, CheckCircle } from 'lucide-react';
 import { seatFeePerMonth } from './PricingData';
+import { useToast } from '@/hooks/use-toast';
 
 const hospitalPlans = [
   {
@@ -106,9 +107,20 @@ const hospitalPlans = [
 
 export const HospitalPricingSection: React.FC = () => {
   const { language } = useLanguage();
+  const { toast } = useToast();
   const [doctorCount, setDoctorCount] = useState(5);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
   const totalSeatFee = doctorCount * seatFeePerMonth;
+
+  const handleSelectPlan = (planName: string, price: number) => {
+    toast({
+      title: language === 'en' ? 'Contact Support' : 'Kontaktirajte Podršku',
+      description: language === 'en' 
+        ? `Thank you for your interest in the ${planName} plan! Please contact our sales team at sales@medrecommend.com to set up your subscription.`
+        : `Hvala vam na zanimanju za ${planName} plan! Molimo kontaktirajte naš prodajni tim na sales@medrecommend.com da postavite vašu pretplatu.`,
+      duration: 6000,
+    });
+  };
 
   return (
     <div className="space-y-12">
@@ -190,11 +202,15 @@ export const HospitalPricingSection: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                  <Button className="w-full" variant="outline">
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleSelectPlan(plan.name, monthlyPrice)}
+                  >
                     {language === 'en' ? 'Choose Plan' : 'Odaberite Plan'}
                   </Button>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                    {language === 'en' ? 'Plus $25/month per doctor seat' : 'Plus $25/mjesec po liječničkom mjestu'}
+                    {language === 'en' ? 'Plus $19/month per doctor seat' : 'Plus $19/mjesec po liječničkom mjestu'}
                   </p>
                 </CardContent>
               </Card>
@@ -212,7 +228,7 @@ export const HospitalPricingSection: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="text-center mb-6">
-            <div className="text-4xl font-bold text-medical-primary mb-2">€25/month per doctor</div>
+            <div className="text-4xl font-bold text-medical-primary mb-2">€19/month per doctor</div>
             <p className="text-gray-600 dark:text-gray-300">
               {language === 'en' ? 'Additional seat fees apply to all plans' : 'Dodatne naknade za mjesta vrijede za sve planove'}
             </p>
@@ -233,7 +249,7 @@ export const HospitalPricingSection: React.FC = () => {
                 </SelectContent>
               </Select>
               <span className="text-2xl">×</span>
-              <span className="text-2xl font-bold">€25</span>
+              <span className="text-2xl font-bold">€19</span>
               <span className="text-2xl">=</span>
               <div className="text-2xl font-bold text-medical-primary">€{totalSeatFee}/month</div>
             </div>
@@ -250,7 +266,11 @@ export const HospitalPricingSection: React.FC = () => {
           <p className="text-lg mb-6">
             {language === 'en' ? 'Contact us for custom enterprise solutions and volume discounts' : 'Kontaktirajte nas za prilagođena enterprise rješenja i popuste na količinu'}
           </p>
-          <Button size="lg" variant="secondary">
+          <Button 
+            size="lg" 
+            variant="secondary"
+            onClick={() => handleSelectPlan('Enterprise', 999)}
+          >
             {language === 'en' ? 'Contact Sales' : 'Kontaktirajte Prodaju'}
           </Button>
         </CardContent>
