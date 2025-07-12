@@ -116,8 +116,8 @@ export const HospitalPricingSection: React.FC = () => {
     toast({
       title: language === 'en' ? 'Contact Support' : 'Kontaktirajte Podršku',
       description: language === 'en' 
-        ? `Thank you for your interest in the ${planName} plan! Please contact our sales team at sales@medrecommend.com to set up your subscription.`
-        : `Hvala vam na zanimanju za ${planName} plan! Molimo kontaktirajte naš prodajni tim na sales@medrecommend.com da postavite vašu pretplatu.`,
+        ? `Thank you for your interest in the ${planName} plan! Please contact our sales team at support@horalix.com to set up your subscription.`
+        : `Hvala vam na zanimanju za ${planName} plan! Molimo kontaktirajte naš prodajni tim na support@horalix.com da postavite vašu pretplatu.`,
       duration: 6000,
     });
   };
