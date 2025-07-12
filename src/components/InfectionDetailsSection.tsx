@@ -38,7 +38,17 @@ export const InfectionDetailsSection: React.FC<InfectionDetailsSectionProps> = (
   const t = translations[language].infectionDetails;
 
   const handleSiteSelect = (site: string) => {
-    onInputChange("infectionSites", [site]); // Changed to only allow one site at a time
+    console.log('Site selected:', site);
+    console.log('Current infection sites:', formData.infectionSites);
+    
+    // Allow multiple sites but ensure array is properly updated
+    const currentSites = formData.infectionSites || [];
+    const updatedSites = currentSites.includes(site)
+      ? currentSites.filter(s => s !== site) // Remove if already selected
+      : [...currentSites, site]; // Add if not selected
+    
+    console.log('Updated infection sites:', updatedSites);
+    onInputChange("infectionSites", updatedSites);
   };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {

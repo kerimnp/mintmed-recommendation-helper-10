@@ -15,23 +15,37 @@ export const FormActions: React.FC<FormActionsProps> = ({
 }) => {
   const { language } = useLanguage();
 
+  const handleClick = (e: React.MouseEvent) => {
+    console.log('=== GENERATE BUTTON CLICKED ===');
+    console.log('Is submitting:', isSubmitting);
+    console.log('Is disabled:', disabled);
+    
+    if (!disabled && !isSubmitting) {
+      console.log('✅ Button click will proceed with form submission');
+    } else {
+      console.log('❌ Button click blocked:', { disabled, isSubmitting });
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-4">
       <Button
         type="submit"
         size="lg"
         disabled={isSubmitting || disabled}
+        onClick={handleClick}
         className="bg-gradient-to-r from-medical-primary to-medical-accent hover:from-medical-primary-hover hover:to-medical-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
       >
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            {language === "en" ? "Generating..." : "Generisanje..."}
+            {language === "en" ? "Analyzing Patient Data..." : "Analiziranje Podataka..."}
           </>
         ) : (
           <>
             <Zap className="mr-2 h-5 w-5" />
-            {language === "en" ? "Generate Recommendation" : "Generiraj Preporuku"}
+            {language === "en" ? "Generate AI Recommendation" : "Generiraj AI Preporuku"}
           </>
         )}
       </Button>

@@ -60,20 +60,38 @@ const AntibioticAdvisor = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handlePatientFormSubmit = async (data: PatientData) => {
+    console.log('=== RECOMMENDATION GENERATION START ===');
+    console.log('Received patient data for recommendation:', data);
+    
     setIsLoading(true);
     setError(null);
     setRecommendation(null);
 
     try {
+      // Validate critical data before processing
+      if (!data.infectionSites || data.infectionSites.length === 0) {
+        throw new Error('At least one infection site must be selected');
+      }
+      
+      if (!data.severity) {
+        throw new Error('Infection severity must be specified');
+      }
+
+      console.log('✅ Critical validation passed, importing rules engine...');
+
       // Import the comprehensive clinical rules engine for hardcoded recommendations
       const { findBestClinicalScenario } = await import("@/utils/antibioticRecommendations/comprehensiveRulesEngine");
       
-      console.log('Generating comprehensive hardcoded recommendation for patient data:', data);
+      console.log('✅ Rules engine imported, generating recommendation...');
 
       // Generate comprehensive hardcoded recommendation covering all scenarios
       const clinicalRecommendation = findBestClinicalScenario(data);
 
-      console.log('Hardcoded clinical recommendation generated:', clinicalRecommendation);
+      console.log('✅ Clinical recommendation generated:', clinicalRecommendation);
+
+      if (!clinicalRecommendation) {
+        throw new Error('Failed to generate recommendation - no matching clinical scenario found');
+      }
 
       setRecommendation(clinicalRecommendation);
       
@@ -86,10 +104,12 @@ const AntibioticAdvisor = () => {
       }, 100);
 
     } catch (error) {
-      console.error('Form submission error:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      console.error('❌ Recommendation generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while generating recommendations';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
+      console.log('=== RECOMMENDATION GENERATION END ===');
     }
   };
 

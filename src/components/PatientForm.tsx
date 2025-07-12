@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Scan, User, AlertTriangle } from "lucide-react";
+import { FormDebugger } from "./debug/FormDebugger";
 
 interface PatientFormProps {
   patientData: PatientData;
@@ -98,11 +99,19 @@ export const PatientForm: React.FC<PatientFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('=== FORM SUBMISSION START ===');
+    console.log('Patient data before validation:', patientData);
+    
     if (validateForm()) {
+      console.log('✅ Form validation passed - submitting data');
       setErrors({});
       setShowErrors(false);
       onSubmit(patientData);
+    } else {
+      console.log('❌ Form validation failed - not submitting');
     }
+    
+    console.log('=== FORM SUBMISSION END ===');
   };
 
   const updateField = (field: keyof PatientData, value: any) => {
@@ -263,6 +272,15 @@ export const PatientForm: React.FC<PatientFormProps> = ({
                   isSubmitting={isLoading}
                   disabled={Object.keys(errors).length > 0}
                 />
+
+                {/* Debug Component - Only shows in development */}
+                {process.env.NODE_ENV === 'development' && (
+                  <FormDebugger 
+                    patientData={patientData}
+                    errors={errors}
+                    isVisible={true}
+                  />
+                )}
               </form>
             </TabsContent>
           </Tabs>
