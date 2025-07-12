@@ -120,9 +120,9 @@ export const ProfileDropdown: React.FC = () => {
             Dashboard
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/clinical')} className="cursor-pointer">
+          <DropdownMenuItem onClick={() => navigate('/subscription')} className="cursor-pointer">
             <TrendingUp className="h-4 w-4 mr-2" />
-            Stats
+            Subscription
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />

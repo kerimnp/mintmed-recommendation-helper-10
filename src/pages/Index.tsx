@@ -108,7 +108,7 @@ const Index = () => {
                   )}
                 </Button>
                 
-                <Link to="/admin?tab=pricing">
+                <Link to="/pricing">
                   <Button 
                     variant="ghost" 
                     size="sm" 
