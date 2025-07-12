@@ -108,10 +108,10 @@ const Index = () => {
                   )}
                 </Button>
                 
-                <Link to="/pricing">
+                <Link to="/admin?tab=pricing">
                   <Button 
                     variant="ghost" 
-                    size="sm" 
+                    size="sm"
                     className="flex items-center gap-2 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
                   >
                     <Euro className="h-4 w-4" />
