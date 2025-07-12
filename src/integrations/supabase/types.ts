@@ -1075,6 +1075,30 @@ export type Database = {
           },
         ]
       }
+      system_admin_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -1152,6 +1176,10 @@ export type Database = {
       }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: boolean
+      }
+      is_super_admin_authorized: {
+        Args: { user_email: string }
         Returns: boolean
       }
     }
