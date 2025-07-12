@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -15,6 +16,7 @@ import Pricing from "./pages/Pricing";
 import Subscription from "./pages/Subscription";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import AntibioticAdvisor from "./pages/AntibioticAdvisor";
+import ProductionVerificationPage from "./pages/ProductionVerification";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -92,19 +94,21 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <LanguageProvider>
-          <AuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <LanguageProvider>
+            <AuthProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
                   <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/production-verification" element={<ProductionVerificationPage />} />
                   <Route 
                     path="/admin" 
                     element={
@@ -143,7 +147,8 @@ function App() {
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
