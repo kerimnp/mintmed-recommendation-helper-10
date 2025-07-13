@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import About from "./pages/About";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import Pricing from "./pages/Pricing";
@@ -125,6 +126,7 @@ function App() {
                 <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
                   <Route path="/pricing" element={<Pricing />} />
