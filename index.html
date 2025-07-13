@@ -4,21 +4,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Horalix Antibioteka - Hospital-Grade Antibiotic Decision Support System</title>
-    <meta name="description" content="Professional AI-powered antibiotic recommendation system designed for hospitals and healthcare institutions. Evidence-based clinical decision support with real-time analytics and patient management." />
-    <meta name="keywords" content="antibiotic recommendations, hospital management, clinical decision support, antimicrobial stewardship, healthcare AI, patient management" />
-    <meta name="author" content="Horalix Medical Systems" />
+    <title>Antibioteka - AI-Powered Antibiotic Recommendation System | Clinical Decision Support</title>
+    <meta name="description" content="Antibioteka: Advanced AI-powered antibiotic recommendation system for healthcare professionals. Evidence-based clinical decision support, antimicrobial stewardship, and patient safety optimization." />
+    <meta name="keywords" content="antibiotic recommendations, AI clinical decision support, antimicrobial stewardship, hospital antibiotic management, evidence-based prescribing, infectious disease treatment, antibiotic resistance prevention, clinical pharmacy, medical AI software" />
+    <meta name="author" content="Antibioteka" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Horalix Antibioteka - Hospital-Grade Antibiotic Decision Support" />
-    <meta property="og:description" content="Professional AI-powered antibiotic recommendation system for hospitals and healthcare institutions." />
-    <meta property="og:url" content="https://antibioteka.horalix.com" />
+    <meta property="og:title" content="Antibioteka - AI-Powered Antibiotic Recommendation System" />
+    <meta property="og:description" content="Advanced AI-powered antibiotic recommendation system for healthcare professionals. Evidence-based clinical decision support and antimicrobial stewardship." />
+    <meta property="og:url" content="https://antibioteka.com" />
+    <meta property="og:site_name" content="Antibioteka" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Horalix Antibioteka - Hospital-Grade Antibiotic Decision Support" />
-    <meta property="twitter:description" content="Professional AI-powered antibiotic recommendation system for hospitals and healthcare institutions." />
+    <meta property="twitter:title" content="Antibioteka - AI-Powered Antibiotic Recommendation System" />
+    <meta property="twitter:description" content="Advanced AI-powered antibiotic recommendation system for healthcare professionals. Evidence-based clinical decision support and antimicrobial stewardship." />
+    <meta property="twitter:site" content="@Antibioteka" />
     <meta property="og:image" content="/og-image.png" />
     
     <!-- Favicon -->
@@ -30,6 +35,87 @@
   </head>
 
   <body class="h-full w-full">
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://antibioteka.com/#organization",
+          "name": "Antibioteka",
+          "url": "https://antibioteka.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://antibioteka.com/lovable-uploads/fd8e2f50-736b-4cd5-bf94-f4212ddb5e3c.png"
+          },
+          "description": "Advanced AI-powered antibiotic recommendation system for healthcare professionals",
+          "foundingDate": "2024",
+          "industry": "Healthcare Technology",
+          "knowsAbout": [
+            "Antibiotic Recommendations",
+            "Clinical Decision Support",
+            "Antimicrobial Stewardship",
+            "Healthcare AI",
+            "Infectious Disease Treatment"
+          ]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://antibioteka.com/#software",
+          "name": "Antibioteka",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web Browser",
+          "description": "AI-powered antibiotic recommendation system providing evidence-based clinical decision support for healthcare professionals",
+          "features": [
+            "Real-time antibiotic recommendations",
+            "Evidence-based clinical guidelines",
+            "Drug interaction alerts",
+            "Patient safety optimization",
+            "Antimicrobial stewardship tools"
+          ],
+          "targetAudience": {
+            "@type": "Audience",
+            "audienceType": "Healthcare Professionals"
+          },
+          "publisher": {
+            "@id": "https://antibioteka.com/#organization"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://antibioteka.com/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Antibioteka?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Antibioteka is an advanced AI-powered antibiotic recommendation system designed for healthcare professionals. It provides evidence-based clinical decision support to optimize antibiotic prescribing and improve patient outcomes."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Antibioteka ensure clinical accuracy?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Antibioteka uses the latest clinical guidelines from IDSA, CDC, and WHO, combined with peer-reviewed literature and real-time data analysis to provide accurate, evidence-based recommendations."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is Antibioteka suitable for hospital use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, Antibioteka is specifically designed for hospital environments and healthcare institutions, providing enterprise-grade security, compliance features, and integration capabilities."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    
     <div id="root" class="h-full w-full"></div>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>

@@ -1,0 +1,21 @@
+# Antibioteka - AI-Powered Antibiotic Recommendation System
+User-agent: *
+Allow: /
+
+# Priority pages for crawling
+Allow: /auth
+Allow: /admin
+Allow: /clinical-dashboard
+Allow: /production-verification
+
+# Block sensitive areas
+Disallow: /api/
+Disallow: /admin/users/
+Disallow: /admin/audit/
+Disallow: /patient-data/
+
+# Sitemap location
+Sitemap: https://antibioteka.com/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
