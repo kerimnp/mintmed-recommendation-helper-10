@@ -15,6 +15,7 @@ import Profile from "./pages/Profile";
 import Pricing from "./pages/Pricing";
 import Subscription from "./pages/Subscription";
 import HospitalDashboard from "./pages/HospitalDashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import AntibioticAdvisor from "./pages/AntibioticAdvisor";
 import ProductionVerificationPage from "./pages/ProductionVerification";
 import { Loader2 } from "lucide-react";
@@ -92,6 +93,25 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// Super Admin Route Component
+const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -139,6 +159,14 @@ function App() {
                       <HospitalAdminRoute>
                         <HospitalDashboard />
                       </HospitalAdminRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/super-admin" 
+                    element={
+                      <SuperAdminRoute>
+                        <SuperAdminDashboard />
+                      </SuperAdminRoute>
                     } 
                   />
                 </Routes>

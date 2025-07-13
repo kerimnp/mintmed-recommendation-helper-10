@@ -11,11 +11,10 @@ import {
   Star,
   Shield,
   Zap,
-  Award,
-  Sparkles
+  Award
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
+import { ContactSupportDialog } from '@/components/dialogs/ContactSupportDialog';
 
 const individualPlans = [
   {
@@ -142,16 +141,6 @@ const hospitalPlans = [
 
 export const IOSStylePricingTab: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState('individual');
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const handleSelectPlan = (planId: string, planName: string, price: number) => {
-    setSelectedPlan(planId);
-    toast({
-      title: "Plan Selected",
-      description: `You've selected the ${planName} plan for $${price}/month.`,
-    });
-  };
 
   const getColorClasses = (color: string, isPopular: boolean) => {
     const baseClasses = "transition-all duration-300 hover:shadow-lg";
@@ -250,20 +239,15 @@ export const IOSStylePricingTab: React.FC = () => {
             ))}
           </ul>
           
-          <Button
-            onClick={() => handleSelectPlan(plan.id, plan.name, plan.price)}
-            className={`w-full ${getButtonClasses(plan.color, plan.popular)}`}
-            disabled={selectedPlan === plan.id}
-          >
-            {selectedPlan === plan.id ? (
-              <>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Processing...
-              </>
-            ) : (
-              `Choose ${plan.name}`
-            )}
-          </Button>
+          <ContactSupportDialog
+            trigger={
+              <Button className={`w-full ${getButtonClasses(plan.color, plan.popular)}`}>
+                Choose {plan.name}
+              </Button>
+            }
+            planName={plan.name}
+            planPrice={plan.price}
+          />
         </CardContent>
       </Card>
     </motion.div>
