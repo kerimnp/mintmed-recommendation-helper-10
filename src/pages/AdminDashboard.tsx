@@ -7,7 +7,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react"; 
+import { Loader2 } from "lucide-react";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 import { AdminHeader } from "@/components/admin/dashboard/layout/AdminHeader";
 import { SettingsDialog } from "@/components/admin/dashboard/layout/SettingsDialog";
@@ -21,6 +22,7 @@ const AdminDashboard = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const { scrollToTop } = useScrollToTop();
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -94,8 +96,10 @@ const AdminDashboard = () => {
     if (validTabs.includes(newTab)) {
       setActiveTab(newTab);
       navigate(`/admin?tab=${newTab}`, { replace: true });
+      // Scroll to top when switching tabs
+      scrollToTop(true, 100);
     }
-  }, [navigate, isUserManagementAuthorized, isHospitalAdmin, validTabs, toast]);
+  }, [navigate, isUserManagementAuthorized, isHospitalAdmin, validTabs, toast, scrollToTop]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

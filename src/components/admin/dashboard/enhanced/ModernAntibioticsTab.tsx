@@ -43,20 +43,11 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
   const [isHovered, setIsHovered] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Enhanced debugging
-  useEffect(() => {
-    console.log(`DrugCard ${drug.name}: isExpanded = ${isExpanded}`);
-  }, [isExpanded, drug.name]);
 
   const handleToggleExpanded = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(`Button clicked for ${drug.name}. Current state: ${isExpanded}, changing to: ${!isExpanded}`);
-    setIsExpanded(prev => {
-      const newState = !prev;
-      console.log(`State changed for ${drug.name}: ${prev} -> ${newState}`);
-      return newState;
-    });
+    setIsExpanded(prev => !prev);
   };
 
   const getEffectivenessColor = (value: number) => {
@@ -271,10 +262,6 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
             </Button>
           </div>
 
-          {/* Debug info */}
-          <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 p-2 rounded">
-            Debug: isExpanded = {isExpanded.toString()}
-          </div>
 
           {/* Enhanced Expanded details */}
           <AnimatePresence mode="wait">
