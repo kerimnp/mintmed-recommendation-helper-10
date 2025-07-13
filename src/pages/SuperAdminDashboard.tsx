@@ -13,6 +13,7 @@ import { SuperAdminActivityLogs } from "@/components/super-admin/SuperAdminActiv
 import { SuperAdminSystemTools } from "@/components/super-admin/SuperAdminSystemTools";
 import { SuperAdminSecurity } from "@/components/super-admin/SuperAdminSecurity";
 import { SuperAdminCommunication } from "@/components/super-admin/SuperAdminCommunication";
+import { SuperAdminSubscriptionEditor } from "@/components/super-admin/SuperAdminSubscriptionEditor";
 
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
@@ -147,7 +148,8 @@ export default function SuperAdminDashboard() {
           </TabsContent>
 
           <TabsContent value="subscriptions" className="space-y-6">
-            <SuperAdminSubscriptions />
+                <SuperAdminSubscriptions />
+                <SuperAdminSubscriptionEditor />
           </TabsContent>
 
           <TabsContent value="organizations" className="space-y-6">

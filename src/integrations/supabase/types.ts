@@ -335,6 +335,86 @@ export type Database = {
           },
         ]
       }
+      doctor_patient_access: {
+        Row: {
+          access_granted_by: string | null
+          access_reason: string | null
+          access_type: string
+          created_at: string
+          doctor_id: string
+          expires_at: string | null
+          granted_at: string
+          id: string
+          is_active: boolean
+          patient_id: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_granted_by?: string | null
+          access_reason?: string | null
+          access_type?: string
+          created_at?: string
+          doctor_id: string
+          expires_at?: string | null
+          granted_at?: string
+          id?: string
+          is_active?: boolean
+          patient_id: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_granted_by?: string | null
+          access_reason?: string | null
+          access_type?: string
+          created_at?: string
+          doctor_id?: string
+          expires_at?: string | null
+          granted_at?: string
+          id?: string
+          is_active?: boolean
+          patient_id?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_patient_access_access_granted_by_fkey"
+            columns: ["access_granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_patient_access_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_patient_access_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_patient_access_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_seat_allocations: {
         Row: {
           allocated_at: string | null
@@ -686,6 +766,72 @@ export type Database = {
           },
         ]
       }
+      patient_data_audit_logs: {
+        Row: {
+          access_method: string | null
+          action_type: string
+          created_at: string
+          data_accessed: Json | null
+          error_details: string | null
+          id: string
+          ip_address: unknown | null
+          patient_id: string
+          resource_id: string | null
+          resource_type: string
+          session_id: string | null
+          success: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          access_method?: string | null
+          action_type: string
+          created_at?: string
+          data_accessed?: Json | null
+          error_details?: string | null
+          id?: string
+          ip_address?: unknown | null
+          patient_id: string
+          resource_id?: string | null
+          resource_type: string
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          access_method?: string | null
+          action_type?: string
+          created_at?: string
+          data_accessed?: Json | null
+          error_details?: string | null
+          id?: string
+          ip_address?: unknown | null
+          patient_id?: string
+          resource_id?: string | null
+          resource_type?: string
+          session_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_data_audit_logs_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_data_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_ehr_mappings: {
         Row: {
           created_at: string
@@ -733,6 +879,86 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_sharing_requests: {
+        Row: {
+          access_type: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          patient_id: string
+          request_reason: string
+          requested_at: string
+          requesting_doctor_id: string
+          responded_at: string | null
+          responded_by: string | null
+          response_notes: string | null
+          status: string
+          target_doctor_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_type?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          patient_id: string
+          request_reason: string
+          requested_at?: string
+          requesting_doctor_id: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_notes?: string | null
+          status?: string
+          target_doctor_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_type?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          patient_id?: string
+          request_reason?: string
+          requested_at?: string
+          requesting_doctor_id?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          response_notes?: string | null
+          status?: string
+          target_doctor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_sharing_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_sharing_requests_requesting_doctor_id_fkey"
+            columns: ["requesting_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_sharing_requests_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_sharing_requests_target_doctor_id_fkey"
+            columns: ["target_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1207,6 +1433,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_doctor_patient_access: {
+        Args: { doctor_id_param: string; patient_id_param: string }
+        Returns: boolean
+      }
       create_admin_doctor_account: {
         Args: {
           p_email: string
@@ -1225,6 +1455,19 @@ export type Database = {
       is_super_admin_authorized: {
         Args: { user_email: string }
         Returns: boolean
+      }
+      log_patient_data_access: {
+        Args: {
+          user_id_param: string
+          patient_id_param: string
+          action_type_param: string
+          resource_type_param: string
+          resource_id_param?: string
+          data_accessed_param?: Json
+          ip_address_param?: unknown
+          user_agent_param?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
