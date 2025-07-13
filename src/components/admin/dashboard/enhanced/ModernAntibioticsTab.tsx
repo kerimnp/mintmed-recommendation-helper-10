@@ -265,6 +265,7 @@ const DrugCard: React.FC<{ drug: EnhancedAntibioticData; index: number }> = ({ d
               variant="outline"
               className="border-blue-500/20 hover:bg-blue-500/5 transition-all duration-300"
               type="button"
+              onClick={() => window.open('https://example.com/guidelines', '_blank')}
             >
               <BookOpen className="w-4 h-4" />
             </Button>

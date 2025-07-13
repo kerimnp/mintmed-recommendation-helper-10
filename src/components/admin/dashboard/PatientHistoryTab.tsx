@@ -259,15 +259,19 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     } as PrescriptionEvent;
   };
 
-  // Enhanced patient fetching with better error handling
+  // Enhanced patient fetching with better error handling - filtered by logged-in doctor
   useEffect(() => {
     const fetchPatients = async () => {
+      if (!user?.id) return;
+      
       setLoadingPatients(true);
       setPatientError(null);
       try {
+        // Filter patients by the current logged-in doctor
         const { data, error } = await supabase
           .from('patients')
           .select('*')
+          .eq('attending_physician_id', user.id)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -286,7 +290,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     };
 
     fetchPatients();
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!loadingPatients && allPatients.length > 0) {

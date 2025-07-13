@@ -203,15 +203,15 @@ export const IOSStylePricingTab: React.FC = () => {
             {plan.icon}
           </motion.div>
           
-          <CardTitle className="text-2xl font-semibold mb-2 text-gray-900">
+          <CardTitle className="text-2xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
             {plan.name}
           </CardTitle>
           
           <div className="mb-4">
-            <div className="text-4xl font-bold text-gray-900 mb-1">
+            <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-1">
               ${plan.price}
             </div>
-            <div className="text-gray-600">/{plan.period}</div>
+            <div className="text-gray-600 dark:text-gray-400">/{plan.period}</div>
             {type === 'individual' && !plan.unlimited && (
               <div className="text-sm text-gray-500 mt-1">
                 {plan.credits} credits/month
@@ -232,7 +232,7 @@ export const IOSStylePricingTab: React.FC = () => {
                 <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center mt-0.5 flex-shrink-0">
                   <Check className="h-2.5 w-2.5 text-white" />
                 </div>
-                <span className="text-gray-700 leading-relaxed">
+                <span className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   {feature}
                 </span>
               </li>
@@ -254,7 +254,7 @@ export const IOSStylePricingTab: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
         <motion.div 
@@ -262,10 +262,10 @@ export const IOSStylePricingTab: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center space-y-4"
         >
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
             Choose Your Plan
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Experience advanced clinical intelligence with our AI-powered antibiotic recommendation system
           </p>
         </motion.div>
@@ -279,19 +279,19 @@ export const IOSStylePricingTab: React.FC = () => {
         >
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">50,000+</div>
-            <div className="text-sm text-gray-600">Healthcare Providers</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Healthcare Providers</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">99.2%</div>
-            <div className="text-sm text-gray-600">Clinical Accuracy</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Clinical Accuracy</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-purple-600">94%</div>
-            <div className="text-sm text-gray-600">Patient Outcomes</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Patient Outcomes</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-yellow-600">$2.3M</div>
-            <div className="text-sm text-gray-600">Average Savings</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Average Savings</div>
           </div>
         </motion.div>
 
@@ -302,7 +302,7 @@ export const IOSStylePricingTab: React.FC = () => {
           transition={{ delay: 0.4 }}
         >
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-white shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-white dark:bg-gray-800 shadow-sm">
               <TabsTrigger 
                 value="individual" 
                 className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
@@ -359,7 +359,7 @@ export const IOSStylePricingTab: React.FC = () => {
           className="mt-16"
         >
           <Card className="p-8">
-            <h3 className="text-2xl font-bold text-center mb-8 text-gray-900">
+            <h3 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-gray-100">
               Why Choose Our Platform?
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -384,10 +384,10 @@ export const IOSStylePricingTab: React.FC = () => {
                   <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mx-auto">
                     {feature.icon}
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {feature.title}
                   </h4>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-400">
                     {feature.description}
                   </p>
                 </div>

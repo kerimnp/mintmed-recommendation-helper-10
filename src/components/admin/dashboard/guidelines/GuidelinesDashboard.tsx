@@ -72,19 +72,57 @@ export const GuidelinesDashboard: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
+              <div className="flex-1">
                 <div className="font-medium">IDSA Sepsis Guidelines 2024</div>
                 <div className="text-sm text-gray-600">Updated antimicrobial recommendations</div>
               </div>
-              <Badge className="bg-green-600">New</Badge>
+              <div className="flex items-center space-x-2">
+                <Badge className="bg-green-600">New</Badge>
+                <button 
+                  onClick={() => window.open('https://example.com/guidelines/sepsis', '_blank')}
+                  className="text-blue-600 hover:text-blue-800 text-sm underline"
+                >
+                  View
+                </button>
+                <button 
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = '/api/guidelines/sepsis/export';
+                    link.download = 'sepsis_guidelines.pdf';
+                    link.click();
+                  }}
+                  className="text-green-600 hover:text-green-800 text-sm underline"
+                >
+                  Export
+                </button>
+              </div>
             </div>
             
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
+              <div className="flex-1">
                 <div className="font-medium">CDC Healthcare-Associated Infections</div>
                 <div className="text-sm text-gray-600">Prevention strategies update</div>
               </div>
-              <Badge className="bg-blue-600">Updated</Badge>
+              <div className="flex items-center space-x-2">
+                <Badge className="bg-blue-600">Updated</Badge>
+                <button 
+                  onClick={() => window.open('https://example.com/guidelines/hai', '_blank')}
+                  className="text-blue-600 hover:text-blue-800 text-sm underline"
+                >
+                  View
+                </button>
+                <button 
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = '/api/guidelines/hai/export';
+                    link.download = 'hai_guidelines.pdf';
+                    link.click();
+                  }}
+                  className="text-green-600 hover:text-green-800 text-sm underline"
+                >
+                  Export
+                </button>
+              </div>
             </div>
           </div>
         </CardContent>

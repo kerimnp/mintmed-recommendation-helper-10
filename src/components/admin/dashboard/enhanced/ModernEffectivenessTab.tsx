@@ -271,6 +271,7 @@ export const ModernEffectivenessTab: React.FC = () => {
                 variant="outline"
                 size="sm"
                 className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-indigo-500/5 transition-all duration-300"
+                onClick={() => window.location.reload()}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
@@ -279,6 +280,17 @@ export const ModernEffectivenessTab: React.FC = () => {
                 variant="outline"
                 size="sm"
                 className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-white/30 dark:border-gray-700/30 hover:bg-indigo-500/5 transition-all duration-300"
+                onClick={() => {
+                  const csvContent = "data:text/csv;charset=utf-8,Drug,Effectiveness,Resistance\n" +
+                    effectivenessData.map(row => `${row.drug},${row.effectiveness},${row.resistance}`).join("\n");
+                  const encodedUri = encodeURI(csvContent);
+                  const link = document.createElement("a");
+                  link.setAttribute("href", encodedUri);
+                  link.setAttribute("download", "effectiveness_data.csv");
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export

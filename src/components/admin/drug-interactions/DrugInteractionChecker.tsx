@@ -8,7 +8,7 @@ import { DrugSelectionPanel } from './components/DrugSelectionPanel';
 import { InteractionResults } from './components/InteractionResults';
 import { ReferencesTab } from './components/ReferencesTab';
 import { InteractionDatabase } from './components/InteractionDatabase';
-import { RealTimeMonitoring } from './components/RealTimeMonitoring';
+
 import { EnhancedAlertSystem } from './components/EnhancedAlertSystem';
 import { ClinicalDecisionEngine } from './components/ClinicalDecisionEngine';
 import { ClinicalValidationEngine } from './components/ClinicalValidationEngine';
@@ -273,11 +273,21 @@ export const DrugInteractionChecker: React.FC<DrugInteractionCheckerProps> = ({ 
         </TabsContent>
 
         <TabsContent value="monitoring">
-          <RealTimeMonitoring
-            patientId={currentPatientId}
-            activeMedications={selectedDrugs}
-            monitoringEnabled={monitoringEnabled}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Patient Monitoring Dashboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">Real-time monitoring coming soon</p>
+                <p className="text-sm text-gray-500">Advanced patient monitoring features will be available in the next update</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="safety">

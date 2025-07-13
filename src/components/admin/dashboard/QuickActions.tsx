@@ -44,32 +44,28 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ onActionClick }) => 
       description: "Start antibiotic recommendation",
       icon: Stethoscope,
       action: "new_consultation",
-      route: "/advisor",
-      color: "bg-blue-500 hover:bg-blue-600"
+      route: "/advisor"
     },
     {
       title: "Patient Management", 
       description: "View and manage patients",
       icon: Users,
       action: "patient_management",
-      route: "/admin?tab=history",
-      color: "bg-green-500 hover:bg-green-600"
+      route: "/admin?tab=history"
     },
     {
       title: "Review Alerts",
       description: "Check critical notifications",
       icon: AlertTriangle,
       action: "review_alerts",
-      route: "/admin?tab=resistance",
-      color: "bg-orange-500 hover:bg-orange-600"
+      route: "/admin?tab=resistance"
     },
     {
       title: "Generate Report",
       description: "Create clinical reports",
       icon: FileText,
       action: "generate_report",
-      route: "/admin?tab=effectiveness",
-      color: "bg-purple-500 hover:bg-purple-600"
+      route: "/admin?tab=effectiveness"
     }
   ];
 
@@ -86,7 +82,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ onActionClick }) => 
           <Button
             key={action.action}
             onClick={() => handleAction(action.title, action.route)}
-            className={`w-full justify-start text-white ${action.color}`}
+            className="w-full justify-start bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
             variant="default"
           >
             <action.icon className="h-4 w-4 mr-2" />

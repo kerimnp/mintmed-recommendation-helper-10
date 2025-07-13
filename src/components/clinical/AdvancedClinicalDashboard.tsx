@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { RealTimeMonitoring } from '../admin/drug-interactions/components/RealTimeMonitoring';
+
 import { DrugInteractionAlerts } from './DrugInteractionAlerts';
 import { EnhancedClinicalDecisionEngine } from '@/utils/clinical/EnhancedClinicalDecisionEngine';
 import { SafetyMonitoringSystem } from '@/utils/safety/SafetyMonitoringSystem';
@@ -159,13 +159,21 @@ export const AdvancedClinicalDashboard: React.FC<AdvancedClinicalDashboardProps>
         </TabsList>
 
         <TabsContent value="monitoring">
-          <RealTimeMonitoring
-            patientId={patientId}
-            activeMedications={recommendations?.recommendation?.primaryRecommendation ? 
-              [recommendations.recommendation.primaryRecommendation.name] : []
-            }
-            monitoringEnabled={true}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Real-time Monitoring Dashboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">Real-time monitoring coming soon</p>
+                <p className="text-sm text-gray-500">Advanced patient monitoring features will be available in the next update</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="interactions">
