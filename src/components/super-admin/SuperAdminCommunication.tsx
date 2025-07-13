@@ -42,8 +42,8 @@ export function SuperAdminCommunication() {
     {
       id: '1',
       name: 'Welcome New User',
-      subject: 'Welcome to MedRecommend',
-      content: 'Welcome to MedRecommend! We\'re excited to have you join our platform for antibiotic decision support. If you have any questions, please don\'t hesitate to reach out to our support team.',
+      subject: 'Welcome to Antibioteka',
+      content: 'Welcome to Antibioteka! We\'re excited to have you join our platform for evidence-based antibiotic decision support. If you have any questions, please don\'t hesitate to reach out to our support team.',
       type: 'email'
     },
     {
@@ -64,7 +64,7 @@ export function SuperAdminCommunication() {
       id: '4',
       name: 'Feature Announcement',
       subject: 'New Features Available',
-      content: 'We\'ve added new features to improve your experience with MedRecommend. Check out the latest updates in your dashboard.',
+      content: 'We\'ve added new features to improve your experience with Antibioteka. Check out the latest updates in your dashboard.',
       type: 'email'
     }
   ];

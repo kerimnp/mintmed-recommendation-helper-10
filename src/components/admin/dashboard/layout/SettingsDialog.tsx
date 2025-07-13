@@ -97,8 +97,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src="/lovable.svg" />
-                  <AvatarFallback>KS</AvatarFallback>
+                  <AvatarImage src="/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png" />
+                  <AvatarFallback>AB</AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium">Dr. Kerim Sabic</p>
