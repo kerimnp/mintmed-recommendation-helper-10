@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Shield, Users, Activity, CreditCard, Settings, Database, Eye, MessageSquare, Building } from "lucide-react";
+import { AlertTriangle, Shield, Users, Activity, CreditCard, Settings, Database, Eye, MessageSquare, Building, Pill } from "lucide-react";
 import { SuperAdminUserManagement } from "@/components/super-admin/SuperAdminUserManagement";
 import { SuperAdminAnalytics } from "@/components/super-admin/SuperAdminAnalytics";
 import { SuperAdminSubscriptions } from "@/components/super-admin/SuperAdminSubscriptions";
@@ -14,6 +14,7 @@ import { SuperAdminSystemTools } from "@/components/super-admin/SuperAdminSystem
 import { SuperAdminSecurity } from "@/components/super-admin/SuperAdminSecurity";
 import { SuperAdminCommunication } from "@/components/super-admin/SuperAdminCommunication";
 import { SuperAdminSubscriptionEditor } from "@/components/super-admin/SuperAdminSubscriptionEditor";
+import { SuperAdminPrescriptions } from "@/components/super-admin/SuperAdminPrescriptions";
 
 export default function SuperAdminDashboard() {
   const { user } = useAuth();
@@ -100,7 +101,7 @@ export default function SuperAdminDashboard() {
 
         {/* Main Content */}
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid grid-cols-5 lg:grid-cols-9 w-full h-auto p-1 bg-muted/50">
+          <TabsList className="grid grid-cols-5 lg:grid-cols-10 w-full h-auto p-1 bg-muted/50">
             <TabsTrigger value="analytics" className="flex items-center gap-2 py-3 px-2 text-xs lg:text-sm">
               <Activity className="h-4 w-4" />
               <span className="hidden sm:inline">Analytics</span>
@@ -136,6 +137,10 @@ export default function SuperAdminDashboard() {
             <TabsTrigger value="communication" className="flex items-center gap-2 py-3 px-2 text-xs lg:text-sm">
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Comm</span>
+            </TabsTrigger>
+            <TabsTrigger value="prescriptions" className="flex items-center gap-2 py-3 px-2 text-xs lg:text-sm">
+              <Pill className="h-4 w-4" />
+              <span className="hidden sm:inline">Prescriptions</span>
             </TabsTrigger>
           </TabsList>
 
@@ -174,6 +179,10 @@ export default function SuperAdminDashboard() {
 
           <TabsContent value="communication" className="space-y-6">
             <SuperAdminCommunication />
+          </TabsContent>
+
+          <TabsContent value="prescriptions" className="space-y-6">
+            <SuperAdminPrescriptions />
           </TabsContent>
         </Tabs>
       </div>
