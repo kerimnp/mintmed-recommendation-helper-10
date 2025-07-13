@@ -259,7 +259,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     } as PrescriptionEvent;
   };
 
-  // Enhanced patient fetching with better error handling - filtered by logged-in doctor
+  // Enhanced patient fetching with role-based access control
   useEffect(() => {
     const fetchPatients = async () => {
       if (!user?.id) return;
@@ -267,17 +267,41 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
       setLoadingPatients(true);
       setPatientError(null);
       try {
-        // Filter patients by the current logged-in doctor
-        const { data, error } = await supabase
+        // First, get the user's role from profiles
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        console.log('User role:', userProfile?.role);
+
+        let query = supabase
           .from('patients')
           .select('*')
-          .eq('attending_physician_id', user.id)
           .order('created_at', { ascending: false });
+
+        // Apply role-based filtering
+        if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin') {
+          // Super admins and admins can see all patients
+          console.log('Admin/Super admin access - showing all patients');
+        } else {
+          // Regular doctors only see their assigned patients
+          console.log('Doctor access - filtering by attending physician');
+          query = query.eq('attending_physician_id', user.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           throw error;
         }
         
+        console.log(`Fetched ${data?.length || 0} patients for user role: ${userProfile?.role}`);
         const mappedPatients: PatientSummary[] = data.map(mapPatientFromSupabase);
         setAllPatients(mappedPatients);
 
