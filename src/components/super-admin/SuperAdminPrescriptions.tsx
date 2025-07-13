@@ -67,22 +67,28 @@ export function SuperAdminPrescriptions() {
 
   const fetchPrescriptions = async () => {
     try {
+      // Use explicit LEFT JOINs for better query reliability
       const { data, error } = await supabase
         .from('prescriptions')
         .select(`
           *,
-          patient:patients(first_name, last_name, medical_record_number),
-          doctor:profiles(first_name, last_name, email, specialization)
+          patient:patients!prescriptions_patient_id_fkey (first_name, last_name, medical_record_number),
+          doctor:profiles!prescriptions_doctor_id_fkey (first_name, last_name, email, specialization)
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Fetched prescriptions data:', data?.length || 0, 'records');
       setPrescriptions((data as any[]) || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching prescriptions:', error);
       toast({
         title: "Error",
-        description: "Failed to load prescriptions",
+        description: error?.message || "Failed to load prescriptions. Please check your permissions and try again.",
         variant: "destructive",
       });
     } finally {
