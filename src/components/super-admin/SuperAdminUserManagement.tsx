@@ -116,7 +116,7 @@ export function SuperAdminUserManagement() {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: string) => {
+  const updateUserRole = async (userId: string, newRole: 'admin' | 'doctor' | 'nurse' | 'pharmacist' | 'researcher' | 'viewer' | 'super_admin') => {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -309,7 +309,7 @@ export function SuperAdminUserManagement() {
                               <label className="text-sm font-medium">Role</label>
                               <Select 
                                 defaultValue={user.role}
-                                onValueChange={(newRole) => updateUserRole(user.id, newRole)}
+                                onValueChange={(newRole) => updateUserRole(user.id, newRole as 'admin' | 'doctor' | 'nurse' | 'pharmacist' | 'researcher' | 'viewer' | 'super_admin')}
                               >
                                 <SelectTrigger>
                                   <SelectValue />

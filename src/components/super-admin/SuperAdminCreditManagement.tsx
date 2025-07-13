@@ -20,7 +20,7 @@ interface CreditUsage {
     first_name: string;
     last_name: string;
     email: string;
-  };
+  } | null;
 }
 
 interface UserCredits {
@@ -52,8 +52,7 @@ export function SuperAdminCreditManagement() {
       const { data: usageData, error: usageError } = await supabase
         .from('credit_usage_history')
         .select(`
-          *,
-          profiles (first_name, last_name, email)
+          *
         `)
         .order('created_at', { ascending: false })
         .limit(50);

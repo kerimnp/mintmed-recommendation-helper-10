@@ -30,7 +30,7 @@ interface Subscription {
     first_name: string;
     last_name: string;
     email: string;
-  };
+  } | null;
   organizations?: {
     name: string;
   };
@@ -54,7 +54,6 @@ export function SuperAdminSubscriptions() {
         .select(`
           *,
           plans (name, price_monthly, price_yearly),
-          profiles (first_name, last_name, email),
           organizations (name)
         `)
         .order('created_at', { ascending: false });

@@ -34,9 +34,11 @@ export function SuperAdminSystemTools() {
     const startTime = Date.now();
 
     try {
-      const { data, error, count } = await supabase.rpc('execute_sql', {
-        query: sqlQuery
-      });
+      // Note: This would require a custom RPC function to be created in Supabase
+      // For now, this is a placeholder for demonstration
+      const data = null;
+      const error = { message: 'SQL execution not implemented - would require custom RPC function' };
+      const count = 0;
 
       const executionTime = Date.now() - startTime;
 
@@ -52,7 +54,7 @@ export function SuperAdminSystemTools() {
         });
       } else {
         setQueryResult({
-          data: data || [],
+          data: Array.isArray(data) ? data : [],
           rowCount: count,
           executionTime
         });

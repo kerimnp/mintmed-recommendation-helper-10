@@ -14,7 +14,7 @@ interface ActivityLog {
   target_type: string;
   target_id: string;
   details: any;
-  ip_address: string;
+  ip_address: string | null;
   user_agent: string;
   created_at: string;
   profiles?: {
@@ -50,7 +50,10 @@ export function SuperAdminActivityLogs() {
         .limit(100);
 
       if (error) throw error;
-      setLogs(data || []);
+      setLogs((data || []).map(log => ({
+        ...log,
+        ip_address: log.ip_address as string | null
+      })));
     } catch (error) {
       console.error('Error fetching activity logs:', error);
       toast({
