@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { usePatientAccess } from '@/hooks/usePatientAccess';
+import { PatientSharingDialog } from './PatientSharingDialog';
 import { Shield, ShieldAlert, Loader2, Lock, AlertTriangle } from 'lucide-react';
 
 interface PatientAccessGuardProps {
@@ -89,15 +90,14 @@ export const PatientAccessGuard: React.FC<PatientAccessGuardProps> = ({
               <li>• Verify you have the correct patient selected</li>
             </ul>
             
-            {onRequestAccess && (
-              <Button 
-                onClick={() => onRequestAccess(patientId)}
-                variant="outline"
-                className="mt-4"
-              >
-                Request Access
-              </Button>
-            )}
+            <PatientSharingDialog
+              patientId={patientId}
+              trigger={
+                <Button variant="outline" className="mt-4">
+                  Request Access
+                </Button>
+              }
+            />
           </div>
         </CardContent>
       </Card>

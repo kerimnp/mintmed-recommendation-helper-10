@@ -25,10 +25,10 @@ const Pricing = () => {
         >
           {/* Header Section */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               {language === 'en' ? 'Choose Your Plan' : 'Odaberite Svoj Plan'}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {language === 'en' ? 'Hospital-grade pricing designed for healthcare professionals and institutions' : 'Bolničke cijene dizajnirane za zdravstvene stručnjake i ustanove'}
             </p>
           </div>

@@ -32,7 +32,7 @@ export const IndividualPricingSection: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {individualPlans.map((plan, index) => (
-            <Card key={index} className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700 ${plan.name === 'Elite' ? 'ring-2 ring-medical-primary scale-105' : ''}`}>
+            <Card key={index} className={`relative bg-card backdrop-blur-lg ${plan.name === 'Elite' ? 'ring-2 ring-primary scale-105' : ''}`}>
               {plan.popular && (
                 <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500">
                   <Star className="h-3 w-3 mr-1" />
@@ -45,7 +45,7 @@ export const IndividualPricingSection: React.FC = () => {
                   {plan.name === 'Elite' && <Crown className="h-5 w-5 text-yellow-500" />}
                 </CardTitle>
                 <div className="text-3xl font-bold">€{plan.price}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">/month</div>
+                <div className="text-sm text-muted-foreground">/month</div>
               </CardHeader>
               <CardContent>
                 <div className="text-center mb-6">
@@ -80,7 +80,7 @@ export const IndividualPricingSection: React.FC = () => {
       </div>
 
       {/* FAQ */}
-      <Card className="max-w-3xl mx-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
+      <Card className="max-w-3xl mx-auto bg-card backdrop-blur-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
             {language === 'en' ? 'Frequently Asked Questions' : 'Često Postavljana Pitanja'}

@@ -126,12 +126,12 @@ export const HospitalPricingSection: React.FC = () => {
     <div className="space-y-12">
       {/* Billing Cycle Toggle */}
       <div className="flex justify-center">
-        <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+        <div className="bg-muted p-1 rounded-lg">
           <button
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               billingCycle === 'monthly'
-                ? 'bg-white dark:bg-gray-700 shadow-sm'
-                : 'text-gray-600 dark:text-gray-400'
+                ? 'bg-background shadow-sm text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             onClick={() => setBillingCycle('monthly')}
           >
@@ -140,8 +140,8 @@ export const HospitalPricingSection: React.FC = () => {
           <button
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               billingCycle === 'yearly'
-                ? 'bg-white dark:bg-gray-700 shadow-sm'
-                : 'text-gray-600 dark:text-gray-400'
+                ? 'bg-background shadow-sm text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             onClick={() => setBillingCycle('yearly')}
           >
@@ -164,7 +164,7 @@ export const HospitalPricingSection: React.FC = () => {
             const monthlyPrice = billingCycle === 'yearly' ? Math.round(plan.priceYearly / 12) : plan.priceMonthly;
             
             return (
-              <Card key={plan.id} className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700 ${plan.popular ? 'border-blue-500' : ''} ${plan.recommended ? 'border-green-500' : ''}`}>
+              <Card key={plan.id} className={`relative bg-card backdrop-blur-lg ${plan.popular ? 'ring-2 ring-primary' : ''} ${plan.recommended ? 'ring-2 ring-green-500' : ''}`}>
                 {plan.popular && (
                   <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-blue-500">
                     <Star className="h-3 w-3 mr-1" />
@@ -182,9 +182,9 @@ export const HospitalPricingSection: React.FC = () => {
                     <IconComponent className={`h-6 w-6 ${plan.color} mr-2`} />
                     <CardTitle className="text-lg">{plan.name}</CardTitle>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{plan.description}</p>
+                  <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                   <div className="text-3xl font-bold">${monthlyPrice}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-muted-foreground">
                     per month {billingCycle === 'yearly' && '(billed annually)'}
                   </div>
                   {billingCycle === 'yearly' && (
@@ -220,7 +220,7 @@ export const HospitalPricingSection: React.FC = () => {
       </div>
 
       {/* Hospital Seat Fees Calculator */}
-      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-gray-200 dark:border-gray-700">
+      <Card className="bg-card backdrop-blur-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
             {language === 'en' ? 'Doctor Seat Calculator' : 'Kalkulator Liječničkih Mjesta'}
@@ -229,7 +229,7 @@ export const HospitalPricingSection: React.FC = () => {
         <CardContent>
           <div className="text-center mb-6">
             <div className="text-4xl font-bold text-medical-primary mb-2">€19/month per doctor</div>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted-foreground">
               {language === 'en' ? 'Additional seat fees apply to all plans' : 'Dodatne naknade za mjesta vrijede za sve planove'}
             </p>
           </div>
