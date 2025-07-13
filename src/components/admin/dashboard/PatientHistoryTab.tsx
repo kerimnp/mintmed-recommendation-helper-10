@@ -4,8 +4,10 @@ import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
 import { HistoryEvent, PatientSummary, PrescriptionEvent } from './patient-history/types'; 
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, AlertTriangle, Users, FileText } from 'lucide-react';
+import { Loader2, AlertTriangle, Users, FileText, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Json } from '@/integrations/supabase/types';
 import { differenceInYears } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,6 +77,10 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   const [selectedPatientHistory, setSelectedPatientHistory] = useState<HistoryEvent[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+
+  // New state for view mode and user role
+  const [showAssignedOnly, setShowAssignedOnly] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { toast } = useToast();
@@ -259,7 +265,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     } as PrescriptionEvent;
   };
 
-  // Enhanced patient fetching with role-based access control
+  // Enhanced patient fetching with role-based access control and toggle support
   useEffect(() => {
     const fetchPatients = async () => {
       if (!user?.id) return;
@@ -279,16 +285,23 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         }
 
         console.log('User role:', userProfile?.role);
+        setUserRole(userProfile?.role || null);
 
         let query = supabase
           .from('patients')
           .select('*')
           .order('created_at', { ascending: false });
 
-        // Apply role-based filtering
+        // Apply role-based filtering with toggle support
         if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin') {
-          // Super admins and admins can see all patients
-          console.log('Admin/Super admin access - showing all patients');
+          if (showAssignedOnly) {
+            // Admin/Super admin viewing only their assigned patients
+            console.log('Admin/Super admin access - showing assigned patients only');
+            query = query.eq('attending_physician_id', user.id);
+          } else {
+            // Admin/Super admin viewing all patients (default)
+            console.log('Admin/Super admin access - showing all patients');
+          }
         } else {
           // Regular doctors only see their assigned patients
           console.log('Doctor access - filtering by attending physician');
@@ -301,7 +314,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
           throw error;
         }
         
-        console.log(`Fetched ${data?.length || 0} patients for user role: ${userProfile?.role}`);
+        console.log(`Fetched ${data?.length || 0} patients for user role: ${userProfile?.role}, showAssignedOnly: ${showAssignedOnly}`);
         const mappedPatients: PatientSummary[] = data.map(mapPatientFromSupabase);
         setAllPatients(mappedPatients);
 
@@ -314,7 +327,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     };
 
     fetchPatients();
-  }, [user?.id]);
+  }, [user?.id, showAssignedOnly]);
 
   useEffect(() => {
     if (!loadingPatients && allPatients.length > 0) {
@@ -428,26 +441,56 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
   }
 
   return (
-    <div className="flex w-full" style={{ height: mainContentHeight }}>
-      <PatientListSidebar
-        patients={filteredPatientsForSidebar}
-        selectedPatientId={selectedPatientId}
-        onSelectPatient={handleSelectPatient}
-        searchTerm={patientListSearch}
-        setSearchTerm={setPatientListSearch}
-      />
-      <PatientDetailView
-        patient={selectedPatientData}
-        historyEvents={filteredHistoryEvents}
-        searchTerm={eventSearchTerm}
-        setSearchTerm={setEventSearchTerm}
-        onClearPatientSelection={() => setSelectedPatientId(null)}
-        allPatients={allPatients} 
-        currentPatientId={selectedPatientId}
-        onSelectPatient={handleSelectPatient}
-        isLoadingHistory={loadingHistory} 
-        historyError={historyError} 
-      />
+    <div className="flex flex-col w-full" style={{ height: mainContentHeight }}>
+      {/* Admin Toggle Control */}
+      {(userRole === 'super_admin' || userRole === 'admin') && (
+        <div className="flex items-center justify-between px-4 py-3 bg-card border-b">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {showAssignedOnly ? (
+                <UserCheck className="h-4 w-4 text-primary" />
+              ) : (
+                <Users className="h-4 w-4 text-primary" />
+              )}
+              <span className="text-sm font-medium">
+                {showAssignedOnly ? 'My Assigned Patients' : 'All Patients'} ({filteredPatientsForSidebar.length})
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="patient-view-toggle" className="text-sm text-muted-foreground">
+              Show assigned only
+            </Label>
+            <Switch
+              id="patient-view-toggle"
+              checked={showAssignedOnly}
+              onCheckedChange={setShowAssignedOnly}
+            />
+          </div>
+        </div>
+      )}
+      
+      <div className="flex flex-1 min-h-0">
+        <PatientListSidebar
+          patients={filteredPatientsForSidebar}
+          selectedPatientId={selectedPatientId}
+          onSelectPatient={handleSelectPatient}
+          searchTerm={patientListSearch}
+          setSearchTerm={setPatientListSearch}
+        />
+        <PatientDetailView
+          patient={selectedPatientData}
+          historyEvents={filteredHistoryEvents}
+          searchTerm={eventSearchTerm}
+          setSearchTerm={setEventSearchTerm}
+          onClearPatientSelection={() => setSelectedPatientId(null)}
+          allPatients={allPatients} 
+          currentPatientId={selectedPatientId}
+          onSelectPatient={handleSelectPatient}
+          isLoadingHistory={loadingHistory} 
+          historyError={historyError} 
+        />
+      </div>
     </div>
   );
 };
