@@ -188,6 +188,66 @@ export type Database = {
           },
         ]
       }
+      clinical_audit_events: {
+        Row: {
+          action_performed: string
+          after_data: Json | null
+          before_data: Json | null
+          compliance_flags: Json | null
+          created_at: string
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          location_info: Json | null
+          metadata: Json | null
+          patient_id: string | null
+          resource_id: string | null
+          resource_type: string
+          risk_score: number | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_performed: string
+          after_data?: Json | null
+          before_data?: Json | null
+          compliance_flags?: Json | null
+          created_at?: string
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          location_info?: Json | null
+          metadata?: Json | null
+          patient_id?: string | null
+          resource_id?: string | null
+          resource_type: string
+          risk_score?: number | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_performed?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          compliance_flags?: Json | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          location_info?: Json | null
+          metadata?: Json | null
+          patient_id?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          risk_score?: number | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       clinical_outcomes: {
         Row: {
           adverse_drug_reactions: Json | null
@@ -693,6 +753,39 @@ export type Database = {
         }
         Relationships: []
       }
+      encryption_audit_logs: {
+        Row: {
+          compliance_level: string
+          created_at: string
+          data_type: string
+          encryption_method: string
+          encryption_status: string
+          id: string
+          key_rotation_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          compliance_level?: string
+          created_at?: string
+          data_type: string
+          encryption_method: string
+          encryption_status?: string
+          id?: string
+          key_rotation_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          compliance_level?: string
+          created_at?: string
+          data_type?: string
+          encryption_method?: string
+          encryption_status?: string
+          id?: string
+          key_rotation_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fhir_resources: {
         Row: {
           created_at: string
@@ -736,6 +829,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hipaa_compliance_checks: {
+        Row: {
+          check_name: string
+          check_type: string
+          compliance_score: number | null
+          created_at: string
+          details: Json | null
+          id: string
+          last_checked: string
+          next_check_due: string | null
+          remediation_required: boolean | null
+          remediation_steps: Json | null
+          responsible_party: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          check_name: string
+          check_type: string
+          compliance_score?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          last_checked?: string
+          next_check_due?: string | null
+          remediation_required?: boolean | null
+          remediation_steps?: Json | null
+          responsible_party?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          check_name?: string
+          check_type?: string
+          compliance_score?: number | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          last_checked?: string
+          next_check_due?: string | null
+          remediation_required?: boolean | null
+          remediation_steps?: Json | null
+          responsible_party?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       organizations: {
         Row: {
@@ -1270,6 +1411,60 @@ export type Database = {
         }
         Relationships: []
       }
+      security_incidents: {
+        Row: {
+          affected_patients: Json | null
+          affected_systems: Json | null
+          assigned_to: string | null
+          compliance_impact: Json | null
+          created_at: string
+          description: string
+          detected_at: string
+          id: string
+          incident_type: string
+          reported_by: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity_level: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          affected_patients?: Json | null
+          affected_systems?: Json | null
+          assigned_to?: string | null
+          compliance_impact?: Json | null
+          created_at?: string
+          description: string
+          detected_at?: string
+          id?: string
+          incident_type: string
+          reported_by?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity_level: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          affected_patients?: Json | null
+          affected_systems?: Json | null
+          assigned_to?: string | null
+          compliance_impact?: Json | null
+          created_at?: string
+          description?: string
+          detected_at?: string
+          id?: string
+          incident_type?: string
+          reported_by?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity_level?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           billing_cycle: string
@@ -1472,6 +1667,10 @@ export type Database = {
         }
         Returns: string
       }
+      get_hipaa_compliance_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       has_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
@@ -1479,6 +1678,20 @@ export type Database = {
       is_super_admin_authorized: {
         Args: { user_email: string }
         Returns: boolean
+      }
+      log_clinical_audit_event: {
+        Args: {
+          p_event_type: string
+          p_user_id: string
+          p_patient_id?: string
+          p_resource_type?: string
+          p_resource_id?: string
+          p_action_performed?: string
+          p_before_data?: Json
+          p_after_data?: Json
+          p_metadata?: Json
+        }
+        Returns: string
       }
       log_patient_data_access: {
         Args: {
