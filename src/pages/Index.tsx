@@ -194,7 +194,7 @@ const Index = () => {
                       alt="Horalix Dashboard" 
                       className="w-full h-auto object-cover" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent dark:from-black/20 dark:via-black/10 dark:to-transparent backdrop-blur-[2px] border border-white/20 dark:border-white/10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 dark:from-white/10 dark:via-transparent dark:to-white/5 border border-white/30 dark:border-white/20 shadow-2xl shadow-black/10 dark:shadow-white/5"></div>
                   </div>
                 </motion.div>
               </div>
