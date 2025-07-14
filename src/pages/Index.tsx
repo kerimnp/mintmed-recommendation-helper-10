@@ -6,10 +6,14 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ProfileDropdown } from "@/components/admin/dashboard/layout/ProfileDropdown";
+import { Footer } from "@/components/layout/Footer";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap, Euro } from "lucide-react";
+import { Sun, Moon, LogIn, ArrowRight, Brain, Microscope, Globe, BookOpen, Hospital, HeartPulse, GraduationCap, UserPlus, Shield, Clock, Users } from "lucide-react";
 import { translations } from "@/translations";
+import medicalHero from "@/assets/medical-hero.jpg";
+import dashboardPreview from "@/assets/dashboard-preview.jpg";
+import clinicalPrecision from "@/assets/clinical-precision.jpg";
 
 const Index = () => {
   const { language } = useLanguage();
@@ -108,13 +112,12 @@ const Index = () => {
                   )}
                 </Button>
                 
-                <Link to="/admin?tab=pricing">
+                <Link to="/pricing">
                   <Button 
                     variant="ghost" 
                     size="sm"
                     className="flex items-center gap-2 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80"
                   >
-                    <Euro className="h-4 w-4" />
                     <span className="hidden sm:inline">{language === "en" ? "Pricing" : "Cijene"}</span>
                   </Button>
                 </Link>
@@ -124,15 +127,27 @@ const Index = () => {
                 {user ? (
                   <ProfileDropdown />
                 ) : (
-                  <Link to="/auth">
-                    <Button 
-                      size="sm" 
-                      className="flex items-center gap-2 bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-sm"
-                    >
-                      <LogIn className="h-4 w-4" />
-                      <span>{language === "en" ? "Sign In" : "Prijava"}</span>
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link to="/auth">
+                      <Button 
+                        variant="ghost"
+                        size="sm" 
+                        className="flex items-center gap-2 rounded-full"
+                      >
+                        <LogIn className="h-4 w-4" />
+                        <span className="hidden sm:inline">{language === "en" ? "Sign In" : "Prijava"}</span>
+                      </Button>
+                    </Link>
+                    <Link to="/auth?mode=signup">
+                      <Button 
+                        size="sm" 
+                        className="flex items-center gap-2 rounded-full shadow-sm"
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        <span className="hidden sm:inline">{language === "en" ? "Get Started" : "Počni"}</span>
+                      </Button>
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
@@ -141,8 +156,15 @@ const Index = () => {
 
         <main className="w-full overflow-auto pt-24">
           {/* Hero Section */}
-          <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 relative">
-            <div className="max-w-7xl mx-auto">
+          <section className="relative min-h-[90vh] flex items-center justify-center py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+            {/* Hero Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/50 to-background"></div>
+            <div 
+              className="absolute inset-0 opacity-5 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${medicalHero})` }}
+            ></div>
+            
+            <div className="relative max-w-7xl mx-auto w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} 
@@ -150,51 +172,84 @@ const Index = () => {
                   transition={{ duration: 0.6 }} 
                   className="space-y-8"
                 >
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-                    {language === "en" ? "Evidence-Based Antibiotic Recommendations" : "Preporuke Antibiotika Temeljene na Dokazima"}
-                  </h1>
-                  <p className="text-xl text-gray-600 dark:text-gray-300">
+                  <div className="space-y-4">
+                    <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                      <Shield className="h-4 w-4 mr-2" />
+                      {language === "en" ? "Clinically Validated AI" : "Klinički Validiran AI"}
+                    </div>
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+                      {language === "en" ? "Smarter Antibiotic Decisions" : "Pametnije Odluke o Antibioticima"}
+                      <span className="block text-primary">
+                        {language === "en" ? "Better Patient Care" : "Bolja Briga o Pacijentima"}
+                      </span>
+                    </h1>
+                  </div>
+                  <p className="text-xl text-muted-foreground leading-relaxed">
                     {language === "en" 
-                      ? "Horalix combines clinical expertise with advanced AI to deliver personalized antibiotic recommendations that help optimize patient outcomes." 
-                      : "Horalix kombinira kliničku stručnost s naprednom umjetnom inteligencijom za pružanje personaliziranih preporuka antibiotika koje pomažu u optimizaciji ishoda pacijenata."}
+                      ? "Transform your antibiotic prescribing with AI-powered recommendations based on the latest clinical guidelines, patient data, and local resistance patterns." 
+                      : "Transformišite propisivanje antibiotika uz AI preporuke zasnovane na najnovijim kliničkim smernicama, podacima o pacijentima i lokalnim obrascima otpornosti."}
                   </p>
+                  
+                  {/* Key Benefits */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Clock className="h-4 w-4 text-primary" />
+                      <span className="text-muted-foreground">
+                        {language === "en" ? "Instant Analysis" : "Trenutna Analiza"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Shield className="h-4 w-4 text-primary" />
+                      <span className="text-muted-foreground">
+                        {language === "en" ? "Safety First" : "Sigurnost Prvo"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Users className="h-4 w-4 text-primary" />
+                      <span className="text-muted-foreground">
+                        {language === "en" ? "Trusted by 10K+" : "Poverenje 10K+"}
+                      </span>
+                    </div>
+                  </div>
+                  
                   <div className="flex flex-wrap gap-4">
-                    <Link to="/advisor">
+                    <Link to="/auth?mode=signup">
                       <Button 
                         size="lg" 
-                        className="bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-md group"
+                        className="rounded-full shadow-lg group"
                       >
-                        {language === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
+                        {language === "en" ? "Start Free Trial" : "Počni Besplatno"}
                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
-                    <Link to="/about">
+                    <Link to="/advisor">
                       <Button 
                         variant="outline" 
                         size="lg" 
-                        className="rounded-full border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="rounded-full"
                       >
-                        {language === "en" ? "Learn More" : "Saznaj Više"}
+                        {language === "en" ? "View Demo" : "Pogledaj Demo"}
                       </Button>
                     </Link>
                   </div>
                 </motion.div>
+                
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }} 
                   animate={{ opacity: 1, scale: 1 }} 
                   transition={{ duration: 0.7, delay: 0.2 }} 
                   className="relative"
                 >
-                  <div className="relative overflow-hidden rounded-3xl shadow-xl">
-                    <img 
-                      src={theme === 'dark' 
-                        ? "/lovable-uploads/2cafe844-3b46-45a9-8503-ee8b3a5b5e96.png"
-                        : "/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png"
-                      } 
-                      alt="Horalix Dashboard" 
-                      className="w-full h-auto object-cover" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 dark:from-white/10 dark:via-transparent dark:to-white/5 border border-white/30 dark:border-white/20 shadow-2xl shadow-black/10 dark:shadow-white/5"></div>
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl transform rotate-3"></div>
+                    <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-card">
+                      <img 
+                        src={dashboardPreview} 
+                        alt="Horalix Dashboard Preview" 
+                        className="w-full h-auto object-cover" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 dark:from-white/10 dark:via-transparent dark:to-white/5"></div>
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -253,17 +308,50 @@ const Index = () => {
                   className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-16 items-center`}
                 >
                   <div className="md:w-1/2">
-                    <div className="rounded-3xl p-12 flex items-center justify-center shadow-lg bg-white dark:bg-gray-800">
-                      {section.icon}
-                    </div>
+                    {index === 1 ? (
+                      <div className="relative">
+                        <img 
+                          src={clinicalPrecision} 
+                          alt="Clinical Precision" 
+                          className="w-full h-auto rounded-3xl shadow-xl" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl"></div>
+                      </div>
+                    ) : (
+                      <div className="rounded-3xl p-12 flex items-center justify-center shadow-lg bg-card border">
+                        {section.icon}
+                      </div>
+                    )}
                   </div>
                   <div className="md:w-1/2 space-y-6">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-3xl font-bold text-foreground">
                       {section.title}
                     </h3>
-                    <p className="text-lg text-gray-600 dark:text-gray-300">
+                    <p className="text-lg text-muted-foreground leading-relaxed">
                       {section.description}
                     </p>
+                    {index === 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center text-sm">
+                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                          <span className="text-muted-foreground">
+                            {language === "en" ? "Integration with EHR systems" : "Integracija sa EHR sistemima"}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                          <span className="text-muted-foreground">
+                            {language === "en" ? "Real-time clinical guidelines" : "Kliničke smernice u realnom vremenu"}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                          <span className="text-muted-foreground">
+                            {language === "en" ? "Customizable alert thresholds" : "Prilagodljivi pragovi upozorenja"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -271,8 +359,11 @@ const Index = () => {
           </section>
 
           {/* CTA Section */}
-          <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800/20">
-            <div className="max-w-5xl mx-auto text-center">
+          <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="absolute inset-0 opacity-40">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,hsl(217,91%,58%)_1px,transparent_0)] bg-[length:60px_60px] opacity-5"></div>
+            </div>
+            <div className="relative max-w-5xl mx-auto text-center">
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }} 
                 whileInView={{ opacity: 1, scale: 1 }} 
@@ -280,52 +371,60 @@ const Index = () => {
                 viewport={{ once: true }} 
                 className="space-y-8"
               >
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {language === "en" 
-                    ? "Ready to transform your antibiotic prescribing practice?" 
-                    : "Spremni za transformaciju vaše prakse propisivanja antibiotika?"}
-                </h2>
-                <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                  {language === "en" 
-                    ? "Join thousands of healthcare professionals who trust Horalix to support their clinical decision-making." 
-                    : "Pridružite se tisućama zdravstvenih djelatnika koji vjeruju Horalixu u podršci njihovom kliničkom odlučivanju."}
-                </p>
-                <Link to="/advisor">
-                  <Button 
-                    size="lg" 
-                    className="bg-medical-primary hover:bg-medical-primary-hover text-white rounded-full shadow-md"
-                  >
+                <div className="space-y-4">
+                  <h2 className="text-4xl font-bold text-foreground">
                     {language === "en" 
-                      ? "Try Antibiotic Advisor Now" 
-                      : "Isprobajte Savjetnik za Antibiotike Sada"}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
+                      ? "Ready to enhance patient care?" 
+                      : "Spremni za poboljšanje brige o pacijentima?"}
+                  </h2>
+                  <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                    {language === "en" 
+                      ? "Join over 10,000 healthcare professionals who trust Horalix for evidence-based antibiotic recommendations." 
+                      : "Pridružite se preko 10.000 zdravstvenih radnika koji veruju Horalixu za preporuke antibiotika zasnovane na dokazima."}
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Link to="/auth?mode=signup">
+                    <Button 
+                      size="lg" 
+                      className="rounded-full shadow-lg group min-w-[200px]"
+                    >
+                      {language === "en" 
+                        ? "Start Free Trial" 
+                        : "Počni Besplatno"}
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link to="/pricing">
+                    <Button 
+                      variant="outline"
+                      size="lg" 
+                      className="rounded-full min-w-[200px]"
+                    >
+                      {language === "en" 
+                        ? "View Pricing" 
+                        : "Pogledaj Cene"}
+                    </Button>
+                  </Link>
+                </div>
+                
+                <div className="flex justify-center items-center space-x-8 text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <Shield className="h-4 w-4 mr-2 text-primary" />
+                    {language === "en" ? "HIPAA Compliant" : "HIPAA Usklađeno"}
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-2 text-primary" />
+                    {language === "en" ? "Setup in 5 minutes" : "Podešavanje za 5 minuta"}
+                  </div>
+                </div>
               </motion.div>
             </div>
           </section>
         </main>
         
-        <footer className="py-12 bg-white dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="md:flex md:items-center md:justify-between">
-              <div className="flex justify-center md:justify-start">
-                <img 
-                  src={theme === 'dark' 
-                    ? "/lovable-uploads/134e4de5-e3af-4097-82b5-25696c1187df.png" 
-                    : "/lovable-uploads/9379e65b-bb1e-43d1-8d21-be1f9263156a.png"} 
-                  alt="Horalix Logo" 
-                  className="h-8 w-auto" 
-                />
-              </div>
-              <div className="mt-8 md:mt-0">
-                <p className="text-center md:text-right text-sm text-gray-500 dark:text-gray-400">
-                  &copy; {new Date().getFullYear()} Horalix. {language === "en" ? "All rights reserved." : "Sva prava pridržana."}
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );
