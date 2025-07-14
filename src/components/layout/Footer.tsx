@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from 'next-themes';
 import { Mail, Phone, MapPin, Globe, Linkedin, Instagram, Shield, Lock, FileText } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const { theme } = useTheme();
 
   const footerLinks = {
@@ -13,7 +15,11 @@ export const Footer: React.FC = () => {
       title: language === 'en' ? 'Product' : 'Proizvod',
       links: [
         { name: language === 'en' ? 'Pricing' : 'Cijene', href: '/admin?tab=pricing' },
-        { name: language === 'en' ? 'AI Advisor' : 'AI Savjetnik', href: '/advisor' },
+        { 
+          name: language === 'en' ? 'AI Advisor' : 'AI Savjetnik', 
+          href: user ? '/advisor' : '/auth',
+          requiresAuth: true
+        },
       ]
     },
     company: {
@@ -97,8 +103,14 @@ export const Footer: React.FC = () => {
                       <Link 
                         to={link.href} 
                         className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+                        title={link.requiresAuth && !user ? (language === 'en' ? 'Sign in required' : 'Potrebna je prijava') : undefined}
                       >
                         {link.name}
+                        {link.requiresAuth && !user && (
+                          <span className="ml-1 text-xs opacity-60">
+                            {language === 'en' ? '(Login required)' : '(Potrebna prijava)'}
+                          </span>
+                        )}
                       </Link>
                     </li>
                   ))}
