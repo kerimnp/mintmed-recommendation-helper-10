@@ -241,14 +241,13 @@ const Index = () => {
                   className="relative"
                 >
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl transform rotate-3"></div>
-                    <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-card">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-3xl blur-xl transform rotate-3"></div>
+                    <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-16 flex items-center justify-center">
                       <img 
-                        src={dashboardPreview} 
-                        alt="Horalix Dashboard Preview" 
-                        className="w-full h-auto object-cover" 
+                        src="/lovable-uploads/e4119d6c-ac9d-4d72-b8cf-fb248447340e.png" 
+                        alt="Horalix Logo" 
+                        className="w-48 h-auto object-contain filter brightness-0 invert" 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 dark:from-white/10 dark:via-transparent dark:to-white/5"></div>
                     </div>
                   </div>
                 </motion.div>
