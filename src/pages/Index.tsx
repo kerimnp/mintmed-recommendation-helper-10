@@ -180,37 +180,21 @@ const Index = () => {
                   </div>
                 </motion.div>
                 <motion.div 
-                  initial={{ opacity: 0, scale: 0.9, x: 50 }} 
-                  animate={{ opacity: 1, scale: 1, x: 0 }} 
-                  transition={{ duration: 1, ease: "easeOut" }} 
-                  className="relative max-w-4xl mx-auto"
+                  initial={{ opacity: 0, scale: 0.95 }} 
+                  animate={{ opacity: 1, scale: 1 }} 
+                  transition={{ duration: 0.7, delay: 0.2 }} 
+                  className="relative"
                 >
-                  <div className="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-700 cursor-pointer">
-                    <div className="relative aspect-[4/3] w-full">
-                      <img 
-                        src={theme === 'dark' 
-                          ? "/lovable-uploads/2cafe844-3b46-45a9-8503-ee8b3a5b5e96.png"
-                          : "/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png"
-                        } 
-                        alt="Horalix Dashboard" 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                      />
-                      
-                      {/* Enhanced Glass Morphism Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-white/3 to-black/8 dark:from-white/12 dark:via-white/4 dark:to-white/8 border border-white/40 dark:border-white/30 shadow-2xl shadow-black/20 dark:shadow-white/10"></div>
-                      
-                      {/* Animated Shimmer Effect */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/30 transform -skew-x-12 animate-shimmer"></div>
-                      </div>
-                      
-                      {/* Floating Glow Effects */}
-                      <div className="absolute top-4 left-4 w-16 h-16 bg-primary/20 rounded-full blur-xl opacity-60 animate-pulse"></div>
-                      <div className="absolute bottom-6 right-6 w-12 h-12 bg-primary/30 rounded-full blur-lg opacity-40 animate-pulse delay-1000"></div>
-                      
-                      {/* Interactive Border Glow */}
-                      <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/50 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm"></div>
-                    </div>
+                  <div className="relative overflow-hidden rounded-3xl shadow-xl">
+                    <img 
+                      src={theme === 'dark' 
+                        ? "/lovable-uploads/2cafe844-3b46-45a9-8503-ee8b3a5b5e96.png"
+                        : "/lovable-uploads/c6384933-7f76-44d0-b4ab-45145d7d7c61.png"
+                      } 
+                      alt="Horalix Dashboard" 
+                      className="w-full h-auto object-cover" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 dark:from-white/10 dark:via-transparent dark:to-white/5 border border-white/30 dark:border-white/20 shadow-2xl shadow-black/10 dark:shadow-white/5"></div>
                   </div>
                 </motion.div>
               </div>
