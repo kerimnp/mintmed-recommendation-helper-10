@@ -5,115 +5,48 @@
  
 @layer base {
   :root {
-    /* Core Colors - Medical Professional Theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 222 47% 100%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    
-    /* Primary - Medical Blue with Scientific Trust */
-    --primary: 213 94% 68%;
-    --primary-glow: 213 94% 78%;
-    --primary-deep: 213 94% 45%;
-    --primary-foreground: 210 40% 98%;
-    
-    /* Secondary - Clean Medical Gray */
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    
-    /* Accent - Professional Teal */
-    --accent: 180 84% 60%;
-    --accent-glow: 180 84% 70%;
-    --accent-foreground: 210 40% 98%;
-    
-    /* Muted - Sophisticated Neutrals */
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    
-    /* UI Elements */
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 210 100% 50%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 213 94% 68%;
-    
-    /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 78%));
-    --gradient-hero: linear-gradient(135deg, hsl(213 94% 68% / 0.1), hsl(180 84% 60% / 0.1));
-    --gradient-accent: linear-gradient(135deg, hsl(180 84% 60%), hsl(180 84% 70%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(210 20% 96% / 0.4));
-    
-    /* Glass Effects */
-    --glass-primary: hsla(213, 94%, 68%, 0.1);
-    --glass-white: hsla(0, 0%, 100%, 0.8);
-    --glass-border: hsla(213, 94%, 68%, 0.2);
-    
-    /* Shadows */
-    --shadow-elegant: 0 10px 30px -10px hsl(213 94% 68% / 0.3);
-    --shadow-glow: 0 0 40px hsl(213 94% 78% / 0.4);
-    --shadow-card: 0 4px 20px -2px hsl(213 94% 68% / 0.1);
-    --shadow-premium: 0 20px 60px -10px hsl(213 94% 68% / 0.2);
-    
-    /* Animation Variables */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 210 100% 50%;
     --radius: 0.75rem;
   }
  
   .dark {
-    /* Core Colors - Medical Professional Dark Theme */
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
-    --card: 217.2 32.6% 17.5%;
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    
-    /* Primary - Medical Blue Dark Mode */
-    --primary: 213 94% 78%;
-    --primary-glow: 213 94% 88%;
-    --primary-deep: 213 94% 65%;
-    --primary-foreground: 222.2 84% 4.9%;
-    
-    /* Secondary - Dark Medical Gray */
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 32% 17%;
     --secondary-foreground: 210 40% 98%;
-    
-    /* Accent - Professional Teal Dark */
-    --accent: 180 84% 70%;
-    --accent-glow: 180 84% 80%;
-    --accent-foreground: 222.2 84% 4.9%;
-    
-    /* Muted - Dark Sophistication */
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 217 32% 17%;
     --muted-foreground: 215 20.2% 65.1%;
-    
-    /* UI Elements */
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 213 94% 78%;
-    
-    /* Premium Gradients Dark */
-    --gradient-primary: linear-gradient(135deg, hsl(213 94% 78%), hsl(213 94% 88%));
-    --gradient-hero: linear-gradient(135deg, hsl(213 94% 78% / 0.1), hsl(180 84% 70% / 0.1));
-    --gradient-accent: linear-gradient(135deg, hsl(180 84% 70%), hsl(180 84% 80%));
-    --gradient-card: linear-gradient(135deg, hsl(217.2 32.6% 17.5% / 0.8), hsl(217.2 32.6% 15% / 0.4));
-    
-    /* Glass Effects Dark */
-    --glass-primary: hsla(213, 94%, 78%, 0.1);
-    --glass-white: hsla(217.2, 32.6%, 17.5%, 0.8);
-    --glass-border: hsla(213, 94%, 78%, 0.2);
-    
-    /* Shadows Dark */
-    --shadow-elegant: 0 10px 30px -10px hsl(213 94% 78% / 0.3);
-    --shadow-glow: 0 0 40px hsl(213 94% 88% / 0.4);
-    --shadow-card: 0 4px 20px -2px hsl(213 94% 78% / 0.1);
-    --shadow-premium: 0 20px 60px -10px hsl(213 94% 78% / 0.2);
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 224 76% 48%;
   }
 }
 
@@ -184,122 +117,79 @@
     ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0;
 }
 
-/* Premium Design System Classes */
-.glass-card {
-  @apply rounded-xl border border-glass-border bg-glass-white backdrop-blur-md shadow-card;
-}
-
-.glass-hero {
-  @apply rounded-2xl border border-glass-border bg-glass-primary backdrop-blur-lg;
+/* Original Classes */
+.form-card {
+  @apply bg-white/80 dark:bg-medical-bg-secondary/80 
+    backdrop-blur-xl border border-black/5 dark:border-medical-text-secondary/10
+    shadow-lg rounded-2xl transition-all duration-300;
 }
 
 .premium-button {
-  @apply relative overflow-hidden rounded-lg bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-elegant transition-all duration-300 hover:shadow-glow hover:scale-105 active:scale-95;
+  @apply bg-gradient-medical text-white font-medium px-6 py-3 rounded-lg
+    hover:shadow-lg transition-all duration-300 sticky bottom-6 z-50 w-full;
 }
 
-.accent-button {
-  @apply relative overflow-hidden rounded-lg bg-gradient-to-r from-accent to-accent-glow text-accent-foreground shadow-elegant transition-all duration-300 hover:shadow-glow hover:scale-105;
+.form-label {
+  @apply text-sm font-medium text-gray-700 dark:text-medical-text-secondary;
 }
 
-.hero-gradient {
-  background: var(--gradient-hero);
+.input-field {
+  @apply bg-white/90 dark:bg-medical-bg/80 
+    border border-gray-200 dark:border-medical-text-secondary/20 
+    rounded-lg px-4 py-2 w-full 
+    focus:ring-2 focus:ring-medical-primary/20 
+    focus:border-medical-primary/40 
+    text-gray-900 dark:text-medical-text
+    placeholder:text-gray-400 dark:placeholder:text-medical-text-secondary/50;
 }
 
-.card-premium {
-  @apply glass-card transition-all duration-300 hover:shadow-premium hover:-translate-y-1;
+.standard-card {
+  @apply bg-white/80 dark:bg-medical-bg-secondary/50
+    backdrop-blur-xl border border-black/5 dark:border-medical-text-secondary/10
+    shadow-lg rounded-2xl transition-all duration-300;
 }
 
-.text-gradient {
-  @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
-}
-
-.feature-icon {
-  @apply p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 shadow-card;
-}
-
-/* Advanced Animation Classes */
 .animate-fade-in {
-  animation: fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-scale-in {
-  animation: scale-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: scaleIn 0.3s ease-out;
 }
 
-.animate-slide-in-up {
-  animation: slide-in-up 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-/* Hover effects */
-.hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-premium;
-}
-
-.hover-glow {
-  @apply transition-all duration-300 hover:shadow-glow;
-}
-
-/* Stagger animation delays */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-
-@keyframes fade-in {
-  "0%" {
+@keyframes scaleIn {
+  from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.95);
   }
-  "100%" {
+  to {
     opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scale-in {
-  "0%" {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  "100%" {
     transform: scale(1);
-    opacity: 1;
   }
 }
 
-@keyframes slide-in-up {
-  "0%" {
-    transform: translateY(40px);
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
     opacity: 0;
+    transform: translateX(20px);
   }
-  "100%" {
-    transform: translateY(0);
+  to {
     opacity: 1;
-  }
-}
-
-@keyframes float {
-  "0%, 100%" {
-    transform: translateY(0px);
-  }
-  "50%" {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes glow {
-  "0%" {
-    filter: brightness(1) blur(0px);
-  }
-  "100%" {
-    filter: brightness(1.2) blur(1px);
+    transform: translateX(0);
   }
 }
