@@ -5,45 +5,26 @@
  
 @layer base {
   :root {
-    /* iOS Light Mode Colors */
-    --background: 220 100% 99%;
-    --foreground: 220 12% 18%;
-    --card: 220 100% 98%;
-    --card-foreground: 220 12% 18%;
-    --popover: 220 100% 99%;
-    --popover-foreground: 220 12% 18%;
-    --primary: 213 100% 55%; /* iOS Blue #007AFF */
-    --primary-foreground: 220 100% 99%;
-    --secondary: 220 6% 95%;
-    --secondary-foreground: 220 12% 35%;
-    --muted: 220 6% 96%;
-    --muted-foreground: 220 8% 46%;
-    --accent: 32 100% 50%; /* iOS Orange */
-    --accent-foreground: 220 100% 99%;
-    --destructive: 6 100% 55%; /* iOS Red */
-    --destructive-foreground: 220 100% 99%;
-    --border: 220 13% 91%;
-    --input: 220 100% 99%;
-    --ring: 213 100% 55%;
-    --radius: 1rem;
-
-    /* iOS Design System Colors */
-    --ios-blue: 213 100% 55%;
-    --ios-green: 149 100% 40%;
-    --ios-orange: 32 100% 50%;
-    --ios-red: 6 100% 55%;
-    --ios-purple: 273 100% 55%;
-    --ios-gray: 220 8% 46%;
-    
-    /* Glass Effects */
-    --glass-bg: 220 100% 99% / 0.8;
-    --glass-border: 220 100% 99% / 0.2;
-    --glass-shadow: 220 50% 20% / 0.1;
-    
-    /* Gradients */
-    --gradient-ios-blue: linear-gradient(135deg, hsl(213 100% 55%), hsl(213 100% 65%));
-    --gradient-ios-purple: linear-gradient(135deg, hsl(273 100% 55%), hsl(273 100% 65%));
-    --gradient-glass: linear-gradient(135deg, hsl(220 100% 99% / 0.8), hsl(220 100% 99% / 0.4));
+    --background: 222 47% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 210 100% 50%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 210 100% 50%;
+    --radius: 0.75rem;
   }
  
   .dark {
@@ -94,33 +75,6 @@
 .ios-blur-background {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-}
-
-/* iOS Glassmorphism */
-.glass-card {
-  @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl 
-    border border-white/20 dark:border-gray-700/30 
-    shadow-2xl shadow-black/5 rounded-2xl;
-}
-
-.glass-hero {
-  @apply bg-gradient-to-br from-white/60 via-white/40 to-white/20 
-    dark:from-gray-900/60 dark:via-gray-900/40 dark:to-gray-900/20
-    backdrop-blur-3xl border border-white/30 dark:border-gray-700/30
-    shadow-2xl shadow-black/10 rounded-3xl;
-}
-
-.glass-button {
-  @apply bg-white/20 dark:bg-gray-900/20 backdrop-blur-xl 
-    border border-white/30 dark:border-gray-700/30 
-    hover:bg-white/30 dark:hover:bg-gray-900/30
-    transition-all duration-200 rounded-xl;
-}
-
-.glass-nav {
-  @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl 
-    border-b border-white/20 dark:border-gray-700/30 
-    shadow-lg shadow-black/5;
 }
 
 .ios-input {

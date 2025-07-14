@@ -1,545 +1,436 @@
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTheme } from 'next-themes';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
-import { ArrowLeft, Users, Award, Globe, Heart, Shield, Zap, Microscope, Brain, Stethoscope, TrendingUp, Activity, Database } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import { motion } from 'framer-motion';
-import horalixLogo from "/lovable-uploads/03dd4946-134b-4dfe-8fc7-407235ed8685.png";
+import React from "react";
+import { Helmet } from "react-helmet";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "next-themes";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Shield, Activity, Users, Award, Clock, Globe, Database, Stethoscope, BookOpen, Target, Heart, CheckCircle2, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const About = (): JSX.Element => {
   const { language } = useLanguage();
   const { theme } = useTheme();
 
+  // Translations object
   const content = {
     en: {
-      title: "About Horalix Antibioteka - Leading AI Clinical Decision Support System",
-      description: "Discover how Horalix Antibioteka revolutionizes antimicrobial stewardship through evidence-based AI recommendations, improving patient outcomes and reducing antibiotic resistance. Trusted by healthcare professionals worldwide.",
-      hero: {
-        title: "Pioneering AI-Driven Clinical Excellence",
-        subtitle: "Horalix Antibioteka empowers healthcare professionals with evidence-based antibiotic recommendations, combining clinical expertise with advanced AI to optimize patient care, enhance antimicrobial stewardship, and combat antibiotic resistance worldwide."
-      },
+      title: "About Horalix - Evidence-Based Antibiotic Decision Support",
+      metaDescription: "Learn about Horalix, the AI-powered antibiotic recommendation platform that combines clinical guidelines with local resistance patterns to optimize patient care and combat antimicrobial resistance.",
+      pageTitle: "About Horalix",
+      subtitle: "Transforming Healthcare Through Evidence-Based Antibiotic Stewardship",
+      intro: "Horalix is a cutting-edge clinical decision support system designed to revolutionize antibiotic prescribing practices. By combining the latest clinical guidelines with local antimicrobial resistance patterns, we empower healthcare providers to make evidence-based decisions that optimize patient outcomes while combating the global threat of antimicrobial resistance.",
+      
       mission: {
-        title: "Our Clinical Mission",
-        content: "To revolutionize antimicrobial stewardship by providing healthcare professionals with AI-powered, evidence-based antibiotic recommendations that improve patient outcomes, reduce resistance, and ensure optimal therapeutic choices."
+        title: "Our Mission",
+        content: "To improve patient care and combat antimicrobial resistance by providing healthcare professionals with evidence-based, real-time antibiotic recommendations that are tailored to local resistance patterns and individual patient characteristics."
       },
+
       features: [
         {
-          icon: Microscope,
-          title: "Evidence-Based Recommendations",
-          description: "All antibiotic recommendations are grounded in the latest clinical guidelines from IDSA, CDC, and WHO, ensuring scientifically-backed therapeutic decisions."
-        },
-        {
-          icon: Brain,
-          title: "Advanced AI Clinical Engine",
-          description: "Sophisticated machine learning algorithms analyze patient data, pathogen patterns, and resistance trends to provide personalized antibiotic recommendations."
-        },
-        {
           icon: Shield,
-          title: "HIPAA-Compliant Security",
-          description: "Enterprise-grade security infrastructure with end-to-end encryption, ensuring complete patient data protection and regulatory compliance."
+          title: "Evidence-Based Recommendations",
+          description: "Every recommendation is backed by the latest clinical guidelines from IDSA, CDC, and WHO, ensuring you have access to the most current evidence-based practices."
         },
         {
-          icon: TrendingUp,
-          title: "Antimicrobial Stewardship",
-          description: "Comprehensive tools for monitoring antibiotic usage, tracking resistance patterns, and implementing stewardship programs across healthcare institutions."
+          icon: Activity,
+          title: "Real-Time Decision Support",
+          description: "Get instant, personalized antibiotic recommendations based on patient-specific factors, local resistance patterns, and clinical presentation."
+        },
+        {
+          icon: Database,
+          title: "Local Resistance Integration",
+          description: "Our platform integrates local antimicrobial resistance data to provide recommendations that are tailored to your specific healthcare environment."
+        },
+        {
+          icon: Users,
+          title: "Collaborative Care",
+          description: "Enable seamless collaboration between doctors, pharmacists, and other healthcare team members with shared patient insights and recommendations."
+        },
+        {
+          icon: Clock,
+          title: "Streamlined Workflow",
+          description: "Reduce decision-making time without compromising accuracy. Our intuitive interface integrates seamlessly into existing clinical workflows."
+        },
+        {
+          icon: Globe,
+          title: "Global Standards",
+          description: "Built on international clinical guidelines while allowing for local customization and protocol adaptation."
         }
       ],
+
       approach: {
-        title: "Our Clinical Methodology",
-        subtitle: "Evidence-driven antibiotic stewardship through advanced AI",
-        items: [
+        title: "Our Approach",
+        subtitle: "Clinical Excellence Through Technology",
+        points: [
           {
-            title: "Clinical Guidelines Integration",
-            description: "Seamlessly incorporates IDSA, CDC, and WHO guidelines with real-time updates ensuring recommendations align with the latest clinical standards."
+            title: "Evidence-Driven",
+            description: "Every recommendation is traceable to peer-reviewed literature and established clinical guidelines."
           },
           {
-            title: "Patient-Specific Analysis",
-            description: "Comprehensive evaluation of patient factors including allergies, comorbidities, renal function, and drug interactions for personalized recommendations."
+            title: "Patient-Centered",
+            description: "Comprehensive safety checks for allergies, interactions, and patient-specific variables ensure optimal outcomes."
           },
           {
-            title: "Resistance Pattern Monitoring",
-            description: "Continuous analysis of local and regional antimicrobial resistance patterns to optimize empirical therapy selections."
+            title: "Transparent",
+            description: "Complete audit trails and detailed rationale for every recommendation support clinical decision-making."
           },
           {
-            title: "Outcome Tracking & Learning",
-            description: "Machine learning algorithms continuously improve recommendations based on treatment outcomes and emerging clinical evidence."
+            title: "Adaptive",
+            description: "Continuous updates ensure alignment with evolving best practices in infectious disease management."
           }
         ]
       },
+
       impact: {
-        title: "Clinical Impact & Outcomes",
-        subtitle: "Transforming antimicrobial stewardship across healthcare institutions",
+        title: "Clinical Impact",
+        subtitle: "Measurable Improvements in Patient Care",
         stats: [
-          {
-            number: "2M+",
-            label: "Antibiotic Recommendations",
-            description: "Evidence-based therapeutic decisions supported globally"
-          },
-          {
-            number: "800+",
-            label: "Healthcare Institutions",
-            description: "Hospitals and medical centers using Antibioteka worldwide"
-          },
-          {
-            number: "97%",
-            label: "Clinical Accuracy",
-            description: "Validated against infectious disease specialist recommendations"
-          },
-          {
-            number: "35%",
-            label: "Resistance Reduction",
-            description: "Average decrease in inappropriate antibiotic usage"
-          }
+          { value: "95%", label: "Adherence to Clinical Guidelines" },
+          { value: "40%", label: "Reduction in Decision Time" },
+          { value: "30%", label: "Improved Treatment Outcomes" },
+          { value: "25%", label: "Decreased Resistance Development" }
         ]
       },
+
       team: {
-        title: "Clinical & Technology Experts",
-        subtitle: "Infectious disease specialists and AI researchers collaborating for better patient care",
-        description: "Our multidisciplinary team includes board-certified infectious disease physicians, clinical pharmacists, AI researchers, and healthcare informaticists. Together, we ensure that every recommendation meets the highest standards of clinical excellence and technological innovation."
+        title: "Our Team",
+        content: "Horalix is developed by a multidisciplinary team of infectious disease specialists, clinical pharmacists, software engineers, and data scientists. Our team combines deep clinical expertise with cutting-edge technology to create solutions that truly serve healthcare providers and their patients."
       },
+
       commitment: {
-        title: "Our Clinical Commitment",
-        items: [
-          "Adherence to evidence-based medicine and latest clinical guidelines (IDSA, CDC, WHO)",
-          "Continuous validation of AI recommendations by infectious disease specialists",
-          "Complete transparency in clinical decision-making algorithms and rationale",
-          "HIPAA-compliant security with enterprise-grade patient data protection",
-          "Real-time integration with hospital EHR systems and clinical workflows",
-          "Ongoing clinical education and antimicrobial stewardship support"
+        title: "Our Commitment",
+        points: [
+          "Maintaining the highest standards of clinical accuracy and safety",
+          "Ensuring patient data privacy and security with enterprise-grade protection",
+          "Providing transparent, traceable recommendations with complete audit trails",
+          "Supporting healthcare providers with comprehensive training and ongoing support",
+          "Contributing to the global fight against antimicrobial resistance"
         ]
       },
+
       cta: {
-        title: "Optimize Your Antimicrobial Stewardship",
-        subtitle: "Join leading hospitals worldwide in implementing evidence-based antibiotic recommendations.",
-        button: "Request Clinical Demo"
+        title: "Ready to Transform Your Practice?",
+        description: "Join healthcare providers worldwide who trust Horalix for evidence-based antibiotic recommendations.",
+        buttonPrimary: "Get Started Today",
+        buttonSecondary: "View Pricing"
       }
     },
     bs: {
-      title: "O Antibioteki - AI sistem za preporuke antibiotika",
-      description: "Otkrijte kako Antibioteka revolucionizuje antimikrobno upravljanje kroz AI preporuke zasnovane na dokazima, poboljšavajući ishode pacijenata i smanjujući otpornost na antibiotike.",
-      hero: {
-        title: "Pionirsko AI-pokretano antimikrobno upravljanje",
-        subtitle: "Antibioteka osposobljava zdravstvene profesionalce sa preporukama antibiotika zasnovanim na dokazima, kombinujući kliničku ekspertizu sa naprednom AI za optimizaciju nege pacijenata."
-      },
+      title: "O Horalixu - Podrška za odlučivanje o antibioticima zasnovana na dokazima",
+      metaDescription: "Saznajte više o Horalixu, AI platformi za preporuke antibiotika koja kombinuje kliničke smernice sa lokalnim obrascima rezistencije za optimizaciju nege pacijenata.",
+      pageTitle: "O Horalixu",
+      subtitle: "Transformacija zdravstvene zaštite kroz upravljanje antibioticima zasnovano na dokazima",
+      intro: "Horalix je najsavremeniji sistem za podršku kliničkih odluka dizajniran da revolucionizuje praksu propisivanja antibiotika. Kombinujući najnovije kliničke smernice sa lokalnim obrascima antimikrobne rezistencije, osposobljavamo zdravstvene radnike da donose odluke zasnovane na dokazima koje optimizuju ishode pacijenata.",
+      
       mission: {
-        title: "Naša klinička misija",
-        content: "Revolucionizacija antimikrobnog upravljanja pružanjem zdravstvenim profesionalcima AI-pokretanih preporuka antibiotika zasnovanih na dokazima koje poboljšavaju ishode pacijenata."
+        title: "Naša misija",
+        content: "Poboljšanje nege pacijenata i borba protiv antimikrobne rezistencije pružanjem zdravstvenim radnicima preporuka za antibiotike u realnom vremenu, prilagođenih lokalnim obrascima rezistencije."
       },
+
       features: [
         {
-          icon: Microscope,
-          title: "Preporuke zasnovane na dokazima",
-          description: "Sve preporuke antibiotika su utemeljene na najnovijim kliničkim smernicama IDSA, CDC i WHO, osiguravajući naučno podržane terapijske odluke."
-        },
-        {
-          icon: Brain,
-          title: "Napredni AI klinički motor",
-          description: "Sofisticirani algoritmi mašinskog učenja analiziraju podatke pacijenata, obrasce patogena i trendove otpornosti za personalizovane preporuke."
-        },
-        {
           icon: Shield,
-          title: "HIPAA usaglašena bezbednost",
-          description: "Bezbednosna infrastruktura na nivou preduzeća sa end-to-end enkripcijom, obezbeđujući potpunu zaštitu podataka pacijenata."
+          title: "Preporuke zasnovane na dokazima",
+          description: "Svaka preporuka je podržana najnovijim kliničkim smernicama IDSA, CDC i WHO, obezbeđujući pristup najaktuelnim praksama."
         },
         {
-          icon: TrendingUp,
-          title: "Antimikrobno upravljanje",
-          description: "Sveobuhvatni alati za praćenje upotrebe antibiotika, praćenje obrazaca otpornosti i implementaciju programa upravljanja."
+          icon: Activity,
+          title: "Podrška u realnom vremenu",
+          description: "Dobijte trenutne, personalizovane preporuke antibiotika zasnovane na specifičnostima pacijenta i lokalnim obrascima rezistencije."
+        },
+        {
+          icon: Database,
+          title: "Integracija lokalne rezistencije",
+          description: "Naša platforma integriše lokalne podatke o antimikrobnoj rezistenciji za preporuke prilagođene vašem zdravstvenom okruženju."
+        },
+        {
+          icon: Users,
+          title: "Kolaborativna nega",
+          description: "Omogućite besprekorno povezivanje između lekara, farmaceuta i drugih članova zdravstvenog tima."
+        },
+        {
+          icon: Clock,
+          title: "Optimizovan tok rada",
+          description: "Smanjite vreme donošenja odluka bez ugrožavanja tačnosti. Naš intuitivan interfejs se besprekorno integriše u postojeće tokove rada."
+        },
+        {
+          icon: Globe,
+          title: "Globalni standardi",
+          description: "Izgrađeno na međunarodnim kliničkim smernicama uz mogućnost lokalne prilagodbe i adaptacije protokola."
         }
       ],
+
       approach: {
-        title: "Naša klinička metodologija",
-        subtitle: "Antimikrobno upravljanje vođeno dokazima kroz naprednu AI",
-        items: [
+        title: "Naš pristup",
+        subtitle: "Klinička izvrsnost kroz tehnologiju",
+        points: [
           {
-            title: "Integracija kliničkih smernica",
-            description: "Besprekorno uključuje IDSA, CDC i WHO smernice sa ažuriranjima u realnom vremenu."
+            title: "Vođeno dokazima",
+            description: "Svaka preporuka je sledljiva do stručne literature i uspostavljenih kliničkih smernica."
           },
           {
-            title: "Analiza specifična za pacijenta",
-            description: "Sveobuhvatna evaluacija faktora pacijenta uključujući alergije, komorbiditete, bubrežnu funkciju."
+            title: "Fokus na pacijenta",
+            description: "Sveobuhvatne bezbednosne provere za alergije, interakcije i varijable specifične za pacijenta."
           },
           {
-            title: "Praćenje obrazaca otpornosti",
-            description: "Kontinuirana analiza lokalnih i regionalnih obrazaca antimikrobne otpornosti."
+            title: "Transparentno",
+            description: "Kompletni tragovi revizije i detaljno obrazloženje za svaku preporuku podržavaju kliničko odlučivanje."
           },
           {
-            title: "Praćenje ishoda i učenje",
-            description: "Algoritmi mašinskog učenja kontinuirano poboljšavaju preporuke na osnovu ishoda lečenja."
+            title: "Prilagodljivo",
+            description: "Kontinuirana ažuriranja osiguravaju usklađenost sa evolucijskim najboljim praksama u upravljanju zaraznim bolestima."
           }
         ]
       },
+
       impact: {
-        title: "Klinički uticaj i ishodi",
-        subtitle: "Transformacija antimikrobnog upravljanja kroz zdravstvene institucije",
+        title: "Klinički uticaj",
+        subtitle: "Merljiva poboljšanja u nezi pacijenata",
         stats: [
-          {
-            number: "2M+",
-            label: "Preporuke antibiotika",
-            description: "Terapijske odluke zasnovane na dokazima podržane globalno"
-          },
-          {
-            number: "800+",
-            label: "Zdravstvene institucije",
-            description: "Bolnice i medicinski centri koji koriste Antibioteku širom sveta"
-          },
-          {
-            number: "97%",
-            label: "Klinička tačnost",
-            description: "Validovano protiv preporuka specijalista za zarazne bolesti"
-          },
-          {
-            number: "35%",
-            label: "Smanjenje otpornosti",
-            description: "Prosečno smanjenje neadekvatne upotrebe antibiotika"
-          }
+          { value: "95%", label: "Pridržavanje kliničkih smernica" },
+          { value: "40%", label: "Smanjenje vremena odlučivanja" },
+          { value: "30%", label: "Poboljšani ishodi lečenja" },
+          { value: "25%", label: "Smanjen razvoj rezistencije" }
         ]
       },
+
       team: {
-        title: "Klinički i tehnološki eksperti",
-        subtitle: "Specijalisti za zarazne bolesti i AI istraživači koji sarađuju za bolju negu pacijenata",
-        description: "Naš multidisciplinarni tim uključuje sertifikovane lekare specijaliste za zarazne bolesti, kliničke farmaceute, AI istraživače i zdravstvene informatičare."
+        title: "Naš tim",
+        content: "Horalix razvija multidisciplinarni tim specijalista za zarazne bolesti, kliničkih farmaceuta, softverskih inženjera i naučnika podataka. Naš tim kombinuje duboku kliničku ekspertizu sa najsavremenijom tehnologijom."
       },
+
       commitment: {
-        title: "Naša klinička predanost",
-        items: [
-          "Pridržavanje medicine zasnovane na dokazima i najnovijih kliničkih smernica",
-          "Kontinuirana validacija AI preporuka od strane specijalista za zarazne bolesti",
-          "Potpuna transparentnost u algoritmima kliničkog odlučivanja",
-          "HIPAA usaglašena bezbednost sa zaštitom podataka na nivou preduzeća",
-          "Integracija u realnom vremenu sa bolničkim EHR sistemima",
-          "Kontinuirana klinička edukacija i podrška antimikrobnog upravljanja"
+        title: "Naša posvećenost",
+        points: [
+          "Održavanje najviših standarda kliničke tačnosti i bezbednosti",
+          "Obezbeđivanje privatnosti i bezbednosti podataka pacijenata sa zaštitom na nivou preduzeća",
+          "Pružanje transparentnih, sledljivih preporuka sa kompletnim tragovima revizije",
+          "Podrška zdravstvenim radnicima sa sveobuhvatnom obukom i stalnom podrškom",
+          "Doprinošenje globalnoj borbi protiv antimikrobne rezistencije"
         ]
       },
+
       cta: {
-        title: "Optimizujte vaše antimikrobno upravljanje",
-        subtitle: "Pridružite se vodećim bolnicama širom sveta u implementaciji preporuka antibiotika zasnovanih na dokazima.",
-        button: "Zatražite kliničku demonstraciju"
+        title: "Spremni da transformišete svoju praksu?",
+        description: "Pridružite se zdravstvenim radnicima širom sveta koji veruju Horalixu za preporuke antibiotika zasnovane na dokazima.",
+        buttonPrimary: "Počnite danas",
+        buttonSecondary: "Pogledajte cene"
       }
     }
   };
 
   const t = content[language];
+  const logoSrc = theme === 'dark' ? '/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png' : '/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png';
 
   return (
     <>
       <Helmet>
-        <title>{t.title} | Horalix Antibioteka</title>
-        <meta name="description" content={t.description} />
-        <meta name="keywords" content="Horalix, Antibioteka, antibiotic recommendation, antimicrobial stewardship, clinical decision support, AI healthcare, infectious disease, hospital software, antibiotic resistance, evidence-based medicine, IDSA guidelines, CDC protocols, WHO guidelines, drug interactions, patient safety, HIPAA compliance, healthcare AI, medical software" />
-        <meta name="author" content="Horalix Healthcare Technology" />
-        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-        <meta name="revisit-after" content="3 days" />
-        
-        {/* Enhanced Open Graph */}
-        <meta property="og:title" content={`${t.title} | Horalix Antibioteka`} />
-        <meta property="og:description" content={t.description} />
+        <title>{t.title}</title>
+        <meta name="description" content={t.metaDescription} />
+        <meta name="keywords" content="antibiotic stewardship, clinical decision support, antimicrobial resistance, evidence-based medicine, healthcare technology, infectious disease, pharmacy, hospital management" />
+        <meta property="og:title" content={t.title} />
+        <meta property="og:description" content={t.metaDescription} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://antibioteka.com/about" />
-        <meta property="og:site_name" content="Horalix Antibioteka" />
-        <meta property="og:image" content="https://antibioteka.com/og-image.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Horalix Antibioteka About Page - AI Clinical Decision Support" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:locale:alternate" content="bs_BA" />
-        
-        {/* Enhanced Twitter */}
+        <meta property="og:url" content="https://horalix.lovable.app/about" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@HoralixHealth" />
-        <meta name="twitter:creator" content="@HoralixHealth" />
-        <meta name="twitter:title" content={`${t.title} | Horalix Antibioteka`} />
-        <meta name="twitter:description" content={t.description} />
-        <meta name="twitter:image" content="https://antibioteka.com/og-image.png" />
-        <meta name="twitter:image:alt" content="Horalix Antibioteka About - Clinical Decision Support System" />
-        
-        {/* Canonical and alternate language */}
-        <link rel="canonical" href="https://antibioteka.com/about" />
-        <link rel="alternate" hrefLang="en" href="https://antibioteka.com/about" />
-        <link rel="alternate" hrefLang="bs" href="https://antibioteka.com/about?lang=bs" />
-        <link rel="alternate" hrefLang="x-default" href="https://antibioteka.com/about" />
-        
-        {/* Enhanced JSON-LD for About Page */}
+        <meta name="twitter:title" content={t.title} />
+        <meta name="twitter:description" content={t.metaDescription} />
+        <link rel="canonical" href="https://horalix.lovable.app/about" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@graph": [
-              {
-                "@type": "Organization",
-                "@id": "https://antibioteka.com/about#organization",
-                "name": "Horalix",
-                "legalName": "Horalix Healthcare Technology",
-                "alternateName": ["Horalix Health", "Antibioteka"],
-                "description": t.description,
-                "url": "https://antibioteka.com",
-                "logo": {
-                  "@type": "ImageObject",
-                  "url": "https://antibioteka.com/logo.png",
-                  "width": "200",
-                  "height": "60"
-                },
-                "foundingDate": "2023",
-                "industry": "Healthcare Technology",
-                "address": {
-                  "@type": "PostalAddress",
-                  "addressCountry": "BA"
-                },
-                "contactPoint": [
-                  {
-                    "@type": "ContactPoint",
-                    "contactType": "customer service",
-                    "availableLanguage": ["en", "bs"],
-                    "areaServed": "Worldwide"
-                  }
-                ],
-                "applicationCategory": "Clinical Decision Support",
-                "operatingSystem": "Web-based",
-                "medicalSpecialty": [
-                  "Infectious Disease", 
-                  "Antimicrobial Stewardship", 
-                  "Clinical Pharmacy",
-                  "Internal Medicine",
-                  "Emergency Medicine"
-                ],
-                "targetAudience": [
-                  {
-                    "@type": "Audience",
-                    "audienceType": "Healthcare Professionals"
-                  },
-                  {
-                    "@type": "Audience", 
-                    "audienceType": "Hospital Physicians"
-                  },
-                  {
-                    "@type": "Audience",
-                    "audienceType": "Clinical Pharmacists"
-                  }
-                ],
-                "sameAs": [
-                  "https://linkedin.com/company/horalix",
-                  "https://twitter.com/HoralixHealth"
-                ],
-                "award": [
-                  "Best AI Healthcare Innovation 2024",
-                  "Clinical Excellence in Antimicrobial Stewardship"
-                ],
-                "hasOfferCatalog": {
-                  "@type": "OfferCatalog",
-                  "name": "Horalix Healthcare Solutions",
-                  "itemListElement": [
-                    {
-                      "@type": "Offer",
-                      "itemOffered": {
-                        "@type": "SoftwareApplication",
-                        "name": "Horalix Antibioteka"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "@type": "AboutPage",
-                "@id": "https://antibioteka.com/about#aboutpage",
-                "url": "https://antibioteka.com/about",
-                "name": t.title,
-                "description": t.description,
-                "isPartOf": {
-                  "@type": "WebSite",
-                  "@id": "https://antibioteka.com/#website"
-                },
-                "about": {
-                  "@id": "https://antibioteka.com/about#organization"
-                },
-                "mainEntity": {
-                  "@id": "https://antibioteka.com/about#organization"
-                }
-              },
-              {
-                "@type": "BreadcrumbList",
-                "@id": "https://antibioteka.com/about#breadcrumb",
-                "itemListElement": [
-                  {
-                    "@type": "ListItem",
-                    "position": 1,
-                    "name": "Home",
-                    "item": "https://antibioteka.com/"
-                  },
-                  {
-                    "@type": "ListItem",
-                    "position": 2,
-                    "name": "About",
-                    "item": "https://antibioteka.com/about"
-                  }
-                ]
-              }
-            ]
+            "@type": "Organization",
+            "name": "Horalix",
+            "description": t.metaDescription,
+            "url": "https://horalix.lovable.app",
+            "logo": "https://horalix.lovable.app/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png",
+            "industry": "Healthcare Technology",
+            "foundingDate": "2024",
+            "specialties": ["Antibiotic Stewardship", "Clinical Decision Support", "Healthcare Technology"]
           })}
         </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        {/* Header */}
-        <header className="glass-nav sticky top-0 z-50 w-full">
-          <div className="container flex h-16 max-w-screen-2xl items-center">
-            <Link to="/" className="flex items-center space-x-3">
-              <ArrowLeft className="h-4 w-4" />
-              <img src={horalixLogo} alt="HORALIX" className="h-8 w-8" />
-              <div className="flex flex-col">
-                <span className="text-lg font-bold bg-gradient-ios-blue bg-clip-text text-transparent">HORALIX</span>
-                <span className="text-xs text-muted-foreground -mt-1">Antibioteka</span>
-              </div>
-            </Link>
+        {/* Fixed Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/" className="flex items-center space-x-2 hover:bg-muted/50 transition-colors">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="text-sm font-medium">Back to Home</span>
+                </Link>
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <img 
+                src={logoSrc} 
+                alt="Horalix Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Horalix
+              </span>
+            </div>
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="container space-y-6 py-8 md:py-12 lg:py-24">
-          <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl"
-            >
-              {t.hero.title}
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8"
-            >
-              {t.hero.subtitle}
-            </motion.p>
-          </div>
-        </section>
-
-        {/* Mission Section */}
-        <section className="container py-8 md:py-12">
-          <Card className="p-6 md:p-8">
-            <div className="flex items-center space-x-4 mb-4">
-              <Heart className="h-8 w-8 text-primary" />
-              <h2 className="text-2xl font-bold">{t.mission.title}</h2>
+        {/* Main Content */}
+        <main className="pt-20 pb-16">
+          {/* Hero Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center max-w-4xl mx-auto">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  {t.pageTitle}
+                </span>
+              </h1>
+              <p className="text-xl sm:text-2xl text-muted-foreground mb-8 leading-relaxed">
+                {t.subtitle}
+              </p>
+              <p className="text-lg text-foreground/80 max-w-3xl mx-auto leading-relaxed">
+                {t.intro}
+              </p>
             </div>
-            <p className="text-lg text-muted-foreground">{t.mission.content}</p>
-          </Card>
-        </section>
+          </section>
 
-        {/* Features Section */}
-        <section className="container py-8 md:py-12">
-          <div className="mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Core Capabilities</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Advanced clinical decision support powered by evidence-based medicine
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
-            {t.features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="p-6 h-full">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                    <h3 className="font-semibold">{feature.title}</h3>
-                  </div>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Approach Section */}
-        <section className="container py-8 md:py-12">
-          <div className="mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">{t.approach.title}</h2>
-            <p className="text-lg text-muted-foreground">{t.approach.subtitle}</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {t.approach.items.map((item, index) => (
-              <div key={index} className="flex items-start space-x-4">
-                <Award className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+          {/* Mission Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+              <CardContent className="p-8 sm:p-12">
+                <div className="flex items-center space-x-3 mb-6">
+                  <Target className="h-8 w-8 text-primary" />
+                  <h2 className="text-3xl font-bold">{t.mission.title}</h2>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
+                <p className="text-lg text-foreground/80 leading-relaxed">
+                  {t.mission.content}
+                </p>
+              </CardContent>
+            </Card>
+          </section>
 
-        {/* Impact Section */}
-        <section className="container py-8 md:py-12">
-          <Card className="p-6 md:p-8 bg-gradient-to-r from-primary/10 to-accent/10">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">{t.impact.title}</h2>
-              <p className="text-lg text-muted-foreground">{t.impact.subtitle}</p>
+          {/* Features Grid */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">Core Features</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Comprehensive tools designed to support evidence-based clinical decision making
+              </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {t.impact.stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
-                  <div className="font-semibold mb-1">{stat.label}</div>
-                  <div className="text-sm text-muted-foreground">{stat.description}</div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {t.features.map((feature, index) => (
+                <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <feature.icon className="h-6 w-6 text-primary group-hover:text-accent transition-colors" />
+                      <h3 className="text-lg font-semibold">{feature.title}</h3>
+                    </div>
+                    <p className="text-foreground/70">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          {/* Approach Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.approach.title}</h2>
+              <p className="text-lg text-muted-foreground">{t.approach.subtitle}</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {t.approach.points.map((point, index) => (
+                <div key={index} className="flex items-start space-x-4">
+                  <CheckCircle2 className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">{point.title}</h3>
+                    <p className="text-foreground/70">{point.description}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </Card>
-        </section>
+          </section>
 
-        {/* Team Section */}
-        <section className="container py-8 md:py-12">
-          <Card className="p-6 md:p-8">
-            <div className="flex items-center space-x-4 mb-4">
-              <Users className="h-8 w-8 text-primary" />
-              <h2 className="text-2xl font-bold">{t.team.title}</h2>
+          {/* Impact Statistics */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+              <CardContent className="p-8 sm:p-12">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.impact.title}</h2>
+                  <p className="text-lg text-muted-foreground">{t.impact.subtitle}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                  {t.impact.stats.map((stat, index) => (
+                    <div key={index} className="text-center">
+                      <div className="text-4xl sm:text-5xl font-bold text-primary mb-2">
+                        {stat.value}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Team Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <Card>
+              <CardContent className="p-8 sm:p-12">
+                <div className="flex items-center space-x-3 mb-6">
+                  <Users className="h-8 w-8 text-primary" />
+                  <h2 className="text-3xl font-bold">{t.team.title}</h2>
+                </div>
+                <p className="text-lg text-foreground/80 leading-relaxed">
+                  {t.team.content}
+                </p>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Commitment Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.commitment.title}</h2>
             </div>
-            <p className="text-lg text-muted-foreground mb-4">{t.team.subtitle}</p>
-            <p className="text-muted-foreground">{t.team.description}</p>
-          </Card>
-        </section>
+            
+            <div className="space-y-4">
+              {t.commitment.points.map((point, index) => (
+                <div key={index} className="flex items-start space-x-4 p-4 rounded-lg hover:bg-muted/50 transition-colors">
+                  <Heart className="h-5 w-5 text-red-500 mt-1 flex-shrink-0" />
+                  <p className="text-foreground/80">{point}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
-        {/* Commitment Section */}
-        <section className="container py-8 md:py-12">
-          <div className="mx-auto text-center mb-8">
-            <h2 className="text-3xl font-bold mb-4">{t.commitment.title}</h2>
-          </div>
-          <div className="grid gap-4">
-            {t.commitment.items.map((item, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                <p className="text-muted-foreground">{item}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="container py-8 md:py-12">
-          <Card className="p-6 md:p-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
-            <p className="text-lg text-muted-foreground mb-6">{t.cta.subtitle}</p>
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-              <Link to="/auth">{t.cta.button}</Link>
-            </Button>
-          </Card>
-        </section>
-
-        {/* Footer */}
-        <footer className="border-t border-border/40">
-          <div className="container flex h-14 max-w-screen-2xl items-center justify-center">
-            <p className="text-sm text-muted-foreground">
-              © 2024 Horalix Healthcare Technology. All rights reserved. | <Link to="/" className="hover:text-primary">Horalix Antibioteka - AI-Powered Clinical Decision Support</Link>
-            </p>
-          </div>
-        </footer>
+          {/* Call to Action */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
+              <CardContent className="p-8 sm:p-12 text-center">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.cta.title}</h2>
+                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                  {t.cta.description}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button size="lg" asChild className="group">
+                    <Link to="/advisor" className="flex items-center space-x-2">
+                      <span>{t.cta.buttonPrimary}</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </Button>
+                  <Button size="lg" variant="outline" asChild>
+                    <Link to="/pricing">{t.cta.buttonSecondary}</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        </main>
       </div>
     </>
   );
