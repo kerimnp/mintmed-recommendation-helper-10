@@ -127,27 +127,16 @@ const Index = () => {
                 {user ? (
                   <ProfileDropdown />
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Link to="/auth">
-                      <Button 
-                        variant="ghost"
-                        size="sm" 
-                        className="flex items-center gap-2 rounded-full"
-                      >
-                        <LogIn className="h-4 w-4" />
-                        <span className="hidden sm:inline">{language === "en" ? "Sign In" : "Prijava"}</span>
-                      </Button>
-                    </Link>
-                    <Link to="/auth?mode=signup">
-                      <Button 
-                        size="sm" 
-                        className="flex items-center gap-2 rounded-full shadow-sm"
-                      >
-                        <UserPlus className="h-4 w-4" />
-                        <span className="hidden sm:inline">{language === "en" ? "Get Started" : "Počni"}</span>
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link to="/auth">
+                    <Button 
+                      variant="outline"
+                      size="sm" 
+                      className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm hover:shadow-md"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      <span className="hidden sm:inline font-medium">{language === "en" ? "Sign In" : "Prijava"}</span>
+                    </Button>
+                  </Link>
                 )}
               </div>
             </div>
