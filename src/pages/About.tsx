@@ -265,7 +265,7 @@ const About = (): JSX.Element => {
             </div>
             <div className="flex items-center space-x-2">
               <img 
-                src={logoSrc} 
+                src="/lovable-uploads/f70528f5-2815-484f-a8de-2b1f18fefb86.png" 
                 alt="Horalix Logo" 
                 className="h-8 w-auto"
               />
