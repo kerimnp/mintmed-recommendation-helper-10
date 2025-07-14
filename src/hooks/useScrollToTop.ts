@@ -1,37 +1,68 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 
 export const useScrollToTop = () => {
-  const scrollToTop = useCallback((smooth: boolean = true, delay: number = 0) => {
+  const isScrollingRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const scrollToTop = useCallback((smooth: boolean = false, delay: number = 0) => {
     const performScroll = () => {
+      // Prevent multiple simultaneous scroll operations
+      if (isScrollingRef.current) return;
+      
+      isScrollingRef.current = true;
+      
       // Check if we're in a browser environment
       if (typeof window !== 'undefined') {
-        // First scroll the main window
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+
+        // Force immediate scroll to prevent layout shift
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Also immediately scroll the main window
         window.scrollTo({
           top: 0,
           left: 0,
-          behavior: smooth ? 'smooth' : 'auto'
+          behavior: 'auto' // Always use instant scroll for immediate effect
         });
         
-        // Also scroll any scrollable containers that might contain the main content
-        const scrollableElements = document.querySelectorAll('[data-scroll-container], .overflow-auto, .overflow-y-auto');
+        // Reset scroll position for any scrollable containers
+        const scrollableElements = document.querySelectorAll(
+          '[data-scroll-container], .overflow-auto, .overflow-y-auto, .overflow-y-scroll, main, [role="main"]'
+        );
+        
         scrollableElements.forEach((element) => {
           if (element.scrollTop > 0) {
-            element.scrollTo({
-              top: 0,
-              left: 0,
-              behavior: smooth ? 'smooth' : 'auto'
-            });
+            element.scrollTop = 0;
           }
         });
+
+        // Reset the scrolling flag after a brief delay
+        timeoutRef.current = setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 100);
       }
     };
 
     if (delay > 0) {
       setTimeout(performScroll, delay);
     } else {
+      // For route changes, execute immediately
       performScroll();
     }
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   const scrollToTopWithFeedback = useCallback((smooth: boolean = true, delay: number = 0) => {
