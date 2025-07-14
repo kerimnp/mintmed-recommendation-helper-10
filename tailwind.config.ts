@@ -20,30 +20,40 @@ export default {
     },
     extend: {
       colors: {
-        // Medical theme colors
+        // iOS Design System Colors
+        "ios": {
+          blue: "hsl(var(--ios-blue))",
+          green: "hsl(var(--ios-green))",
+          orange: "hsl(var(--ios-orange))",
+          red: "hsl(var(--ios-red))",
+          purple: "hsl(var(--ios-purple))",
+          gray: "hsl(var(--ios-gray))",
+        },
+        
+        // Medical theme colors (keeping for compatibility)
         "medical-bg": {
-          DEFAULT: "#FFFFFF", // Changed to white for light theme base
-          secondary: "#F0F4F8", // Light grayish blue
-          tertiary: "#E2E8F0",   // Lighter gray
+          DEFAULT: "#FFFFFF", 
+          secondary: "#F0F4F8", 
+          tertiary: "#E2E8F0",   
         },
-        "medical-primary": { // Horalix Primary Blue
-          DEFAULT: "#2A7FFF", 
-          hover: "#1A6FFF", // Darker shade for hover
+        "medical-primary": { 
+          DEFAULT: "hsl(var(--primary))", 
+          hover: "hsl(var(--primary) / 0.9)", 
         },
-        "medical-accent": { // A complementary accent, can adjust
-          DEFAULT: "#4DA8DA", // Existing accent
-          secondary: "#008CFF",
-          tertiary: "#00AEEF",
+        "medical-accent": { 
+          DEFAULT: "hsl(var(--accent))", 
+          secondary: "hsl(var(--ios-blue))",
+          tertiary: "hsl(var(--ios-purple))",
         },
-        "medical-text": { // Dark slate for text
-          DEFAULT: "#334155", 
-          secondary: "#475569", // Lighter slate
-          tertiary: "#64748B",  // Even lighter slate
+        "medical-text": { 
+          DEFAULT: "hsl(var(--foreground))", 
+          secondary: "hsl(var(--muted-foreground))", 
+          tertiary: "hsl(var(--muted-foreground) / 0.7)",  
         },
-        "medical-success": "#28C76F",
-        "medical-error": "#FF4C4C",
-        "medical-warning": "#FFB74D",
-        "medical-info": "#2196F3",
+        "medical-success": "hsl(var(--ios-green))",
+        "medical-error": "hsl(var(--ios-red))",
+        "medical-warning": "hsl(var(--ios-orange))",
+        "medical-info": "hsl(var(--ios-blue))",
 
         // System colors (ensure these align with light mode first)
         border: "hsl(var(--border))", // Should be light gray for light mode
@@ -108,9 +118,21 @@ export default {
         "pulse-slow": "pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite", // Added slow pulse
       },
       backgroundImage: {
-        'gradient-medical': 'linear-gradient(135deg, #2A7FFF, #4DA8DA)', // Updated with primary blue
-        'gradient-teal': 'linear-gradient(135deg, #00BFA6, #008CFF)',
-        'gradient-dark': 'linear-gradient(135deg, #1E1E2E, #3A3A5E)',
+        'gradient-ios-blue': 'var(--gradient-ios-blue)',
+        'gradient-ios-purple': 'var(--gradient-ios-purple)',
+        'gradient-glass': 'var(--gradient-glass)',
+        'gradient-medical': 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)))',
+        'gradient-hero': 'linear-gradient(135deg, hsl(var(--ios-blue)), hsl(var(--ios-purple)))',
+        'gradient-subtle': 'linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)))',
+      },
+      backdropBlur: {
+        'xs': '2px',
+        'sm': '4px',
+        'md': '8px',
+        'lg': '12px',
+        'xl': '16px',
+        '2xl': '24px',
+        '3xl': '40px',
       },
     },
   },
