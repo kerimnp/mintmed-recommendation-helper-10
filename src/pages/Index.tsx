@@ -15,34 +15,36 @@ const Index = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
-  const t = translations[language];
+  
+  // Ensure language has a fallback to prevent undefined errors
+  const currentLanguage = language || "en";
   
   const features = [
     {
       icon: Brain,
-      title: language === "en" ? "AI-Powered Recommendations" : "Preporuke Temeljene na AI",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "AI-Powered Recommendations" : "Preporuke Temeljene na AI",
+      description: currentLanguage === "en"
         ? "Get evidence-based antibiotic recommendations tailored to each patient's unique profile." 
         : "Dobijte preporuke antibiotika temeljene na dokazima i prilagođene jedinstvenom profilu svakog pacijenta."
     },
     {
       icon: Microscope,
-      title: language === "en" ? "Clinical Precision" : "Klinička Preciznost",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Clinical Precision" : "Klinička Preciznost",
+      description: currentLanguage === "en"
         ? "Factor in allergies, renal function, and comorbidities for safer prescribing." 
         : "Uzmite u obzir alergije, bubrežnu funkciju i komorbiditete za sigurnije propisivanje."
     },
     {
       icon: Globe,
-      title: language === "en" ? "Regional Adaptation" : "Regionalna Prilagodba",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Regional Adaptation" : "Regionalna Prilagodba",
+      description: currentLanguage === "en"
         ? "Recommendations consider local resistance patterns for optimal outcomes." 
         : "Preporuke uzimaju u obzir lokalne obrasce otpornosti za optimalne ishode."
     },
     {
       icon: BookOpen,
-      title: language === "en" ? "Continuous Learning" : "Kontinuirano Učenje",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Continuous Learning" : "Kontinuirano Učenje",
+      description: currentLanguage === "en"
         ? "Access educational resources to stay updated with the latest clinical guidelines." 
         : "Pristupite obrazovnim resursima kako biste bili u toku s najnovijim kliničkim smjernicama."
     }
@@ -51,38 +53,38 @@ const Index = () => {
   const sections = [
     {
       icon: Hospital,
-      title: language === "en" ? "Clinical Decision Support" : "Podrška Kliničkom Odlučivanju",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Clinical Decision Support" : "Podrška Kliničkom Odlučivanju",
+      description: currentLanguage === "en" 
         ? "Our system integrates the latest clinical guidelines with patient-specific data to provide personalized antibiotic recommendations that optimize treatment outcomes while minimizing risks." 
         : "Naš sustav integrira najnovije kliničke smjernice s podacima specifičnim za pacijenta kako bi pružio personalizirane preporuke antibiotika koje optimiziraju ishode liječenja uz minimiziranje rizika.",
       features: [
-        language === "en" ? "Evidence-based protocols" : "Protokoli temeljeni na dokazima",
-        language === "en" ? "Patient-specific recommendations" : "Preporuke specifične za pacijenta",
-        language === "en" ? "Risk assessment integration" : "Integracija procjene rizika"
+        currentLanguage === "en" ? "Evidence-based protocols" : "Protokoli temeljeni na dokazima",
+        currentLanguage === "en" ? "Patient-specific recommendations" : "Preporuke specifične za pacijenta",
+        currentLanguage === "en" ? "Risk assessment integration" : "Integracija procjene rizika"
       ]
     },
     {
       icon: HeartPulse,
-      title: language === "en" ? "Patient Safety Focus" : "Fokus na Sigurnost Pacijenata",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Patient Safety Focus" : "Fokus na Sigurnost Pacijenata",
+      description: currentLanguage === "en" 
         ? "Every recommendation accounts for patient allergies, drug interactions, renal/hepatic function, and other critical factors to ensure the safest possible antibiotic regimen for each individual." 
         : "Svaka preporuka uzima u obzir alergije pacijenta, interakcije lijekova, bubrežnu/jetrenu funkciju i druge kritične faktore kako bi se osigurao najsigurniji mogući režim antibiotika za svakog pojedinca.",
       features: [
-        language === "en" ? "Allergy screening" : "Provjera alergija",
-        language === "en" ? "Drug interaction alerts" : "Upozorenja o interakcijama lijekova",
-        language === "en" ? "Organ function monitoring" : "Praćenje funkcije organa"
+        currentLanguage === "en" ? "Allergy screening" : "Provjera alergija",
+        currentLanguage === "en" ? "Drug interaction alerts" : "Upozorenja o interakcijama lijekova",
+        currentLanguage === "en" ? "Organ function monitoring" : "Praćenje funkcije organa"
       ]
     },
     {
       icon: GraduationCap,
-      title: language === "en" ? "Educational Resources" : "Obrazovni Resursi",
-      description: language === "en" 
+      title: currentLanguage === "en" ? "Educational Resources" : "Obrazovni Resursi",
+      description: currentLanguage === "en" 
         ? "Beyond recommendations, we provide comprehensive educational materials to help clinicians stay current with evolving best practices in antibiotic stewardship and infectious disease management." 
         : "Osim preporuka, pružamo sveobuhvatne obrazovne materijale kako bismo pomogli kliničarima da ostanu u toku s evolucijom najboljih praksi u upravljanju antibioticima i zaraznim bolestima.",
       features: [
-        language === "en" ? "Latest clinical guidelines" : "Najnovije kliničke smjernice",
-        language === "en" ? "Continuing education" : "Kontinuirana edukacija",
-        language === "en" ? "Expert insights" : "Stručni uvidi"
+        currentLanguage === "en" ? "Latest clinical guidelines" : "Najnovije kliničke smjernice",
+        currentLanguage === "en" ? "Continuing education" : "Kontinuirana edukacija",
+        currentLanguage === "en" ? "Expert insights" : "Stručni uvidi"
       ]
     }
   ];
@@ -120,7 +122,7 @@ const Index = () => {
             <LanguageToggle />
             <Link className="text-sm font-medium hover:text-primary transition-colors duration-300 flex items-center gap-2" to="/pricing">
               <Euro className="w-4 h-4" />
-              {language === "en" ? "Pricing" : "Cijene"}
+              {currentLanguage === "en" ? "Pricing" : "Cijene"}
             </Link>
             <Button
               variant="ghost"
@@ -137,7 +139,7 @@ const Index = () => {
               <Link to="/auth">
                 <Button variant="premium" size="sm" className="animate-glow">
                   <LogIn className="w-4 h-4 mr-2" />
-                  {language === "en" ? "Sign In" : "Prijava"}
+                  {currentLanguage === "en" ? "Sign In" : "Prijava"}
                 </Button>
               </Link>
             )}
@@ -162,7 +164,7 @@ const Index = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1.2, delay: 0.2 }}
                   >
-                    {language === "en" ? "Evidence-Based Antibiotic Recommendations" : "Preporuke Antibiotika Temeljene na Dokazima"}
+                    {currentLanguage === "en" ? "Evidence-Based Antibiotic Recommendations" : "Preporuke Antibiotika Temeljene na Dokazima"}
                   </motion.h1>
                   <motion.p 
                     className="mx-auto max-w-[800px] text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed"
@@ -170,7 +172,7 @@ const Index = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.4 }}
                   >
-                    {language === "en" ? "Advanced AI-powered clinical decision support for optimal patient care" : "Napredna AI podrška za kliničke odluke za optimalnu skrb o pacijentima"}
+                    {currentLanguage === "en" ? "Advanced AI-powered clinical decision support for optimal patient care" : "Napredna AI podrška za kliničke odluke za optimalnu skrb o pacijentima"}
                   </motion.p>
                 </div>
                 <motion.div 
@@ -182,21 +184,21 @@ const Index = () => {
                   {isAuthenticated ? (
                     <Link to="/dashboard">
                       <Button variant="premium" size="xl" className="group">
-                        {language === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
+                        {currentLanguage === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
                   ) : (
                     <Link to="/auth">
                       <Button variant="premium" size="xl" className="group">
-                        {language === "en" ? "Get Started" : "Počni"}
+                        {currentLanguage === "en" ? "Get Started" : "Počni"}
                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
                   )}
                   <Link to="/pricing">
                     <Button variant="glass" size="xl">
-                      {language === "en" ? "Learn More" : "Saznaj Više"}
+                      {currentLanguage === "en" ? "Learn More" : "Saznaj Više"}
                     </Button>
                   </Link>
                 </motion.div>
@@ -228,7 +230,7 @@ const Index = () => {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     viewport={{ once: true }}
                   >
-                    {language === "en" ? "Advanced Features" : "Napredne Značajke"}
+                    {currentLanguage === "en" ? "Advanced Features" : "Napredne Značajke"}
                   </motion.h2>
                   <motion.p 
                     className="max-w-[900px] text-lg md:text-xl text-muted-foreground leading-relaxed"
@@ -237,7 +239,7 @@ const Index = () => {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     viewport={{ once: true }}
                   >
-                    {language === "en" ? "Cutting-edge technology meets clinical expertise for optimal patient outcomes" : "Najnovija tehnologija spaja se s kliničkom stručnošću za optimalne ishode pacijenata"}
+                    {currentLanguage === "en" ? "Cutting-edge technology meets clinical expertise for optimal patient outcomes" : "Najnovija tehnologija spaja se s kliničkom stručnošću za optimalne ishode pacijenata"}
                   </motion.p>
                 </div>
               </motion.div>
@@ -352,7 +354,7 @@ const Index = () => {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     viewport={{ once: true }}
                   >
-                    {language === "en" ? "Ready to Transform Healthcare?" : "Spremni Transformirati Zdravstvo?"}
+                    {currentLanguage === "en" ? "Ready to Transform Healthcare?" : "Spremni Transformirati Zdravstvo?"}
                   </motion.h2>
                   <motion.p 
                     className="mx-auto max-w-[700px] text-lg md:text-xl text-muted-foreground leading-relaxed"
@@ -361,7 +363,7 @@ const Index = () => {
                     transition={{ duration: 0.8, delay: 0.4 }}
                     viewport={{ once: true }}
                   >
-                    {language === "en" ? "Join healthcare professionals worldwide who trust Horalix for evidence-based care" : "Pridružite se zdravstvenim djelatnicima širom svijeta koji vjeruju Horalixu"}
+                    {currentLanguage === "en" ? "Join healthcare professionals worldwide who trust Horalix for evidence-based care" : "Pridružite se zdravstvenim djelatnicima širom svijeta koji vjeruju Horalixu"}
                   </motion.p>
                 </div>
                 <motion.div 
@@ -374,21 +376,21 @@ const Index = () => {
                   {isAuthenticated ? (
                     <Link to="/dashboard">
                       <Button variant="premium" size="xl" className="group">
-                        {language === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
+                        {currentLanguage === "en" ? "Enter Application" : "Uđi u Aplikaciju"}
                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
                   ) : (
                     <Link to="/auth">
                       <Button variant="premium" size="xl" className="group">
-                        {language === "en" ? "Get Started" : "Počni"}
+                        {currentLanguage === "en" ? "Get Started" : "Počni"}
                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
                   )}
                   <Link to="/pricing">
                     <Button variant="accent" size="xl">
-                      {language === "en" ? "Pricing" : "Cijene"}
+                      {currentLanguage === "en" ? "Pricing" : "Cijene"}
                     </Button>
                   </Link>
                 </motion.div>
