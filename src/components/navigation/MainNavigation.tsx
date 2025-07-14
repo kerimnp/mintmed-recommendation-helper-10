@@ -41,7 +41,7 @@ export const MainNavigation: React.FC = () => {
       icon: Pill,
     },
     {
-      href: '/pricing',
+      href: '/admin?tab=pricing',
       label: language === 'en' ? 'Pricing' : 'Cijene',
       icon: Euro,
     },

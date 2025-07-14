@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
     product: {
       title: language === 'en' ? 'Product' : 'Proizvod',
       links: [
-        { name: language === 'en' ? 'Pricing' : 'Cijene', href: '/pricing' },
+        { name: language === 'en' ? 'Pricing' : 'Cijene', href: '/admin?tab=pricing' },
         { name: language === 'en' ? 'AI Advisor' : 'AI Savjetnik', href: '/advisor' },
       ]
     },

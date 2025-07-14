@@ -112,7 +112,7 @@ const Index = () => {
                   )}
                 </Button>
                 
-                <Link to="/pricing">
+                <Link to="/admin?tab=pricing">
                   <Button 
                     variant="ghost" 
                     size="sm"
@@ -395,7 +395,7 @@ const Index = () => {
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
-                  <Link to="/pricing">
+                  <Link to="/admin?tab=pricing">
                     <Button 
                       variant="outline"
                       size="lg" 

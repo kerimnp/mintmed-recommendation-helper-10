@@ -14,7 +14,7 @@ import Auth from "./pages/Auth";
 import About from "./pages/About";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
-import Pricing from "./pages/Pricing";
+
 import Subscription from "./pages/Subscription";
 import HospitalDashboard from "./pages/HospitalDashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
@@ -135,7 +135,7 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
-                  <Route path="/pricing" element={<Pricing />} />
+                  
                   <Route path="/production-verification" element={<ProductionVerificationPage />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsOfService />} />

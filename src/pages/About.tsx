@@ -374,7 +374,7 @@ const About = (): JSX.Element => {
                     </Link>
                   </Button>
                   <Button size="lg" variant="outline" asChild>
-                    <Link to="/pricing">{t.cta.buttonSecondary}</Link>
+                    <Link to="/admin?tab=pricing">{t.cta.buttonSecondary}</Link>
                   </Button>
                 </div>
               </CardContent>
