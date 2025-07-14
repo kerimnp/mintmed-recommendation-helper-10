@@ -12,7 +12,6 @@ export const Footer: React.FC = () => {
     product: {
       title: language === 'en' ? 'Product' : 'Proizvod',
       links: [
-        { name: language === 'en' ? 'Features' : 'Značajke', href: '#features' },
         { name: language === 'en' ? 'Pricing' : 'Cijene', href: '/pricing' },
         { name: language === 'en' ? 'AI Advisor' : 'AI Savjetnik', href: '/advisor' },
       ]
@@ -21,7 +20,6 @@ export const Footer: React.FC = () => {
       title: language === 'en' ? 'Company' : 'Kompanija',
       links: [
         { name: language === 'en' ? 'About Us' : 'O Nama', href: '/about' },
-        { name: language === 'en' ? 'Contact Us' : 'Kontaktiraj Nas', href: '/contact' },
       ]
     },
     legal: {
@@ -35,11 +33,11 @@ export const Footer: React.FC = () => {
   };
 
   const contactInfo = {
-    email: 'contact@horalix.com',
-    phone: '+387 33 456 789',
+    email: 'support@horalix.com',
+    phone: '+387 62 340 020',
     address: language === 'en' 
-      ? 'Sarajevo Technology Park, Sarajevo, Bosnia and Herzegovina'
-      : 'Sarajevo Technology Park, Sarajevo, Bosna i Hercegovina'
+      ? 'Maglajska 1, Sarajevo, Bosnia and Herzegovina'
+      : 'Maglajska 1, Sarajevo, Bosna i Hercegovina'
   };
 
   const certifications = [
@@ -151,7 +149,7 @@ export const Footer: React.FC = () => {
             {/* Social Links */}
             <div className="flex items-center space-x-4">
               <a 
-                href="https://www.instagram.com/horalix_official/" 
+                href="https://www.instagram.com/horalix.ai" 
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
                 aria-label="Instagram"
                 target="_blank"
