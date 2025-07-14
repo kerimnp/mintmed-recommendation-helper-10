@@ -186,7 +186,7 @@ const About = (): JSX.Element => {
     }
   };
   const t = content[language];
-  const logoSrc = theme === 'dark' ? '/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png' : '/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png';
+  const logoSrc = '/lovable-uploads/1137c601-aeed-47a5-aaf7-e3d1f4473cb9.png';
   return <>
       <Helmet>
         <title>{t.title}</title>
