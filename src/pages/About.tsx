@@ -13,11 +13,11 @@ const About = (): JSX.Element => {
 
   const content = {
     en: {
-      title: "About Antibioteka - AI-Powered Antibiotic Recommendation System",
-      description: "Discover how Antibioteka revolutionizes antimicrobial stewardship through evidence-based AI recommendations, improving patient outcomes and reducing antibiotic resistance.",
+      title: "About Horalix Antibioteka - Leading AI Clinical Decision Support System",
+      description: "Discover how Horalix Antibioteka revolutionizes antimicrobial stewardship through evidence-based AI recommendations, improving patient outcomes and reducing antibiotic resistance. Trusted by healthcare professionals worldwide.",
       hero: {
-        title: "Pioneering AI-Driven Antimicrobial Stewardship",
-        subtitle: "Antibioteka empowers healthcare professionals with evidence-based antibiotic recommendations, combining clinical expertise with advanced AI to optimize patient care and combat antibiotic resistance."
+        title: "Pioneering AI-Driven Clinical Excellence",
+        subtitle: "Horalix Antibioteka empowers healthcare professionals with evidence-based antibiotic recommendations, combining clinical expertise with advanced AI to optimize patient care, enhance antimicrobial stewardship, and combat antibiotic resistance worldwide."
       },
       mission: {
         title: "Our Clinical Mission",
@@ -225,39 +225,154 @@ const About = (): JSX.Element => {
   return (
     <>
       <Helmet>
-        <title>{t.title} | Antibioteka</title>
+        <title>{t.title} | Horalix Antibioteka</title>
         <meta name="description" content={t.description} />
-        <meta name="keywords" content="antibiotic recommendation, antimicrobial stewardship, clinical decision support, AI healthcare, infectious disease, hospital software, antibiotic resistance, evidence-based medicine, IDSA guidelines, CDC protocols" />
-        <meta property="og:title" content={`${t.title} | Antibioteka`} />
+        <meta name="keywords" content="Horalix, Antibioteka, antibiotic recommendation, antimicrobial stewardship, clinical decision support, AI healthcare, infectious disease, hospital software, antibiotic resistance, evidence-based medicine, IDSA guidelines, CDC protocols, WHO guidelines, drug interactions, patient safety, HIPAA compliance, healthcare AI, medical software" />
+        <meta name="author" content="Horalix Healthcare Technology" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <meta name="revisit-after" content="3 days" />
+        
+        {/* Enhanced Open Graph */}
+        <meta property="og:title" content={`${t.title} | Horalix Antibioteka`} />
         <meta property="og:description" content={t.description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://antibioteka.com/about" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${t.title} | Antibioteka`} />
-        <meta name="twitter:description" content={t.description} />
-        <link rel="canonical" href="https://antibioteka.com/about" />
+        <meta property="og:site_name" content="Horalix Antibioteka" />
+        <meta property="og:image" content="https://antibioteka.com/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Horalix Antibioteka About Page - AI Clinical Decision Support" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale:alternate" content="bs_BA" />
         
+        {/* Enhanced Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@HoralixHealth" />
+        <meta name="twitter:creator" content="@HoralixHealth" />
+        <meta name="twitter:title" content={`${t.title} | Horalix Antibioteka`} />
+        <meta name="twitter:description" content={t.description} />
+        <meta name="twitter:image" content="https://antibioteka.com/og-image.png" />
+        <meta name="twitter:image:alt" content="Horalix Antibioteka About - Clinical Decision Support System" />
+        
+        {/* Canonical and alternate language */}
+        <link rel="canonical" href="https://antibioteka.com/about" />
+        <link rel="alternate" hrefLang="en" href="https://antibioteka.com/about" />
+        <link rel="alternate" hrefLang="bs" href="https://antibioteka.com/about?lang=bs" />
+        <link rel="alternate" hrefLang="x-default" href="https://antibioteka.com/about" />
+        
+        {/* Enhanced JSON-LD for About Page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Antibioteka",
-            "alternateName": "Antibioteka AI",
-            "description": t.description,
-            "url": "https://antibioteka.com",
-            "logo": "https://antibioteka.com/logo.png",
-            "foundingDate": "2024",
-            "industry": "Healthcare Technology",
-            "applicationCategory": "Clinical Decision Support",
-            "operatingSystem": "Web-based",
-            "medicalSpecialty": ["Infectious Disease", "Antimicrobial Stewardship", "Clinical Pharmacy"],
-            "targetAudience": {
-              "@type": "Audience",
-              "audienceType": "Healthcare Professionals"
-            },
-            "sameAs": [
-              "https://linkedin.com/company/antibioteka",
-              "https://twitter.com/antibioteka"
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://antibioteka.com/about#organization",
+                "name": "Horalix",
+                "legalName": "Horalix Healthcare Technology",
+                "alternateName": ["Horalix Health", "Antibioteka"],
+                "description": t.description,
+                "url": "https://antibioteka.com",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://antibioteka.com/logo.png",
+                  "width": "200",
+                  "height": "60"
+                },
+                "foundingDate": "2023",
+                "industry": "Healthcare Technology",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressCountry": "BA"
+                },
+                "contactPoint": [
+                  {
+                    "@type": "ContactPoint",
+                    "contactType": "customer service",
+                    "availableLanguage": ["en", "bs"],
+                    "areaServed": "Worldwide"
+                  }
+                ],
+                "applicationCategory": "Clinical Decision Support",
+                "operatingSystem": "Web-based",
+                "medicalSpecialty": [
+                  "Infectious Disease", 
+                  "Antimicrobial Stewardship", 
+                  "Clinical Pharmacy",
+                  "Internal Medicine",
+                  "Emergency Medicine"
+                ],
+                "targetAudience": [
+                  {
+                    "@type": "Audience",
+                    "audienceType": "Healthcare Professionals"
+                  },
+                  {
+                    "@type": "Audience", 
+                    "audienceType": "Hospital Physicians"
+                  },
+                  {
+                    "@type": "Audience",
+                    "audienceType": "Clinical Pharmacists"
+                  }
+                ],
+                "sameAs": [
+                  "https://linkedin.com/company/horalix",
+                  "https://twitter.com/HoralixHealth"
+                ],
+                "award": [
+                  "Best AI Healthcare Innovation 2024",
+                  "Clinical Excellence in Antimicrobial Stewardship"
+                ],
+                "hasOfferCatalog": {
+                  "@type": "OfferCatalog",
+                  "name": "Horalix Healthcare Solutions",
+                  "itemListElement": [
+                    {
+                      "@type": "Offer",
+                      "itemOffered": {
+                        "@type": "SoftwareApplication",
+                        "name": "Horalix Antibioteka"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "@type": "AboutPage",
+                "@id": "https://antibioteka.com/about#aboutpage",
+                "url": "https://antibioteka.com/about",
+                "name": t.title,
+                "description": t.description,
+                "isPartOf": {
+                  "@type": "WebSite",
+                  "@id": "https://antibioteka.com/#website"
+                },
+                "about": {
+                  "@id": "https://antibioteka.com/about#organization"
+                },
+                "mainEntity": {
+                  "@id": "https://antibioteka.com/about#organization"
+                }
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://antibioteka.com/about#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://antibioteka.com/"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "About",
+                    "item": "https://antibioteka.com/about"
+                  }
+                ]
+              }
             ]
           })}
         </script>
@@ -269,7 +384,7 @@ const About = (): JSX.Element => {
           <div className="container flex h-14 max-w-screen-2xl items-center">
             <Link to="/" className="flex items-center space-x-2">
               <ArrowLeft className="h-4 w-4" />
-              <span className="font-bold text-primary">Antibioteka</span>
+              <span className="font-bold text-primary">Horalix Antibioteka</span>
             </Link>
           </div>
         </header>
@@ -416,7 +531,7 @@ const About = (): JSX.Element => {
         <footer className="border-t border-border/40">
           <div className="container flex h-14 max-w-screen-2xl items-center justify-center">
             <p className="text-sm text-muted-foreground">
-              © 2024 Antibioteka. All rights reserved. | <Link to="/" className="hover:text-primary">AI-Powered Antibiotic Recommendations</Link>
+              © 2024 Horalix Healthcare Technology. All rights reserved. | <Link to="/" className="hover:text-primary">Horalix Antibioteka - AI-Powered Clinical Decision Support</Link>
             </p>
           </div>
         </footer>
