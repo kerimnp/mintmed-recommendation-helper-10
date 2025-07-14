@@ -19,6 +19,10 @@ import HospitalDashboard from "./pages/HospitalDashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import AntibioticAdvisor from "./pages/AntibioticAdvisor";
 import ProductionVerificationPage from "./pages/ProductionVerification";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Compliance from "./pages/Compliance";
+import Contact from "./pages/Contact";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -131,6 +135,10 @@ function App() {
                   <Route path="/advisor" element={<AntibioticAdvisor />} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/production-verification" element={<ProductionVerificationPage />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/compliance" element={<Compliance />} />
+                  <Route path="/contact" element={<Contact />} />
                   <Route 
                     path="/admin" 
                     element={

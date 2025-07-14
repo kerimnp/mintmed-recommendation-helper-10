@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from 'next-themes';
-import { Mail, Phone, MapPin, Globe, Twitter, Linkedin, Facebook, Shield, Lock, FileText, HelpCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Linkedin, Instagram, Shield, Lock, FileText } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
@@ -14,26 +14,14 @@ export const Footer: React.FC = () => {
       links: [
         { name: language === 'en' ? 'Features' : 'Značajke', href: '#features' },
         { name: language === 'en' ? 'Pricing' : 'Cijene', href: '/pricing' },
-        { name: language === 'en' ? 'API Documentation' : 'API Dokumentacija', href: '/docs' },
-        { name: language === 'en' ? 'System Status' : 'Status Sistema', href: '/status' },
+        { name: language === 'en' ? 'AI Advisor' : 'AI Savjetnik', href: '/advisor' },
       ]
     },
     company: {
       title: language === 'en' ? 'Company' : 'Kompanija',
       links: [
         { name: language === 'en' ? 'About Us' : 'O Nama', href: '/about' },
-        { name: language === 'en' ? 'Careers' : 'Karijere', href: '/careers' },
-        { name: language === 'en' ? 'Blog' : 'Blog', href: '/blog' },
-        { name: language === 'en' ? 'Press' : 'Mediji', href: '/press' },
-      ]
-    },
-    support: {
-      title: language === 'en' ? 'Support' : 'Podrška',
-      links: [
-        { name: language === 'en' ? 'Help Center' : 'Centar za Pomoć', href: '/help' },
         { name: language === 'en' ? 'Contact Us' : 'Kontaktiraj Nas', href: '/contact' },
-        { name: language === 'en' ? 'Training' : 'Obuka', href: '/training' },
-        { name: language === 'en' ? 'Community' : 'Zajednica', href: '/community' },
       ]
     },
     legal: {
@@ -41,18 +29,17 @@ export const Footer: React.FC = () => {
       links: [
         { name: language === 'en' ? 'Privacy Policy' : 'Politika Privatnosti', href: '/privacy' },
         { name: language === 'en' ? 'Terms of Service' : 'Uslovi Korišćenja', href: '/terms' },
-        { name: language === 'en' ? 'Security' : 'Sigurnost', href: '/security' },
         { name: language === 'en' ? 'Compliance' : 'Usklađenost', href: '/compliance' },
       ]
     }
   };
 
   const contactInfo = {
-    email: 'info@horalix.com',
-    phone: '+387 33 123 456',
+    email: 'contact@horalix.com',
+    phone: '+387 33 456 789',
     address: language === 'en' 
-      ? 'Medical Innovation District, Sarajevo, Bosnia and Herzegovina'
-      : 'Medicinski Inovacijski Okrug, Sarajevo, Bosna i Hercegovina'
+      ? 'Sarajevo Technology Park, Sarajevo, Bosnia and Herzegovina'
+      : 'Sarajevo Technology Park, Sarajevo, Bosna i Hercegovina'
   };
 
   const certifications = [
@@ -164,25 +151,22 @@ export const Footer: React.FC = () => {
             {/* Social Links */}
             <div className="flex items-center space-x-4">
               <a 
-                href="https://twitter.com/horalix" 
+                href="https://www.instagram.com/horalix_official/" 
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                aria-label="Twitter"
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Twitter className="h-5 w-5" />
+                <Instagram className="h-5 w-5" />
               </a>
               <a 
-                href="https://linkedin.com/company/horalix" 
+                href="https://www.linkedin.com/company/horalix/" 
                 className="text-muted-foreground hover:text-primary transition-colors duration-200"
                 aria-label="LinkedIn"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <Linkedin className="h-5 w-5" />
-              </a>
-              <a 
-                href="https://facebook.com/horalix" 
-                className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                aria-label="Facebook"
-              >
-                <Facebook className="h-5 w-5" />
               </a>
             </div>
           </div>
