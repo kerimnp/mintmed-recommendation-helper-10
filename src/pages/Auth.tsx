@@ -54,7 +54,7 @@ const Auth = () => {
       if (isHospitalAdmin) {
         navigate("/hospital-dashboard");
       } else {
-        navigate("/");
+        navigate("/advisor");
       }
     }
   }, [authUser, navigate]);
