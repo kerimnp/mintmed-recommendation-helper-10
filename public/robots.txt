@@ -1,21 +1,40 @@
-# Antibioteka - AI-Powered Antibiotic Recommendation System
+# Antibioteka - AI-Powered Antibiotic Stewardship Platform
+# Leading clinical decision support system for evidence-based antibiotic recommendations
+
 User-agent: *
 Allow: /
 
-# Priority pages for crawling
-Allow: /auth
-Allow: /admin
+# Priority pages for search engines
+Allow: /about
+Allow: /advisor
 Allow: /clinical-dashboard
-Allow: /production-verification
+Allow: /auth
 
-# Block sensitive areas
+# Block sensitive areas and private data
 Disallow: /api/
 Disallow: /admin/users/
 Disallow: /admin/audit/
 Disallow: /patient-data/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /temp/
+
+# Special rules for search engine bots
+User-agent: Googlebot
+Allow: /about
+Allow: /advisor
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /about
+Allow: /advisor
+Crawl-delay: 2
 
 # Sitemap location
 Sitemap: https://antibioteka.com/sitemap.xml
 
 # Crawl delay for respectful crawling
 Crawl-delay: 1
+
+# Host declaration for canonical domain
+Host: https://antibioteka.com
