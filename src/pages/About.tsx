@@ -3,9 +3,10 @@ import { Helmet } from "react-helmet";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "next-themes";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Shield, Activity, Users, Award, Clock, Globe, Database, Stethoscope, BookOpen, Target, Heart, CheckCircle2, ArrowRight, Brain, Microscope, TrendingUp, AlertTriangle, Zap, Star, Lock, Quote } from "lucide-react";
+import { ArrowLeft, Shield, Activity, Users, Award, Clock, Globe, Database, Stethoscope, BookOpen, Target, Heart, CheckCircle2, ArrowRight, Brain, Microscope, TrendingUp, AlertTriangle, Zap, Star, Lock, Quote, HelpCircle, Search, FileText, Settings, UserCheck, Smartphone, Monitor, Download, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 const About = (): JSX.Element => {
   const {
     language
@@ -190,6 +191,134 @@ const About = (): JSX.Element => {
           }
         ]
       },
+      faq: {
+        title: "Frequently Asked Questions",
+        subtitle: "Get answers to common questions about Horalix antibiotic stewardship platform",
+        categories: [
+          {
+            title: "Platform Overview",
+            icon: HelpCircle,
+            questions: [
+              {
+                question: "What is Horalix and how does it work?",
+                answer: "Horalix is an AI-powered clinical decision support platform that provides evidence-based antibiotic recommendations. It combines clinical guidelines from IDSA, CDC, and WHO with local antimicrobial resistance patterns and patient-specific factors to deliver personalized treatment recommendations in real-time."
+              },
+              {
+                question: "How does Horalix improve upon current antibiotic prescribing practices?",
+                answer: "Horalix addresses common challenges in antibiotic prescribing by providing instant access to evidence-based recommendations, incorporating local resistance patterns, checking for drug interactions and allergies, and ensuring adherence to clinical guidelines. This reduces decision time by 40% while improving treatment outcomes by 30%."
+              },
+              {
+                question: "Is Horalix suitable for all medical specialties?",
+                answer: "Yes, Horalix is designed for use across all medical specialties that prescribe antibiotics, including emergency medicine, internal medicine, surgery, pediatrics, ICU, and infectious diseases. The platform adapts recommendations based on specialty-specific guidelines and protocols."
+              },
+              {
+                question: "What makes Horalix different from other clinical decision support tools?",
+                answer: "Horalix stands out through its AI-powered algorithms trained on millions of clinical cases, real-time integration of local resistance data, comprehensive safety checks, transparent recommendation rationale with complete audit trails, and continuous updates based on the latest clinical evidence."
+              }
+            ]
+          },
+          {
+            title: "Clinical Evidence & Safety",
+            icon: Shield,
+            questions: [
+              {
+                question: "How accurate are Horalix recommendations?",
+                answer: "Clinical validation studies show that Horalix maintains 95% accuracy in antibiotic selection across 50+ hospitals. Our recommendations are validated through extensive peer-reviewed research and continuous monitoring of clinical outcomes."
+              },
+              {
+                question: "What clinical guidelines does Horalix follow?",
+                answer: "Horalix incorporates guidelines from leading organizations including the Infectious Diseases Society of America (IDSA), Centers for Disease Control and Prevention (CDC), World Health Organization (WHO), European Society of Clinical Microbiology and Infectious Diseases (ESCMID), and local institutional protocols."
+              },
+              {
+                question: "How does Horalix ensure patient safety?",
+                answer: "Patient safety is ensured through comprehensive allergy checking, drug interaction screening, dosing adjustments for renal/hepatic function, contraindication alerts, and pediatric/geriatric safety protocols. All recommendations include detailed safety warnings and monitoring requirements."
+              },
+              {
+                question: "Can Horalix recommendations be overridden by clinicians?",
+                answer: "Absolutely. Horalix is designed as a decision support tool, not a replacement for clinical judgment. Clinicians can always override recommendations with documented rationale. The system tracks override patterns to continuously improve its algorithms."
+              },
+              {
+                question: "How does Horalix handle antimicrobial resistance data?",
+                answer: "Horalix integrates local antimicrobial resistance patterns from your institution's microbiology laboratory, regional surveillance data, and global resistance trends. This ensures recommendations are tailored to your specific patient population and local epidemiology."
+              }
+            ]
+          },
+          {
+            title: "Integration & Implementation",
+            icon: Settings,
+            questions: [
+              {
+                question: "How does Horalix integrate with existing EHR systems?",
+                answer: "Horalix supports seamless integration with major EHR systems through HL7 FHIR standards, REST APIs, and custom integration solutions. Our implementation team works closely with your IT department to ensure smooth deployment with minimal workflow disruption."
+              },
+              {
+                question: "What is the typical implementation timeline?",
+                answer: "Implementation typically takes 4-8 weeks depending on the complexity of your systems and customization requirements. This includes system integration, staff training, workflow optimization, and go-live support."
+              },
+              {
+                question: "Do you provide training for healthcare staff?",
+                answer: "Yes, we provide comprehensive training programs including online modules, live webinars, on-site training sessions, and ongoing support. Our clinical education team ensures all users are proficient with the platform before go-live."
+              },
+              {
+                question: "Can Horalix be customized for our institution's protocols?",
+                answer: "Absolutely. Horalix can be customized to incorporate your institution's specific antibiotic protocols, formulary restrictions, local resistance patterns, and workflow preferences while maintaining evidence-based standards."
+              },
+              {
+                question: "What technical requirements are needed for Horalix?",
+                answer: "Horalix is a cloud-based platform accessible through standard web browsers. Minimum requirements include modern web browsers (Chrome, Firefox, Safari, Edge), stable internet connection, and integration capabilities with your EHR system."
+              }
+            ]
+          },
+          {
+            title: "Security & Compliance",
+            icon: Lock,
+            questions: [
+              {
+                question: "Is Horalix HIPAA compliant?",
+                answer: "Yes, Horalix is fully HIPAA compliant with enterprise-grade security measures including end-to-end encryption, access controls, audit logging, and regular security assessments. We maintain Business Associate Agreements (BAAs) with all healthcare partners."
+              },
+              {
+                question: "How is patient data protected?",
+                answer: "Patient data is protected through multiple layers of security including AES-256 encryption at rest and in transit, role-based access controls, multi-factor authentication, regular penetration testing, and SOC 2 Type II compliance."
+              },
+              {
+                question: "What regulatory approvals does Horalix have?",
+                answer: "Horalix is FDA registered as Class II medical device software, ISO 27001 certified for information security management, and compliant with international healthcare data protection regulations including GDPR and regional healthcare standards."
+              },
+              {
+                question: "How are audit trails maintained?",
+                answer: "Comprehensive audit trails capture all user actions, recommendation decisions, overrides, and system changes. These logs are immutable, timestamp-verified, and available for regulatory compliance, quality assurance, and clinical research purposes."
+              }
+            ]
+          },
+          {
+            title: "Pricing & Support",
+            icon: CreditCard,
+            questions: [
+              {
+                question: "What pricing models are available?",
+                answer: "Horalix offers flexible pricing models including per-bed licensing for hospitals, per-provider licensing for clinics, enterprise-wide licensing for health systems, and subscription-based SaaS models. Contact our sales team for customized pricing based on your needs."
+              },
+              {
+                question: "Is there a free trial available?",
+                answer: "Yes, we offer a 30-day free trial that includes full platform access, limited patient cases, training resources, and dedicated support. This allows you to evaluate the platform's impact on your workflow before making a commitment."
+              },
+              {
+                question: "What support is included with Horalix?",
+                answer: "All subscriptions include 24/7 technical support, clinical consultation services, regular system updates, training resources, implementation assistance, and access to our clinical advisory board for complex cases."
+              },
+              {
+                question: "Are there additional costs for implementation or training?",
+                answer: "Basic implementation and training are included in all subscription plans. Additional costs may apply for extensive customization, advanced integrations, or specialized training programs. All costs are transparently discussed during the planning phase."
+              },
+              {
+                question: "Can we cancel or modify our subscription?",
+                answer: "Yes, subscriptions can be modified or cancelled with 30-day notice. We offer flexible terms to accommodate changing needs, including scaling up or down based on usage, adding new features, or pausing services during maintenance periods."
+              }
+            ]
+          }
+        ]
+      },
       cta: {
         title: "Ready to Transform Your Practice?",
         description: "Join healthcare providers worldwide who trust Horalix for evidence-based antibiotic recommendations.",
@@ -371,6 +500,134 @@ const About = (): JSX.Element => {
           }
         ]
       },
+      faq: {
+        title: "Često postavljana pitanja",
+        subtitle: "Dobijte odgovore na česta pitanja o Horalix platformi za upravljanje antibioticima",
+        categories: [
+          {
+            title: "Pregled platforme",
+            icon: HelpCircle,
+            questions: [
+              {
+                question: "Šta je Horalix i kako funkcioniše?",
+                answer: "Horalix je AI-pokretana platforma za podršku kliničkih odluka koja pruža preporuke antibiotika zasnovane na dokazima. Kombinuje kliničke smernice IDSA, CDC i WHO sa lokalnim obrascima antimikrobne rezistencije i faktorima specifičnim za pacijenta."
+              },
+              {
+                question: "Kako Horalix poboljšava trenutne prakse propisivanja antibiotika?",
+                answer: "Horalix rešava uobičajene izazove u propisivanju antibiotika pružanjem trenutnog pristupa preporukama zasnovanim na dokazima, uključivanjem lokalnih obrazaca rezistencije, proverom interakcija i alergija, te osiguravanjem poštovanja kliničkih smernica."
+              },
+              {
+                question: "Da li je Horalix pogodan za sve medicinske specijalnosti?",
+                answer: "Da, Horalix je dizajniran za korišćenje u svim medicinskim specijalnostima koje propisuju antibiotike, uključujući urgentnu medicinu, internu medicinu, hirurgiju, pedijatriju, JIL i infektivne bolesti."
+              },
+              {
+                question: "Šta čini Horalix različitim od drugih alata za podršku kliničkih odluka?",
+                answer: "Horalix se izdvaja kroz AI algoritme obučene na milionima kliničkih slučajeva, integraciju lokalnih podataka o rezistenciji u realnom vremenu, sveobuhvatne bezbednosne provere i transparentno obrazloženje preporuka."
+              }
+            ]
+          },
+          {
+            title: "Klinički dokazi i bezbednost",
+            icon: Shield,
+            questions: [
+              {
+                question: "Koliko su tačne Horalix preporuke?",
+                answer: "Kliničke validacione studije pokazuju da Horalix održava 95% tačnost u izboru antibiotika kroz 50+ bolnica. Naše preporuke su validne kroz opsežna recenzirana istraživanja."
+              },
+              {
+                question: "Koje kliničke smernice Horalix prati?",
+                answer: "Horalix uključuje smernice vodećih organizacija uključujući IDSA, CDC, WHO, ESCMID i lokalne institucionalne protokole."
+              },
+              {
+                question: "Kako Horalix osigurava bezbednost pacijenata?",
+                answer: "Bezbednost pacijenata je osigurana kroz sveobuhvatno proveravanje alergija, skrining interakcija lekova, prilagođavanje doziranja za bubrežnu/hepatičnu funkciju i pedijatrijske/gerijatrijske bezbednosne protokole."
+              },
+              {
+                question: "Da li kliničari mogu da prekinu Horalix preporuke?",
+                answer: "Apsolutno. Horalix je dizajniran kao alat za podršku odlučivanju, a ne zamena za kliničku prosudbu. Kliničari uvek mogu da prekinu preporuke sa dokumentovanim obrazloženjem."
+              },
+              {
+                question: "Kako Horalix rukuje podacima o antimikrobnoj rezistenciji?",
+                answer: "Horalix integriše lokalne obrasce antimikrobne rezistencije iz mikrobiolškog laboratorije vaše institucije, regionalne nadzorne podatke i globalne trendove rezistencije."
+              }
+            ]
+          },
+          {
+            title: "Integracija i implementacija",
+            icon: Settings,
+            questions: [
+              {
+                question: "Kako se Horalix integriše sa postojećim EHR sistemima?",
+                answer: "Horalix podržava besprekorno povezivanje sa glavnim EHR sistemima kroz HL7 FHIR standarde, REST API-je i prilagođena integraciona rešenja."
+              },
+              {
+                question: "Koliki je tipičan rok implementacije?",
+                answer: "Implementacija obično traje 4-8 nedelja u zavisnosti od složenosti vaših sistema i zahteva za prilagođavanje. Ovo uključuje integraciju sistema, obuku osoblja i podršku za pokretanje."
+              },
+              {
+                question: "Da li pružate obuku za zdravstveno osoblje?",
+                answer: "Da, pružamo sveobuhvatne programe obuke uključujući online module, live vebinare, obuku na licu mesta i stalnu podršku."
+              },
+              {
+                question: "Da li Horalix može biti prilagođen protokolima naše institucije?",
+                answer: "Apsolutno. Horalix može biti prilagođen specifičnim protokolima antibiotika vaše institucije, ograničenjima formulara, lokalnim obrascima rezistencije i preferencijama toka rada."
+              },
+              {
+                question: "Koji su tehnički zahtevi potrebni za Horalix?",
+                answer: "Horalix je cloud-based platforma dostupna kroz standardne web preglednike. Minimalni zahtevi uključuju moderne web preglednike, stabilnu internet konekciju i integracione mogućnosti sa vašim EHR sistemom."
+              }
+            ]
+          },
+          {
+            title: "Bezbednost i usklađenost",
+            icon: Lock,
+            questions: [
+              {
+                question: "Da li je Horalix HIPAA usklađen?",
+                answer: "Da, Horalix je potpuno HIPAA usklađen sa bezbednosnim merama na nivou preduzeća uključujući end-to-end enkripciju, kontrole pristupa, beleženje revizije i redovne bezbednosne procene."
+              },
+              {
+                question: "Kako su podaci pacijenata zaštićeni?",
+                answer: "Podaci pacijenata su zaštićeni kroz više slojeva bezbednosti uključujući AES-256 enkripciju u mirovanju i tokom prenosa, kontrole pristupa zasnovane na ulogama i multi-factor autentifikaciju."
+              },
+              {
+                question: "Koje regulatorne odobrenja ima Horalix?",
+                answer: "Horalix je FDA registrovan kao Class II medicinski softver, ISO 27001 sertifikovan za upravljanje bezbednošću informacija i usklađen sa međunarodnim propisima o zaštiti zdravstvenih podataka."
+              },
+              {
+                question: "Kako se održavaju tragovi revizije?",
+                answer: "Sveobuhvatni tragovi revizije beleže sve korisničke radnje, odluke preporuka, prekide i sistemske promene. Ovi zapisi su nepromenjivi, vremenski verifikovani i dostupni za regulatornu usklađenost."
+              }
+            ]
+          },
+          {
+            title: "Cene i podrška",
+            icon: CreditCard,
+            questions: [
+              {
+                question: "Koji modeli cena su dostupni?",
+                answer: "Horalix nudi fleksibilne modele cena uključujući licenciranje po krevetu za bolnice, licenciranje po pružaocu za klinike, enterprise-wide licenciranje za zdravstvene sisteme i subscription-based SaaS modele."
+              },
+              {
+                question: "Da li je dostupna besplatna probna verzija?",
+                answer: "Da, nudimo 30-dnevnu besplatnu probnu verziju koja uključuje pun pristup platformi, ograničene slučajeve pacijenata, resurse za obuku i namenjenu podršku."
+              },
+              {
+                question: "Koja podrška je uključena u Horalix?",
+                answer: "Sve pretplate uključuju 24/7 tehničku podršku, usluge kliničkih konsultacija, redovne sistemske ažuriranja, resurse za obuku, pomoć u implementaciji i pristup našem kliničkom savetodavnom odboru."
+              },
+              {
+                question: "Da li postoje dodatni troškovi za implementaciju ili obuku?",
+                answer: "Osnovna implementacija i obuka su uključene u sve planove pretplate. Dodatni troškovi mogu se primeniti za opsežno prilagođavanje, napredne integracije ili specijalizovane programe obuke."
+              },
+              {
+                question: "Da li možemo otkazati ili modifikovati našu pretplatu?",
+                answer: "Da, pretplate mogu biti modifikovane ili otkazane uz obaveštenje od 30 dana. Nudimo fleksibilne uslove da bismo prilagodili menjajuće potrebe."
+              }
+            ]
+          }
+        ]
+      },
       cta: {
         title: "Spremni da transformišete svoju praksu?",
         description: "Pridružite se zdravstvenim radnicima širom sveta koji veruju Horalixu za preporuke antibiotika zasnovane na dokazima.",
@@ -493,30 +750,90 @@ const About = (): JSX.Element => {
             "@context": "https://schema.org",
             "@type": "FAQPage",
             "mainEntity": [
+              ...t.faq.categories.flatMap(category => 
+                category.questions.slice(0, 3).map(faqItem => ({
+                  "@type": "Question",
+                  "name": faqItem.question,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faqItem.answer
+                  }
+                }))
+              )
+            ]
+          })}
+        </script>
+        
+        {/* Structured Data - BreadcrumbList */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
               {
-                "@type": "Question",
-                "name": "What is Horalix antibiotic stewardship platform?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Horalix is an AI-powered clinical decision support platform that provides evidence-based antibiotic recommendations by combining clinical guidelines from IDSA, CDC, and WHO with local antimicrobial resistance patterns."
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://antibioteka.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "About",
+                "item": "https://antibioteka.com/about"
+              }
+            ]
+          })}
+        </script>
+        
+        {/* Structured Data - HealthcareOrganization */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HealthcareOrganization",
+            "name": "Horalix",
+            "description": "AI-powered antibiotic stewardship platform providing evidence-based clinical decision support for healthcare providers worldwide",
+            "url": "https://antibioteka.com",
+            "logo": "https://antibioteka.com/lovable-uploads/30c9b6c0-b3ad-45c6-b39e-3c60b60db295.png",
+            "foundingDate": "2024",
+            "hasCredential": [
+              {
+                "@type": "EducationalOccupationalCredential",
+                "credentialCategory": "FDA Registration",
+                "recognizedBy": {
+                  "@type": "Organization",
+                  "name": "U.S. Food and Drug Administration"
                 }
               },
               {
-                "@type": "Question", 
-                "name": "How does Horalix improve patient outcomes?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Horalix improves patient outcomes by providing personalized antibiotic recommendations based on patient-specific factors, reducing decision time by 40%, improving treatment outcomes by 30%, and decreasing resistance development by 25%."
+                "@type": "EducationalOccupationalCredential", 
+                "credentialCategory": "HIPAA Compliance",
+                "recognizedBy": {
+                  "@type": "Organization",
+                  "name": "U.S. Department of Health and Human Services"
                 }
               },
               {
-                "@type": "Question",
-                "name": "Is Horalix compliant with clinical guidelines?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Yes, Horalix maintains 95% adherence to clinical guidelines from leading organizations including IDSA, CDC, and WHO, with complete audit trails and transparent recommendation rationale."
+                "@type": "EducationalOccupationalCredential",
+                "credentialCategory": "ISO 27001 Certification",
+                "recognizedBy": {
+                  "@type": "Organization",
+                  "name": "International Organization for Standardization"
                 }
               }
+            ],
+            "serviceArea": {
+              "@type": "Place",
+              "name": "Global"
+            },
+            "medicalSpecialty": [
+              "Infectious Diseases",
+              "Internal Medicine", 
+              "Emergency Medicine",
+              "Critical Care Medicine",
+              "Pediatrics",
+              "Surgery",
+              "Pharmacy"
             ]
           })}
         </script>
@@ -751,6 +1068,59 @@ const About = (): JSX.Element => {
                 </p>
               </CardContent>
             </Card>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t.faq.title}</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">{t.faq.subtitle}</p>
+            </div>
+            
+            <div className="space-y-8">
+              {t.faq.categories.map((category, categoryIndex) => (
+                <Card key={categoryIndex} className="border-l-4 border-l-primary">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <category.icon className="h-6 w-6 text-primary" />
+                      <h3 className="text-2xl font-semibold">{category.title}</h3>
+                    </div>
+                    
+                    <Accordion type="single" collapsible className="w-full">
+                      {category.questions.map((faq, faqIndex) => (
+                        <AccordionItem key={faqIndex} value={`faq-${categoryIndex}-${faqIndex}`}>
+                          <AccordionTrigger className="text-left hover:text-primary transition-colors">
+                            <span className="font-medium">{faq.question}</span>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <p className="text-foreground/80 leading-relaxed pt-2">{faq.answer}</p>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="mt-12 text-center">
+              <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
+                <CardContent className="p-8">
+                  <h3 className="text-xl font-semibold mb-4">Still have questions?</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Our clinical support team is available 24/7 to help with any questions about Horalix implementation, features, or clinical protocols.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button asChild>
+                      <Link to="/advisor">Try Horalix Free</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link to="/admin?tab=contact">Contact Support</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </section>
 
           {/* Commitment Section */}
