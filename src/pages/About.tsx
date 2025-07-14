@@ -6,6 +6,7 @@ import { ArrowLeft, Users, Award, Globe, Heart, Shield, Zap, Microscope, Brain, 
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
+import horalixLogo from "/lovable-uploads/03dd4946-134b-4dfe-8fc7-407235ed8685.png";
 
 const About = (): JSX.Element => {
   const { language } = useLanguage();
@@ -380,11 +381,15 @@ const About = (): JSX.Element => {
 
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
         {/* Header */}
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-14 max-w-screen-2xl items-center">
-            <Link to="/" className="flex items-center space-x-2">
+        <header className="glass-nav sticky top-0 z-50 w-full">
+          <div className="container flex h-16 max-w-screen-2xl items-center">
+            <Link to="/" className="flex items-center space-x-3">
               <ArrowLeft className="h-4 w-4" />
-              <span className="font-bold text-primary">Horalix Antibioteka</span>
+              <img src={horalixLogo} alt="HORALIX" className="h-8 w-8" />
+              <div className="flex flex-col">
+                <span className="text-lg font-bold bg-gradient-ios-blue bg-clip-text text-transparent">HORALIX</span>
+                <span className="text-xs text-muted-foreground -mt-1">Antibioteka</span>
+              </div>
             </Link>
           </div>
         </header>

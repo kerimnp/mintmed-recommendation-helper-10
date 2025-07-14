@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "next-themes";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import horalixLogo from "@/assets/horalix-logo.png";
+import horalixLogo from "/lovable-uploads/03dd4946-134b-4dfe-8fc7-407235ed8685.png";
 
 const Index = () => {
   const { language } = useLanguage();
