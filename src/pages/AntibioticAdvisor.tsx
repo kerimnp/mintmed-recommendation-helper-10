@@ -173,9 +173,27 @@ const AntibioticAdvisor = () => {
             <div className="flex items-center space-x-4">
               {/* Credits Display */}
               {profile && !profileLoading && (
-                <div className="flex items-center space-x-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <Coins className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                <div className={`flex items-center space-x-2 px-3 py-1 rounded-lg border ${
+                  profile.free_credits_left <= 2 
+                    ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800' 
+                    : profile.free_credits_left === 0
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                    : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                }`}>
+                  <Coins className={`h-4 w-4 ${
+                    profile.free_credits_left <= 2 
+                      ? 'text-yellow-600 dark:text-yellow-400' 
+                      : profile.free_credits_left === 0
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-blue-600 dark:text-blue-400'
+                  }`} />
+                  <span className={`text-sm font-medium ${
+                    profile.free_credits_left <= 2 
+                      ? 'text-yellow-900 dark:text-yellow-100' 
+                      : profile.free_credits_left === 0
+                      ? 'text-red-900 dark:text-red-100'
+                      : 'text-blue-900 dark:text-blue-100'
+                  }`}>
                     {profile.free_credits_left} {language === "en" ? "credits" : "kredita"}
                   </span>
                 </div>
@@ -185,6 +203,23 @@ const AntibioticAdvisor = () => {
           </div>
         </div>
       </header>
+
+      {/* Low Credits Warning */}
+      {profile && !profileLoading && profile.free_credits_left <= 2 && profile.free_credits_left > 0 && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-center text-yellow-800 dark:text-yellow-200">
+              <AlertTriangle className="h-5 w-5 mr-2" />
+              <span className="text-sm font-medium">
+                {language === "en" 
+                  ? `Low credits warning: You have ${profile.free_credits_left} credits remaining.`
+                  : `Upozorenje: Imate samo ${profile.free_credits_left} kredita preostalo.`
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
