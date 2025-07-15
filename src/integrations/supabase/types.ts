@@ -1667,6 +1667,10 @@ export type Database = {
         }
         Returns: string
       }
+      current_user_is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_hipaa_compliance_status: {
         Args: Record<PropertyKey, never>
         Returns: Json
