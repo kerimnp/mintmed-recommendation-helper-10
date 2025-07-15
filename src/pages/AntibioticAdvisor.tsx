@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "next-themes";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
-import { Shield, Zap, Award } from "lucide-react";
+import { Shield, Zap, Award, Coins } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ProfileDropdown } from "@/components/admin/dashboard/layout/ProfileDropdown";
 import { PatientData } from "@/utils/types/patientTypes";
@@ -14,11 +14,15 @@ import { AntibioticRecommendation } from "@/components/AntibioticRecommendation"
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useToast } from "@/hooks/use-toast";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const { profile, loading: profileLoading, decrementCredits } = useUserProfile();
+  const { toast } = useToast();
 
   // Initialize patient form state
   const [patientData, setPatientData] = useState<PatientData>({
@@ -68,6 +72,15 @@ const AntibioticAdvisor = () => {
     setRecommendation(null);
 
     try {
+      // Check if user has sufficient credits
+      if (!profile) {
+        throw new Error('User profile not loaded. Please wait and try again.');
+      }
+
+      if (profile.free_credits_left <= 0) {
+        throw new Error('Insufficient credits. You have used all your free credits. Please contact support or upgrade your plan.');
+      }
+
       // Validate critical data before processing
       if (!data.infectionSites || data.infectionSites.length === 0) {
         throw new Error('At least one infection site must be selected');
@@ -77,7 +90,21 @@ const AntibioticAdvisor = () => {
         throw new Error('Infection severity must be specified');
       }
 
-      console.log('✅ Critical validation passed, importing rules engine...');
+      console.log('✅ Credit check passed. User has', profile.free_credits_left, 'credits remaining');
+      console.log('✅ Critical validation passed, decrementing credits...');
+
+      // Decrement credits before generating recommendation
+      const creditSuccess = await decrementCredits();
+      if (!creditSuccess) {
+        throw new Error('Failed to process credit usage. Please try again.');
+      }
+
+      console.log('✅ Credits decremented successfully, importing rules engine...');
+
+      toast({
+        title: "Credit Used",
+        description: `1 credit used. ${(profile.free_credits_left - 1)} credits remaining.`,
+      });
 
       // Import the comprehensive clinical rules engine for hardcoded recommendations
       const { findBestClinicalScenario } = await import("@/utils/antibioticRecommendations/comprehensiveRulesEngine");
@@ -143,7 +170,18 @@ const AntibioticAdvisor = () => {
                 </p>
               </div>
             </div>
-            <ProfileDropdown />
+            <div className="flex items-center space-x-4">
+              {/* Credits Display */}
+              {profile && !profileLoading && (
+                <div className="flex items-center space-x-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <Coins className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                    {profile.free_credits_left} {language === "en" ? "credits" : "kredita"}
+                  </span>
+                </div>
+              )}
+              <ProfileDropdown />
+            </div>
           </div>
         </div>
       </header>
