@@ -188,6 +188,134 @@ export type Database = {
           },
         ]
       }
+      assessment_attempts: {
+        Row: {
+          assessment_id: string
+          attempt_number: number
+          completed_at: string | null
+          created_at: string
+          feedback: Json | null
+          id: string
+          responses: Json
+          score: number | null
+          started_at: string | null
+          status: string
+          time_taken_minutes: number | null
+          user_id: string
+        }
+        Insert: {
+          assessment_id: string
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          responses?: Json
+          score?: number | null
+          started_at?: string | null
+          status: string
+          time_taken_minutes?: number | null
+          user_id: string
+        }
+        Update: {
+          assessment_id?: string
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          feedback?: Json | null
+          id?: string
+          responses?: Json
+          score?: number | null
+          started_at?: string | null
+          status?: string
+          time_taken_minutes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_attempts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          adaptive_rules: Json | null
+          assessment_type: string
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty_level: string
+          id: string
+          is_active: boolean
+          learning_objectives: Json | null
+          passing_score: number | null
+          prerequisites: Json | null
+          questions: Json
+          tags: Json | null
+          time_limit_minutes: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          adaptive_rules?: Json | null
+          assessment_type: string
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level: string
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json | null
+          passing_score?: number | null
+          prerequisites?: Json | null
+          questions?: Json
+          tags?: Json | null
+          time_limit_minutes?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          adaptive_rules?: Json | null
+          assessment_type?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json | null
+          passing_score?: number | null
+          prerequisites?: Json | null
+          questions?: Json
+          tags?: Json | null
+          time_limit_minutes?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clinical_audit_events: {
         Row: {
           action_performed: string
@@ -1201,6 +1329,68 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_paths: {
+        Row: {
+          category: string
+          completion_criteria: Json
+          content_structure: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty_level: string
+          estimated_duration_hours: number
+          id: string
+          is_active: boolean
+          learning_objectives: Json
+          prerequisites: Json | null
+          tags: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          completion_criteria?: Json
+          content_structure?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level: string
+          estimated_duration_hours?: number
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json
+          prerequisites?: Json | null
+          tags?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          completion_criteria?: Json
+          content_structure?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string
+          estimated_duration_hours?: number
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json
+          prerequisites?: Json | null
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_paths_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           billing_address: string | null
@@ -1800,6 +1990,137 @@ export type Database = {
         }
         Relationships: []
       }
+      simulation_attempts: {
+        Row: {
+          attempt_number: number
+          completed_at: string | null
+          created_at: string
+          decisions: Json
+          feedback: Json | null
+          id: string
+          outcomes: Json | null
+          score: number | null
+          simulation_id: string
+          started_at: string | null
+          status: string
+          time_taken_minutes: number | null
+          user_id: string
+        }
+        Insert: {
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          decisions?: Json
+          feedback?: Json | null
+          id?: string
+          outcomes?: Json | null
+          score?: number | null
+          simulation_id: string
+          started_at?: string | null
+          status: string
+          time_taken_minutes?: number | null
+          user_id: string
+        }
+        Update: {
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          decisions?: Json
+          feedback?: Json | null
+          id?: string
+          outcomes?: Json | null
+          score?: number | null
+          simulation_id?: string
+          started_at?: string | null
+          status?: string
+          time_taken_minutes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_attempts_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulation_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      simulations: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          decision_points: Json
+          description: string | null
+          difficulty_level: string
+          estimated_duration_minutes: number | null
+          id: string
+          is_active: boolean
+          learning_objectives: Json | null
+          prerequisites: Json | null
+          scenario_data: Json
+          scoring_criteria: Json
+          simulation_type: string
+          tags: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          decision_points?: Json
+          description?: string | null
+          difficulty_level: string
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json | null
+          prerequisites?: Json | null
+          scenario_data?: Json
+          scoring_criteria?: Json
+          simulation_type: string
+          tags?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          decision_points?: Json
+          description?: string | null
+          difficulty_level?: string
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean
+          learning_objectives?: Json | null
+          prerequisites?: Json | null
+          scenario_data?: Json
+          scoring_criteria?: Json
+          simulation_type?: string
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           billing_cycle: string
@@ -1954,6 +2275,128 @@ export type Database = {
             columns: ["subscription_id"]
             isOneToOne: false
             referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_education_preferences: {
+        Row: {
+          accessibility_settings: Json | null
+          created_at: string
+          daily_learning_goal_minutes: number | null
+          id: string
+          interested_categories: Json | null
+          learning_style: string | null
+          notification_preferences: Json | null
+          preferred_difficulty: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_settings?: Json | null
+          created_at?: string
+          daily_learning_goal_minutes?: number | null
+          id?: string
+          interested_categories?: Json | null
+          learning_style?: string | null
+          notification_preferences?: Json | null
+          preferred_difficulty?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessibility_settings?: Json | null
+          created_at?: string
+          daily_learning_goal_minutes?: number | null
+          id?: string
+          interested_categories?: Json | null
+          learning_style?: string | null
+          notification_preferences?: Json | null
+          preferred_difficulty?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_education_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_learning_progress: {
+        Row: {
+          article_id: string | null
+          assessment_id: string | null
+          attempts: number | null
+          completed_at: string | null
+          completion_percentage: number | null
+          created_at: string
+          id: string
+          last_accessed: string | null
+          learning_path_id: string | null
+          metadata: Json | null
+          progress_type: string
+          score: number | null
+          simulation_id: string | null
+          status: string
+          time_spent_minutes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_id?: string | null
+          assessment_id?: string | null
+          attempts?: number | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          created_at?: string
+          id?: string
+          last_accessed?: string | null
+          learning_path_id?: string | null
+          metadata?: Json | null
+          progress_type: string
+          score?: number | null
+          simulation_id?: string | null
+          status: string
+          time_spent_minutes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string | null
+          assessment_id?: string | null
+          attempts?: number | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          created_at?: string
+          id?: string
+          last_accessed?: string | null
+          learning_path_id?: string | null
+          metadata?: Json | null
+          progress_type?: string
+          score?: number | null
+          simulation_id?: string | null
+          status?: string
+          time_spent_minutes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_learning_progress_learning_path_id_fkey"
+            columns: ["learning_path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_learning_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
