@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -49,6 +50,7 @@ interface RealTimeStats {
 }
 
 export const PremiumMainDashboardWithRealData: React.FC<PremiumMainDashboardProps> = ({ searchTerm }) => {
+  const navigate = useNavigate();
   const { data: doctorProfile } = useDoctorProfile();
   const [stats, setStats] = useState<RealTimeStats>({
     totalUsers: 0,
@@ -429,19 +431,34 @@ export const PremiumMainDashboardWithRealData: React.FC<PremiumMainDashboardProp
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full bg-gradient-to-r from-medical-primary to-blue-600 hover:from-medical-primary/90 hover:to-blue-600/90 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30">
+              <Button 
+                onClick={() => navigate('/advisor')}
+                className="w-full bg-gradient-to-r from-medical-primary to-blue-600 hover:from-medical-primary/90 hover:to-blue-600/90 text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30"
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 New Clinical Assessment
               </Button>
-              <Button variant="outline" className="w-full border-purple-200 hover:border-purple-300 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900/20">
+              <Button 
+                onClick={() => navigate('/admin?tab=history')}
+                variant="outline" 
+                className="w-full border-purple-200 hover:border-purple-300 hover:bg-purple-50 dark:border-purple-700 dark:hover:bg-purple-900/20"
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Patient Management
               </Button>
-              <Button variant="outline" className="w-full border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-700 dark:hover:bg-emerald-900/20">
+              <Button 
+                onClick={() => navigate('/admin?tab=effectiveness')}
+                variant="outline" 
+                className="w-full border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+              >
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Analytics Dashboard
               </Button>
-              <Button variant="outline" className="w-full border-amber-200 hover:border-amber-300 hover:bg-amber-50 dark:border-amber-700 dark:hover:bg-amber-900/20">
+              <Button 
+                onClick={() => navigate('/admin?tab=resistance')}
+                variant="outline" 
+                className="w-full border-amber-200 hover:border-amber-300 hover:bg-amber-50 dark:border-amber-700 dark:hover:bg-amber-900/20"
+              >
                 <Settings className="h-4 w-4 mr-2" />
                 System Settings
               </Button>
