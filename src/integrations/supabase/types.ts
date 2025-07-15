@@ -795,7 +795,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_encounters_doctor"
+            foreignKeyName: "encounters_doctor_id_fkey"
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
