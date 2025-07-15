@@ -28,14 +28,17 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ onActionClick }) => 
       onActionClick(action);
     }
     
-    if (route) {
-      navigate(route);
-    }
-    
     toast({
       title: "Action Initiated",
       description: `${action} has been started.`,
     });
+    
+    if (route) {
+      // Use setTimeout to ensure toast is shown before navigation
+      setTimeout(() => {
+        navigate(route);
+      }, 100);
+    }
   };
 
   const quickActions = [
