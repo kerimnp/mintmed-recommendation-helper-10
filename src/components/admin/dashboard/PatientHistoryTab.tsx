@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { PatientListSidebar } from './patient-history/PatientListSidebar';
 import { PatientDetailView } from './patient-history/PatientDetailView';
-import { HistoryEvent, PatientSummary, PrescriptionEvent } from './patient-history/types'; 
+import { HistoryEvent, PatientSummary, PrescriptionEvent, ConsultationEvent } from './patient-history/types'; 
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, AlertTriangle, Users, FileText } from 'lucide-react';
+import { Loader2, AlertTriangle, Users, FileText, Stethoscope } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Json } from '@/integrations/supabase/types';
 import { differenceInYears } from 'date-fns';
@@ -215,6 +215,87 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     };
   }, [selectedPatientId, toast]);
 
+  // Real-time subscription for encounters
+  useEffect(() => {
+    if (!selectedPatientId) return;
+
+    const encountersChannel = supabase
+      .channel(`encounters-changes-${selectedPatientId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'encounters',
+          filter: `patient_id=eq.${selectedPatientId}`
+        },
+        async (payload) => {
+          console.log('Real-time encounters change:', payload);
+          
+          try {
+            if (payload.eventType === 'INSERT') {
+              // Fetch the complete encounter data with doctor profile
+              const { data: encounterData, error } = await supabase
+                .from('encounters')
+                .select(`
+                  *,
+                  doctor:profiles!encounters_doctor_id_fkey (id, first_name, last_name, email)
+                `)
+                .eq('id', payload.new.id)
+                .single();
+
+              if (!error && encounterData) {
+                const newEvent = mapEncounterToHistoryEvent(encounterData);
+                setSelectedPatientHistory(prev => [newEvent, ...prev]);
+                toast({
+                  title: "New Encounter Added",
+                  description: `${encounterData.specialty} consultation has been added.`,
+                });
+              }
+            } else if (payload.eventType === 'UPDATE') {
+              // Fetch updated encounter data
+              const { data: encounterData, error } = await supabase
+                .from('encounters')
+                .select(`
+                  *,
+                  doctor:profiles!encounters_doctor_id_fkey (id, first_name, last_name, email)
+                `)
+                .eq('id', payload.new.id)
+                .single();
+
+              if (!error && encounterData) {
+                const updatedEvent = mapEncounterToHistoryEvent(encounterData);
+                setSelectedPatientHistory(prev => 
+                  prev.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+                );
+                toast({
+                  title: "Encounter Updated",
+                  description: `${encounterData.specialty} consultation has been updated.`,
+                });
+              }
+            } else if (payload.eventType === 'DELETE') {
+              const deletedEncounter = payload.old as any;
+              setSelectedPatientHistory(prev => 
+                prev.filter(event => event.id !== deletedEncounter.id)
+              );
+              toast({
+                title: "Encounter Removed",
+                description: `An encounter has been removed.`,
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            console.error('Error processing real-time encounter update:', error);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(encountersChannel);
+    };
+  }, [selectedPatientId, toast]);
+
   // Helper function to map PatientFromSupabase to PatientSummary
   const mapPatientFromSupabase = (p: PatientFromSupabase): PatientSummary => {
     let age = 0;
@@ -260,6 +341,28 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
       physician: physicianName,
       notes: rx.status ? `Status: ${rx.status}` : undefined,
     } as PrescriptionEvent;
+  };
+
+  // Helper function to map encounter to history event
+  const mapEncounterToHistoryEvent = (encounter: any): ConsultationEvent => {
+    const doctorProfile = encounter.doctor as {id: string, first_name: string | null, last_name: string | null, email: string | null} | null;
+    const physicianName = doctorProfile ? `${doctorProfile.first_name || ''} ${doctorProfile.last_name || ''}`.trim() || doctorProfile.email || 'N/A' : 'N/A';
+    
+    return {
+      id: encounter.id,
+      date: encounter.encounter_date,
+      type: 'Consultation',
+      title: `${encounter.specialty} Consultation`,
+      icon: Stethoscope,
+      details: {
+        specialty: encounter.specialty,
+        reason: encounter.reason_for_visit,
+        findings: encounter.findings,
+        recommendations: encounter.recommendations || undefined,
+      },
+      physician: physicianName,
+      notes: encounter.notes || undefined,
+    } as ConsultationEvent;
   };
 
   // Enhanced patient fetching with role-based access control and toggle support
@@ -331,7 +434,7 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
     }
   }, [initialPatientIdFromUrl, initialSearchTermFromUrl, allPatients, loadingPatients]);
 
-  // Enhanced patient history fetching with better error handling - FIXED QUERY
+  // Enhanced patient history fetching with better error handling - includes encounters
   useEffect(() => {
     if (selectedPatientId && user) {
       const fetchPatientHistory = async () => {
@@ -339,22 +442,43 @@ export const PatientHistoryTab: React.FC<PatientHistoryTabProps> = ({ patientId:
         setHistoryError(null);
         setSelectedPatientHistory([]);
         try {
-          const { data: prescriptionsData, error: prescriptionsError } = await supabase
-            .from('prescriptions')
-            .select(`
-              *,
-              doctor:profiles!prescriptions_doctor_id_fkey (id, first_name, last_name, email)
-            `)
-            .eq('patient_id', selectedPatientId)
-            .order('start_date', { ascending: false });
+          // Fetch prescriptions and encounters in parallel
+          const [prescriptionsResult, encountersResult] = await Promise.all([
+            supabase
+              .from('prescriptions')
+              .select(`
+                *,
+                doctor:profiles!prescriptions_doctor_id_fkey (id, first_name, last_name, email)
+              `)
+              .eq('patient_id', selectedPatientId)
+              .order('start_date', { ascending: false }),
+            
+            supabase
+              .from('encounters')
+              .select(`
+                *,
+                doctor:profiles!encounters_doctor_id_fkey (id, first_name, last_name, email)
+              `)
+              .eq('patient_id', selectedPatientId)
+              .order('encounter_date', { ascending: false })
+          ]);
 
-          if (prescriptionsError) {
-            throw prescriptionsError;
+          if (prescriptionsResult.error) {
+            throw prescriptionsResult.error;
           }
 
-          const historyEvents: HistoryEvent[] = prescriptionsData.map(mapPrescriptionToHistoryEvent);
+          if (encountersResult.error) {
+            throw encountersResult.error;
+          }
+
+          // Map all history events
+          const prescriptionEvents: HistoryEvent[] = prescriptionsResult.data.map(mapPrescriptionToHistoryEvent);
+          const encounterEvents: HistoryEvent[] = encountersResult.data.map(mapEncounterToHistoryEvent);
           
-          setSelectedPatientHistory(historyEvents);
+          // Combine and sort all events by date
+          const allHistoryEvents = [...prescriptionEvents, ...encounterEvents];
+          
+          setSelectedPatientHistory(allHistoryEvents);
 
         } catch (err: any) {
           console.error("Error fetching patient history:", err);

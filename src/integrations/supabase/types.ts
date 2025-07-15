@@ -753,6 +753,63 @@ export type Database = {
         }
         Relationships: []
       }
+      encounters: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          encounter_date: string
+          findings: string
+          id: string
+          notes: string | null
+          patient_id: string
+          reason_for_visit: string
+          recommendations: string | null
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          encounter_date?: string
+          findings: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reason_for_visit: string
+          recommendations?: string | null
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          encounter_date?: string
+          findings?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reason_for_visit?: string
+          recommendations?: string | null
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_encounters_doctor"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_encounters_patient"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encryption_audit_logs: {
         Row: {
           compliance_level: string
