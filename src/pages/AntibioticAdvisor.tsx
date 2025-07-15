@@ -16,11 +16,13 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading, decrementCredits } = useUserProfile();
   const { toast } = useToast();
 
@@ -72,6 +74,11 @@ const AntibioticAdvisor = () => {
     setRecommendation(null);
 
     try {
+      // Check if user is authenticated
+      if (!user) {
+        throw new Error('You must be logged in to use this feature. Please log in and try again.');
+      }
+
       // Check if user has sufficient credits
       if (!profile) {
         throw new Error('User profile not loaded. Please wait and try again.');

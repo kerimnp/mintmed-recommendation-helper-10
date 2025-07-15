@@ -134,7 +134,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/advisor" element={<AntibioticAdvisor />} />
+                  <Route path="/advisor" element={<ProtectedRoute><AntibioticAdvisor /></ProtectedRoute>} />
                   
                   <Route path="/production-verification" element={<ProductionVerificationPage />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
