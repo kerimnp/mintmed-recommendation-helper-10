@@ -305,6 +305,7 @@ export const AntibioticRecommendation = ({
         recommendationData={recommendation}
         selectedProduct={selectedProduct}
         patientId={patientId}
+        patientData={patientData}
       />
     </div>
   );

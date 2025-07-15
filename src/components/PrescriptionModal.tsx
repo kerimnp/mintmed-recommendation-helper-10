@@ -12,19 +12,23 @@ import { ReferralModal } from "./ReferralModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDoctorProfile } from "@/hooks/useDoctorProfile";
+import { PatientData } from "@/utils/types/patientTypes";
+
 interface PrescriptionModalProps {
   open: boolean;
   onClose: () => void;
   recommendationData: EnhancedAntibioticRecommendation;
   selectedProduct?: DrugProduct;
   patientId?: string | null;
+  patientData?: PatientData;
 }
 export const PrescriptionModal = ({
   open,
   onClose,
   recommendationData,
   selectedProduct,
-  patientId
+  patientId,
+  patientData
 }: PrescriptionModalProps) => {
   const {
     toast
@@ -41,6 +45,7 @@ export const PrescriptionModal = ({
   const [doctorSurname, setDoctorSurname] = useState("");
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [currentPatientId, setCurrentPatientId] = useState<string | null>(patientId || null);
 
   // Auto-fill doctor information when component loads or profile changes
   useEffect(() => {
@@ -73,16 +78,74 @@ export const PrescriptionModal = ({
     };
     if (open && patientId) {
       fetchPatientData();
+    } else if (open && patientData && patientData.firstName && patientData.lastName) {
+      // Pre-fill from patient data if available
+      setPatientName(patientData.firstName);
+      setPatientSurname(patientData.lastName);
     }
-  }, [open, patientId]);
-  const savePrescriptionToDatabase = async () => {
-    if (!user || !patientId) {
+  }, [open, patientId, patientData]);
+  const createPatientFromForm = async (): Promise<string> => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Calculate date of birth from age if patientData is available
+    let dateOfBirth = '1980-01-01'; // Default fallback
+    if (patientData && patientData.age) {
+      const age = parseInt(patientData.age);
+      const dob = new Date();
+      dob.setFullYear(dob.getFullYear() - age);
+      dateOfBirth = dob.toISOString().split('T')[0];
+    }
+
+    const patientRecord = {
+      first_name: patientName || 'Patient',
+      last_name: patientSurname || 'Unknown',
+      date_of_birth: dateOfBirth,
+      gender: patientData?.gender || 'male',
+      contact_phone: patientData?.contactPhone || null,
+      contact_email: patientData?.contactEmail || null,
+      address: patientData?.address || null,
+      allergies: patientData?.allergies ? patientData.allergies as any : null,
+      known_conditions: patientData ? {
+        kidneyDisease: patientData.kidneyDisease,
+        liverDisease: patientData.liverDisease,
+        diabetes: patientData.diabetes,
+        immunosuppressed: patientData.immunosuppressed,
+        infectionSites: patientData.infectionSites,
+        symptoms: patientData.symptoms,
+        duration: patientData.duration,
+        severity: patientData.severity,
+        isHospitalAcquired: patientData.isHospitalAcquired,
+        resistances: patientData.resistances
+      } as any : null,
+      attending_physician_id: user.id,
+      notes: patientData ? `Weight: ${patientData.weight}kg, Height: ${patientData.height}cm, Region: ${patientData.region}${patientData.creatinine ? `, Creatinine: ${patientData.creatinine}` : ''}` : null
+    };
+
+    const { data: createdPatient, error } = await supabase
+      .from('patients')
+      .insert([patientRecord])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating patient record:', error);
+      throw error;
+    }
+
+    console.log('✅ Patient record created from prescription modal:', createdPatient.id);
+    return createdPatient.id;
+  };
+
+  const savePrescriptionToDatabase = async (usePatientId: string) => {
+    if (!user || !usePatientId) {
       console.warn('Cannot save prescription: missing user or patient ID');
       return null;
     }
     try {
       const prescriptionData = {
-        patient_id: patientId,
+        patient_id: usePatientId,
         doctor_id: user.id,
         antibiotic_name: recommendationData.primaryRecommendation.name,
         dosage: recommendationData.primaryRecommendation.dosage,
@@ -121,11 +184,28 @@ export const PrescriptionModal = ({
     }
     setIsSaving(true);
     try {
-      // Save prescription to database first
-      let savedPrescription = null;
-      if (user && patientId) {
+      // Ensure we have a patient ID - create patient if needed
+      let activePatientId = currentPatientId;
+      if (!activePatientId && user) {
         try {
-          savedPrescription = await savePrescriptionToDatabase();
+          activePatientId = await createPatientFromForm();
+          setCurrentPatientId(activePatientId);
+          console.log('✅ Patient created for prescription:', activePatientId);
+        } catch (error) {
+          console.error('Failed to create patient:', error);
+          toast({
+            title: "Warning",
+            description: "Failed to create patient record. PDF will be generated without database storage.",
+            variant: "destructive"
+          });
+        }
+      }
+
+      // Save prescription to database
+      let savedPrescription = null;
+      if (user && activePatientId) {
+        try {
+          savedPrescription = await savePrescriptionToDatabase(activePatientId);
           toast({
             title: "Prescription Saved",
             description: "Prescription has been saved to the patient's medical record"
@@ -264,8 +344,8 @@ export const PrescriptionModal = ({
                 <Input id="doctorSurname" value={doctorSurname} onChange={e => setDoctorSurname(e.target.value)} placeholder="Last name" disabled className="bg-gray-100 dark:bg-gray-800" />
               </div>
             </div>
-            {patientId && <div className="text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
-                <p>✓ This prescription will be linked to the patient's medical record</p>
+            {(currentPatientId || user) && <div className="text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                <p>✓ This prescription will be saved to the patient's medical record</p>
               </div>}
           </div>
           <DialogFooter className="flex-col space-y-4">

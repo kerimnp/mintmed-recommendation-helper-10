@@ -17,6 +17,7 @@ import { AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const AntibioticAdvisor = () => {
   const { language } = useLanguage();
@@ -64,6 +65,58 @@ const AntibioticAdvisor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [recommendation, setRecommendation] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [patientId, setPatientId] = useState<string | null>(null);
+
+  const createPatientRecord = async (data: PatientData): Promise<string> => {
+    try {
+      // Calculate date of birth from age
+      const age = parseInt(data.age);
+      const dateOfBirth = new Date();
+      dateOfBirth.setFullYear(dateOfBirth.getFullYear() - age);
+      
+      const patientRecord = {
+        first_name: data.firstName || 'Patient',
+        last_name: data.lastName || 'Unknown',
+        date_of_birth: dateOfBirth.toISOString().split('T')[0],
+        gender: data.gender,
+        contact_phone: data.contactPhone || null,
+        contact_email: data.contactEmail || null,
+        address: data.address || null,
+        allergies: data.allergies as any, // Convert to JSON for database
+        known_conditions: {
+          kidneyDisease: data.kidneyDisease,
+          liverDisease: data.liverDisease,
+          diabetes: data.diabetes,
+          immunosuppressed: data.immunosuppressed,
+          infectionSites: data.infectionSites,
+          symptoms: data.symptoms,
+          duration: data.duration,
+          severity: data.severity,
+          isHospitalAcquired: data.isHospitalAcquired,
+          resistances: data.resistances
+        } as any, // Convert to JSON for database
+        attending_physician_id: user?.id || null,
+        notes: `Weight: ${data.weight}kg, Height: ${data.height}cm, Region: ${data.region}${data.creatinine ? `, Creatinine: ${data.creatinine}` : ''}`
+      };
+
+      const { data: createdPatient, error } = await supabase
+        .from('patients')
+        .insert([patientRecord])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating patient record:', error);
+        throw error;
+      }
+
+      console.log('✅ Patient record created:', createdPatient.id);
+      return createdPatient.id;
+    } catch (error) {
+      console.error('Failed to create patient record:', error);
+      throw error;
+    }
+  };
 
   const handlePatientFormSubmit = async (data: PatientData) => {
     console.log('=== RECOMMENDATION GENERATION START ===');
@@ -106,7 +159,18 @@ const AntibioticAdvisor = () => {
         throw new Error('Failed to process credit usage. Please try again.');
       }
 
-      console.log('✅ Credits decremented successfully, importing rules engine...');
+      console.log('✅ Credits decremented successfully, creating patient record...');
+
+      // Create patient record first
+      let createdPatientId: string | null = null;
+      try {
+        createdPatientId = await createPatientRecord(data);
+        setPatientId(createdPatientId);
+        console.log('✅ Patient record created with ID:', createdPatientId);
+      } catch (error) {
+        console.warn('⚠️ Failed to create patient record, proceeding without database storage:', error);
+        // Continue with recommendation generation even if patient creation fails
+      }
 
       toast({
         title: "Credit Used",
@@ -127,7 +191,14 @@ const AntibioticAdvisor = () => {
         throw new Error('Failed to generate recommendation - no matching clinical scenario found');
       }
 
-      setRecommendation(clinicalRecommendation);
+      // Add patient ID to recommendation for prescription tracking
+      const enhancedRecommendation = {
+        ...clinicalRecommendation,
+        patientId: createdPatientId,
+        patientData: data
+      };
+
+      setRecommendation(enhancedRecommendation);
       
       // Scroll to recommendation section
       setTimeout(() => {
@@ -403,6 +474,7 @@ const AntibioticAdvisor = () => {
               <AntibioticRecommendation 
                 recommendation={recommendation}
                 patientData={patientData}
+                patientId={patientId}
               />
               
               {/* Action Buttons */}
