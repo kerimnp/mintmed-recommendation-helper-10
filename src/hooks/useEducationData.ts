@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { articles } from '@/components/admin/education/data';
+import { allArticles } from '@/components/admin/education/data/allArticles';
+import { learningPathsData } from '@/components/admin/education/data/learningPathsData';
+import { assessmentsData } from '@/components/admin/education/data/assessmentsData';
+import { simulationsData } from '@/components/admin/education/data/simulationsData';
 import type { 
   LearningPath, 
   Assessment, 
@@ -18,7 +21,7 @@ export const useEducationData = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Static data
-  const [staticArticles] = useState<Article[]>(articles);
+  const [staticArticles] = useState<Article[]>(allArticles);
   
   // Database data
   const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
