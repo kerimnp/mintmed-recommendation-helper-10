@@ -11,7 +11,7 @@ export interface CategoryOption {
 export interface Article {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   icon: LucideIcon;
   category: ArticleCategory;
   readTime: string;
@@ -19,6 +19,11 @@ export interface Article {
   author: string;
   authorCredentials: string;
   content: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  tags?: string[];
+  relatedTopics?: string[];
+  quiz?: any[];
+  references?: string[];
 }
 
 // Export ArticleType as an alias to Article for backward compatibility
