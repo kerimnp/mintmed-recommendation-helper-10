@@ -26,15 +26,9 @@ export default {
           secondary: "#F0F4F8", // Light grayish blue
           tertiary: "#E2E8F0",   // Lighter gray
         },
-        "medical-primary": { // Horalix Primary Blue
-          DEFAULT: "#2A7FFF", 
-          hover: "#1A6FFF", // Darker shade for hover
-        },
-        "medical-accent": { // A complementary accent, can adjust
-          DEFAULT: "#4DA8DA", // Existing accent
-          secondary: "#008CFF",
-          tertiary: "#00AEEF",
-        },
+        "medical-primary": "hsl(var(--medical-primary))",
+        "medical-secondary": "hsl(var(--medical-secondary))",
+        "medical-accent": "hsl(var(--medical-accent))",
         "medical-text": { // Dark slate for text
           DEFAULT: "#334155", 
           secondary: "#475569", // Lighter slate
