@@ -1,17 +1,20 @@
-export const hospitalGradeArticles = [
+import { Article } from '../types/articleTypes';
+import { Shield, Microscope, Activity } from 'lucide-react';
+
+export const hospitalGradeArticles: Article[] = [
   {
     id: "antibiotic-stewardship-principles",
     title: "Antibiotic Stewardship: Core Principles and Implementation",
     description: "Comprehensive guide to implementing evidence-based antibiotic stewardship programs in hospital settings",
-    category: "Antibiotic Stewardship" as any,
+    category: "guidelines",
     difficulty: "intermediate",
     readTime: "15 min",
     author: "Dr. Sarah Johnson, PharmD",
     authorCredentials: "PharmD, Clinical Pharmacy Specialist",
-    publishedDate: "2024-01-15",
+    
     lastUpdated: "2024-01-15",
     tags: ["stewardship", "implementation", "evidence-based", "hospital"],
-    icon: "Shield" as any,
+    icon: Shield,
     references: [
       "CDC. Core Elements of Hospital Antibiotic Stewardship Programs. 2019.",
       "Barlam TF, et al. Implementing an Antibiotic Stewardship Program. Clin Microbiol Rev. 2016;29(4):699-747."
@@ -150,15 +153,15 @@ Regular assessment and adaptation ensure programs remain effective and responsiv
     id: "antimicrobial-resistance-mechanisms",
     title: "Understanding Antimicrobial Resistance: Mechanisms and Clinical Implications",
     description: "Detailed exploration of bacterial resistance mechanisms and their impact on clinical decision-making",
-    category: "Microbiology" as any,
+    category: "research",
     difficulty: "advanced",
     readTime: "20 min",
     author: "Dr. Michael Chen, MD, PhD",
     authorCredentials: "MD, PhD, Infectious Disease Specialist",
-    publishedDate: "2024-01-10",
+    
     lastUpdated: "2024-01-10",
     tags: ["resistance", "mechanisms", "clinical", "microbiology"],
-    icon: "Microscope" as any,
+    icon: Microscope,
     references: [
       "Blair JM, et al. Molecular mechanisms of antibiotic resistance. Nat Rev Microbiol. 2015;13(1):42-51.",
       "Davies J, et al. Origins and evolution of antibiotic resistance. Microbiol Mol Biol Rev. 2010;74(3):417-433."
@@ -375,11 +378,12 @@ Regular updates in resistance patterns and mechanisms ensure evidence-based deci
     id: "sepsis-antimicrobial-management",
     title: "Sepsis and Septic Shock: Evidence-Based Antimicrobial Management",
     description: "Comprehensive guide to antimicrobial therapy in sepsis, including early recognition, empirical selection, and optimization strategies",
-    category: "Critical Care",
+    category: "emergency",
     difficulty: "advanced",
     readTime: "18 min",
     author: "Dr. Rebecca Martinez, MD",
-    publishedDate: "2024-01-08",
+    authorCredentials: "Emergency Medicine Physician",
+    icon: Activity,
     lastUpdated: "2024-01-08",
     tags: ["sepsis", "critical-care", "antimicrobials", "emergency"],
     references: [
@@ -629,11 +633,12 @@ Healthcare teams must maintain proficiency in sepsis recognition and management 
     id: "surgical-prophylaxis-guidelines",
     title: "Surgical Antimicrobial Prophylaxis: Evidence-Based Guidelines and Implementation",
     description: "Comprehensive guide to surgical prophylaxis selection, timing, and duration based on current evidence and guidelines",
-    category: "Surgery",
+    category: "surgical",
     difficulty: "intermediate",
     readTime: "16 min",
     author: "Dr. Jennifer Walsh, PharmD",
-    publishedDate: "2024-01-05",
+    authorCredentials: "Clinical Pharmacist",
+    icon: Shield,
     lastUpdated: "2024-01-05",
     tags: ["surgery", "prophylaxis", "prevention", "guidelines"],
     references: [
@@ -952,11 +957,12 @@ Healthcare systems must balance infection prevention goals with antimicrobial st
     id: "cdiff-prevention-management",
     title: "Clostridioides difficile: Prevention, Diagnosis, and Management Strategies",
     description: "Evidence-based approach to C. difficile infection prevention, rapid diagnosis, and optimal treatment selection",
-    category: "Infection Control",
+    category: "infection-control",
     difficulty: "intermediate",
     readTime: "14 min",
     author: "Dr. Kevin Park, MD",
-    publishedDate: "2024-01-03",
+    authorCredentials: "Infectious Disease Specialist",
+    icon: Shield,
     lastUpdated: "2024-01-03",
     tags: ["c-difficile", "prevention", "infection-control", "treatment"],
     references: [
