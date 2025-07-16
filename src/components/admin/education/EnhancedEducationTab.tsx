@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { useEducationData } from '@/hooks/useEducationData';
 import { ArticleLibrary } from './ArticleLibrary';
+import { AssessmentInterface } from './AssessmentInterface';
+import { SimulationInterface } from './SimulationInterface';
+import { LearningPathInterface } from './LearningPathInterface';
 
 interface EnhancedEducationTabProps {
   searchTerm?: string;
@@ -61,15 +64,29 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
   }
 
   if (selectedPath) {
-    return <LearningPathDetail path={selectedPath} onBack={() => setSelectedPath(null)} />;
+    return <LearningPathInterface learningPath={selectedPath} onBack={() => setSelectedPath(null)} />;
   }
 
   if (selectedAssessment) {
-    return <AssessmentDetail assessment={selectedAssessment} onBack={() => setSelectedAssessment(null)} />;
+    return <AssessmentInterface 
+      assessment={selectedAssessment} 
+      onBack={() => setSelectedAssessment(null)}
+      onComplete={(score, responses) => {
+        setSelectedAssessment(null);
+        // Handle completion if needed
+      }}
+    />;
   }
 
   if (selectedSimulation) {
-    return <SimulationDetail simulation={selectedSimulation} onBack={() => setSelectedSimulation(null)} />;
+    return <SimulationInterface 
+      simulation={selectedSimulation} 
+      onBack={() => setSelectedSimulation(null)}
+      onComplete={(score, decisions) => {
+        setSelectedSimulation(null);
+        // Handle completion if needed
+      }}
+    />;
   }
 
   return (
