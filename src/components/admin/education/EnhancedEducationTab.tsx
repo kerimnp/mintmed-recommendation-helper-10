@@ -22,6 +22,7 @@ import { ArticleLibrary } from './ArticleLibrary';
 import { AssessmentInterface } from './AssessmentInterface';
 import { SimulationInterface } from './SimulationInterface';
 import { LearningPathInterface } from './LearningPathInterface';
+import { LearningPathsComponent } from './LearningPathsComponent';
 
 interface EnhancedEducationTabProps {
   searchTerm?: string;
@@ -336,11 +337,7 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
         </TabsContent>
 
         <TabsContent value="paths">
-          <LearningPathsGrid 
-            paths={learningPaths} 
-            onPathSelect={setSelectedPath}
-            searchTerm={searchTerm}
-          />
+          <LearningPathsComponent />
         </TabsContent>
 
         <TabsContent value="assessments">

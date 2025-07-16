@@ -17,20 +17,23 @@ import {
   Star
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEducationData } from '@/hooks/useEducationData';
+import { learningPathsData } from './data/learningPathsData';
 
 interface LearningModule {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   duration: string;
-  type: 'article' | 'quiz' | 'case' | 'simulation';
+  type: 'article' | 'quiz' | 'case' | 'simulation' | 'assessment';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   completed: boolean;
   locked: boolean;
   score?: number;
+  order: number;
 }
 
-interface LearningPath {
+interface DisplayLearningPath {
   id: string;
   title: string;
   description: string;
@@ -42,149 +45,43 @@ interface LearningPath {
   cmeCredits?: number;
 }
 
-const learningPaths: LearningPath[] = [
-  {
-    id: 'antibiotic-fundamentals',
-    title: 'Antibiotic Therapy Fundamentals',
-    description: 'Master the basic principles of antimicrobial therapy, from mechanism of action to appropriate selection.',
-    difficulty: 'beginner',
-    estimatedTime: '4-6 hours',
-    completionRate: 65,
-    certificationAvailable: true,
-    cmeCredits: 6,
-    modules: [
-      {
-        id: 'basics-1',
-        title: 'Mechanisms of Antibiotic Action',
-        description: 'Understanding how antibiotics work at the cellular level',
-        duration: '20 min',
-        type: 'article',
-        difficulty: 'beginner',
-        completed: true,
-        locked: false
-      },
-      {
-        id: 'basics-2',
-        title: 'Spectrum of Activity Quiz',
-        description: 'Test your knowledge of antibiotic spectrums',
-        duration: '15 min',
-        type: 'quiz',
-        difficulty: 'beginner',
-        completed: true,
-        locked: false,
-        score: 85
-      },
-      {
-        id: 'basics-3',
-        title: 'Pharmacokinetics and Dosing',
-        description: 'Learn about absorption, distribution, and elimination',
-        duration: '25 min',
-        type: 'article',
-        difficulty: 'intermediate',
-        completed: false,
-        locked: false
-      },
-      {
-        id: 'basics-4',
-        title: 'Clinical Case: Simple UTI',
-        description: 'Practice antibiotic selection for uncomplicated UTI',
-        duration: '30 min',
-        type: 'case',
-        difficulty: 'beginner',
-        completed: false,
-        locked: false
-      },
-      {
-        id: 'basics-5',
-        title: 'Resistance Mechanisms',
-        description: 'Understanding bacterial resistance strategies',
-        duration: '20 min',
-        type: 'article',
-        difficulty: 'intermediate',
-        completed: false,
-        locked: true
-      }
-    ]
-  },
-  {
-    id: 'pediatric-antibiotics',
-    title: 'Pediatric Antimicrobial Therapy',
-    description: 'Specialized training for antibiotic use in pediatric populations, including dosing and safety considerations.',
-    difficulty: 'intermediate',
-    estimatedTime: '6-8 hours',
-    completionRate: 25,
-    certificationAvailable: true,
-    cmeCredits: 8,
-    modules: [
-      {
-        id: 'peds-1',
-        title: 'Pediatric Pharmacokinetics',
-        description: 'Age-related changes in drug handling',
-        duration: '30 min',
-        type: 'article',
-        difficulty: 'intermediate',
-        completed: true,
-        locked: false
-      },
-      {
-        id: 'peds-2',
-        title: 'Neonatal Dosing Guidelines',
-        description: 'Special considerations for newborns',
-        duration: '25 min',
-        type: 'article',
-        difficulty: 'advanced',
-        completed: false,
-        locked: false
-      },
-      {
-        id: 'peds-3',
-        title: 'Pediatric Sepsis Simulation',
-        description: 'Interactive case management',
-        duration: '45 min',
-        type: 'simulation',
-        difficulty: 'advanced',
-        completed: false,
-        locked: true
-      }
-    ]
-  },
-  {
-    id: 'resistance-stewardship',
-    title: 'Antimicrobial Resistance & Stewardship',
-    description: 'Advanced training in resistance patterns, stewardship principles, and infection prevention.',
-    difficulty: 'advanced',
-    estimatedTime: '8-10 hours',
-    completionRate: 10,
-    certificationAvailable: true,
-    cmeCredits: 12,
-    modules: [
-      {
-        id: 'res-1',
-        title: 'Global Resistance Trends',
-        description: 'Epidemiology of antimicrobial resistance',
-        duration: '35 min',
-        type: 'article',
-        difficulty: 'advanced',
-        completed: false,
-        locked: false
-      },
-      {
-        id: 'res-2',
-        title: 'MRSA Management Workshop',
-        description: 'Comprehensive MRSA case studies',
-        duration: '60 min',
-        type: 'case',
-        difficulty: 'advanced',
-        completed: false,
-        locked: false
-      }
-    ]
-  }
-];
+// Convert real data to display format
+const convertToDisplayFormat = (data: any[]): DisplayLearningPath[] => {
+  return data.map(path => {
+    const modules = path.content_structure?.map((content: any, index: number) => ({
+      id: content.id,
+      title: content.title || content.id,
+      description: `${content.type} module`,
+      duration: `${content.estimated_minutes || 30} min`,
+      type: content.type === 'assessment' ? 'quiz' : content.type,
+      difficulty: path.difficulty_level,
+      completed: Math.random() > 0.7, // Mock completion status
+      locked: index > 2, // Lock modules after 3rd
+      score: Math.random() > 0.5 ? Math.floor(Math.random() * 40 + 60) : undefined,
+      order: content.order
+    })) || [];
+
+    return {
+      id: path.id,
+      title: path.title,
+      description: path.description,
+      difficulty: path.difficulty_level,
+      estimatedTime: `${path.estimated_duration_hours} hours`,
+      modules,
+      completionRate: Math.floor(Math.random() * 100), // Mock completion rate
+      certificationAvailable: true,
+      cmeCredits: Math.floor(path.estimated_duration_hours * 1.5)
+    };
+  });
+};
 
 export const LearningPathsComponent: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const { userProgress } = useEducationData();
   const isMobile = useIsMobile();
+  
+  // Use real data
+  const learningPaths = convertToDisplayFormat(learningPathsData);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -199,6 +96,7 @@ export const LearningPathsComponent: React.FC = () => {
     switch (type) {
       case 'article': return BookOpen;
       case 'quiz': return Brain;
+      case 'assessment': return Brain;
       case 'case': return Users;
       case 'simulation': return PlayCircle;
       default: return BookOpen;
@@ -287,7 +185,7 @@ export const LearningPathsComponent: React.FC = () => {
                         </span>
                         {!module.locked && !module.completed && (
                           <Button size="sm" variant="outline">
-                            {module.type === 'quiz' ? 'Take Quiz' : 
+                            {module.type === 'quiz' || module.type === 'assessment' ? 'Take Quiz' : 
                              module.type === 'case' ? 'Start Case' :
                              module.type === 'simulation' ? 'Begin Simulation' : 'Read Article'}
                           </Button>

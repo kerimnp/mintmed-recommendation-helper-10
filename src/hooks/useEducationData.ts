@@ -40,39 +40,46 @@ export const useEducationData = () => {
   const calculateLearningStreak = (progress: any[]): number => {
     if (progress.length === 0) return 0;
 
-    // Get unique days with activity, sorted by date
+    // Get unique days with completed activities, sorted by date
+    const completedProgress = progress.filter(p => p.status === 'completed' && p.completed_at);
+    
     const activityDates = [...new Set(
-      progress.map(p => new Date(p.last_accessed).toDateString())
-    )].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      completedProgress.map(p => {
+        const date = new Date(p.completed_at);
+        // Reset time to start of day for accurate date comparison
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+      })
+    )].sort((a, b) => b - a); // Sort descending (most recent first)
 
     if (activityDates.length === 0) return 0;
 
-    // Check if today has activity
-    const today = new Date().toDateString();
-    const hasActivityToday = activityDates.includes(today);
-    
-    // If no activity today, check if yesterday has activity
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
-    const hasActivityYesterday = activityDates.includes(yesterday);
+    // Check consecutive days starting from today or yesterday
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
 
-    // Start counting from today or yesterday if there's activity
     let streak = 0;
-    let currentDate = new Date();
-    
-    if (hasActivityToday) {
+    let currentCheckDate = todayStart;
+
+    // If there's activity today, start streak
+    if (activityDates.includes(todayStart)) {
       streak = 1;
-      currentDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // Start checking from yesterday
-    } else if (hasActivityYesterday) {
+      currentCheckDate = yesterdayStart;
+    } 
+    // If there's activity yesterday but not today, start from yesterday
+    else if (activityDates.includes(yesterdayStart)) {
       streak = 1;
-      currentDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // Start checking from day before yesterday
-    } else {
-      return 0; // No recent activity
+      currentCheckDate = yesterdayStart - 24 * 60 * 60 * 1000;
+    } 
+    // No recent activity
+    else {
+      return 0;
     }
 
     // Count consecutive days backwards
-    while (activityDates.includes(currentDate.toDateString())) {
+    while (activityDates.includes(currentCheckDate)) {
       streak++;
-      currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+      currentCheckDate -= 24 * 60 * 60 * 1000;
     }
 
     return streak;
@@ -107,10 +114,16 @@ export const useEducationData = () => {
       if (progressRes.error) throw progressRes.error;
       if (preferencesRes.error) throw preferencesRes.error;
 
-      // Set data with proper type casting
-      setLearningPaths((pathsRes.data || []) as any);
-      setAssessments((assessmentsRes.data || []) as any);
-      setSimulations((simulationsRes.data || []) as any);
+      // Merge database data with static data for comprehensive coverage
+      const dbPaths = (pathsRes.data || []) as any;
+      const dbAssessments = (assessmentsRes.data || []) as any;
+      const dbSimulations = (simulationsRes.data || []) as any;
+      
+      // Use static data as fallback for demonstration and testing
+      // In production, this would be database-driven
+      setLearningPaths(dbPaths.length > 0 ? dbPaths : learningPathsData as any);
+      setAssessments(dbAssessments.length > 0 ? dbAssessments : assessmentsData as any);
+      setSimulations(dbSimulations.length > 0 ? dbSimulations : simulationsData as any);
       setUserProgress((progressRes.data || []) as any);
       setUserPreferences((preferencesRes.data || null) as any);
 
