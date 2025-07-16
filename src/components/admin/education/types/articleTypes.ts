@@ -24,6 +24,9 @@ export interface Article {
   relatedTopics?: string[];
   quiz?: any[];
   references?: string[];
+  learningObjectives?: string[];
+  keyTakeaways?: string[];
+  clinicalApplications?: string[];
 }
 
 // Export ArticleType as an alias to Article for backward compatibility

@@ -14,6 +14,24 @@ export const fundamentalsArticles: Article[] = [
     lastUpdated: 'March 23, 2025',
     author: 'Dr. Maria Chen, MD, PhD',
     authorCredentials: 'Infectious Disease Specialist',
+    learningObjectives: [
+      'Understand the core principles of antibiotic selection',
+      'Differentiate between narrow-spectrum and broad-spectrum antibiotics',
+      'Apply stewardship principles in clinical practice',
+      'Evaluate factors influencing antibiotic choice'
+    ],
+    keyTakeaways: [
+      'Use narrow-spectrum antibiotics whenever clinically appropriate',
+      'Consider patient factors and local resistance patterns',
+      'Empiric therapy should target most likely pathogens',
+      'Antimicrobial stewardship reduces resistance development'
+    ],
+    clinicalApplications: [
+      'Review culture results to de-escalate therapy when possible',
+      'Consider patient allergies and comorbidities in selection',
+      'Monitor for therapeutic response and adjust as needed',
+      'Educate patients on proper antibiotic use and adherence'
+    ],
     content: `
       <h3>Principles of Antibiotic Therapy</h3>
       <p class="text-sm text-gray-500 mb-4">Last reviewed and updated: March 23, 2025</p>

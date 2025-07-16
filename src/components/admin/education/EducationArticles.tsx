@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArticleCard } from './ArticleCard';
 import { ArticleDetail } from './ArticleDetail';
+import { ModernArticleViewer } from './ModernArticleViewer';
 import { Article, ArticleType } from './types/articleTypes';
 import { categories } from './data/categories';
 import { articles } from './data/index';
@@ -72,13 +73,10 @@ export const EducationArticles: React.FC<EducationArticlesProps> = ({ searchTerm
   };
   
   if (selectedArticle) {
-    const relatedArticles = getRelatedArticles(selectedArticle);
     return (
-      <ArticleDetail 
-        article={selectedArticle} 
+      <ModernArticleViewer
+        article={selectedArticle}
         onBack={handleBackToArticles}
-        relatedArticles={relatedArticles}
-        onSelectRelated={handleArticleSelect}
       />
     );
   }
