@@ -45,6 +45,7 @@ export const SimulationInterface: React.FC<SimulationInterfaceProps> = ({
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [detailedResults, setDetailedResults] = useState<any>(null);
   const [patientVitals, setPatientVitals] = useState({
     heartRate: 85,
     bloodPressure: '120/80',
@@ -138,6 +139,7 @@ export const SimulationInterface: React.FC<SimulationInterfaceProps> = ({
   const calculateScore = (finalDecisions: any[]) => {
     let totalPoints = 0;
     let maxPoints = 0;
+    let optimalDecisions = 0;
 
     finalDecisions.forEach((decision, index) => {
       const decisionPoint = decisionPoints[index];
@@ -148,6 +150,12 @@ export const SimulationInterface: React.FC<SimulationInterfaceProps> = ({
       } else if (selectedOption?.score) {
         totalPoints += selectedOption.score;
       }
+
+      // Check if this was the optimal choice
+      const selectedOptionId = selectedOption?.id || decision.selectedOption.toString();
+      if (decisionPoint?.optimal_choice === selectedOptionId) {
+        optimalDecisions++;
+      }
       
       // Calculate max possible points for this decision
       const maxForThisDecision = Math.max(
@@ -156,7 +164,43 @@ export const SimulationInterface: React.FC<SimulationInterfaceProps> = ({
       maxPoints += maxForThisDecision;
     });
 
-    return maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    const percentageScore = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+    const decisionAccuracy = finalDecisions.length > 0 ? Math.round((optimalDecisions / finalDecisions.length) * 100) : 0;
+    
+    // Store detailed results for feedback
+    setDetailedResults({
+      earnedPoints: totalPoints,
+      maxPoints,
+      percentageScore,
+      optimalDecisions,
+      totalDecisions: finalDecisions.length,
+      decisionAccuracy,
+      passed: percentageScore >= (simulation.scoring_criteria?.passing_score || 70),
+      timeElapsed: Math.floor(timeElapsed / 60),
+      feedback: generateDetailedFeedback(finalDecisions)
+    });
+
+    return percentageScore;
+  };
+
+  const generateDetailedFeedback = (finalDecisions: any[]) => {
+    const feedback: string[] = [];
+    
+    finalDecisions.forEach((decision, index) => {
+      const decisionPoint = decisionPoints[index];
+      const selectedOption = decisionPoint?.options[decision.selectedOption];
+      const selectedOptionId = selectedOption?.id || decision.selectedOption.toString();
+      const isOptimal = decisionPoint?.optimal_choice === selectedOptionId;
+      
+      if (isOptimal) {
+        feedback.push(`✓ Decision ${index + 1}: Excellent choice - ${selectedOption?.consequences?.outcome || 'Well done!'}`);
+      } else {
+        const optimalOption = decisionPoint?.options.find(opt => opt.id === decisionPoint.optimal_choice);
+        feedback.push(`⚠ Decision ${index + 1}: ${selectedOption?.consequences?.outcome || 'Consider alternative approaches'}. ${optimalOption ? `The optimal choice would have been: "${optimalOption.text}"` : ''}`);
+      }
+    });
+    
+    return feedback;
   };
 
   const handleComplete = async (finalDecisions: any[]) => {
@@ -315,20 +359,42 @@ export const SimulationInterface: React.FC<SimulationInterfaceProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="text-center p-4 border rounded-lg">
                 <p className="text-3xl font-bold text-primary">{score}%</p>
                 <p className="text-sm text-muted-foreground">Performance Score</p>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <p className="text-3xl font-bold">{decisions.length}/{decisionPoints.length}</p>
-                <p className="text-sm text-muted-foreground">Decisions Made</p>
+                <p className="text-3xl font-bold">{detailedResults?.optimalDecisions || 0}/{detailedResults?.totalDecisions || 0}</p>
+                <p className="text-sm text-muted-foreground">Optimal Decisions</p>
+              </div>
+              <div className="text-center p-4 border rounded-lg">
+                <p className="text-3xl font-bold">{detailedResults?.earnedPoints || 0}/{detailedResults?.maxPoints || 0}</p>
+                <p className="text-sm text-muted-foreground">Points Earned</p>
               </div>
               <div className="text-center p-4 border rounded-lg">
                 <p className="text-3xl font-bold">{formatTime(timeElapsed)}</p>
                 <p className="text-sm text-muted-foreground">Time Taken</p>
               </div>
             </div>
+
+            {/* Detailed Feedback */}
+            {detailedResults?.feedback && (
+              <div className="space-y-4">
+                <h3 className="font-medium">Detailed Feedback:</h3>
+                <div className="space-y-2">
+                  {detailedResults.feedback.map((feedback: string, index: number) => (
+                    <div key={index} className={`p-3 rounded-lg border text-sm ${
+                      feedback.startsWith('✓') 
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+                        : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200'
+                    }`}>
+                      {feedback}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="space-y-4">
               <h3 className="font-medium">Decision Summary:</h3>

@@ -39,6 +39,7 @@ export const AssessmentInterface: React.FC<AssessmentInterfaceProps> = ({
   const [isCompleted, setIsCompleted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [detailedResults, setDetailedResults] = useState<any>(null);
 
   const questions = Array.isArray(assessment.questions) ? assessment.questions : [];
   const currentQuestion = questions[currentQuestionIndex];
@@ -95,16 +96,46 @@ export const AssessmentInterface: React.FC<AssessmentInterfaceProps> = ({
   };
 
   const calculateScore = () => {
-    let correct = 0;
-    
-    responses.forEach((response, index) => {
-      const question = questions[index];
-      if (response !== null && question.correct_answer === response) {
-        correct++;
+    let totalScore = 0;
+    let totalPoints = 0;
+    let correctAnswers = 0;
+    let categoryScores: Record<string, {correct: number, total: number}> = {};
+
+    questions.forEach((question, index) => {
+      const userAnswer = responses[index];
+      const questionPoints = question.points || 1;
+      totalPoints += questionPoints;
+      
+      // Initialize category tracking
+      const category = question.category || 'general';
+      if (!categoryScores[category]) {
+        categoryScores[category] = { correct: 0, total: 0 };
+      }
+      categoryScores[category].total++;
+
+      if (userAnswer !== null && userAnswer !== undefined) {
+        if (userAnswer === question.correct_answer) {
+          totalScore += questionPoints;
+          correctAnswers++;
+          categoryScores[category].correct++;
+        }
       }
     });
+
+    const percentageScore = totalPoints > 0 ? Math.round((totalScore / totalPoints) * 100) : 0;
     
-    return Math.round((correct / questions.length) * 100);
+    // Store detailed results for feedback
+    setDetailedResults({
+      totalScore,
+      totalPoints,
+      percentageScore,
+      correctAnswers,
+      totalQuestions: questions.length,
+      categoryScores,
+      passed: percentageScore >= (assessment.passing_score || 70)
+    });
+
+    return percentageScore;
   };
 
   const handleSubmit = async () => {
@@ -266,14 +297,61 @@ export const AssessmentInterface: React.FC<AssessmentInterfaceProps> = ({
                 <p className="text-sm text-muted-foreground">Your Score</p>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <p className="text-3xl font-bold">{answeredQuestions}/{questions.length}</p>
-                <p className="text-sm text-muted-foreground">Questions Answered</p>
-              </div>
-              <div className="text-center p-4 border rounded-lg">
-                <p className="text-3xl font-bold">{responses.filter((r, i) => r === questions[i]?.correct_answer).length}</p>
+                <p className="text-3xl font-bold">{detailedResults?.correctAnswers || 0}/{questions.length}</p>
                 <p className="text-sm text-muted-foreground">Correct Answers</p>
               </div>
+              <div className="text-center p-4 border rounded-lg">
+                <p className="text-3xl font-bold">{detailedResults?.totalScore || 0}/{detailedResults?.totalPoints || questions.length}</p>
+                <p className="text-sm text-muted-foreground">Points Earned</p>
+              </div>
             </div>
+
+            {/* Category Performance */}
+            {detailedResults?.categoryScores && Object.keys(detailedResults.categoryScores).length > 1 && (
+              <div>
+                <h3 className="font-medium mb-3">Performance by Category</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {Object.entries(detailedResults.categoryScores).map(([category, scores]: [string, any]) => (
+                    <div key={category} className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium capitalize">{category}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {scores.correct}/{scores.total}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={scores.total > 0 ? (scores.correct / scores.total) * 100 : 0} 
+                        className="h-2"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recommendations */}
+            {!passed && (
+              <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <h3 className="font-medium text-amber-800 dark:text-amber-200 mb-2">Improvement Areas</h3>
+                <div className="space-y-2 text-sm text-amber-700 dark:text-amber-300">
+                  {detailedResults?.categoryScores && Object.entries(detailedResults.categoryScores)
+                    .filter(([_, scores]: [string, any]) => scores.total > 0 && (scores.correct / scores.total) < 0.7)
+                    .map(([category]: [string, any]) => (
+                      <div key={category} className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                        <span>Review {category} concepts for better understanding</span>
+                      </div>
+                    ))
+                  }
+                  {(!detailedResults?.categoryScores || Object.keys(detailedResults.categoryScores).length <= 1) && (
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                      <span>Review the study materials and try again</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
             <div className="flex gap-4 justify-center">
               <Button onClick={onBack} variant="outline">
@@ -286,6 +364,7 @@ export const AssessmentInterface: React.FC<AssessmentInterfaceProps> = ({
                   setShowResults(false);
                   setCurrentQuestionIndex(0);
                   setResponses([]);
+                  setDetailedResults(null);
                   setTimeRemaining(assessment.time_limit_minutes ? assessment.time_limit_minutes * 60 : null);
                 }}>
                   Try Again

@@ -37,6 +37,47 @@ export const useEducationData = () => {
     }
   }, [user]);
 
+  const calculateLearningStreak = (progress: any[]): number => {
+    if (progress.length === 0) return 0;
+
+    // Get unique days with activity, sorted by date
+    const activityDates = [...new Set(
+      progress.map(p => new Date(p.last_accessed).toDateString())
+    )].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+    if (activityDates.length === 0) return 0;
+
+    // Check if today has activity
+    const today = new Date().toDateString();
+    const hasActivityToday = activityDates.includes(today);
+    
+    // If no activity today, check if yesterday has activity
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
+    const hasActivityYesterday = activityDates.includes(yesterday);
+
+    // Start counting from today or yesterday if there's activity
+    let streak = 0;
+    let currentDate = new Date();
+    
+    if (hasActivityToday) {
+      streak = 1;
+      currentDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // Start checking from yesterday
+    } else if (hasActivityYesterday) {
+      streak = 1;
+      currentDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000); // Start checking from day before yesterday
+    } else {
+      return 0; // No recent activity
+    }
+
+    // Count consecutive days backwards
+    while (activityDates.includes(currentDate.toDateString())) {
+      streak++;
+      currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+    }
+
+    return streak;
+  };
+
   const fetchEducationData = async () => {
     if (!user) return;
     
@@ -92,11 +133,8 @@ export const useEducationData = () => {
       progress.filter(p => p.score !== null).reduce((sum, p) => sum + (p.score || 0), 0) / 
       progress.filter(p => p.score !== null).length : 0;
 
-    // Calculate streak (simplified - days with activity)
-    const recentDays = progress.filter(p => {
-      const daysDiff = Math.floor((Date.now() - new Date(p.last_accessed).getTime()) / (1000 * 60 * 60 * 24));
-      return daysDiff <= 7;
-    }).length;
+    // Calculate streak - consecutive days with learning activity
+    const streakDays = calculateLearningStreak(progress);
 
     // Category progress
     const categoryProgress: Record<string, number> = {};
@@ -126,7 +164,7 @@ export const useEducationData = () => {
       totalTime: totalTimeMinutes,
       completedItems,
       averageScore,
-      streakDays: recentDays,
+      streakDays: streakDays,
       categoryProgress,
       recentActivity
     };

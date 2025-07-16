@@ -90,12 +90,108 @@ export const simulationsData = [
           }
         ],
         optimal_choice: 'option3'
+      },
+      {
+        id: 'monitoring_response',
+        situation: 'Day 2: Patient shows improvement with decreased fever and improved oxygen saturation',
+        question: 'How should you monitor the patient\'s response to therapy?',
+        options: [
+          {
+            id: 'option1',
+            text: 'Continue current therapy without any monitoring',
+            consequences: {
+              score: 3,
+              outcome: 'Poor practice - monitoring is essential for treatment optimization'
+            }
+          },
+          {
+            id: 'option2',
+            text: 'Monitor clinical response, vital signs, and consider biomarkers like CRP',
+            consequences: {
+              score: 15,
+              outcome: 'Excellent approach - comprehensive monitoring for treatment response'
+            }
+          },
+          {
+            id: 'option3',
+            text: 'Switch to oral antibiotics immediately',
+            consequences: {
+              score: 8,
+              outcome: 'May be premature - ensure stability before transitioning to oral therapy'
+            }
+          }
+        ],
+        optimal_choice: 'option2'
+      },
+      {
+        id: 'duration_decision',
+        situation: 'Day 5: Patient is clinically stable, afebrile for 48 hours, and ready for discharge',
+        question: 'What is the appropriate duration of antibiotic therapy?',
+        options: [
+          {
+            id: 'option1',
+            text: 'Complete 10-14 days of therapy',
+            consequences: {
+              score: 5,
+              outcome: 'Traditional approach but may be longer than necessary for uncomplicated CAP'
+            }
+          },
+          {
+            id: 'option2',
+            text: 'Complete 5-7 days total if clinically stable',
+            consequences: {
+              score: 15,
+              outcome: 'Evidence-based approach - shorter courses are effective for uncomplicated CAP'
+            }
+          },
+          {
+            id: 'option3',
+            text: 'Continue until chest X-ray clears completely',
+            consequences: {
+              score: 3,
+              outcome: 'Radiographic changes lag behind clinical improvement; not necessary'
+            }
+          }
+        ],
+        optimal_choice: 'option2'
+      },
+      {
+        id: 'stewardship_reflection',
+        situation: 'Final decision point: Reflecting on the case management',
+        question: 'What stewardship principles were applied in this case?',
+        options: [
+          {
+            id: 'option1',
+            text: 'Used broadest spectrum antibiotic available',
+            consequences: {
+              score: 2,
+              outcome: 'Not optimal stewardship - should use targeted therapy when possible'
+            }
+          },
+          {
+            id: 'option2',
+            text: 'Right drug for pathogen, appropriate duration, allergy consideration',
+            consequences: {
+              score: 15,
+              outcome: 'Excellent stewardship - demonstrates optimal antimicrobial use principles'
+            }
+          },
+          {
+            id: 'option3',
+            text: 'Extended duration to ensure complete cure',
+            consequences: {
+              score: 5,
+              outcome: 'Overly conservative - evidence supports shorter durations for uncomplicated cases'
+            }
+          }
+        ],
+        optimal_choice: 'option2'
       }
     ],
     scoring_criteria: {
-      total_points: 30,
-      passing_score: 24,
-      excellence_score: 28
+      total_points: 75,
+      passing_score: 60,
+      excellence_score: 70
     },
     learning_objectives: [
       'Apply stewardship principles in clinical scenarios',
@@ -103,7 +199,7 @@ export const simulationsData = [
       'Balance diagnostic workup with timely treatment'
     ],
     prerequisites: [],
-    estimated_duration_minutes: 20,
+    estimated_duration_minutes: 35,
     tags: ['case-study', 'pneumonia', 'allergy'],
     is_active: true,
     created_at: '2025-07-16T00:00:00Z',

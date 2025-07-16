@@ -38,6 +38,126 @@ export const assessmentsData = [
         explanation: 'For community-acquired pneumonia in healthy adults, narrow-spectrum therapy targeting likely pathogens is preferred.',
         points: 5,
         category: 'clinical'
+      },
+      {
+        id: 'q3',
+        type: 'multiple_choice',
+        question: 'Which mechanism is responsible for penicillin resistance in Streptococcus pneumoniae?',
+        options: [
+          'Beta-lactamase production',
+          'Altered penicillin-binding proteins (PBPs)',
+          'Efflux pumps',
+          'Target modification'
+        ],
+        correct_answer: 1,
+        explanation: 'S. pneumoniae develops penicillin resistance primarily through alterations in penicillin-binding proteins rather than beta-lactamase production.',
+        points: 5,
+        category: 'resistance'
+      },
+      {
+        id: 'q4',
+        type: 'multiple_choice',
+        question: 'What is the recommended duration for most uncomplicated urinary tract infections in women?',
+        options: [
+          '1-3 days',
+          '3-5 days',
+          '7-10 days',
+          '10-14 days'
+        ],
+        correct_answer: 1,
+        explanation: 'Short-course therapy (3-5 days) is as effective as longer courses for uncomplicated UTIs and reduces the risk of adverse effects.',
+        points: 5,
+        category: 'clinical'
+      },
+      {
+        id: 'q5',
+        type: 'multiple_choice',
+        question: 'Which of the following is a key principle of antimicrobial stewardship?',
+        options: [
+          'Use the broadest spectrum antibiotic available',
+          'Always use combination therapy',
+          'Right drug, right dose, right duration',
+          'Continue antibiotics until all symptoms resolve'
+        ],
+        correct_answer: 2,
+        explanation: 'The "right drug, right dose, right duration" principle emphasizes optimizing all aspects of antibiotic therapy.',
+        points: 5,
+        category: 'stewardship'
+      },
+      {
+        id: 'q6',
+        type: 'multiple_choice',
+        question: 'What is the most concerning consequence of inappropriate antibiotic use?',
+        options: [
+          'Increased healthcare costs',
+          'Antibiotic resistance development',
+          'Allergic reactions',
+          'Drug interactions'
+        ],
+        correct_answer: 1,
+        explanation: 'While all options are concerns, antibiotic resistance poses the greatest long-term threat to public health.',
+        points: 5,
+        category: 'resistance'
+      },
+      {
+        id: 'q7',
+        type: 'multiple_choice',
+        question: 'Which antibiotic class is most associated with C. difficile infection risk?',
+        options: [
+          'Macrolides',
+          'Fluoroquinolones',
+          'Tetracyclines',
+          'Aminoglycosides'
+        ],
+        correct_answer: 1,
+        explanation: 'Fluoroquinolones, along with clindamycin and cephalosporins, are high-risk antibiotics for C. difficile infection.',
+        points: 5,
+        category: 'adverse-effects'
+      },
+      {
+        id: 'q8',
+        type: 'multiple_choice',
+        question: 'What is the primary indication for adding anaerobic coverage in pneumonia?',
+        options: [
+          'All elderly patients',
+          'Aspiration risk or poor dental hygiene',
+          'Community-acquired pneumonia',
+          'All hospitalized patients'
+        ],
+        correct_answer: 1,
+        explanation: 'Anaerobic coverage should be considered in cases with aspiration risk or poor dental hygiene due to increased risk of anaerobic pathogens.',
+        points: 5,
+        category: 'clinical'
+      },
+      {
+        id: 'q9',
+        type: 'multiple_choice',
+        question: 'Which laboratory value is most important when prescribing vancomycin?',
+        options: [
+          'Liver function tests',
+          'Serum creatinine',
+          'White blood cell count',
+          'Hemoglobin level'
+        ],
+        correct_answer: 1,
+        explanation: 'Serum creatinine is crucial for vancomycin dosing and monitoring due to its nephrotoxic potential and renal elimination.',
+        points: 5,
+        category: 'monitoring'
+      },
+      {
+        id: 'q10',
+        type: 'multiple_choice',
+        question: 'What is the recommended empirical therapy for severe community-acquired pneumonia requiring ICU admission?',
+        options: [
+          'Azithromycin alone',
+          'Ceftriaxone + azithromycin',
+          'Beta-lactam + macrolide or fluoroquinolone',
+          'Vancomycin + piperacillin-tazobactam'
+        ],
+        correct_answer: 2,
+        explanation: 'Severe CAP requires combination therapy with a beta-lactam plus either a macrolide or fluoroquinolone to cover both typical and atypical pathogens.',
+        points: 5,
+        category: 'clinical'
       }
     ],
     prerequisites: [],
