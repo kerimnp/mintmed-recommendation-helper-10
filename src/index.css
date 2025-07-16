@@ -121,7 +121,7 @@
 
 .ios-button {
   @apply rounded-xl bg-medical-primary text-white font-medium px-5 py-3
-    hover:bg-medical-primary-hover active:scale-95 transition-all duration-200;
+    hover:opacity-90 active:scale-95 transition-all duration-200;
 }
 
 .ios-button-secondary {
