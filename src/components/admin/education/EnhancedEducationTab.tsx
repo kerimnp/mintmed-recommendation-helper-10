@@ -20,9 +20,7 @@ import {
 import { useEducationData } from '@/hooks/useEducationData';
 import { ArticleLibrary } from './ArticleLibrary';
 import { AssessmentInterface } from './AssessmentInterface';
-import { SimulationInterface } from './SimulationInterface';
-import { LearningPathInterface } from './LearningPathInterface';
-import { LearningPathsComponent } from './LearningPathsComponent';
+
 
 interface EnhancedEducationTabProps {
   searchTerm?: string;
@@ -33,17 +31,15 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
     loading, 
     error,
     articles, 
-    learningPaths, 
-    assessments, 
-    simulations, 
+    assessments,
     analytics,
     userProgress,
     userPreferences 
   } = useEducationData();
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedPath, setSelectedPath] = useState<any>(null);
+  
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
-  const [selectedSimulation, setSelectedSimulation] = useState<any>(null);
+  
 
   if (loading) {
     return (
@@ -64,9 +60,6 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
     );
   }
 
-  if (selectedPath) {
-    return <LearningPathInterface learningPath={selectedPath} onBack={() => setSelectedPath(null)} />;
-  }
 
   if (selectedAssessment) {
     return <AssessmentInterface 
@@ -79,16 +72,6 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
     />;
   }
 
-  if (selectedSimulation) {
-    return <SimulationInterface 
-      simulation={selectedSimulation} 
-      onBack={() => setSelectedSimulation(null)}
-      onComplete={(score, decisions) => {
-        setSelectedSimulation(null);
-        // Handle completion if needed
-      }}
-    />;
-  }
 
   return (
     <div className="space-y-6">
@@ -144,12 +127,10 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="articles">Articles</TabsTrigger>
-          <TabsTrigger value="paths">Learning Paths</TabsTrigger>
+          <TabsTrigger value="articles">Clinical Articles</TabsTrigger>
           <TabsTrigger value="assessments">Assessments</TabsTrigger>
-          <TabsTrigger value="simulations">Simulations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -191,48 +172,41 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
               </CardContent>
             </Card>
 
-            {/* Learning Paths */}
+            {/* Recent Assessments */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Recommended Learning Paths
+                  <Brain className="h-5 w-5" />
+                  Knowledge Assessments
                 </CardTitle>
                 <CardDescription>
-                  Structured learning based on your interests
+                  Test your clinical knowledge and skills
                 </CardDescription>
               </CardHeader>
-               <CardContent className="space-y-4">
-                 {learningPaths && learningPaths.length > 0 ? learningPaths.slice(0, 3).map((path) => {
-                  const pathProgress = userProgress.find(p => p.learning_path_id === path.id);
+              <CardContent className="space-y-4">
+                {assessments.slice(0, 3).map((assessment) => {
+                  const progress = userProgress.find(p => p.assessment_id === assessment.id);
                   return (
                     <div 
-                      key={path.id}
+                      key={assessment.id}
                       className="p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
-                      onClick={() => setSelectedPath(path)}
+                      onClick={() => setActiveTab('assessments')}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium">{path.title}</h4>
-                        <Badge variant={path.difficulty_level === 'beginner' ? 'default' : 'secondary'}>
-                          {path.difficulty_level}
+                        <h4 className="font-medium line-clamp-1">{assessment.title}</h4>
+                        <Badge variant={assessment.difficulty_level === 'beginner' ? 'default' : 'secondary'}>
+                          {assessment.difficulty_level}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">{path.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{assessment.description}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">
-                          {path.estimated_duration_hours}h
-                        </span>
-                        <Progress value={pathProgress?.completion_percentage || 0} className="w-20" />
+                        <span className="text-xs text-muted-foreground">{assessment.category}</span>
+                        <Progress value={progress?.completion_percentage || 0} className="w-20" />
                       </div>
-                     </div>
-                   );
-                 }) : (
-                   <div className="text-center py-8">
-                     <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                     <p className="text-muted-foreground">No learning paths available yet.</p>
-                   </div>
-                 )}
-               </CardContent>
+                    </div>
+                  );
+                })}
+              </CardContent>
             </Card>
           </div>
 
@@ -258,8 +232,6 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                             {activity.type === 'article' && <BookOpen className="h-4 w-4 text-primary" />}
                             {activity.type === 'assessment' && <Brain className="h-4 w-4 text-primary" />}
-                            {activity.type === 'simulation' && <Gamepad2 className="h-4 w-4 text-primary" />}
-                            {activity.type === 'path' && <GraduationCap className="h-4 w-4 text-primary" />}
                           </div>
                           <div>
                             <p className="font-medium text-sm">{activity.title}</p>
@@ -314,18 +286,10 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setActiveTab('simulations')}
+                  onClick={() => setActiveTab('articles')}
                 >
-                  <Gamepad2 className="h-4 w-4 mr-2" />
-                  Try Simulation
-                </Button>
-                <Button 
-                  className="w-full justify-start" 
-                  variant="outline"
-                  onClick={() => setActiveTab('paths')}
-                >
-                  <GraduationCap className="h-4 w-4 mr-2" />
-                  Learning Paths
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Clinical Guidelines
                 </Button>
               </CardContent>
             </Card>
@@ -336,22 +300,10 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
           <ArticleLibrary searchTerm={searchTerm} />
         </TabsContent>
 
-        <TabsContent value="paths">
-          <LearningPathsComponent />
-        </TabsContent>
-
         <TabsContent value="assessments">
           <AssessmentsGrid 
             assessments={assessments} 
             onAssessmentSelect={setSelectedAssessment}
-            searchTerm={searchTerm}
-          />
-        </TabsContent>
-
-        <TabsContent value="simulations">
-          <SimulationsGrid 
-            simulations={simulations} 
-            onSimulationSelect={setSelectedSimulation}
             searchTerm={searchTerm}
           />
         </TabsContent>
@@ -360,58 +312,6 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
   );
 };
 
-// Component implementations for grids and details
-const LearningPathsGrid: React.FC<{ paths: any[], onPathSelect: (path: any) => void, searchTerm?: string }> = ({ paths, onPathSelect, searchTerm }) => {
-  const filteredPaths = paths.filter(path => 
-    !searchTerm || 
-    path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    path.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (filteredPaths.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">No learning paths found</h3>
-        <p className="text-muted-foreground">
-          {searchTerm ? 'Try adjusting your search terms.' : 'No learning paths are available yet.'}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredPaths.map((path) => (
-        <Card key={path.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onPathSelect(path)}>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg">{path.title}</CardTitle>
-              <Badge variant={path.difficulty_level === 'beginner' ? 'default' : 'secondary'}>
-                {path.difficulty_level}
-              </Badge>
-            </div>
-            <CardDescription>{path.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between text-sm">
-                <span>Duration: {path.estimated_duration_hours}h</span>
-                <span className="text-primary">0% Complete</span>
-              </div>
-              <Progress value={0} />
-              <div className="flex flex-wrap gap-1">
-                {Array.isArray(path.tags) && path.tags.slice(0, 3).map((tag: string) => (
-                  <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-};
 
 const AssessmentsGrid: React.FC<{ assessments: any[], onAssessmentSelect: (assessment: any) => void, searchTerm?: string }> = ({ assessments, onAssessmentSelect, searchTerm }) => {
   const filteredAssessments = assessments.filter(assessment => 
@@ -458,53 +358,6 @@ const AssessmentsGrid: React.FC<{ assessments: any[], onAssessmentSelect: (asses
   );
 };
 
-const SimulationsGrid: React.FC<{ simulations: any[], onSimulationSelect: (simulation: any) => void, searchTerm?: string }> = ({ simulations, onSimulationSelect, searchTerm }) => {
-  const filteredSimulations = simulations.filter(simulation => 
-    !searchTerm || 
-    simulation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    simulation.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (filteredSimulations.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <Gamepad2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">No simulations found</h3>
-        <p className="text-muted-foreground">
-          {searchTerm ? 'Try adjusting your search terms.' : 'No simulations are available yet.'}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredSimulations.map((simulation) => (
-        <Card key={simulation.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onSimulationSelect(simulation)}>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg">{simulation.title}</CardTitle>
-              <PlayCircle className="h-5 w-5 text-primary" />
-            </div>
-            <CardDescription>{simulation.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between text-sm">
-                <Badge variant="secondary">{simulation.simulation_type}</Badge>
-                <span>{simulation.estimated_duration_minutes}min</span>
-              </div>
-              <Button className="w-full" variant="outline">
-                <PlayCircle className="h-4 w-4 mr-2" />
-                Start Simulation
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-};
 
 // Detail view components
 const LearningPathDetail: React.FC<{ path: any, onBack: () => void }> = ({ path, onBack }) => (

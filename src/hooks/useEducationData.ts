@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { allArticles } from '@/components/admin/education/data/allArticles';
-import { learningPathsData } from '@/components/admin/education/data/learningPathsData';
+import { expandedArticles } from '@/components/admin/education/data/expandedArticles';
+
 import { assessmentsData } from '@/components/admin/education/data/assessmentsData';
-import { simulationsData } from '@/components/admin/education/data/simulationsData';
+
 import type { 
   LearningPath, 
   Assessment, 
@@ -21,12 +21,10 @@ export const useEducationData = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Static data
-  const [staticArticles] = useState<Article[]>(allArticles);
+  const [staticArticles] = useState<Article[]>(expandedArticles);
   
   // Database data
-  const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [simulations, setSimulations] = useState<Simulation[]>([]);
   const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
   const [userPreferences, setUserPreferences] = useState<UserEducationPreferences | null>(null);
   const [analytics, setAnalytics] = useState<EducationAnalytics | null>(null);
@@ -92,38 +90,28 @@ export const useEducationData = () => {
     setError(null);
     
     try {
-      // Fetch all education data in parallel
+      // Fetch education data in parallel
       const [
-        pathsRes,
         assessmentsRes,
-        simulationsRes,
         progressRes,
         preferencesRes
       ] = await Promise.all([
-        supabase.from('learning_paths').select('*').eq('is_active', true),
         supabase.from('assessments').select('*').eq('is_active', true),
-        supabase.from('simulations').select('*').eq('is_active', true),
         supabase.from('user_learning_progress').select('*').eq('user_id', user.id),
         supabase.from('user_education_preferences').select('*').eq('user_id', user.id).maybeSingle()
       ]);
 
       // Handle errors
-      if (pathsRes.error) throw pathsRes.error;
       if (assessmentsRes.error) throw assessmentsRes.error;
-      if (simulationsRes.error) throw simulationsRes.error;
       if (progressRes.error) throw progressRes.error;
       if (preferencesRes.error) throw preferencesRes.error;
 
       // Merge database data with static data for comprehensive coverage
-      const dbPaths = (pathsRes.data || []) as any;
       const dbAssessments = (assessmentsRes.data || []) as any;
-      const dbSimulations = (simulationsRes.data || []) as any;
       
       // Use static data as fallback for demonstration and testing
       // In production, this would be database-driven
-      setLearningPaths(dbPaths.length > 0 ? dbPaths : learningPathsData as any);
       setAssessments(dbAssessments.length > 0 ? dbAssessments : assessmentsData as any);
-      setSimulations(dbSimulations.length > 0 ? dbSimulations : simulationsData as any);
       setUserProgress((progressRes.data || []) as any);
       setUserPreferences((preferencesRes.data || null) as any);
 
@@ -167,7 +155,7 @@ export const useEducationData = () => {
       .slice(0, 10)
       .map(p => ({
         type: p.progress_type,
-        title: getItemTitle(p, staticArticles, learningPaths, assessments, simulations),
+        title: getItemTitle(p, staticArticles, assessments),
         timestamp: p.last_accessed,
         score: p.score,
         status: p.status
@@ -186,21 +174,13 @@ export const useEducationData = () => {
   const getItemTitle = (
     progress: any, 
     articles: Article[], 
-    paths: any[], 
-    assessments: any[], 
-    simulations: any[]
+    assessments: any[]
   ): string => {
     if (progress.article_id) {
       return articles.find(a => a.id === progress.article_id)?.title || 'Unknown Article';
     }
-    if (progress.learning_path_id) {
-      return paths.find(p => p.id === progress.learning_path_id)?.title || 'Unknown Path';
-    }
     if (progress.assessment_id) {
       return assessments.find(a => a.id === progress.assessment_id)?.title || 'Unknown Assessment';
-    }
-    if (progress.simulation_id) {
-      return simulations.find(s => s.id === progress.simulation_id)?.title || 'Unknown Simulation';
     }
     return 'Unknown Item';
   };
@@ -252,9 +232,6 @@ export const useEducationData = () => {
     return userProgress.find(p => p.article_id === articleId);
   };
 
-  const getPathProgress = (pathId: string): any => {
-    return userProgress.find(p => p.learning_path_id === pathId);
-  };
 
   return {
     // Loading states
@@ -265,9 +242,7 @@ export const useEducationData = () => {
     articles: staticArticles,
     
     // Database data
-    learningPaths,
     assessments,
-    simulations,
     userProgress,
     userPreferences,
     analytics,
@@ -278,7 +253,6 @@ export const useEducationData = () => {
     refetch: fetchEducationData,
     
     // Helpers
-    getArticleProgress,
-    getPathProgress
+    getArticleProgress
   };
 };
