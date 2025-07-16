@@ -91,7 +91,9 @@ export const ArticleLibrary: React.FC<ArticleLibraryProps> = ({ searchTerm: exte
     return cats.sort();
   }, [articles]);
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyColor = (difficulty: string | undefined) => {
+    if (!difficulty) return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+    
     switch (difficulty.toLowerCase()) {
       case 'beginner': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
@@ -209,7 +211,7 @@ export const ArticleLibrary: React.FC<ArticleLibraryProps> = ({ searchTerm: exte
                 {/* Badges */}
                 <div className="flex flex-wrap gap-2">
                   <Badge className={getDifficultyColor(article.difficulty)}>
-                    {article.difficulty}
+                    {article.difficulty || 'Not specified'}
                   </Badge>
                   <Badge variant="outline">
                     {categoryLabels[article.category as ArticleCategory] || article.category}

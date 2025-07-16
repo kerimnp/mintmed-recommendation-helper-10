@@ -9,6 +9,7 @@ export const fundamentalsArticles: Article[] = [
     description: 'Foundational knowledge for effective antimicrobial prescribing',
     icon: BookOpen,
     category: 'fundamentals',
+    difficulty: 'beginner',
     readTime: '15 min',
     lastUpdated: 'March 23, 2025',
     author: 'Dr. Maria Chen, MD, PhD',

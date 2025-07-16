@@ -184,8 +184,8 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
                   Structured learning based on your interests
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {learningPaths.slice(0, 3).map((path) => {
+               <CardContent className="space-y-4">
+                 {learningPaths && learningPaths.length > 0 ? learningPaths.slice(0, 3).map((path) => {
                   const pathProgress = userProgress.find(p => p.learning_path_id === path.id);
                   return (
                     <div 
@@ -206,10 +206,15 @@ export const EnhancedEducationTab: React.FC<EnhancedEducationTabProps> = ({ sear
                         </span>
                         <Progress value={pathProgress?.completion_percentage || 0} className="w-20" />
                       </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
+                     </div>
+                   );
+                 }) : (
+                   <div className="text-center py-8">
+                     <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                     <p className="text-muted-foreground">No learning paths available yet.</p>
+                   </div>
+                 )}
+               </CardContent>
             </Card>
           </div>
 
@@ -349,6 +354,18 @@ const LearningPathsGrid: React.FC<{ paths: any[], onPathSelect: (path: any) => v
     path.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (filteredPaths.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">No learning paths found</h3>
+        <p className="text-muted-foreground">
+          {searchTerm ? 'Try adjusting your search terms.' : 'No learning paths are available yet.'}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredPaths.map((path) => (
@@ -389,6 +406,18 @@ const AssessmentsGrid: React.FC<{ assessments: any[], onAssessmentSelect: (asses
     assessment.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (filteredAssessments.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">No assessments found</h3>
+        <p className="text-muted-foreground">
+          {searchTerm ? 'Try adjusting your search terms.' : 'No assessments are available yet.'}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredAssessments.map((assessment) => (
@@ -421,6 +450,18 @@ const SimulationsGrid: React.FC<{ simulations: any[], onSimulationSelect: (simul
     simulation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     simulation.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (filteredSimulations.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Gamepad2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-medium mb-2">No simulations found</h3>
+        <p className="text-muted-foreground">
+          {searchTerm ? 'Try adjusting your search terms.' : 'No simulations are available yet.'}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
