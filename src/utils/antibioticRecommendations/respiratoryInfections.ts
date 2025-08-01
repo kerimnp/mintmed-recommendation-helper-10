@@ -20,10 +20,10 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
 
   const isPediatric = isPediatricPatient(Number(data.age));
 
-  // Community-acquired vs hospital-acquired logic
-  const isHospitalAcquired = data.duration && parseInt(data.duration) > 2;
+  // Use proper hospital-acquired flag from patient data
+  const isHospitalAcquired = data.isHospitalAcquired || false;
 
-  if (data.severity === "mild" && !isHospitalAcquired) {
+  if (data.severity === "mild") {
     if (!data.allergies.penicillin) {
       recommendation.primaryRecommendation = {
         name: "Amoxicillin",
@@ -45,27 +45,66 @@ export const generateRespiratoryRecommendation = (data: PatientData): Antibiotic
       };
       recommendation.reasoning = "Alternative for penicillin-allergic patients";
     }
-  } else if (data.severity === "moderate" || isHospitalAcquired) {
-    if (!data.allergies.cephalosporin) {
-      recommendation.primaryRecommendation = {
-        name: "Ceftriaxone",
-        dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
-        frequency: "daily",
-        duration: "7-10 days",
-        route: "IV",
-        reason: "Treatment for moderate CAP or early HAP"
-      };
-      recommendation.reasoning = "Treatment for moderate CAP or early HAP";
-
-      if (!data.allergies.macrolide) {
-        recommendation.alternatives.push({
-          name: "Azithromycin",
-          dosage: isPediatric ? "10mg/kg daily" : "500mg daily",
+  } else if (data.severity === "moderate") {
+    if (isHospitalAcquired) {
+      // Hospital-acquired moderate pneumonia - use IV therapy
+      if (!data.allergies.cephalosporin) {
+        recommendation.primaryRecommendation = {
+          name: "Ceftriaxone",
+          dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
           frequency: "daily",
-          duration: "5 days",
+          duration: "7-10 days",
           route: "IV",
-          reason: "Added for atypical coverage"
-        });
+          reason: "Treatment for hospital-acquired pneumonia"
+        };
+        recommendation.reasoning = "IV therapy for hospital-acquired pneumonia with broader spectrum coverage";
+      }
+    } else {
+      // Community-acquired moderate pneumonia - prefer oral therapy when possible
+      if (!data.allergies.penicillin) {
+        recommendation.primaryRecommendation = {
+          name: "Amoxicillin-Clavulanate",
+          dosage: isPediatric ? "45mg/kg q12h" : "875mg",
+          frequency: "q12h",
+          duration: "7-10 days",
+          route: "oral",
+          reason: "Oral therapy for moderate community-acquired pneumonia"
+        };
+        recommendation.reasoning = "High-dose amoxicillin-clavulanate for moderate CAP with broader spectrum coverage";
+        
+        // Add macrolide for atypical coverage
+        if (!data.allergies.macrolide) {
+          recommendation.alternatives.push({
+            name: "Azithromycin",
+            dosage: isPediatric ? "10mg/kg on day 1, then 5mg/kg daily" : "500mg on day 1, then 250mg daily",
+            frequency: "daily",
+            duration: "5 days",
+            route: "oral",
+            reason: "Added for atypical pathogen coverage"
+          });
+        }
+      } else if (!data.allergies.cephalosporin) {
+        // IV option for moderate CAP if oral not suitable or patient requires hospitalization
+        recommendation.primaryRecommendation = {
+          name: "Ceftriaxone",
+          dosage: isPediatric ? "50-75mg/kg/day" : "1-2g daily",
+          frequency: "daily",
+          duration: "7-10 days",
+          route: "IV",
+          reason: "IV therapy for moderate CAP when oral therapy not suitable"
+        };
+        recommendation.reasoning = "IV ceftriaxone for moderate CAP in penicillin-allergic patients or when IV therapy indicated";
+      } else {
+        // Alternative for multiple allergies
+        recommendation.primaryRecommendation = {
+          name: "Levofloxacin",
+          dosage: isPediatric ? "8-10mg/kg q12h" : "750mg",
+          frequency: "daily",
+          duration: "5-7 days",
+          route: "oral",
+          reason: "Alternative for moderate CAP with multiple allergies"
+        };
+        recommendation.reasoning = "Respiratory fluoroquinolone for moderate CAP when beta-lactams contraindicated";
       }
     }
   } else if (data.severity === "severe") {
