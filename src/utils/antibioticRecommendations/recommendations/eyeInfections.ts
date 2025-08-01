@@ -1,4 +1,3 @@
-
 import { PatientData } from "../../types/patientTypes";
 import { EnhancedAntibioticRecommendation } from "../../types/recommendationTypes";
 
@@ -7,52 +6,24 @@ export const generateEyeRecommendation = (
   gfr: number, 
   isPediatric: boolean
 ): EnhancedAntibioticRecommendation => {
-  let recommendation: EnhancedAntibioticRecommendation = {
+  return {
     primaryRecommendation: {
-      name: "",
-      dosage: "",
-      frequency: "",
-      duration: "",
-      route: "",
-      reason: ""
+      name: data.severity === "severe" ? "Vancomycin + Ceftazidime (intravitreal)" : "Erythromycin ophthalmic ointment",
+      dosage: data.severity === "severe" ? "1mg/0.1mL + 2.25mg/0.1mL" : "0.5% ointment",
+      frequency: data.severity === "severe" ? "Single injection" : "q6h",
+      duration: data.severity === "severe" ? "Per ophthalmology" : "7 days",
+      route: data.severity === "severe" ? "Intravitreal" : "topical",
+      reason: data.severity === "severe" ? "Emergency treatment for endophthalmitis" : "Standard conjunctivitis therapy"
     },
-    reasoning: "",
+    reasoning: "Ophthalmic infection treatment based on severity",
     alternatives: [],
-    precautions: [],
+    precautions: data.severity === "severe" ? 
+      ["URGENT ophthalmology consultation required"] : 
+      ["Avoid contact lens use during treatment"],
     rationale: {
-      infectionType: "eye",
+      infectionType: "ophthalmic",
       severity: data.severity,
-      reasons: []
+      reasons: ["Appropriate for infection severity"]
     }
   };
-
-  if (data.severity === "mild") {
-    recommendation.primaryRecommendation = {
-      name: "Ciprofloxacin ophthalmic drops",
-      dosage: "1-2 drops",
-      frequency: "q2h while awake for 2 days, then q4h",
-      duration: "7 days",
-      route: "topical",
-      reason: "Topical treatment for bacterial conjunctivitis"
-    };
-    recommendation.reasoning = "First-line topical therapy for bacterial eye infections";
-  } else {
-    recommendation.primaryRecommendation = {
-      name: "Ceftriaxone",
-      dosage: isPediatric ? "50mg/kg/day" : "1-2g daily",
-      frequency: "daily",
-      duration: "10-14 days",
-      route: "IV",
-      reason: "Systemic therapy for severe eye infections"
-    };
-    recommendation.reasoning = "Systemic therapy for endophthalmitis or orbital cellulitis";
-  }
-
-  recommendation.precautions.push(
-    "Ophthalmology consultation for severe infections",
-    "Monitor for vision changes",
-    "Consider culture of purulent discharge"
-  );
-
-  return recommendation;
 };

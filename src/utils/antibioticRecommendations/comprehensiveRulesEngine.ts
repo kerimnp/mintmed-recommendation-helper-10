@@ -2,6 +2,10 @@
 import { PatientData } from "../types/patientTypes";
 import { EnhancedAntibioticRecommendation } from "../types/recommendationTypes";
 import { calculateCreatinineClearance } from "./renalAdjustments/creatinineClearance";
+import { calculateEnhancedSeverity } from "./core/severityAssessment";
+import { getAllergyMatrix } from "./core/allergyMatrix";
+import { analyzeResistancePatterns } from "./core/resistanceEngine";
+import { getComprehensiveSpecialPopulationAdjustments } from "./core/specialPopulations";
 import { generateRespiratoryRecommendation } from "./recommendations/respiratoryInfections";
 import { generateUTIRecommendation } from "./recommendations/utiInfections";
 import { generateSkinRecommendation } from "./recommendations/skinInfections";
